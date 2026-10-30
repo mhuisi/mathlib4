@@ -41,44 +41,46 @@ i.e. the function `fun x ↦ ∫ y, f (x * y) dμ` (bundled as a continuous map)
 def convolveFunRight : D(G, R) →ₗ[R] C(G, R) →ₗ[R] C(G, R) :=
   ((ContinuousMap.compCLM R R ⟨_, continuous_mul⟩).toLinearMap.lcomp _ _).comp contractSnd
 
-lemma convolveFunRight_apply (μ : D(G, R)) (f : C(G, R)) (x : G) :
-    μ.convolveFunRight f x = μ ⟨fun y ↦ f (x * y), by fun_prop⟩ := by
+lemma convolveFunRight_apply (μ : D(G, R)) (f : C(G, R)) (x : G)
+    : μ.convolveFunRight f x = μ ⟨fun y ↦ f (x * y), by fun_prop⟩ := by
   simp [convolveFunRight, ContinuousMap.compCLM_apply]
 
 @[simp]
-lemma convolveFunRight_dirac_apply (x : G) (f : C(G, R)) (y : G) :
-    convolveFunRight (dirac R x) f y = f (y * x) := by
+lemma convolveFunRight_dirac_apply (x : G) (f : C(G, R)) (y : G)
+    : convolveFunRight (dirac R x) f y = f (y * x) := by
   simp [convolveFunRight_apply]
 
 @[simp]
-lemma convolveFunRight_apply_one (μ : D(G, R)) (f : C(G, R)) :
-    convolveFunRight μ f 1 = μ f := by
+lemma convolveFunRight_apply_one (μ : D(G, R)) (f : C(G, R)) : convolveFunRight μ f 1 = μ f := by
   simp only [convolveFunRight_apply]
   congr with
   simp
 
-lemma convolveFunRight_eq_sum {ι : Type*} {s : Finset ι} (ν : D(G, R)) {f : C(G, R)}
-    {g h : ι → C(G, R)} (hf : ∀ x y, f (x * y) = ∑ i ∈ s, g i x * h i y) :
-    convolveFunRight ν f = ∑ i ∈ s, ν (h i) • g i := by
+lemma convolveFunRight_eq_sum
+    {ι : Type*} {s : Finset ι}
+    (ν : D(G, R))
+    {f : C(G, R)} {g h : ι → C(G, R)} (hf : ∀ x y, f (x * y) = ∑ i ∈ s, g i x * h i y)
+    : convolveFunRight ν f = ∑ i ∈ s, ν (h i) • g i := by
   ext x
-  rw [convolveFunRight_apply, show (⟨fun y ↦ f (x * y), _⟩ : C(G, R)) = ∑ i ∈ s, g i x • h i by
-    ext; simp [hf]]
+  rw [convolveFunRight_apply,
+    show (⟨fun y ↦ f (x * y), _⟩ : C(G, R)) = ∑ i ∈ s, g i x • h i by ext; simp [hf]]
   simp [mul_comm]
 
 /--
 We define `1 : D(G, R)` to be the Dirac measure at `1 : G` (since we are writing convolution as
 multiplication).
 -/
-instance : One D(G, R) where one := dirac R 1
+instance : One D(G, R) where
+  one := dirac R 1
 
 omit [ContinuousMul G] in
 lemma one_def : (1 : D(G, R)) = dirac R 1 := rfl
 
 omit [ContinuousMul G] in
-@[simp] lemma one_apply (f : C(G, R)) : (1 : D(G, R)) f = f 1 := by
-  simp [one_def]
+@[simp] lemma one_apply (f : C(G, R)) : (1 : D(G, R)) f = f 1 := by simp [one_def]
 
-@[simp] lemma convolveFunRight_one (f : C(G, R)) : convolveFunRight 1 f = f := by
+@[simp]
+lemma convolveFunRight_one (f : C(G, R)) : convolveFunRight 1 f = f := by
   ext
   simp [convolveFunRight_apply]
 
@@ -103,12 +105,12 @@ lemma mul_apply (μ ν : D(G, R)) (f : C(G, R)) : (μ * ν) f = μ (convolveFunR
   simp [mul_def, map_apply, prodMk'_apply, convolveFunRight]
 
 /-- Convolution of Dirac measures corresponds to addition in the group. -/
-lemma dirac_mul_dirac (x y : G) : dirac R x * dirac R y = dirac R (x * y) :=  by
+lemma dirac_mul_dirac (x y : G) : dirac R x * dirac R y = dirac R (x * y) := by
   ext f
   simp only [mul_apply, dirac_apply, convolveFunRight_apply, ContinuousMap.coe_mk]
 
-lemma convolveFunRight_mul (μ ν : D(G, R)) (f : C(G, R)) :
-    convolveFunRight (μ * ν) f = convolveFunRight μ (convolveFunRight ν f) := by
+lemma convolveFunRight_mul (μ ν : D(G, R)) (f : C(G, R))
+    : convolveFunRight (μ * ν) f = convolveFunRight μ (convolveFunRight ν f) := by
   ext
   simp only [convolveFunRight_apply, mul_apply]
   congr 1 with h
@@ -120,9 +122,11 @@ instance : Ring D(G, R) where
   mul_one _ := by ext; simp [mul_apply]
 
 /-- `μ * ν` integrates a function with separated variables to a sum of products. -/
-lemma mul_apply_eq_sum {ι : Type*} {s : Finset ι} (μ ν : D(G, R))
-    {f : C(G, R)} {g h : ι → C(G, R)} (hf : ∀ x y, f (x * y) = ∑ i ∈ s, g i x * h i y) :
-    (μ * ν) f = ∑ i ∈ s, μ (g i) * ν (h i) := by
+lemma mul_apply_eq_sum
+    {ι : Type*} {s : Finset ι}
+    (μ ν : D(G, R))
+    {f : C(G, R)} {g h : ι → C(G, R)} (hf : ∀ x y, f (x * y) = ∑ i ∈ s, g i x * h i y)
+    : (μ * ν) f = ∑ i ∈ s, μ (g i) * ν (h i) := by
   simp [mul_apply, convolveFunRight_eq_sum ν hf, mul_comm]
 
 /-- The Dirac map `G → D(G, R)`, packaged as a multiplicative homomorphism. -/
@@ -135,22 +139,21 @@ def diracHom : G →* D(G, R) where
 @[simp] lemma diracHom_apply (x : G) : diracHom x = dirac R x := (rfl)
 
 /-- Measures form a `R`-algebra. -/
-noncomputable instance : Algebra R D(G, R) := Algebra.ofModule
-  (by intros; ext; simp [mul_apply]) (by intros; ext; simp [mul_apply])
+noncomputable instance : Algebra R D(G, R) :=
+  Algebra.ofModule (by intros; ext; simp [mul_apply]) (by intros; ext; simp [mul_apply])
 
 /-- The canonical homomorphism from the monoid algebra `R[G]` to `D(G, R)`. -/
-def monoidAlgebraHom : MonoidAlgebra R G →ₐ[R] D(G, R) :=
-  MonoidAlgebra.lift R _ G diracHom
+def monoidAlgebraHom : MonoidAlgebra R G →ₐ[R] D(G, R) := MonoidAlgebra.lift R _ G diracHom
 
-@[simp] lemma monoidAlgebraHom_single (g : G) :
-    monoidAlgebraHom (.single g 1) = dirac R g := by
+@[simp]
+lemma monoidAlgebraHom_single (g : G) : monoidAlgebraHom (.single g 1) = dirac R g := by
   simp [monoidAlgebraHom]
 
 @[simps!]
-instance : SMul D(G, R) C(G, R) where
+instance : SMul (D(G, R)) C(G, R) where
   smul μ := μ.convolveFunRight
 
-instance : Module D(G, R) C(G, R) where
+instance : Module (D(G, R)) C(G, R) where
   one_smul := convolveFunRight_one
   smul_zero _ := map_zero _
   zero_smul f := by simp
@@ -180,14 +183,15 @@ order of the two integration variables. The Fubini theorem we use
 (`AbstractMeasure.prodMk_eq_prodMk'`) requires the space to be compact and separated.
 -/
 
-variable [CommMonoid G] [ContinuousMul G]
-  [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] [T0Space R]
+variable
+  [CommMonoid G] [ContinuousMul G] [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
+  [T0Space R]
 
 noncomputable instance : CommRing D(G, R) where
   mul_comm μ ν := by
     ext
-    simp [mul_apply, convolveFunRight, ContinuousMap.comp, Function.comp_def,
-      ← prodMk'_apply, prodMk'_flip μ ν, prodMk_eq_prodMk', mul_comm]
+    simp [mul_apply, convolveFunRight, ContinuousMap.comp, Function.comp_def, ← prodMk'_apply,
+      prodMk'_flip μ ν, prodMk_eq_prodMk', mul_comm]
 
 end CommMonoid
 

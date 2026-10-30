@@ -27,42 +27,40 @@ variable (C : Type u) [Category.{v} C]
 namespace Functor
 
 /-- The constant functor sending everything to `PUnit.star`. -/
-@[simps!]
-def star : C ⥤ Discrete PUnit.{w + 1} :=
-  (Functor.const _).obj ⟨⟨⟩⟩
+@[simps!] def star : C ⥤ Discrete PUnit.{w + 1} := (Functor.const _).obj ⟨⟨⟩⟩
 variable {C}
 
 /-- Any two functors to `Discrete PUnit` are isomorphic. -/
 @[simps!]
-def punitExt (F G : C ⥤ Discrete PUnit.{w + 1}) : F ≅ G :=
-  NatIso.ofComponents fun X => eqToIso rfl
+def punitExt (F G : C ⥤ Discrete PUnit.{w + 1}) : F ≅ G := NatIso.ofComponents fun X => eqToIso rfl
 
-/-- Any two functors to `Discrete PUnit` are *equal*.
-You probably want to use `punitExt` instead of this. -/
-theorem punit_ext' (F G : C ⥤ Discrete PUnit.{w + 1}) : F = G :=
-  Functor.ext fun X => rfl
+/--
+Any two functors to `Discrete PUnit` are *equal*.
+You probably want to use `punitExt` instead of this.
+-/
+theorem punit_ext' (F G : C ⥤ Discrete PUnit.{w + 1}) : F = G := Functor.ext fun X => rfl
 
 /-- The functor from `Discrete PUnit` sending everything to the given object. -/
-abbrev fromPUnit (X : C) : Discrete PUnit.{w + 1} ⥤ C :=
-  (Functor.const _).obj X
+abbrev fromPUnit (X : C) : Discrete PUnit.{w + 1} ⥤ C := (Functor.const _).obj X
 
 /-- Functors from `Discrete PUnit` are equivalent to the category itself. -/
 @[simps]
 def equiv : Discrete PUnit.{w + 1} ⥤ C ≌ C where
-  functor :=
-    { obj := fun F => F.obj ⟨⟨⟩⟩
-      map := fun θ => θ.app ⟨⟨⟩⟩ }
+  functor := { obj := fun F => F.obj ⟨⟨⟩⟩, map := fun θ => θ.app ⟨⟨⟩⟩ }
   inverse := Functor.const _
   unitIso := NatIso.ofComponents fun _ => Discrete.natIso fun _ => Iso.refl _
   counitIso := NatIso.ofComponents Iso.refl
 
 end Functor
 
-/-- A category being equivalent to `PUnit` is equivalent to it having a unique morphism between
-  any two objects. (In fact, such a category is also a groupoid;
-  see `CategoryTheory.Groupoid.ofHomUnique`) -/
-theorem equiv_punit_iff_unique :
-    Nonempty (C ≌ Discrete PUnit.{w + 1}) ↔ Nonempty C ∧ ∀ x y : C, Nonempty <| Unique (x ⟶ y) := by
+/--
+A category being equivalent to `PUnit` is equivalent to it having a unique morphism between
+any two objects. (In fact, such a category is also a groupoid;
+see `CategoryTheory.Groupoid.ofHomUnique`)
+-/
+theorem equiv_punit_iff_unique
+    : Nonempty (C ≌ Discrete PUnit.{w + 1})
+      ↔ Nonempty C ∧ ∀ x y : C, Nonempty <| Unique (x ⟶ y) := by
   constructor
   · rintro ⟨h⟩
     refine ⟨⟨h.inverse.obj ⟨⟨⟩⟩⟩, fun x y => Nonempty.intro ?_⟩
@@ -82,13 +80,8 @@ theorem equiv_punit_iff_unique :
     rfl
   · rintro ⟨⟨p⟩, h⟩
     have := fun x y => (h x y).some
-    refine
-      Nonempty.intro
-        (CategoryTheory.Equivalence.mk ((Functor.const _).obj ⟨⟨⟩⟩)
-          ((@Functor.const <| Discrete PUnit).obj p) ?_ (by apply Functor.punitExt))
-    exact
-      NatIso.ofComponents fun _ =>
-        { hom := default
-          inv := default }
+    refine Nonempty.intro (CategoryTheory.Equivalence.mk ((Functor.const _).obj ⟨⟨⟩⟩)
+      ((@Functor.const <| Discrete PUnit).obj p) ?_ (by apply Functor.punitExt))
+    exact NatIso.ofComponents fun _ => { hom := default, inv := default }
 
 end CategoryTheory

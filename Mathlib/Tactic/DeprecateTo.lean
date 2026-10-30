@@ -7,7 +7,6 @@ module
 
 public meta import Mathlib.Lean.Name
 public meta import Std.Time.Format
-
 import Mathlib.Init
 
 /-!
@@ -46,8 +45,8 @@ namespace Mathlib.Tactic.DeprecateTo
 open Lean Elab Term Command
 
 /-- Produce the syntax for the command `@[deprecated (since := "YYYY-MM-DD")] alias n := id`. -/
-def mkDeprecationStx (id : TSyntax `ident) (n : Name) (date : Option String := none) :
-    CommandElabM (TSyntax `command) := do
+def mkDeprecationStx (id : TSyntax `ident) (n : Name) (date : Option String := none)
+    : CommandElabM (TSyntax `command) := do
   let date ← date.getDM (toString <$> Std.Time.PlainDate.now)
   let nd := Syntax.mkStrLit date
   `(command| @[deprecated (since := $nd)] alias $(mkIdent n) := $id)
@@ -76,9 +75,8 @@ def renameTheorem (newName : String) (stx : TSyntax `command) : CoreM (Name × S
     let some fullRange := stx.raw.getRange?
       | throwError m!"Could not extract syntax range of declaration{indentD stx}"
     let newCmd :=
-      String.Pos.Raw.extract file.source fullRange.start nameRange.start ++
-      newName ++
-      String.Pos.Raw.extract file.source nameRange.stop fullRange.stop
+      String.Pos.Raw.extract file.source fullRange.start nameRange.start ++ newName
+        ++ String.Pos.Raw.extract file.source nameRange.stop fullRange.stop
     return (id.raw[0].getId, newCmd)
   | _ => throwError m!"Command is not a `theorem` or a `lemma`{indentD stx}"
 
@@ -116,8 +114,9 @@ Technically, the command also take an optional `String` argument to fill in the 
 However, its use is mostly intended for debugging purposes, where having a variable date would
 make tests time-dependent.
 -/
-elab (name := deprecateTo) tk:"#deprecate " "to" id:ident+ date:(ppSpace str ppSpace)? ppLine
-    cmd:command : command => do
+elab (name := deprecateTo)
+      tk:"#deprecate " "to" id:ident+ date:(ppSpace str ppSpace)? ppLine cmd:command
+    : command => do
   let oldEnv ← getEnv
   try
     elabCommand cmd
@@ -130,11 +129,13 @@ elab (name := deprecateTo) tk:"#deprecate " "to" id:ident+ date:(ppSpace str ppS
       logWarningAt tk
         m!"Un-deprecated declarations: command produced {news.size} new constants, \
           but only {id.size} names were provided, so the remiaining declarations \
-          are left without deprecations:\n{news.toList.drop id.size |>.map MessageData.ofConstName}"
+          are left without deprecations:\
+          \n{news.toList.drop id.size |>.map MessageData.ofConstName}"
     if news.size < id.size then
       logWarningAt (mkNullNode (id.toList.drop news.size).toArray)
         m!"Unused names: {id.size} names were provided, but only {news.size} new declarations \
-          were found, so the remiaining names are unused:\n{id.drop news.size}"
+          were found, so the remiaining names are unused:\
+          \n{id.drop news.size}"
     let (oldId, newCmd) ← liftCoreM <| renameTheorem id[0]!.getId.toString cmd
     let oldNames ← resolveGlobalName oldId
     let fil := news.filter fun n => oldNames.any (·.fst == n)
@@ -142,20 +143,20 @@ elab (name := deprecateTo) tk:"#deprecate " "to" id:ident+ date:(ppSpace str ppS
       | throwError m!"Expected to find one declaration called {oldId}, found {fil.size}"
     news := #[newId] ++ (news.erase newId)
     let pairs := id.zip news
-    let msg := s!"* Pairings:\n{pairs.map fun (l, r) => (l.getId, r)}" ++
-      if skip.size != 0 then s!"\n\n* Ignoring: {skip}" else ""
+    let msg :=
+      s!"* Pairings:\
+          \n{pairs.map fun (l, r) => (l.getId, r)}"
+        ++ if skip.size != 0 then s!"\n\n* Ignoring: {skip}" else ""
     let date := date.map (·.getString)
     let stxs ← pairs.mapM fun (id, n) => mkDeprecationStx id n date
     liftTermElabM do
       let prettyStxs ← stxs.mapM (SuggestionText.prettyExtra <| .tsyntax ·)
-      let suggestion := prettyStxs.foldl
-        (fun x y => x ++ "\n\n" ++ y) newCmd
-      addSuggestion (header := msg ++ "\n\nTry this:\n") (← getRef)
-        suggestion
+      let suggestion := prettyStxs.foldl (fun x y => x ++ "\n\n" ++ y) newCmd
+      addSuggestion (header := msg ++ "\n\nTry this:\n") (← getRef) suggestion
 
 @[inherit_doc deprecateTo]
-macro (name := oldStx) "deprecate" "to" id:ident* dat:(ppSpace str ppSpace)? ppLine cmd:command :
-    command =>
+macro (name := oldStx) "deprecate" "to" id:ident* dat:(ppSpace str ppSpace)? ppLine cmd:command
+    : command =>
   `(command| #deprecate to $id* $[$dat]? $cmd)
 
 deprecated_syntax oldStx "use `#deprecate to` instead of `deprecate to`" (since := "2026-09-19")

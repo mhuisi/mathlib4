@@ -6,7 +6,6 @@ Authors: Parikshit Khanna, Jeremy Avigad, Leonardo de Moura, Floris van Doorn, M
 module
 
 public import Batteries.Data.List.Basic
-
 import Mathlib.Init
 
 /-! # `List.lookmap` -/
@@ -19,8 +18,8 @@ namespace List
 
 variable (f : α → Option α)
 
-private theorem lookmap.go_append (l : List α) (acc : Array α) :
-    lookmap.go f l acc = acc.toListAppend (lookmap f l) := by
+private theorem lookmap.go_append (l : List α) (acc : Array α)
+    : lookmap.go f l acc = acc.toListAppend (lookmap f l) := by
   cases l with
   | nil => simp [go, lookmap]
   | cons hd tl =>
@@ -32,26 +31,27 @@ private theorem lookmap.go_append (l : List α) (acc : Array α) :
     | some a => simp
 
 @[simp, grind =]
-theorem lookmap_nil : [].lookmap f = [] :=
-  rfl
+theorem lookmap_nil : [].lookmap f = [] := rfl
 
 @[simp]
-theorem lookmap_cons_none {a : α} (l : List α) (h : f a = none) :
-    (a :: l).lookmap f = a :: l.lookmap f := by
+theorem lookmap_cons_none {a : α} (l : List α) (h : f a = none)
+    : (a :: l).lookmap f = a :: l.lookmap f := by
   simp only [lookmap, lookmap.go, Array.toListAppend_eq, nil_append]
-  rw [lookmap.go_append, lookmap, h]; simp
+  rw [lookmap.go_append, lookmap, h]
+  simp
 
 @[simp]
-theorem lookmap_cons_some {a b : α} (l : List α) (h : f a = some b) :
-    (a :: l).lookmap f = b :: l := by
+theorem lookmap_cons_some {a b : α} (l : List α) (h : f a = some b)
+    : (a :: l).lookmap f = b :: l := by
   simp only [lookmap, lookmap.go, Array.toListAppend_eq, nil_append]
   rw [h]
 
 @[grind =]
-theorem lookmap_cons {a : α} {l : List α} :
-    (a :: l).lookmap f = match f a with
-    | none => a :: l.lookmap f
-    | some b => b :: l := by
+theorem lookmap_cons {a : α} {l : List α}
+    : (a :: l).lookmap f
+      = match f a with
+        | none => a :: l.lookmap f
+        | some b => b :: l := by
   cases h : f a <;> simp_all
 
 theorem lookmap_some : ∀ l : List α, l.lookmap some = l
@@ -62,8 +62,8 @@ theorem lookmap_none : ∀ l : List α, (l.lookmap fun _ => none) = l
   | [] => rfl
   | a :: l => (lookmap_cons_none _ l rfl).trans (congrArg (cons a) (lookmap_none l))
 
-theorem lookmap_congr {f g : α → Option α} :
-    ∀ {l : List α}, (∀ a ∈ l, f a = g a) → l.lookmap f = l.lookmap g
+theorem lookmap_congr {f g : α → Option α}
+    : ∀ {l : List α}, (∀ a ∈ l, f a = g a) → l.lookmap f = l.lookmap g
   | [], _ => rfl
   | a :: l, H => by
     obtain ⟨H₁, H₂⟩ := forall_mem_cons.1 H
@@ -74,8 +74,8 @@ theorem lookmap_congr {f g : α → Option α} :
 theorem lookmap_of_forall_not {l : List α} (H : ∀ a ∈ l, f a = none) : l.lookmap f = l :=
   (lookmap_congr H).trans (lookmap_none l)
 
-theorem lookmap_map_eq (g : α → β) (h : ∀ (a), ∀ b ∈ f a, g a = g b) :
-    ∀ l : List α, map g (l.lookmap f) = map g l
+theorem lookmap_map_eq (g : α → β) (h : ∀ (a), ∀ b ∈ f a, g a = g b)
+    : ∀ l : List α, map g (l.lookmap f) = map g l
   | [] => rfl
   | a :: l => by
     rcases h' : f a with - | b
@@ -90,9 +90,11 @@ theorem length_lookmap (l : List α) : length (l.lookmap f) = length l := by
   rw [← length_map, lookmap_map_eq _ fun _ => (), length_map]; simp
 
 open Perm in
-theorem perm_lookmap (f : α → Option α) {l₁ l₂ : List α}
-    (H : Pairwise (fun a b => ∀ c ∈ f a, ∀ d ∈ f b, a = b ∧ c = d) l₁) (p : l₁ ~ l₂) :
-    lookmap f l₁ ~ lookmap f l₂ := by
+theorem perm_lookmap
+    (f : α → Option α)
+    {l₁ l₂ : List α}
+    (H : Pairwise (fun a b => ∀ c ∈ f a, ∀ d ∈ f b, a = b ∧ c = d) l₁) (p : l₁ ~ l₂)
+    : lookmap f l₁ ~ lookmap f l₂ := by
   induction p with
   | nil => simp
   | cons a p IH =>

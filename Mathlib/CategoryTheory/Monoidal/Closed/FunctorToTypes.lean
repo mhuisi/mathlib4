@@ -21,7 +21,6 @@ It should be shown that `C ⥤ Type max w v u` is Cartesian closed.
 
 @[expose] public section
 
-
 universe w v' v u u'
 
 open CategoryTheory Functor MonoidalCategory
@@ -41,12 +40,15 @@ def functorHomEquiv (G H : C ⥤ Type (max w v u)) : (G ⟶ F.functorHom H) ≃ 
 @[simps! obj_obj obj_map map_app]
 def rightAdj : (C ⥤ Type (max w v u)) ⥤ C ⥤ Type (max w v u) where
   obj G := F.functorHom G
-  map f := { app X := ↾fun a ↦ {
-    app d b := a.app d b ≫ f.app d
-    naturality g h := by
-      have := a.naturality g h
-      change (F.map g ≫ a.app _ (h ≫ g)) ≫ _ = _
-      aesop  }}
+  map f := {
+    app X :=
+      ↾fun a ↦ {
+        app d b := a.app d b ≫ f.app d
+        naturality g h := by
+          have := a.naturality g h
+          change (F.map g ≫ a.app _ (h ≫ g)) ≫ _ = _
+          aesop  }
+  }
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
@@ -61,7 +63,8 @@ def adj : tensorLeft F ⊣ rightAdj F where
       ext
       apply Prod.ext
       · rfl
-      · simp }
+      · simp
+  }
   counit := { app := fun G ↦ functorHomEquiv F _ G (𝟙 _) }
 
 instance closed : Closed F where

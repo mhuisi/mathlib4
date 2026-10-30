@@ -19,8 +19,7 @@ warning: `lia` can replace `omega`
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.omegaToLia false`
 -/
 #guard_msgs in
-example : 1 + 1 = 2 := by
-  omega
+example : 1 + 1 = 2 := by omega
 
 end omega
 
@@ -40,8 +39,7 @@ Counterexample:
 -- The counterexample name contains a number that varies between runs, so we can't fully test this.
 #guard_msgs (substring := true) in
 set_option linter.tacticAnalysis.dummy true in
-example : List.sum ([1,2,3].map fun x ↦ x + 1) = 9 := by
-  simp
+example : List.sum ([1, 2, 3].map fun x ↦ x + 1) = 9 := by simp
 
 end terminalReplacement
 
@@ -142,20 +140,21 @@ run_cmd do
 /-- error: an error -/
 #guard_msgs in
 run_cmd do
-  withLintTagging linter.tacticAnalysis.dummy do
-    logError "an error"
-  let #[err] := (← get).messages.toArray | throwError "expected one message"
+  withLintTagging linter.tacticAnalysis.dummy do logError "an error"
+  let #[err] := (← get).messages.toArray
+    | throwError "expected one message"
   unless err.data.kind.isAnonymous do
     throwError "error was tagged: {err.data.kind}"
 
 -- The exact nesting `logLint` uses: the kind outside, the linter tag directly inside.
 run_cmd do
-  withLintTagging linter.tacticAnalysis.dummy do
-    logInfo "shape"
-  let #[msg] := (← get).messages.toArray | throwError "expected one message"
+  withLintTagging linter.tacticAnalysis.dummy do logInfo "shape"
+  let #[msg] := (← get).messages.toArray
+    | throwError "expected one message"
   let .tagged ``linter.tacticAnalysis.dummy (.tagged tag _) := msg.data
     | throwError "unexpected message shape"
-  unless tag == Linter.linterMessageTag do throwError "wrong inner tag: {tag}"
+  unless tag == Linter.linterMessageTag do
+    throwError "wrong inner tag: {tag}"
   modify fun s => { s with messages := {} }
 
 -- Messages logged outside the wrapper are kept, in order, and untouched,
@@ -176,17 +175,20 @@ Note: This linter can be disabled with `set_option linter.tacticAnalysis.dummy f
 #guard_msgs in
 run_cmd do
   logInfo "before"
-  withLintTagging linter.tacticAnalysis.dummy do
-    logInfo "inside"
+  withLintTagging linter.tacticAnalysis.dummy do logInfo "inside"
   logInfo "after"
   try
     withLintTagging linter.tacticAnalysis.dummy do
       logWarning "before throw"
       throwError "boom"
-  catch _ => pure ()
+  catch _ =>
+    pure ()
   let kinds := (← get).messages.toArray.map (·.data.kind)
-  unless kinds == #[.anonymous, ``linter.tacticAnalysis.dummy, .anonymous,
-      ``linter.tacticAnalysis.dummy] do
+  unless kinds
+      == #[
+        .anonymous, ``linter.tacticAnalysis.dummy, .anonymous,
+        ``linter.tacticAnalysis.dummy
+      ] do
     throwError "wrong kinds: {kinds}"
 
 open Tactic in
@@ -199,8 +201,10 @@ elab "loggingTrivial" : tactic => do
 macro "probe" : tactic => `(tactic| trivial)
 
 @[tacticAnalysis linter.tacticAnalysis.dummy]
-meta def leaky := terminalReplacement "probe" "loggingTrivial" ``tacticProbe
-  (fun _ _ _ => `(tactic| loggingTrivial)) (reportSuccess := true)
+meta def leaky :=
+  terminalReplacement "probe" "loggingTrivial" ``tacticProbe
+    (fun _ _ _ => `(tactic| loggingTrivial))
+    (reportSuccess := true)
 
 -- What a re-run tactic logs is not a finding of the pass and is not attributed to it.
 /--
@@ -210,8 +214,7 @@ Note: This linter can be disabled with `set_option linter.tacticAnalysis.dummy f
 -/
 #guard_msgs in
 set_option linter.tacticAnalysis.dummy true in
-example : True := by
-  probe
+example : True := by probe
 
 end tagging
 
@@ -225,8 +228,7 @@ def z := 1
 theorem xy : x = y := rfl
 theorem yz : y = z := rfl
 
-example : x = y := by
-  rw [xy]
+example : x = y := by rw [xy]
 
 /--
 warning: Try this: rw [xy, yz]
@@ -312,8 +314,7 @@ section mergeWithGrind
 
 set_option linter.tacticAnalysis.mergeWithGrind true
 
-example : 1 + 1 = 2 := by
-  grind
+example : 1 + 1 = 2 := by grind
 
 /--
 info: 'have : 1 + 1 < 3 := by omega; grind' can be replaced with 'grind'
@@ -366,8 +367,10 @@ Try this:
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.mergeWithGrind false`
 -/
 #guard_msgs in
-theorem Associated.prod' {M : Type*} [CommMonoid M] {ι : Type*} (s : Finset ι) (f : ι → M)
-    (g : ι → M) (h : ∀ i, i ∈ s → Associated (f i) (g i)) : Associated (∏ i ∈ s, f i) (∏ i ∈ s, g i) := by
+theorem Associated.prod'
+    {M : Type*} [CommMonoid M]
+    {ι : Type*} (s : Finset ι) (f : ι → M) (g : ι → M) (h : ∀ i, i ∈ s → Associated (f i) (g i))
+    : Associated (∏ i ∈ s, f i) (∏ i ∈ s, g i) := by
   induction s using Finset.induction with
   | empty => grind [Associated.prod]
   | insert j s hjs IH =>
@@ -381,8 +384,7 @@ section replaceWithGrind
 
 set_option linter.tacticAnalysis.terminalToGrind true
 
-example : 1 + 1 = 2 := by
-  grind
+example : 1 + 1 = 2 := by grind
 
 /--
 warning: replace the proof with 'grind': have : 1 + 1 < 3 := by omega;
@@ -417,12 +419,13 @@ example {α : Type u} (f : α → Type max u v) : 1 = 1 := by
 -- Ensure the effects of `classical` are picked up. Otherwise we get an error like:
 -- failed to synthesize
 --   Decidable b
-theorem forall_imp_iff_exists_imp' {α : Type} {p : α → Prop} {b : Prop} [ha : Nonempty α] :
-    (∀ x, p x) → b ↔ ∃ x, p x → b := by
+theorem forall_imp_iff_exists_imp' {α : Type} {p : α → Prop} {b : Prop} [ha : Nonempty α]
+    : (∀ x, p x) → b ↔ ∃ x, p x → b := by
   classical
   let ⟨a⟩ := ha
   refine ⟨fun h ↦ Decidable.not_forall_not.1 fun h' ↦ ?_, fun ⟨x, hx⟩ h ↦ hx (h x)⟩
-  exact if hb : b then h' a fun _ ↦ hb else hb <| h fun x ↦ (Decidable.not_imp_iff_and_not.1 (h' x)).1
+  exact
+    if hb : b then h' a fun _ ↦ hb else hb <| h fun x ↦ (Decidable.not_imp_iff_and_not.1 (h' x)).1
 
 end replaceWithGrind
 
@@ -587,8 +590,7 @@ info: `rfl` can be replaced with `grind`
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.tryAtEachStepGrind false`
 -/
 #guard_msgs in
-example : 1 + 1 = 2 := by
-  rfl
+example : 1 + 1 = 2 := by rfl
 
 /--
 warning: Unused tactic linter: `skip` does not change the goal.
@@ -617,16 +619,14 @@ theorem p : P 37 := trivial
 
 set_library_suggestions fun _ _ => pure #[{ name := `p, score := 1.0 }]
 
-example : P 37 := by
-  grind +suggestions
+example : P 37 := by grind +suggestions
 
 /--
 info: Try this:
   [apply] simp_all only [p]
 -/
 #guard_msgs in
-example : P 37 := by
-  simp_all? +suggestions
+example : P 37 := by simp_all? +suggestions
 
 set_option linter.tacticAnalysis.tryAtEachStepGrindSuggestions true in
 -- FIXME: why is the dagger here?
@@ -636,8 +636,7 @@ info: `trivial` can be replaced with `grind +suggestions✝`
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.tryAtEachStepGrindSuggestions false`
 -/
 #guard_msgs in
-example : P 37 := by
-  trivial
+example : P 37 := by trivial
 
 set_option linter.tacticAnalysis.tryAtEachStepSimpAllSuggestions true in
 /--
@@ -646,8 +645,7 @@ info: `trivial` can be replaced with `simp_all? +suggestions✝`
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.tryAtEachStepSimpAllSuggestions false`
 -/
 #guard_msgs in
-example : P 37 := by
-  trivial
+example : P 37 := by trivial
 
 end
 
@@ -665,16 +663,14 @@ info: `grind` can be replaced with `grind`
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.tryAtEachStepGrind false`
 -/
 #guard_msgs in
-example : 1 + 1 = 2 := by
-  grind
+example : 1 + 1 = 2 := by grind
 
 section
 set_option linter.tacticAnalysis.tryAtEachStep.selfReplacements false
 
 -- With selfReplacements false, grind replacing grind is NOT reported
 #guard_msgs in
-example : 1 + 1 = 2 := by
-  grind
+example : 1 + 1 = 2 := by grind
 
 -- Non-self replacements are still reported when selfReplacements is false
 /--
@@ -683,8 +679,7 @@ info: `rfl` can be replaced with `grind`
 Note: This linter can be disabled with `set_option linter.tacticAnalysis.tryAtEachStepGrind false`
 -/
 #guard_msgs in
-example : 1 + 1 = 2 := by
-  rfl
+example : 1 + 1 = 2 := by rfl
 
 end
 
@@ -765,9 +760,7 @@ section unknownTactic
 -- Test that tryAtEachStepFromStrings gracefully handles unknown tactics
 -- (e.g., trying to run `aesop` before Aesop is imported)
 
-register_option linter.tacticAnalysis.unknownTacticTest : Bool := {
-  defValue := false
-}
+register_option linter.tacticAnalysis.unknownTacticTest : Bool := { defValue := false }
 
 @[tacticAnalysis linter.tacticAnalysis.unknownTacticTest]
 meta def unknownTacticTest :=
@@ -788,14 +781,12 @@ section verifyGrindSuggestions
 
 #guard_msgs in
 set_option linter.tacticAnalysis.verifyGrind true in
-example : 1 + 1 = 2 := by
-  rfl
+example : 1 + 1 = 2 := by rfl
 
 -- Test with grind? +suggestions
 #guard_msgs in
 set_option linter.tacticAnalysis.verifyGrindSuggestions true in
-example : 1 + 1 = 2 := by
-  rfl
+example : 1 + 1 = 2 := by rfl
 
 -- Test: a failure of an applied try-this suggestion should print a warning
 section
@@ -808,9 +799,7 @@ elab "fakeRfl?" : tactic => do
   evalTactic (← `(tactic| trivial))
 
 @[tacticAnalysis linter.tacticAnalysis.dummy]
-meta def verifyFakeRfl := verifyTryThisSuggestions
-  (fun _ _ => `(tactic| fakeRfl?))
-  "fakeRfl?"
+meta def verifyFakeRfl := verifyTryThisSuggestions (fun _ _ => `(tactic| fakeRfl?)) "fakeRfl?"
 
 /--
 info: Try this:
@@ -822,8 +811,7 @@ Note: This linter can be disabled with `set_option linter.tacticAnalysis.dummy f
 -/
 #guard_msgs in
 set_option linter.tacticAnalysis.dummy true in
-example : True := by
-  fakeRfl?
+example : True := by fakeRfl?
 
 end
 

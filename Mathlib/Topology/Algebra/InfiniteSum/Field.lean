@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Analysis.Normed.Ring.Basic
 public import Mathlib.Topology.Algebra.InfiniteSum.Defs
-
 import Mathlib.Analysis.Normed.Group.Continuity
 
 set_option doc.verso true
@@ -22,11 +21,9 @@ the most familiar examples.
 
 public section
 
-
 section NormMulClass
 
-variable {α E : Type*} [SeminormedCommRing E] [NormMulClass E] [NormOneClass E]
-  {f : α → E} {x : E}
+variable {α E : Type*} [SeminormedCommRing E] [NormMulClass E] [NormOneClass E] {f : α → E} {x : E}
 
 nonrec theorem HasProd.norm (hfx : HasProd f x) : HasProd (‖f ·‖) ‖x‖ := by
   simp only [HasProd, ← norm_prod]

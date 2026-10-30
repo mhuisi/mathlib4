@@ -21,10 +21,14 @@ namespace Mathlib
 
 /-! ### Inequalities -/
 
-/-- The three-element type `Ineq` is used to represent the strength of a comparison between
-terms. -/
+/--
+The three-element type `Ineq` is used to represent the strength of a comparison between
+terms.
+-/
 inductive Ineq : Type
-  | eq | le | lt
+  | eq
+  | le
+  | lt
 deriving DecidableEq, Inhabited, Repr
 
 namespace Ineq

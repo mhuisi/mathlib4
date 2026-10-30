@@ -50,49 +50,53 @@ open ImportGraph Lean Elab Command Linter
 
 namespace Mathlib.Linter
 
-/-- `toSyntax s pattern` converts the two input strings into a `Syntax`, assuming that `pattern`
+/--
+`toSyntax s pattern` converts the two input strings into a `Syntax`, assuming that `pattern`
 is a substring of `s`:
-the syntax is an atom with value `pattern` whose the range is the range of `pattern` in `s`. -/
+the syntax is an atom with value `pattern` whose the range is the range of `pattern` in `s`.
+-/
 def toSyntax (s pattern : String) (offset : String.Pos.Raw := 0) : Syntax :=
   let beg := ((s.splitOn pattern).getD 0 "").rawEndPos.offsetBy offset
   let fin := (((s.splitOn pattern).getD 0 "") ++ pattern).rawEndPos.offsetBy offset
   mkAtomFrom (.ofRange ⟨beg, fin⟩) pattern
 
-/-- Return if `line` looks like a correct authors line in a copyright header.
+/--
+Return if `line` looks like a correct authors line in a copyright header.
 
 The `offset` input is used to shift the position information of the `Syntax` that the command
 produces.
 `authorsLineChecks` computes a position for its warning *relative to `line`*.
 The `offset` input passes on the starting position of `line` in the whole file.
 -/
-def authorsLineChecks (line : String) (offset : String.Pos.Raw) : Array (Syntax × String) :=
-  Id.run do
+def authorsLineChecks (line : String) (offset : String.Pos.Raw)
+    : Array (Syntax × String) := Id.run do
   -- We cannot reasonably validate the author names, so we look only for a few common mistakes:
   -- the line starting wrongly, double spaces, using ' and ' between names,
   -- and ending the line with a period.
   let mut stxs := #[]
-  if !line.startsWith "Authors: " then
-    stxs := stxs.push
-      (toSyntax line (line.take "Authors: ".length |>.copy) offset,
-       s!"The authors line should begin with 'Authors: '")
+  if ! line.startsWith "Authors: " then
+    stxs :=
+      stxs.push (
+        toSyntax line (line.take "Authors: ".length |>.copy) offset,
+        s!"The authors line should begin with 'Authors: '"
+      )
   if (line.splitOn "  ").length != 1 then
     stxs := stxs.push (toSyntax line "  " offset, s!"Double spaces are not allowed.")
   if (line.splitOn " and ").length != 1 then
     stxs := stxs.push (toSyntax line " and " offset, s!"Please, do not use 'and'; use ',' instead.")
   if line.back == '.' then
-    stxs := stxs.push
-      (toSyntax line "." offset,
-       s!"Please, do not end the authors' line with a period.")
+    stxs :=
+      stxs.push (toSyntax line "." offset, s!"Please, do not end the authors' line with a period.")
   -- If there are no previous exceptions, then we try to validate the names.
   if !stxs.isEmpty then
     return stxs
   if (line.drop "Authors:".length).trimAscii.isEmpty then
-    return #[(toSyntax line "Authors:" offset,
-       s!"Please, add at least one author!")]
+    return #[(toSyntax line "Authors:" offset, s!"Please, add at least one author!")]
   else
     return #[]
 
-/-- The main function to validate the copyright string.
+/--
+The main function to validate the copyright string.
 The input is the copyright string, the output is an array of `Syntax × String` encoding:
 * the `Syntax` factors are atoms whose ranges are "best guesses" for where the changes should
   take place; the embedded string is the current text that the linter flagged;
@@ -106,14 +110,18 @@ The linter checks that
 * the remainder of the string begins with `Authors: `, does not end with `.` and
   contains no ` and ` nor a double space, except possibly after a line break.
 -/
-public def copyrightHeaderChecks (copyright : String) (expectedLicense : String) :
-    Array (Syntax × String) := Id.run do
+public def copyrightHeaderChecks (copyright : String) (expectedLicense : String)
+    : Array (Syntax × String) := Id.run do
   -- First, we merge lines ending in `,`: two spaces after the line-break are ok,
   -- but so is only one or none.  We take care of *not* adding more consecutive spaces, though.
   -- This is to allow the copyright or authors' lines to span several lines.
   -- We also allow the "All rights reserved" line to be on a separate line.
-  let preprocessCopyright := (copyright.replace ",\n  " ", ").replace ",\n" ","
-    |>.replace ".\nAll rights reserved." ". All rights reserved."
+  let preprocessCopyright :=
+    (copyright.replace ",\n  " ", ").replace ",\n" ","
+      |>.replace
+        ".\
+          \nAll rights reserved."
+        ". All rights reserved."
   -- Filter out everything after the first isolated `-/`.
   let pieces := preprocessCopyright.splitOn "\n-/"
   let copyright := (pieces.getD 0 "") ++ "\n-/"
@@ -129,54 +137,66 @@ public def copyrightHeaderChecks (copyright : String) (expectedLicense : String)
     -- The header should start and end with blank comments.
     match openComment, closeComment with
     | "/-", "-/" => output := output
-    | "/-", _    =>
-      output := output.push (toSyntax copyright closeComment, s!"{stdText "-/"}")
-    | _, _       =>
-      output := output.push (toSyntax copyright openComment, s!"{stdText ("/".push '-')}")
+    | "/-", _ => output := output.push (toSyntax copyright closeComment, s!"{stdText "-/"}")
+    | _, _ => output := output.push (toSyntax copyright openComment, s!"{stdText ("/".push '-')}")
     -- Validate the first copyright line.
     let copStart := "Copyright (c) 20"
     let copStop := ". All rights reserved."
-    if !copyrightAuthor.startsWith copStart then
-      output := output.push
-        (toSyntax copyright (copyrightAuthor.take copStart.length).copy,
-         s!"Copyright line should start with 'Copyright (c) YYYY'")
+    if ! copyrightAuthor.startsWith copStart then
+      output :=
+        output.push (
+          toSyntax copyright (copyrightAuthor.take copStart.length).copy,
+          s!"Copyright line should start with 'Copyright (c) YYYY'"
+        )
     let author := (copyrightAuthor.drop (copStart.length + 2))
     if output.isEmpty && author.take 1 != " ".toSlice then
-      output := output.push
-        (toSyntax copyright (copyrightAuthor.drop (copStart.length + 2)).copy,
-         s!"'Copyright (c) YYYY' should be followed by a space")
+      output :=
+        output.push (
+          toSyntax copyright (copyrightAuthor.drop (copStart.length + 2)).copy,
+          s!"'Copyright (c) YYYY' should be followed by a space"
+        )
     if output.isEmpty && #["", ".", ","].contains ((author.drop 1).take 1).trimAscii.copy then
-      output := output.push
-        (toSyntax copyright (copyrightAuthor.drop (copStart.length + 3)).copy,
-         s!"There should be at least one copyright author, separated from the year by exactly one space.")
-    if !copyrightAuthor.endsWith copStop then
-      output := output.push
-        (toSyntax copyright (copyrightAuthor.takeEnd copStop.length).copy,
-         s!"Copyright line should end with '. All rights reserved.'")
+      output :=
+        output.push (
+          toSyntax copyright (copyrightAuthor.drop (copStart.length + 3)).copy,
+          s!"There should be at least one copyright author, separated from the year by exactly one \
+            space."
+        )
+    if ! copyrightAuthor.endsWith copStop then
+      output :=
+        output.push (
+          toSyntax copyright (copyrightAuthor.takeEnd copStop.length).copy,
+          s!"Copyright line should end with '. All rights reserved.'"
+        )
     -- Validate the authors line(s). The last line is the closing comment: trim that off right away.
     let authorsLines := authorsLines.dropLast
     -- Complain about a missing authors line.
     if authorsLines.length == 0 then
       output := output.push (toSyntax copyright "-/", s!"Copyright too short!")
     else
-    -- If the list of authors spans multiple lines, all but the last line should end with a trailing
-    -- comma. This excludes e.g. other comments in the copyright header.
-    let authorsLine := "\n".intercalate authorsLines
-    let authorsStart := (("\n".intercalate [openComment, copyrightAuthor, license, ""])).rawEndPos
-    if authorsLines.length > 1 && !authorsLines.dropLast.all (·.endsWith ",") then
-      output := output.push ((toSyntax copyright authorsLine),
-        "If an authors line spans multiple lines, \
-        each line but the last must end with a trailing comma")
-    output := output.append (authorsLineChecks authorsLine authorsStart)
-    if license != expectedLicense then
-      output := output.push (toSyntax copyright license,
-        s!"Second copyright line should be \"{expectedLicense}\"")
-  | _ =>
-    output := output.push (toSyntax copyright "-/", s!"Copyright too short!")
+      -- If the list of authors spans multiple lines, all but the last line should end with a trailing
+      -- comma. This excludes e.g. other comments in the copyright header.
+      let authorsLine := "\n".intercalate authorsLines
+      let authorsStart := (("\n".intercalate [openComment, copyrightAuthor, license, ""])).rawEndPos
+      if authorsLines.length > 1 && ! authorsLines.dropLast.all (·.endsWith ",") then
+        output :=
+          output.push (
+            (toSyntax copyright authorsLine),
+            "If an authors line spans multiple lines, \
+              each line but the last must end with a trailing comma"
+          )
+      output := output.append (authorsLineChecks authorsLine authorsStart)
+      if license != expectedLicense then
+        output :=
+          output.push
+            (toSyntax copyright license, s!"Second copyright line should be \"{expectedLicense}\"")
+  | _ => output := output.push (toSyntax copyright "-/", s!"Copyright too short!")
   return output
 
-/-- Given `modPath := foo/bar/A/B/C(.lean)` and a module name `A.B.C`, return `foo/bar/A.lean`.
-Return `none` if the name components do not match the path components. -/
+/--
+Given `modPath := foo/bar/A/B/C(.lean)` and a module name `A.B.C`, return `foo/bar/A.lean`.
+Return `none` if the name components do not match the path components.
+-/
 def modPathToRootPath (modPath : System.FilePath) (modName : Name) : Option System.FilePath :=
   match modName with
   | .str .anonymous root => do
@@ -206,9 +226,11 @@ def isInLibraryRoot (rootPath : System.FilePath) (modName : Name) : IO Bool := d
   if ← rootPath.pathExists then
     let res ← parseImports' (← IO.FS.readFile rootPath) ""
     return res.imports.any (·.module == modName)
-  else return false
+  else
+    return false
 
-/-- `inLibraryRootMutex` caches whether the current file is imported in the library root file
+/--
+`inLibraryRootMutex` caches whether the current file is imported in the library root file
 (e.g. `Mathlib.lean`), as computed by `isInLibraryRoot`. It is
 * `none` at initialization time;
 * `some true` if the `header` linter has already discovered that the current file
@@ -257,8 +279,9 @@ module system. This does not remove redundant imports.
 -/
 public register_option linter.style.header.imports : Bool := {
   defValue := true
-  descr := "Whether to reformat module system import blocks according to the style convention when \
-    `linter.style.header` is `true`."
+  descr :=
+    "Whether to reformat module system import blocks according to the style convention when \
+      `linter.style.header` is `true`."
 }
 
 /-- Returns the `module` token from header syntax, if there is one. -/
@@ -279,19 +302,23 @@ namespace Style.Header
 The set of files outside the `Mathlib` package to run the header style linter on,
 because they are files that test the linter.
 -/
-def headerTestFiles : NameSet := .ofList [
-  `MathlibTest.Linter.Header.Basic,
-  `MathlibTest.Linter.Header.Fail,
-  `MathlibTest.Linter.Header.ImportFormat,
-  `MathlibTest.Linter.Header.ImportFormatOff,
-  `MathlibTest.Linter.Header.Verso,
-  `MathlibTest.DirectoryDependencyLinter.Test]
+def headerTestFiles : NameSet :=
+  .ofList [
+    `MathlibTest.Linter.Header.Basic,
+    `MathlibTest.Linter.Header.Fail,
+    `MathlibTest.Linter.Header.ImportFormat,
+    `MathlibTest.Linter.Header.ImportFormatOff,
+    `MathlibTest.Linter.Header.Verso,
+    `MathlibTest.DirectoryDependencyLinter.Test
+  ]
 
-/-- Check the `Syntax` `imports` for broad imports:
+/--
+Check the `Syntax` `imports` for broad imports:
 `Mathlib.Tactic`, any import starting with `Lake`, or `Mathlib.Tactic.{Have,Replace}`.
 
 This currently returns without logging if `mainModule` is not in `Mathlib` (nor the linter's test
-files). TODO: make this extensible for use in other libraries. -/
+files). TODO: make this extensible for use in other libraries.
+-/
 def broadImportsCheck (imports : Array ImportRef) (mainModule : Name) : CommandElabM Unit := do
   unless mainModule.getRoot == `Mathlib || headerTestFiles.contains mainModule do
     return
@@ -300,29 +327,30 @@ def broadImportsCheck (imports : Array ImportRef) (mainModule : Name) : CommandE
     | `Mathlib.Tactic | `Lean | `Lean.Meta | `Lean.Elab | `Lean.Elab.Tactic | `Std | `Batteries =>
       Linter.logLint linter.style.header i.getIdent
         s!"Files in mathlib cannot import the whole `{i.module}` folder. \
-        Doing so would cause imports to be unnecessarily slow."
+          Doing so would cause imports to be unnecessarily slow."
     | `Mathlib.Tactic.Replace =>
       if mainModule != `Mathlib.Tactic then
         Linter.logLint linter.style.header i.getIdent
           "`Mathlib.Tactic.Replace` defines a deprecated form of the `replace` tactic; \
-          please do not use it in mathlib."
+            please do not use it in mathlib."
     | `Mathlib.Tactic.Have =>
-      if ![`Mathlib.Tactic, `Mathlib.Tactic.Replace].contains mainModule then
+      if ! [`Mathlib.Tactic, `Mathlib.Tactic.Replace].contains mainModule then
         Linter.logLint linter.style.header i.getIdent
           "`Mathlib.Tactic.Have` defines a deprecated form of the `have` tactic; \
-          please do not use it in mathlib."
+            please do not use it in mathlib."
     | modName =>
       if modName.getRoot == `Lake then
         Linter.logLint linter.style.header i.getIdent
           "In the past, importing `Lake` in mathlib has led to dramatic slow-downs of the linter \
-          (see e.g. https://github.com/leanprover-community/mathlib4/pull/13779). \
-          Please consider carefully if this import is useful and \
-          make sure to benchmark it. If this is fine, feel free to silence this linter."
+            (see e.g. https://github.com/leanprover-community/mathlib4/pull/13779). \
+            Please consider carefully if this import is useful and \
+            make sure to benchmark it. If this is fine, feel free to silence this linter."
       else if modName.getRoot == `Init && !i.importAll then
         Linter.logLint linter.style.header i.getIdent
           "Importing anything from `Init` is redundant, because it is already imported by default."
 
-/-- Check the syntax `imports` for syntactically duplicate imports.
+/--
+Check the syntax `imports` for syntactically duplicate imports.
 Two imports are considered duplicates only if they import the same module with the same modifiers.
 For example, `public import Foo` and `import all Foo` are NOT duplicates.
 -/
@@ -341,25 +369,28 @@ If we are in the module system and `linter.style.header.imports` is `true`, refo
 Note that this assumes the check for `linter.style.header` has already been performed.
 -/
 def formatImports (imports : Array (ImportRef × Import.Whitespace)) : CommandElabM Unit := do
-  unless
-    (← getEnv).header.isModule && getLinterValue linter.style.header.imports (← getLinterOptions)
-  do
+  unless (← getEnv).header.isModule
+      && getLinterValue linter.style.header.imports (← getLinterOptions) do
     return
-  let some (lastImportRef, _) := imports.back? | return
-  let impsRef := mkNullNode <| imports.map (·.1.stx)
-  let some (msg, errs) ← liftCoreM <|
-      Import.mkImportSuggestionMessage impsRef (imports.map (·.1.toImport)) imports
+  let some (lastImportRef, _) := imports.back?
     | return
-  let note := .note m!"This linter can be disabled by writing \
-    `set_option {linter.style.header.imports.name} false` just after the import block."
+  let impsRef := mkNullNode <| imports.map (·.1.stx)
+  let some (msg, errs) ←
+      liftCoreM <| Import.mkImportSuggestionMessage impsRef (imports.map (·.1.toImport)) imports
+    | return
+  let note :=
+    .note m!"This linter can be disabled by writing \
+      `set_option {linter.style.header.imports.name} false` just after the import block."
   if errs.isEmpty then
     -- Note: when `errs.isEmpty`, `Import.mkImportSuggestionMessage` gives us a clickable widget
     -- that uses `diffGranularity := .word`. This effectively gives us a newline before `{msg}`,
     -- meaning we don't need one after `reformatted:` here.
     logWarningAt lastImportRef.stx m!"Imports can be reformatted:{msg}{note}"
   else
-    logWarningAt lastImportRef.stx m!"Imports can be reformatted, but some comments could not be \
-      carried over. Please review the comment that will be inserted after the imports.\n{msg}{note}"
+    logWarningAt lastImportRef.stx
+      m!"Imports can be reformatted, but some comments could not be \
+        carried over. Please review the comment that will be inserted after the imports.\
+        \n{msg}{note}"
 
 section HeaderParser
 
@@ -371,11 +402,13 @@ and ignore the other bits of the state.
 
 This approach may be unneeded in the future when using stateful linters. -/
 
-/-- Allow zero or more repetitions of the parser before the parser errors.
+/--
+Allow zero or more repetitions of the parser before the parser errors.
 
 Backtracks to the start of parse at any failure.
 -/
-@[specialize] partial def many (p : Parser) : Parser := fun input s ↦
+@[specialize]
+partial def many (p : Parser) : Parser := fun input s ↦
   let newS := p input s
   if newS.error?.isSome then
     s
@@ -390,93 +423,104 @@ def anyOf (ps : List Parser) : Parser := fun input s ↦ Id.run do
       continue
     else
       return newS
-  return {s with error? := some "no alternative matches"}
+  return { s with error? := some "no alternative matches" }
 
 /-- Accepts either the keyword "false" or the keyword "true". -/
 @[inline] def boolLit : Parser := anyOf [keyword "false", keyword "true"]
 
 /-- Parser for all the module header code allowed before the module docs. -/
 partial def allowedHeaderParser : Parser :=
-  ParseImports.main >>
-  many (keyword "set_option" >> anyOf [
-    keyword "doc.verso.suggestions",
-    keyword "doc.verso.module",
-    -- check last, otherwise it prevents hitting the ones it is a prefix of
-    keyword "doc.verso",
-    keyword "linter.style.header.license",
-    keyword "linter.style.header.imports",
-    -- check last, otherwise it prevents hitting the ones it is a prefix of
-    keyword "linter.style.header" -- for testing and downstream
-  ] >> boolLit)
+  ParseImports.main >> many
+    (keyword "set_option"
+      >> anyOf [
+        keyword "doc.verso.suggestions",
+        keyword "doc.verso.module",
+        -- check last, otherwise it prevents hitting the ones it is a prefix of
+        keyword "doc.verso",
+        keyword "linter.style.header.license",
+        keyword "linter.style.header.imports",
+        -- check last, otherwise it prevents hitting the ones it is a prefix of
+        keyword "linter.style.header" -- for testing and downstream
+      ]
+      >> boolLit)
 
 end HeaderParser
 
 @[inherit_doc Mathlib.Linter.linter.style.header]
-def headerLinter : Linter where run := withSetOptionIn fun stx ↦ do
-  unless getLinterValue linter.style.header (← getLinterOptions) do
-    return
-  if (← get).messages.hasErrors then
-    return
-  profileitM Exception "headerLinter" (← getOptions) do
-  let map ← getFileMap
-  -- This is essentially the same as calling `parseImports'`, but we need access to `s.pos`.
-  let s := allowedHeaderParser map.source (ParseImports.whitespace map.source {})
-  unless (← read).cmdPos == s.pos do
-    return
-  let mainModule ← getMainModule
-  if Parser.isTerminalCommand stx ||
-    -- Deprecated module files are exempt from all header style checks (copyright, doc-string,
-    -- directory dependency, etc.) since they are just import-redirect stubs.
-    stx.isOfKind ``Parser.Command.deprecated_module ||
-    -- Skip linting the library root file itself.
-    -- In practice, the `inLibraryRoot?` check above already covers this (a well-formed
-    -- `<root>.lean` does not import itself), but a root module could appear in `headerTestFiles`.
-    mainModule matches .str .anonymous _libroot
-  then return
-  unless stx.isOfKind ``Parser.Command.moduleDoc do
-    Linter.logLint linter.style.header stx
-      m!"The module doc-string for a file should be the first command after the imports\n\
-        and any necessary `set_option` commands.\n\
-        Please, add a module doc-string (`/-! ... -/`) before `{stx}`.\
-        {.hint' m!"Type `m(odule docstring) + [tab]` to insert a template via snippet."}"
-  let some rootPath := modPathToRootPath (← getFileName) mainModule | return
-  let inLibraryRoot? ← inLibraryRootMutex.atomically do
-    match ← get with
-    | some d => return d
-    | none =>
-      let val ← isInLibraryRoot rootPath mainModule
-      -- We cache the answer to avoid recomputing it on every command. The fill runs under the mutex
-      -- so that concurrent (async) linter runs don't all miss the cache and each redundantly parse
-      -- the library root file; `mainModule` is fixed for the duration of the elaboration.
-      set (some val)
-      return val
-  -- The linter skips files not imported in their library root (e.g. `Mathlib.lean`), to avoid
-  -- linting "scratch files". It is however active in the test files for the linter itself.
-  unless inLibraryRoot? || headerTestFiles.contains mainModule do return
-  -- Re-parse the header slowly, to get the leading whitespace and nice source locations for imports
-  let (headerStx, s, log) ← Parser.parseHeader (Parser.mkInputContext map.source (← getFileName))
-  if log.hasErrors then return
-  let importRefsWithWhitespace := headerToImportRefsWithWhitespace headerStx
-  -- TODO: Enable this more broadly (Archive, etc., and downstream)
-  if mainModule.getRoot == `Mathlib || headerTestFiles.contains mainModule then
-    formatImports importRefsWithWhitespace
-  let importRefs := importRefsWithWhitespace.map (·.1)
-  -- Report on broad or duplicate imports.
-  broadImportsCheck importRefs mainModule
-  duplicateImportsCheck importRefs
-  let srcDir := rootPath.parent.getD "."
-  let errors ← directoryDependencyCheck srcDir mainModule
-  if errors.size > 0 then
-    Linter.logLint linter.directoryDependency (importRefs.back?.elim headerStx (·.stx)) <|
-      m!"\n\n".joinSep errors.toList
-  -- Report any errors about the copyright line.
-  if mainModule != `Mathlib.Init && mainModule != `Mathlib.Tactic then
-    let expectedLicense := linter.style.header.license.get (← getOptions)
-    let copyright := match headerStx.raw.getHeadInfo with
-      | .original lead .. => lead.toString
-      | _ => ""
-    for (stx, m) in copyrightHeaderChecks copyright expectedLicense do
-      Linter.logLint linter.style.header stx m!"* `{stx.getAtomVal}`:\n{m}\n"
+def headerLinter : Linter where
+  run :=
+    withSetOptionIn fun stx ↦ do
+      unless getLinterValue linter.style.header (← getLinterOptions) do
+        return
+      if (← get).messages.hasErrors then
+        return
+      profileitM Exception "headerLinter" (← getOptions) do
+        let map ← getFileMap
+        -- This is essentially the same as calling `parseImports'`, but we need access to `s.pos`.
+        let s := allowedHeaderParser map.source (ParseImports.whitespace map.source {})
+        unless (← read).cmdPos == s.pos do
+          return
+        let mainModule ← getMainModule
+        if Parser.isTerminalCommand stx
+            -- Deprecated module files are exempt from all header style checks (copyright, doc-string,
+            -- directory dependency, etc.) since they are just import-redirect stubs.
+            || stx.isOfKind ``Parser.Command.deprecated_module
+            -- Skip linting the library root file itself.
+            -- In practice, the `inLibraryRoot?` check above already covers this (a well-formed
+            -- `<root>.lean` does not import itself), but a root module could appear in `headerTestFiles`.
+            || mainModule matches .str .anonymous _libroot then
+          return
+        unless stx.isOfKind ``Parser.Command.moduleDoc do
+          Linter.logLint linter.style.header stx
+            m!"The module doc-string for a file should be the first command after the imports\n\
+              and any necessary `set_option` commands.\n\
+              Please, add a module doc-string (`/-! ... -/`) before `{stx}`.\
+              {.hint' m!"Type `m(odule docstring) + [tab]` to insert a template via snippet."}"
+        let some rootPath := modPathToRootPath (← getFileName) mainModule
+          | return
+        let inLibraryRoot? ←
+          inLibraryRootMutex.atomically do
+            match ← get with
+            | some d => return d
+            | none =>
+              let val ← isInLibraryRoot rootPath mainModule
+              -- We cache the answer to avoid recomputing it on every command. The fill runs under the mutex
+              -- so that concurrent (async) linter runs don't all miss the cache and each redundantly parse
+              -- the library root file; `mainModule` is fixed for the duration of the elaboration.
+              set (some val)
+              return val
+        -- The linter skips files not imported in their library root (e.g. `Mathlib.lean`), to avoid
+        -- linting "scratch files". It is however active in the test files for the linter itself.
+        unless inLibraryRoot? || headerTestFiles.contains mainModule do
+          return
+        -- Re-parse the header slowly, to get the leading whitespace and nice source locations for imports
+        let (headerStx, s, log) ←
+          Parser.parseHeader (Parser.mkInputContext map.source (← getFileName))
+        if log.hasErrors then return
+        let importRefsWithWhitespace := headerToImportRefsWithWhitespace headerStx
+        -- TODO: Enable this more broadly (Archive, etc., and downstream)
+        if mainModule.getRoot == `Mathlib || headerTestFiles.contains mainModule then
+          formatImports importRefsWithWhitespace
+        let importRefs := importRefsWithWhitespace.map (·.1)
+        -- Report on broad or duplicate imports.
+        broadImportsCheck importRefs mainModule
+        duplicateImportsCheck importRefs
+        let srcDir := rootPath.parent.getD "."
+        let errors ← directoryDependencyCheck srcDir mainModule
+        if errors.size > 0 then
+          Linter.logLint linter.directoryDependency (importRefs.back?.elim headerStx (·.stx)) <|
+            m!"\n\n".joinSep errors.toList
+        -- Report any errors about the copyright line.
+        if mainModule != `Mathlib.Init && mainModule != `Mathlib.Tactic then
+          let expectedLicense := linter.style.header.license.get (← getOptions)
+          let copyright :=
+            match headerStx.raw.getHeadInfo with
+            | .original lead .. => lead.toString
+            | _ => ""
+          for (stx, m) in copyrightHeaderChecks copyright expectedLicense do
+            Linter.logLint linter.style.header stx
+              m!"* `{stx.getAtomVal}`:\
+                \n{m}\n"
 
 initialize addLinter headerLinter
 

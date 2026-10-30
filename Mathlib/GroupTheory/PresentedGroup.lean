@@ -31,16 +31,16 @@ generators, relations, group presentations
 
 @[expose] public section
 
-
 variable {α β : Type*}
 
-/-- Given a set of relations, `rels`, over a type `α`, `PresentedGroup` constructs the group with
-generators `x : α` and relations `rels` as a quotient of `FreeGroup α`. -/
+/--
+Given a set of relations, `rels`, over a type `α`, `PresentedGroup` constructs the group with
+generators `x : α` and relations `rels` as a quotient of `FreeGroup α`.
+-/
 @[to_additive /-- Given a set of relations, `rels`, over a type `α`, `PresentedAddGroup` constructs
 the additive group with generators `x : α` and relations `rels` as a quotient of
 `FreeAddGroup α`. -/]
-def PresentedGroup (rels : Set (FreeGroup α)) :=
-  FreeGroup α ⧸ Subgroup.normalClosure rels
+def PresentedGroup (rels : Set (FreeGroup α)) := FreeGroup α ⧸ Subgroup.normalClosure rels
 deriving Group
 -- Manual setup for PresentedAddGroup
 instance (rels : Set (FreeAddGroup α)) : AddGroup (PresentedAddGroup rels) :=
@@ -49,8 +49,10 @@ attribute [to_additive existing] instGroupPresentedGroup
 
 namespace PresentedGroup
 
-/-- The canonical map from the free group on `α` to a presented group with generators `x : α`,
-where `x` is mapped to its equivalence class under the given set of relations `rels` -/
+/--
+The canonical map from the free group on `α` to a presented group with generators `x : α`,
+where `x` is mapped to its equivalence class under the given set of relations `rels`
+-/
 @[to_additive /-- The canonical map from the free additive group on `α` to a presented additive
 group with generators `x : α`, where `x` is mapped to its equivalence class under the given set of
 relations `rels` -/]
@@ -61,12 +63,13 @@ def mk (rels : Set (FreeGroup α)) : FreeGroup α →* PresentedGroup rels :=
 theorem mk_surjective (rels : Set (FreeGroup α)) : Function.Surjective <| mk rels :=
   QuotientGroup.mk_surjective
 
-/-- `of` is the canonical map from `α` to a presented group with generators `x : α`. The term `x` is
-mapped to the equivalence class of the image of `x` in `FreeGroup α`. -/
+/--
+`of` is the canonical map from `α` to a presented group with generators `x : α`. The term `x` is
+mapped to the equivalence class of the image of `x` in `FreeGroup α`.
+-/
 @[to_additive /-- `of` is the canonical map from `α` to a presented additive group with generators
  `x : α`. The term `x` is mapped to the equivalence class of the image of `x` in `FreeGroup α`. -/]
-def of {rels : Set (FreeGroup α)} (x : α) : PresentedGroup rels :=
-  mk rels (FreeGroup.of x)
+def of {rels : Set (FreeGroup α)} (x : α) : PresentedGroup rels := mk rels (FreeGroup.of x)
 
 open Subgroup in
 /--
@@ -74,56 +77,61 @@ open Subgroup in
 `PresentedGroup s →* PresentedGroup t` if the image of `s` is contained in `t`.
 -/
 @[to_additive /--
-`FreeAddGroup α →* FreeAddGroup β` induces a homomorphism
+  `FreeAddGroup α →* FreeAddGroup β` induces a homomorphism
 `PresentedAddGroup s →* PresentedAddGroup t` if the image of `s` is contained in `t`.
--/]
-protected def map (f : FreeGroup α →* FreeGroup β)
-    {s : Set (FreeGroup α)} {t : Set (FreeGroup β)} (hst : s.MapsTo f t) :
-    PresentedGroup s →* PresentedGroup t :=
+  -/]
+protected def map
+    (f : FreeGroup α →* FreeGroup β)
+    {s : Set (FreeGroup α)} {t : Set (FreeGroup β)} (hst : s.MapsTo f t)
+    : PresentedGroup s →* PresentedGroup t :=
   QuotientGroup.map _ _ f
-    ((comap_normalClosure_image_ge s f).trans
-    (comap_mono (normalClosure_mono hst.image_subset)))
+    ((comap_normalClosure_image_ge s f).trans (comap_mono (normalClosure_mono hst.image_subset)))
 
 @[to_additive]
-lemma mk_eq_one_iff {rels : Set (FreeGroup α)} {x : FreeGroup α} :
-    mk rels x = 1 ↔ x ∈ Subgroup.normalClosure rels :=
+lemma mk_eq_one_iff {rels : Set (FreeGroup α)} {x : FreeGroup α}
+    : mk rels x = 1 ↔ x ∈ Subgroup.normalClosure rels :=
   QuotientGroup.eq_one_iff _
 
 @[to_additive]
-lemma one_of_mem {rels : Set (FreeGroup α)} {x : FreeGroup α} (hx : x ∈ rels) :
-    mk rels x = 1 :=
+lemma one_of_mem {rels : Set (FreeGroup α)} {x : FreeGroup α} (hx : x ∈ rels) : mk rels x = 1 :=
   mk_eq_one_iff.mpr <| Subgroup.subset_normalClosure hx
 
 @[to_additive]
-lemma mk_eq_mk_of_mul_inv_mem {rels : Set (FreeGroup α)} {x y : FreeGroup α}
-    (hx : x * y⁻¹ ∈ rels) : mk rels x = mk rels y :=
+lemma mk_eq_mk_of_mul_inv_mem {rels : Set (FreeGroup α)} {x y : FreeGroup α} (hx : x * y⁻¹ ∈ rels)
+    : mk rels x = mk rels y :=
   eq_of_mul_inv_eq_one <| one_of_mem hx
 
 @[to_additive]
-lemma mk_eq_mk_of_inv_mul_mem {rels : Set (FreeGroup α)} {x y : FreeGroup α}
-    (hx : x⁻¹ * y ∈ rels) : mk rels x = mk rels y :=
+lemma mk_eq_mk_of_inv_mul_mem {rels : Set (FreeGroup α)} {x y : FreeGroup α} (hx : x⁻¹ * y ∈ rels)
+    : mk rels x = mk rels y :=
   eq_of_inv_mul_eq_one <| one_of_mem hx
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The generators of a presented group generate the presented group. That is, the subgroup closure
-of the set of generators equals `⊤`. -/
+/--
+The generators of a presented group generate the presented group. That is, the subgroup closure
+of the set of generators equals `⊤`.
+-/
 @[to_additive (attr := simp) /-- The generators of a presented additive group generate the presented
 group. That is, the subgroup closure of the set of generators equals `⊤`. -/]
-theorem closure_range_of (rels : Set (FreeGroup α)) :
-    Subgroup.closure (Set.range (PresentedGroup.of : α → PresentedGroup rels)) = ⊤ := by
+theorem closure_range_of (rels : Set (FreeGroup α))
+    : Subgroup.closure (Set.range (PresentedGroup.of : α → PresentedGroup rels)) = ⊤ := by
   have : (PresentedGroup.of : α → PresentedGroup rels) = QuotientGroup.mk' _ ∘ FreeGroup.of := rfl
   rw [this, Set.range_comp, ← MonoidHom.map_closure (QuotientGroup.mk' _),
     FreeGroup.closure_range_of, Subgroup.map_top]
   exact MonoidHom.range_eq_top.2 (QuotientGroup.mk'_surjective _)
 
 @[induction_eliminator, to_additive (attr := induction_eliminator)]
-theorem induction_on {rels : Set (FreeGroup α)} {C : PresentedGroup rels → Prop}
-    (x : PresentedGroup rels) (H : ∀ z, C (mk rels z)) : C x :=
+theorem induction_on
+    {rels : Set (FreeGroup α)} {C : PresentedGroup rels → Prop}
+    (x : PresentedGroup rels) (H : ∀ z, C (mk rels z))
+    : C x :=
   Quotient.inductionOn' x H
 
 @[to_additive]
-theorem generated_by (rels : Set (FreeGroup α)) (H : Subgroup (PresentedGroup rels))
-    (h : ∀ j : α, PresentedGroup.of j ∈ H) (x : PresentedGroup rels) : x ∈ H := by
+theorem generated_by
+    (rels : Set (FreeGroup α)) (H : Subgroup (PresentedGroup rels))
+    (h : ∀ j : α, PresentedGroup.of j ∈ H) (x : PresentedGroup rels)
+    : x ∈ H := by
   obtain ⟨z⟩ := x
   induction z
   · exact one_mem H
@@ -146,17 +154,19 @@ variable {G : Type*} [Group G] {f : α → G} {rels : Set (FreeGroup α)}
 local notation "F" => FreeGroup.lift f
 
 @[to_additive]
-theorem closure_rels_subset_ker (h : ∀ r ∈ rels, FreeGroup.lift f r = 1) :
-    Subgroup.normalClosure rels ≤ MonoidHom.ker F :=
+theorem closure_rels_subset_ker (h : ∀ r ∈ rels, FreeGroup.lift f r = 1)
+    : Subgroup.normalClosure rels ≤ MonoidHom.ker F :=
   Subgroup.normalClosure_le_normal fun x w ↦ MonoidHom.mem_ker.2 (h x w)
 
 @[to_additive]
-theorem to_group_eq_one_of_mem_closure (h : ∀ r ∈ rels, FreeGroup.lift f r = 1) :
-    ∀ x ∈ Subgroup.normalClosure rels, F x = 1 :=
-  fun _ w ↦ MonoidHom.mem_ker.1 <| closure_rels_subset_ker h w
+theorem to_group_eq_one_of_mem_closure (h : ∀ r ∈ rels, FreeGroup.lift f r = 1)
+    : ∀ x ∈ Subgroup.normalClosure rels, F x = 1 := fun _ w ↦
+  MonoidHom.mem_ker.1 <| closure_rels_subset_ker h w
 
-/-- The extension of a map `f : α → G` that satisfies the given relations to a group homomorphism
-from `PresentedGroup rels → G`. -/
+/--
+The extension of a map `f : α → G` that satisfies the given relations to a group homomorphism
+from `PresentedGroup rels → G`.
+-/
 @[to_additive /-- The extension of a map `f : α → G` that satisfies the given relations to an
 additive group homomorphism from `PresentedGroup rels → G`. -/]
 def toGroup (h : ∀ r ∈ rels, FreeGroup.lift f r = 1) : PresentedGroup rels →* G :=
@@ -167,8 +177,10 @@ theorem toGroup.of (h : ∀ r ∈ rels, FreeGroup.lift f r = 1) {x : α} : toGro
   FreeGroup.lift_apply_of
 
 @[to_additive]
-theorem toGroup.unique (h : ∀ r ∈ rels, FreeGroup.lift f r = 1) (g : PresentedGroup rels →* G)
-    (hg : ∀ x : α, g (PresentedGroup.of x) = f x) : ∀ {x}, g x = toGroup h x := by
+theorem toGroup.unique
+    (h : ∀ r ∈ rels, FreeGroup.lift f r = 1)
+    (g : PresentedGroup rels →* G) (hg : ∀ x : α, g (PresentedGroup.of x) = f x)
+    : ∀ {x}, g x = toGroup h x := by
   intro x
   refine QuotientGroup.induction_on x ?_
   exact fun _ ↦ FreeGroup.lift_unique (g.comp (QuotientGroup.mk' _)) hg
@@ -181,27 +193,27 @@ theorem ext {φ ψ : PresentedGroup rels →* G} (hx : ∀ (x : α), φ (.of x) 
 
 /-- Presented groups of isomorphic types are isomorphic. -/
 @[to_additive /-- Presented additive groups of isomorphic types are isomorphic. -/]
-def equivPresentedGroup (rels : Set (FreeGroup α)) (e : α ≃ β) :
-    PresentedGroup rels ≃* PresentedGroup (FreeGroup.freeGroupCongr e '' rels) :=
+def equivPresentedGroup (rels : Set (FreeGroup α)) (e : α ≃ β)
+    : PresentedGroup rels ≃* PresentedGroup (FreeGroup.freeGroupCongr e '' rels) :=
   QuotientGroup.congr (Subgroup.normalClosure rels)
     (Subgroup.normalClosure ((FreeGroup.freeGroupCongr e) '' rels)) (FreeGroup.freeGroupCongr e)
     (Subgroup.map_normalClosure rels (FreeGroup.freeGroupCongr e).toMonoidHom
       (FreeGroup.freeGroupCongr e).surjective)
 
 @[to_additive]
-theorem equivPresentedGroup_apply_of (x : α) (rels : Set (FreeGroup α)) (e : α ≃ β) :
-    equivPresentedGroup rels e (PresentedGroup.of x) =
-      PresentedGroup.of (rels := FreeGroup.freeGroupCongr e '' rels) (e x) := rfl
+theorem equivPresentedGroup_apply_of (x : α) (rels : Set (FreeGroup α)) (e : α ≃ β)
+    : equivPresentedGroup rels e (PresentedGroup.of x)
+      = PresentedGroup.of (rels := FreeGroup.freeGroupCongr e '' rels) (e x) :=
+  rfl
 @[to_additive]
-theorem equivPresentedGroup_symm_apply_of (x : β) (rels : Set (FreeGroup α)) (e : α ≃ β) :
-    (equivPresentedGroup rels e).symm (PresentedGroup.of x) =
-      PresentedGroup.of (rels := rels) (e.symm x) := rfl
+theorem equivPresentedGroup_symm_apply_of (x : β) (rels : Set (FreeGroup α)) (e : α ≃ β)
+    : (equivPresentedGroup rels e).symm (PresentedGroup.of x)
+      = PresentedGroup.of (rels := rels) (e.symm x) :=
+  rfl
 
 end ToGroup
 
-@[to_additive]
-instance (rels : Set (FreeGroup α)) : Inhabited (PresentedGroup rels) :=
-  ⟨1⟩
+@[to_additive] instance (rels : Set (FreeGroup α)) : Inhabited (PresentedGroup rels) := ⟨1⟩
 
 section Coprod
 
@@ -211,25 +223,28 @@ variable (rels₁ : Set (FreeGroup α)) (rels₂ : Set (FreeGroup β))
 The canonical inclusion map from the disjoint union of types to the free product of the relations
 -/
 @[to_additive /--
-The canonical inclusion map from the disjoint union of types to the free product of the relations
--/]
+  The canonical inclusion map from the disjoint union of types to the free product of the relations
+  -/]
 def toCoprod : α ⊕ β → Monoid.Coprod (PresentedGroup rels₁) (PresentedGroup rels₂) :=
   Sum.elim (Monoid.Coprod.inl ∘ .of) (Monoid.Coprod.inr ∘ .of)
 
 @[to_additive (attr := simp)]
-lemma lift_toCoprod_inl_eq_inl_mk : (FreeGroup.lift (toCoprod rels₁ rels₂)).comp
-    (FreeGroup.map Sum.inl) = Monoid.Coprod.inl.comp (mk rels₁) :=
+lemma lift_toCoprod_inl_eq_inl_mk
+    : (FreeGroup.lift (toCoprod rels₁ rels₂)).comp (FreeGroup.map Sum.inl)
+      = Monoid.Coprod.inl.comp (mk rels₁) :=
   FreeGroup.ext_hom _ _ fun _ ↦ rfl
 
 @[to_additive (attr := simp)]
-lemma lift_toCoprod_inr_eq_inr_mk : (FreeGroup.lift (toCoprod rels₁ rels₂)).comp
-    (FreeGroup.map Sum.inr) = Monoid.Coprod.inr.comp (mk rels₂) :=
+lemma lift_toCoprod_inr_eq_inr_mk
+    : (FreeGroup.lift (toCoprod rels₁ rels₂)).comp (FreeGroup.map Sum.inr)
+      = Monoid.Coprod.inr.comp (mk rels₂) :=
   FreeGroup.ext_hom _ _ fun _ ↦ rfl
 
 @[to_additive]
-lemma lift_toCoprod_eq_one (r : FreeGroup (α ⊕ β))
-    (hr : r ∈ FreeGroup.map Sum.inl '' rels₁ ∪ FreeGroup.map Sum.inr '' rels₂) :
-    FreeGroup.lift (toCoprod rels₁ rels₂) r = 1 := by
+lemma lift_toCoprod_eq_one
+    (r : FreeGroup (α ⊕ β))
+    (hr : r ∈ FreeGroup.map Sum.inl '' rels₁ ∪ FreeGroup.map Sum.inr '' rels₂)
+    : FreeGroup.lift (toCoprod rels₁ rels₂) r = 1 := by
   obtain ⟨r, hr, rfl⟩ | ⟨r, hr, rfl⟩ := hr <;> simp [← MonoidHom.comp_apply, one_of_mem hr]
 
 /--
@@ -237,16 +252,14 @@ The free product (Coproduct) of presentations is isomorphic to the presentation 
 the `FreeGroup (α ⊕ β)`
 -/
 @[to_additive /--
-The free product (Coproduct) of presentations is isomorphic to the presentation of the union over
+  The free product (Coproduct) of presentations is isomorphic to the presentation of the union over
 the `FreeAddGroup (α ⊕ β)`
--/]
-def coprodPresentations :
-    PresentedGroup (FreeGroup.map Sum.inl '' rels₁ ∪ FreeGroup.map Sum.inr '' rels₂) ≃*
-    Monoid.Coprod (PresentedGroup rels₁) (PresentedGroup rels₂) :=
-  MonoidHom.toMulEquiv
-    (toGroup (lift_toCoprod_eq_one rels₁ rels₂))
-    (Monoid.Coprod.lift
-      (PresentedGroup.map (FreeGroup.map Sum.inl) fun r hr ↦ .inl ⟨r, hr, rfl⟩)
+  -/]
+def coprodPresentations
+    : PresentedGroup (FreeGroup.map Sum.inl '' rels₁ ∪ FreeGroup.map Sum.inr '' rels₂)
+      ≃* Monoid.Coprod (PresentedGroup rels₁) (PresentedGroup rels₂) :=
+  MonoidHom.toMulEquiv (toGroup (lift_toCoprod_eq_one rels₁ rels₂))
+    (Monoid.Coprod.lift (PresentedGroup.map (FreeGroup.map Sum.inl) fun r hr ↦ .inl ⟨r, hr, rfl⟩)
       (PresentedGroup.map (FreeGroup.map Sum.inr) fun r hr ↦ .inr ⟨r, hr, rfl⟩))
     (ext <| Sum.rec (fun _ ↦ rfl) (fun _ ↦ rfl))
     (Monoid.Coprod.hom_ext (ext fun _ ↦ rfl) (ext fun _ ↦ rfl))

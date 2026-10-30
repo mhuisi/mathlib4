@@ -54,28 +54,29 @@ open scoped Topology SetRel Uniformity
 
 variable {X : Type*}
 
-lemma IsTransitiveRel.prod_subset_trans {s : SetRel X X} {t u v : Set X} [s.IsTrans]
-    (htu : t ×ˢ u ⊆ s) (huv : u ×ˢ v ⊆ s) (hu : u.Nonempty) :
-    t ×ˢ v ⊆ s := by
+lemma IsTransitiveRel.prod_subset_trans
+    {s : SetRel X X} {t u v : Set X} [s.IsTrans]
+    (htu : t ×ˢ u ⊆ s) (huv : u ×ˢ v ⊆ s) (hu : u.Nonempty)
+    : t ×ˢ v ⊆ s := by
   rintro ⟨a, b⟩ hab
   simp only [mem_prod] at hab
   obtain ⟨x, hx⟩ := hu
   exact s.trans (@htu ⟨a, x⟩ ⟨hab.left, hx⟩) (@huv ⟨x, b⟩ ⟨hx, hab.right⟩)
 
-lemma IsTransitiveRel.mem_filter_prod_trans {s : SetRel X X} {f g h : Filter X} [g.NeBot]
-    [s.IsTrans] (hfg : s ∈ f ×ˢ g) (hgh : s ∈ g ×ˢ h) :
-    s ∈ f ×ˢ h :=
+lemma IsTransitiveRel.mem_filter_prod_trans
+    {s : SetRel X X} {f g h : Filter X} [g.NeBot] [s.IsTrans] (hfg : s ∈ f ×ˢ g) (hgh : s ∈ g ×ˢ h)
+    : s ∈ f ×ˢ h :=
   Eventually.trans_prod (p := (fun x y ↦ (x, y) ∈ s)) (q := (fun x y ↦ (x, y) ∈ s))
     (r := (fun x y ↦ (x, y) ∈ s)) hfg hgh fun _ _ _ ↦ s.trans
 
 open UniformSpace
 
-lemma ball_subset_of_mem {V : SetRel X X} [V.IsTrans] {x y : X} (hy : y ∈ V.ball x) :
-    V.ball y ⊆ V.ball x :=
+lemma ball_subset_of_mem {V : SetRel X X} [V.IsTrans] {x y : X} (hy : y ∈ V.ball x)
+    : V.ball y ⊆ V.ball x :=
   SetRel.ball_subset_ball_of_comp_subset hy SetRel.comp_subset_self
 
-lemma ball_eq_of_mem {V : SetRel X X} [V.IsSymm] [V.IsTrans] {x y : X} (hy : y ∈ V.ball x) :
-    V.ball x = V.ball y := by
+lemma ball_eq_of_mem {V : SetRel X X} [V.IsSymm] [V.IsTrans] {x y : X} (hy : y ∈ V.ball x)
+    : V.ball x = V.ball y := by
   refine le_antisymm (ball_subset_of_mem ?_) (ball_subset_of_mem hy)
   exact V.comm.mp hy
 
@@ -84,19 +85,19 @@ variable [UniformSpace X]
 variable (X) in
 /-- A uniform space is ultrametric if the uniformity `𝓤 X` has a basis of equivalence relations. -/
 class IsUltraUniformity : Prop where
-  hasBasis : (𝓤 X).HasBasis
-    (fun s : SetRel X X => s ∈ 𝓤 X ∧ SetRel.IsSymm s ∧ SetRel.IsTrans s) id
+  hasBasis : (𝓤 X).HasBasis (fun s : SetRel X X => s ∈ 𝓤 X ∧ SetRel.IsSymm s ∧ SetRel.IsTrans s) id
 
-lemma IsUltraUniformity.mk_of_hasBasis {ι : Type*} {p : ι → Prop} {s : ι → SetRel X X}
-    (h_basis : (𝓤 X).HasBasis p s) (h_symm : ∀ i, p i → SetRel.IsSymm (s i))
-    (h_trans : ∀ i, p i → SetRel.IsTrans (s i)) :
-    IsUltraUniformity X where
-  hasBasis := h_basis.to_hasBasis'
-    (fun i hi ↦ ⟨s i, ⟨h_basis.mem_of_mem hi, h_symm i hi, h_trans i hi⟩, subset_rfl⟩)
-    (fun _ hs ↦ hs.1)
+lemma IsUltraUniformity.mk_of_hasBasis
+    {ι : Type*} {p : ι → Prop} {s : ι → SetRel X X} (h_basis : (𝓤 X).HasBasis p s)
+    (h_symm : ∀ i, p i → SetRel.IsSymm (s i)) (h_trans : ∀ i, p i → SetRel.IsTrans (s i))
+    : IsUltraUniformity X where
+  hasBasis :=
+    h_basis.to_hasBasis'
+      (fun i hi ↦ ⟨s i, ⟨h_basis.mem_of_mem hi, h_symm i hi, h_trans i hi⟩, subset_rfl⟩)
+      (fun _ hs ↦ hs.1)
 
-lemma IsUltraUniformity.mem_nhds_iff_symm_trans [IsUltraUniformity X] {x : X} {s : Set X} :
-    s ∈ 𝓝 x ↔ ∃ V ∈ 𝓤 X, SetRel.IsSymm V ∧ SetRel.IsTrans V ∧ SetRel.ball V x ⊆ s := by
+lemma IsUltraUniformity.mem_nhds_iff_symm_trans [IsUltraUniformity X] {x : X} {s : Set X}
+    : s ∈ 𝓝 x ↔ ∃ V ∈ 𝓤 X, SetRel.IsSymm V ∧ SetRel.IsTrans V ∧ SetRel.ball V x ⊆ s := by
   rw [UniformSpace.mem_nhds_iff]
   constructor
   · rintro ⟨V, V_in, V_sub⟩
@@ -108,39 +109,41 @@ lemma IsUltraUniformity.mem_nhds_iff_symm_trans [IsUltraUniformity X] {x : X} {s
 
 namespace UniformSpace
 
-lemma isOpen_ball_of_mem_uniformity (x : X) {V : SetRel X X} [V.IsTrans] (h' : V ∈ 𝓤 X) :
-    IsOpen (V.ball x) := by
+lemma isOpen_ball_of_mem_uniformity (x : X) {V : SetRel X X} [V.IsTrans] (h' : V ∈ 𝓤 X)
+    : IsOpen (V.ball x) := by
   rw [isOpen_iff_mem_nhds]
   intro y hy
   have hV : V.ball y ∈ 𝓝 y := SetRel.ball_mem_nhds y h'
   have hsub : V.ball y ⊆ V.ball x := ball_subset_of_mem hy
   exact mem_of_superset hV hsub
 
-lemma isClosed_ball_of_isSymm_of_isTrans_of_mem_uniformity (x : X) {V : SetRel X X} [V.IsSymm]
-    [V.IsTrans] (h' : V ∈ 𝓤 X) :
-    IsClosed (V.ball x) := by
+lemma isClosed_ball_of_isSymm_of_isTrans_of_mem_uniformity
+    (x : X) {V : SetRel X X} [V.IsSymm] [V.IsTrans] (h' : V ∈ 𝓤 X)
+    : IsClosed (V.ball x) := by
   rw [← isOpen_compl_iff, isOpen_iff_ball_subset]
   exact fun y hy ↦ ⟨V, h', fun z hyz hxz ↦ hy <| V.trans (V.symm hyz) hxz⟩
 
-lemma isClopen_ball_of_isSymm_of_isTrans_of_mem_uniformity (x : X) {V : SetRel X X} [V.IsSymm]
-    [V.IsTrans] (h' : V ∈ 𝓤 X) :
-    IsClopen (V.ball x) :=
+lemma isClopen_ball_of_isSymm_of_isTrans_of_mem_uniformity
+    (x : X) {V : SetRel X X} [V.IsSymm] [V.IsTrans] (h' : V ∈ 𝓤 X)
+    : IsClopen (V.ball x) :=
   ⟨isClosed_ball_of_isSymm_of_isTrans_of_mem_uniformity _ ‹_›, isOpen_ball_of_mem_uniformity _ ‹_›⟩
 
 variable [IsUltraUniformity X]
 
-lemma nhds_basis_clopens (x : X) :
-    (𝓝 x).HasBasis (fun s : Set X => x ∈ s ∧ IsClopen s) id := by
+lemma nhds_basis_clopens (x : X) : (𝓝 x).HasBasis (fun s : Set X => x ∈ s ∧ IsClopen s) id := by
   refine (nhds_basis_uniformity (IsUltraUniformity.hasBasis)).to_hasBasis' ?_ ?_
   · intro V ⟨hV, h_symm, h_trans⟩
-    exact ⟨V.ball x, ⟨refl_mem_uniformity hV,
-      isClopen_ball_of_isSymm_of_isTrans_of_mem_uniformity _ hV⟩, le_rfl⟩
+    exact ⟨
+      V.ball x,
+      ⟨refl_mem_uniformity hV, isClopen_ball_of_isSymm_of_isTrans_of_mem_uniformity _ hV⟩,
+      le_rfl
+    ⟩
   · rintro u ⟨hx, hu⟩
     simp [hu.right.mem_nhds_iff, hx]
 
 /-- A uniform space with a nonarchimedean uniformity is zero-dimensional. -/
-lemma _root_.TopologicalSpace.isTopologicalBasis_clopens :
-    TopologicalSpace.IsTopologicalBasis {s : Set X | IsClopen s} :=
+lemma _root_.TopologicalSpace.isTopologicalBasis_clopens
+    : TopologicalSpace.IsTopologicalBasis {s : Set X | IsClopen s} :=
   .of_hasBasis_nhds fun x ↦ by simpa [and_comm] using nhds_basis_clopens x
 
 end UniformSpace

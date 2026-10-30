@@ -34,42 +34,50 @@ variable {α : Type u} {l₁ l₂ : List α}
 
 /-! ### take, drop -/
 
-theorem take_one_drop_eq_of_lt_length {l : List α} {n : ℕ} (h : n < l.length) :
-    (l.drop n).take 1 = [l.get ⟨n, h⟩] := by
+theorem take_one_drop_eq_of_lt_length {l : List α} {n : ℕ} (h : n < l.length)
+    : (l.drop n).take 1 = [l.get ⟨n, h⟩] := by
   rw [drop_eq_getElem_cons h, take, take]
   simp
 
-@[simp] lemma take_eq_self_iff (x : List α) {n : ℕ} : x.take n = x ↔ x.length ≤ n :=
+@[simp]
+lemma take_eq_self_iff (x : List α) {n : ℕ} : x.take n = x ↔ x.length ≤ n :=
   ⟨by grind, take_of_length_le⟩
 
-@[simp] lemma take_self_eq_iff (x : List α) {n : ℕ} : x = x.take n ↔ x.length ≤ n := by
+@[simp]
+lemma take_self_eq_iff (x : List α) {n : ℕ} : x = x.take n ↔ x.length ≤ n := by
   rw [Eq.comm, take_eq_self_iff]
 
-@[simp] lemma take_eq_left_iff {x y : List α} {n : ℕ} :
-    (x ++ y).take n = x.take n ↔ y = [] ∨ n ≤ x.length := by
+@[simp]
+lemma take_eq_left_iff {x y : List α} {n : ℕ}
+    : (x ++ y).take n = x.take n ↔ y = [] ∨ n ≤ x.length := by
   simp [take_append, Nat.sub_eq_zero_iff_le, Or.comm]
 
-@[simp] lemma left_eq_take_iff {x y : List α} {n : ℕ} :
-    x.take n = (x ++ y).take n ↔ y = [] ∨ n ≤ x.length := by
+@[simp]
+lemma left_eq_take_iff {x y : List α} {n : ℕ}
+    : x.take n = (x ++ y).take n ↔ y = [] ∨ n ≤ x.length := by
   rw [Eq.comm]; apply take_eq_left_iff
 
-@[simp] lemma drop_take_append_drop (x : List α) (m n : ℕ) :
-    (x.drop m).take n ++ x.drop (m + n) = x.drop m := by rw [← drop_drop, take_append_drop]
+@[simp]
+lemma drop_take_append_drop (x : List α) (m n : ℕ)
+    : (x.drop m).take n ++ x.drop (m + n) = x.drop m := by
+  rw [← drop_drop, take_append_drop]
 
 /-- Compared to `drop_take_append_drop`, the order of summands is swapped. -/
-@[simp] lemma drop_take_append_drop' (x : List α) (m n : ℕ) :
-    (x.drop m).take n ++ x.drop (n + m) = x.drop m := by rw [Nat.add_comm, drop_take_append_drop]
+@[simp]
+lemma drop_take_append_drop' (x : List α) (m n : ℕ)
+    : (x.drop m).take n ++ x.drop (n + m) = x.drop m := by
+  rw [Nat.add_comm, drop_take_append_drop]
 
 /-- `take_concat_get` in simp normal form -/
-lemma take_concat_get' (l : List α) (i : ℕ) (h : i < l.length) :
-    l.take i ++ [l[i]] = l.take (i + 1) := by simp
+lemma take_concat_get' (l : List α) (i : ℕ) (h : i < l.length)
+    : l.take i ++ [l[i]] = l.take (i + 1) := by
+  simp
 
-theorem cons_getElem_drop_succ {l : List α} {n : Nat} {h : n < l.length} :
-    l[n] :: l.drop (n + 1) = l.drop n :=
+theorem cons_getElem_drop_succ {l : List α} {n : Nat} {h : n < l.length}
+    : l[n] :: l.drop (n + 1) = l.drop n :=
   (drop_eq_getElem_cons h).symm
 
-theorem cons_get_drop_succ {l : List α} {n} :
-    l.get n :: l.drop (n.1 + 1) = l.drop n.1 :=
+theorem cons_get_drop_succ {l : List α} {n} : l.get n :: l.drop (n.1 + 1) = l.drop n.1 :=
   (drop_eq_getElem_cons n.2).symm
 
 lemma drop_length_sub_one {l : List α} (h : l ≠ []) : l.drop (l.length - 1) = [l.getLast h] := by
@@ -167,8 +175,8 @@ variable (p)
 
 variable (p : α → Bool)
 
-private theorem span.loop_eq_take_drop :
-    ∀ l₁ l₂ : List α, span.loop p l₁ l₂ = (l₂.reverse ++ takeWhile p l₁, dropWhile p l₁)
+private theorem span.loop_eq_take_drop
+    : ∀ l₁ l₂ : List α, span.loop p l₁ l₂ = (l₂.reverse ++ takeWhile p l₁, dropWhile p l₁)
   | [], l₂ => by simp [span.loop, takeWhile, dropWhile]
   | (a :: l), l₂ => by
     cases hp : p a <;> simp [hp, span.loop, span.loop_eq_take_drop, takeWhile, dropWhile]
@@ -185,11 +193,12 @@ theorem dropSlice_eq (xs : List α) (n m : ℕ) : dropSlice n m xs = xs.take n +
   induction n generalizing xs with cases xs with grind [dropSlice]
 
 @[simp, grind =]
-theorem length_dropSlice (i j : ℕ) (xs : List α) :
-    (dropSlice i j xs).length = xs.length - min j (xs.length - i) := by
+theorem length_dropSlice (i j : ℕ) (xs : List α)
+    : (dropSlice i j xs).length = xs.length - min j (xs.length - i) := by
   induction xs generalizing i j with cases i with grind [dropSlice]
 
-theorem length_dropSlice_lt (i j : ℕ) (hj : 0 < j) (xs : List α) (hi : i < xs.length) :
-    (dropSlice i j xs).length < xs.length := by grind
+theorem length_dropSlice_lt (i j : ℕ) (hj : 0 < j) (xs : List α) (hi : i < xs.length)
+    : (dropSlice i j xs).length < xs.length := by
+  grind
 
 end List

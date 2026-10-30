@@ -10,7 +10,7 @@ public meta import Lean.Message
 public meta import Lean.ResolveName
 -- Import this linter explicitly to ensure that
 -- this file has a valid copyright header and module docstring.
-public meta import Mathlib.Tactic.Linter.Header  -- shake: keep
+public meta import Mathlib.Tactic.Linter.Header -- shake: keep
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
@@ -28,8 +28,8 @@ namespace Mathlib.Linter
 If `pos` is a `String.Pos`, then `getNamesFrom pos` returns the array of identifiers
 for the names of the declarations whose syntax begins in position at least `pos`.
 -/
-def getNamesFrom {m} [Monad m] [MonadEnv m] [MonadFileMap m] (pos : String.Pos.Raw) :
-    m (Array Syntax) := do
+def getNamesFrom {m} [Monad m] [MonadEnv m] [MonadFileMap m] (pos : String.Pos.Raw)
+    : m (Array Syntax) := do
   -- declarations from parallelism branches should not be interesting here, so use `local`
   let drs := declRangeExt.toPersistentEnvExtension.getState (asyncMode := .local) (← getEnv)
   let fm ← getFileMap
@@ -51,12 +51,15 @@ def getAliasSyntax {m} [Monad m] [MonadResolveName m] (stx : Syntax) : m (Array 
     let currNamespace ← getCurrNamespace
     for idStx in ids do
       let id := idStx.getId
-      aliases := aliases.push
-        (mkIdentFrom (.ofRange (idStx.raw.getRange?.getD default)) (currNamespace ++ id))
+      aliases :=
+        aliases.push (mkIdentFrom (.ofRange (idStx.raw.getRange?.getD default))
+          (currNamespace ++ id))
   return aliases
 
 /-- Used for linters which use `0` instead of `false` for disabling. -/
-def logLint0Disable {m} [Monad m] [MonadLog m] [AddMessageContext m] [MonadOptions m]
-    (linterOption : Lean.Option Nat) (stx : Syntax) (msg : MessageData) : m Unit :=
+def logLint0Disable
+    {m} [Monad m] [MonadLog m] [AddMessageContext m] [MonadOptions m]
+    (linterOption : Lean.Option Nat) (stx : Syntax) (msg : MessageData)
+    : m Unit :=
   let disable := .note m!"This linter can be disabled with `set_option {linterOption.name} 0`"
   logWarningAt stx (.tagged linterOption.name m!"{msg}{disable}")

@@ -32,8 +32,8 @@ namespace Nonneg
 
 variable {α : Type*}
 
-instance floorSemiring [Semiring α] [PartialOrder α] [IsOrderedRing α] [FloorSemiring α] :
-    FloorSemiring (Nonneg α) where
+instance floorSemiring [Semiring α] [PartialOrder α] [IsOrderedRing α] [FloorSemiring α]
+    : FloorSemiring (Nonneg α) where
   floor a := ⌊(a : α)⌋₊
   ceil a := ⌈(a : α)⌉₊
   floor_of_neg ha := FloorSemiring.floor_of_neg ha
@@ -41,15 +41,15 @@ instance floorSemiring [Semiring α] [PartialOrder α] [IsOrderedRing α] [Floor
   gc_ceil a n := FloorSemiring.gc_ceil (a : α) n
 
 @[norm_cast]
-theorem nat_floor_coe [Semiring α] [PartialOrder α] [IsOrderedRing α] [FloorSemiring α]
-    (a : Nonneg α) :
-    ⌊(a : α)⌋₊ = ⌊a⌋₊ :=
+theorem nat_floor_coe
+    [Semiring α] [PartialOrder α] [IsOrderedRing α] [FloorSemiring α] (a : Nonneg α)
+    : ⌊(a : α)⌋₊ = ⌊a⌋₊ :=
   rfl
 
 @[norm_cast]
-theorem nat_ceil_coe [Semiring α] [PartialOrder α] [IsOrderedRing α] [FloorSemiring α]
-    (a : Nonneg α) :
-    ⌈(a : α)⌉₊ = ⌈a⌉₊ :=
+theorem nat_ceil_coe
+    [Semiring α] [PartialOrder α] [IsOrderedRing α] [FloorSemiring α] (a : Nonneg α)
+    : ⌈(a : α)⌉₊ = ⌈a⌉₊ :=
   rfl
 
 end Nonneg

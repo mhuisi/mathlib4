@@ -47,9 +47,7 @@ x : Nat
 ⊢ True
 -/
 #guard_msgs in
-example (x : Nat) : True := by
-  have := x + _
-
+example (x : Nat) : True := by have := x + _
 
 /-!
 `#check` cannot be used to accidentally assign metavariables, since it saves the state.
@@ -99,7 +97,6 @@ example (x : Nat) : True := by
   let y : Nat := ?a
   have := (by refine rfl : ?a = x)
   trace_state
-
 
 /-! The same tests for check' -/
 
@@ -167,7 +164,6 @@ variable (x : {i : Nat} → (y : Nat) → String → String → {j : Nat} → F 
 #check' x
 
 end arrow
-
 -/
 
 /-!

@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Algebra.Field.Defs
 public import Mathlib.Data.Nat.Cast.Basic
-
 import Mathlib.Algebra.GroupWithZero.Units.Basic
 
 set_option doc.verso true
@@ -25,7 +24,6 @@ This file concerns the canonical homomorphism `ℕ → F`, where `F` is a field.
 
 public section
 
-
 namespace Nat
 
 variable {K : Type*} [DivisionSemiring K] {d m n : ℕ}
@@ -34,8 +32,8 @@ variable {K : Type*} [DivisionSemiring K] {d m n : ℕ}
 lemma cast_div (hnm : n ∣ m) (hn : (n : K) ≠ 0) : (↑(m / n) : K) = m / n := by
   obtain ⟨k, rfl⟩ := hnm
   have : n ≠ 0 := by rintro rfl; simp at hn
-  rw [Nat.mul_div_cancel_left _ <| zero_lt_of_ne_zero this, mul_comm n,
-    cast_mul, mul_div_cancel_right₀ _ hn]
+  rw [Nat.mul_div_cancel_left _ <| zero_lt_of_ne_zero this, mul_comm n, cast_mul,
+    mul_div_cancel_right₀ _ hn]
 
 variable [CharZero K]
 
@@ -43,9 +41,10 @@ variable [CharZero K]
 lemma cast_div_charZero (hnm : n ∣ m) : (↑(m / n) : K) = m / n := by
   obtain rfl | hn := eq_or_ne n 0 <;> simp [*]
 
-lemma cast_div_div_div_cancel_right (hn : d ∣ n) (hm : d ∣ m) :
-    (↑(m / d) : K) / (↑(n / d) : K) = (m : K) / n := by
-  rcases eq_or_ne d 0 with (rfl | hd); · simp [Nat.zero_dvd.1 hm]
+lemma cast_div_div_div_cancel_right (hn : d ∣ n) (hm : d ∣ m)
+    : (↑(m / d) : K) / (↑(n / d) : K) = (m : K) / n := by
+  rcases eq_or_ne d 0 with (rfl | hd)
+  · simp [Nat.zero_dvd.1 hm]
   replace hd : (d : K) ≠ 0 := by norm_cast
   rw [cast_div hm, cast_div hn, div_div_div_cancel_right₀ hd] <;> exact hd
 

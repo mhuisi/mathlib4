@@ -49,8 +49,7 @@ def getTableauImp : GaussM n m matType <| Tableau matType := do
       free := free.push col
       col := col + 1
       continue
-    | some rowToSwap =>
-      modify fun mat => swapRows mat row rowToSwap
+    | some rowToSwap => modify fun mat => swapRows mat row rowToSwap
 
     modify fun mat => divideRow mat row mat[(row, col)]!
 
@@ -69,11 +68,13 @@ def getTableauImp : GaussM n m matType <| Tableau matType := do
     free := free.push i
 
   let ansMatrix : matType basic.size free.size ← do
-    let vals := getValues (← get) |>.filterMap fun (i, j, v) =>
-      if j == basic[i]! then
-        none
-      else
-        some (i, free.findIdx? (· == j) |>.get!, -v)
+    let vals :=
+      getValues (← get)
+        |>.filterMap fun (i, j, v) =>
+          if j == basic[i]! then
+            none
+          else
+            some (i, free.findIdx? (· == j) |>.get!, -v)
     pure <| ofValues vals
 
   return ⟨basic, free, ansMatrix⟩

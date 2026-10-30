@@ -48,8 +48,7 @@ theorem isQuotientMap_mk' : IsQuotientMap (mk' K : {v : V // v ≠ 0} → ℙ K 
   isQuotientMap_quotient_mk'
 
 @[fun_prop]
-theorem continuous_mk' : Continuous (mk' K : {v : V // v ≠ 0} → ℙ K V) :=
-  continuous_quotient_mk'
+theorem continuous_mk' : Continuous (mk' K : {v : V // v ≠ 0} → ℙ K V) := continuous_quotient_mk'
 
 variable {α : Type*} [TopologicalSpace α]
 
@@ -58,8 +57,8 @@ theorem continuous_iff {f : ℙ K V → α} : Continuous f ↔ Continuous (f ∘
 
 /-- `Projectivization.mk` is continuous in the vector, as long as the vector stays nonzero. -/
 @[fun_prop]
-theorem continuous_mk {f : α → V} (hf : Continuous f) (hf₀ : ∀ x, f x ≠ 0) :
-    Continuous fun x ↦ mk K (f x) (hf₀ x) :=
+theorem continuous_mk {f : α → V} (hf : Continuous f) (hf₀ : ∀ x, f x ≠ 0)
+    : Continuous fun x ↦ mk K (f x) (hf₀ x) :=
   continuous_mk'.comp (hf.subtype_mk hf₀)
 
 section Map
@@ -68,8 +67,9 @@ variable {L W : Type*} [DivisionRing L] [AddCommGroup W] [Module L W] [Topologic
 
 /-- An injective continuous semilinear map induces a continuous map on projective spaces. -/
 @[fun_prop]
-theorem continuous_map {σ : K →+* L} {f : V →ₛₗ[σ] W} (hf : Function.Injective f)
-    (hfc : Continuous f) : Continuous (map f hf) :=
+theorem continuous_map
+    {σ : K →+* L} {f : V →ₛₗ[σ] W} (hf : Function.Injective f) (hfc : Continuous f)
+    : Continuous (map f hf) :=
   continuous_iff.2 <| continuous_mk (hfc.comp continuous_subtype_val) _
 
 end Map

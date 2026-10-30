@@ -6,7 +6,6 @@ Authors: Kyle Miller, Thomas R. Murrills
 module
 
 public import Mathlib.Init
-
 meta import Lean.Elab.Term
 
 set_option doc.verso true
@@ -20,10 +19,12 @@ public meta section
 
 namespace Lean.Elab.Term
 
-/-- Fully elaborates the term `patt`, allowing typeclass inference failure,
+/--
+Fully elaborates the term `patt`, allowing typeclass inference failure,
 but while setting `errToSorry` to false.
 Typeclass failures result in plain metavariables.
-Instantiates all assigned metavariables. -/
+Instantiates all assigned metavariables.
+-/
 def elabPattern (patt : Term) (expectedType? : Option Expr) : TermElabM Expr := do
   withTheReader Term.Context ({ · with ignoreTCFailures := true, errToSorry := false }) <|
     withSynthesizeLight do

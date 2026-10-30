@@ -9,11 +9,11 @@ public meta import Mathlib.Tactic.Echelon.Bareiss
 public meta import Mathlib.Tactic.Echelon.Cert
 public meta import Mathlib.Tactic.Matrix.Swaps
 public meta import Mathlib.Tactic.NormNum.Basic
-public import Mathlib.LinearAlgebra.Matrix.Echelon.Decomposition  -- shake: keep (Qq dependency)
-public import Mathlib.Tactic.Determinant.Echelon.Reflection  -- shake: keep (Qq dependency)
+public import Mathlib.LinearAlgebra.Matrix.Echelon.Decomposition -- shake: keep (Qq dependency)
+public import Mathlib.Tactic.Determinant.Echelon.Reflection -- shake: keep (Qq dependency)
 public import Mathlib.Tactic.Echelon.Bareiss
 public import Mathlib.Tactic.Echelon.Cert
-public import Mathlib.Tactic.Matrix.Swaps  -- shake: keep (Qq dependency)
+public import Mathlib.Tactic.Matrix.Swaps -- shake: keep (Qq dependency)
 public import Mathlib.Tactic.NormNum.Basic
 
 /-!
@@ -45,8 +45,9 @@ open Lean Meta Qq Mathlib.Tactic.Echelon Mathlib.Tactic.Matrix
 namespace Mathlib.Tactic.Determinant
 
 /-- Compute `diagProd k c rows` with a proof of the equality. -/
-def certifyDiagProdList {u : Level} {α : Q(Type u)} (rα : Q(CommRing $α)) (k c : Nat)
-    (rows : Q(List (List $α))) : MetaM ((e : Q($α)) × Q(diagProd $k $c $rows = $e)) :=
+def certifyDiagProdList
+    {u : Level} {α : Q(Type u)} (rα : Q(CommRing $α)) (k c : Nat) (rows : Q(List (List $α)))
+    : MetaM ((e : Q($α)) × Q(diagProd $k $c $rows = $e)) :=
   match c with
   | 0 => return ⟨q(1), q(diagProd_zero $k $rows)⟩
   | c + 1 => do
@@ -56,17 +57,22 @@ def certifyDiagProdList {u : Level} {α : Q(Type u)} (rα : Q(CommRing $α)) (k 
     have hdrop : List.drop $k $row =Q $entry :: $suffix := ⟨⟩
     return ⟨q($entry * $e), q(diagProd_add_one_cons $hdrop $h)⟩
 
-/-- Compute the product `diagProd 0 m M.lit` of the diagonal of `M` with a proof of the
-equality. -/
-def certifyDiagProd {u : Level} {m : Nat} {α : Q(Type u)} (rα : Q(CommRing $α))
-    (M : ListMatrixLit α m m) : MetaM ((e : Q($α)) × Q(diagProd 0 $m $(M.lit) = $e)) :=
+/--
+Compute the product `diagProd 0 m M.lit` of the diagonal of `M` with a proof of the
+equality.
+-/
+def certifyDiagProd
+    {u : Level} {m : Nat} {α : Q(Type u)} (rα : Q(CommRing $α)) (M : ListMatrixLit α m m)
+    : MetaM ((e : Q($α)) × Q(diagProd 0 $m $(M.lit) = $e)) :=
   certifyDiagProdList rα 0 m M.lit
 
-/-- The value of the determinant read off the decomposition `data`, computed by `s * u / l`,
+/--
+The value of the determinant read off the decomposition `data`, computed by `s * u / l`,
 where `u` and `l` are the diagonal products of `U` and `L` and `s` is the sign of the swaps.
 -/
-def detValue {u : Level} {α : Q(Type u)} (m : Nat) {V : Type} (model : ModelAux α V)
-    (data : BareissData V) : MetaM (Option Q($α)) := do
+def detValue
+    {u : Level} {α : Q(Type u)} (m : Nat) {V : Type} (model : ModelAux α V) (data : BareissData V)
+    : MetaM (Option Q($α)) := do
   let ops := model.ops
   -- In positive characteristic a missing pivot leaves a diagonal entry that is a nonzero multiple
   -- of the characteristic, so the quotient below would not read as zero.
@@ -80,19 +86,23 @@ def detValue {u : Level} {α : Q(Type u)} (m : Nat) {V : Type} (model : ModelAux
   if ops.isZero (ops.sub (ops.mul v diagL) num) then
     return some (← model.mkEntry v)
   -- The fraction needs a `DivisionRing`. Without one, `norm_det` falls back to Bird's algorithm.
-  let some _dα ← synthInstanceQ? q(DivisionRing $α) | return none
+  let some _dα ← synthInstanceQ? q(DivisionRing $α)
+    | return none
   let frac : Q($α) := q($(← model.mkEntry num) / $(← model.mkEntry diagL))
   -- Normalize `frac` when it is `norm_num` evaluable
-  let some r ← try some <$> Meta.NormNum.derive frac catch _ => pure none |
-    return some frac
+  let some r ← try some <$> Meta.NormNum.derive frac catch _ => pure none
+    | return some frac
   return some (← r.toSimpResult).expr
 
 /-- Construct the value `v` and a proof that `A.det = v` by computing the echelon decomposition. -/
-def proveEchelonDet {u : Level} {α : Q(Type u)} (rα : Q(CommRing $α)) (iα : Q(IsDomain $α))
-    (m : Nat) (A : Q(Matrix (Fin $m) (Fin $m) $α)) (entries : Array (Array Q($α))) :
-    MetaM (Option ((v : Q($α)) × Q(($A).det = $v))) := do
+def proveEchelonDet
+    {u : Level} {α : Q(Type u)} (rα : Q(CommRing $α)) (iα : Q(IsDomain $α))
+    (m : Nat) (A : Q(Matrix (Fin $m) (Fin $m) $α))
+    (entries : Array (Array Q($α)))
+    : MetaM (Option ((v : Q($α)) × Q(($A).det = $v))) := do
   let r ← mkBareissDecomposition rα A entries
-  let some v ← detValue m r.model r.data | return none
+  let some v ← detValue m r.model r.data
+    | return none
   let ⟨L, swaps, pivot, decomp, U, hmul⟩ := r.cert
   let ⟨s, hs⟩ := certifyPermSign rα swaps r.data.swaps.size
   let σ : Q(Equiv.Perm (Fin $m)) := q(permOfSwaps $swaps)
@@ -100,9 +110,8 @@ def proveEchelonDet {u : Level} {α : Q(Type u)} (rα : Q(CommRing $α)) (iα : 
   let ⟨diagL, hl⟩ ← certifyDiagProd rα L
   let ⟨diagU, hu⟩ ← certifyDiagProd rα U
   let hv : Q($diagL * ($s * $v) = $diagU) ←
-    (r.model.entryCertifier?.getD (decideCertifier α)).eq q($diagL * ($s * $v)) diagU
-  have hmul : Q((ofLists $m $m $(L.lit)) * ($A).submatrix $σ id = ofLists $m $m $(U.lit)) :=
-    hmul
+    (r.model.entryCertifier?.getD (decideCertifier α)).eq (q($diagL * ($s * $v))) diagU
+  have hmul : Q((ofLists $m $m $(L.lit)) * ($A).submatrix $σ id = ofLists $m $m $(U.lit)) := hmul
   return some ⟨v, q(det_eq_of_decomposition $decomp $hmul $hl $hu $hs $hv)⟩
 
 end Mathlib.Tactic.Determinant

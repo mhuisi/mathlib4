@@ -8,7 +8,6 @@ module
 public import Mathlib.GroupTheory.Perm.Sign
 public import Mathlib.LinearAlgebra.Matrix.Echelon.Decomposition
 public import Mathlib.Tactic.Matrix.OfLists
-
 import Mathlib.Algebra.BigOperators.Fin
 
 /-!
@@ -43,19 +42,21 @@ section
 
 variable [Zero α] [One α] [Mul α]
 
-/-- The product of the entries of rows at positions `(i, k + i)` for `i < c`. Missing entries
-are padded with 0. -/
+/--
+The product of the entries of rows at positions `(i, k + i)` for `i < c`. Missing entries
+are padded with 0.
+-/
 def diagProd (k c : ℕ) (rows : List (List α)) : α :=
   match c with
   | 0 => 1
   | c + 1 => ((rows.headD []).drop k).headD 0 * diagProd (k + 1) c rows.tail
 
-theorem diagProd_zero (k : ℕ) (rows : List (List α)) : diagProd k 0 rows = 1 := by
-  rw [diagProd]
+theorem diagProd_zero (k : ℕ) (rows : List (List α)) : diagProd k 0 rows = 1 := by rw [diagProd]
 
-theorem diagProd_add_one_cons {k c : ℕ} {row : List α} {rows : List (List α)} {d e : α}
-    {suffix : List α} (hdrop : row.drop k = d :: suffix) (h : diagProd (k + 1) c rows = e) :
-    diagProd k (c + 1) (row :: rows) = d * e := by
+theorem diagProd_add_one_cons
+    {k c : ℕ} {row : List α} {rows : List (List α)} {d e : α} {suffix : List α}
+    (hdrop : row.drop k = d :: suffix) (h : diagProd (k + 1) c rows = e)
+    : diagProd k (c + 1) (row :: rows) = d * e := by
   simp [diagProd, hdrop, h]
 
 end
@@ -64,32 +65,34 @@ section CommMonoid
 
 variable [CommMonoid α] [Zero α]
 
-theorem diagProd_eq (k c : ℕ) (rows : List (List α)) :
-    diagProd k c rows = ∏ i : Fin c, (rows.getD i []).getD (k + i) 0 := by
+theorem diagProd_eq (k c : ℕ) (rows : List (List α))
+    : diagProd k c rows = ∏ i : Fin c, (rows.getD i []).getD (k + i) 0 := by
   induction c generalizing k rows with
   | zero => simp [diagProd]
   | succ c ih =>
     rw [Fin.prod_univ_succ, diagProd, ih]
     cases rows <;> simp [Nat.add_assoc, Nat.add_comm 1]
 
-theorem prod_diag_ofLists (m : ℕ) (rows : List (List α)) :
-    ∏ i, ofLists m m rows i i = diagProd 0 m rows := by
+theorem prod_diag_ofLists (m : ℕ) (rows : List (List α))
+    : ∏ i, ofLists m m rows i i = diagProd 0 m rows := by
   simp [diagProd_eq]
 
 end CommMonoid
 
 /-! ### Determinants from echelon decompositions -/
 
-theorem det_eq_of_decomposition {m : ℕ} {R : Type*} [CommRing R] [IsDomain R]
+theorem det_eq_of_decomposition
+    {m : ℕ} {R : Type*} [CommRing R] [IsDomain R]
     {A : Matrix (Fin m) (Fin m) R} {rowsL rowsU : List (List R)} {σ : Equiv.Perm (Fin m)}
     {pivot : Fin m → WithTop (Fin m)} (cert : Echelon.Decomposition A (ofLists m m rowsL) σ pivot)
-    {l u s v : R} (hU : ofLists m m rowsL * A.submatrix σ id = ofLists m m rowsU)
-    (hl : diagProd 0 m rowsL = l) (hu : diagProd 0 m rowsU = u)
-    (hs : ((Equiv.Perm.sign σ : ℤ) : R) = s) (hv : l * (s * v) = u) : A.det = v := by
+    {l u s v : R}
+    (hU : ofLists m m rowsL * A.submatrix σ id = ofLists m m rowsU) (hl : diagProd 0 m rowsL = l)
+    (hu : diagProd 0 m rowsU = u) (hs : ((Equiv.Perm.sign σ : ℤ) : R) = s) (hv : l * (s * v) = u)
+    : A.det = v := by
   have hdiag : ∏ i, ofLists m m rowsL i i ≠ 0 :=
     Finset.prod_ne_zero_iff.mpr fun i _ ↦ cert.L_diag_ne_zero i
   have hσ : IsUnit (Equiv.Perm.sign σ : R) := (Equiv.Perm.sign σ).isUnit.map (Int.castRingHom R)
-  rw [← hσ.mul_right_inj, ← mul_right_inj' hdiag, cert.prod_diag_mul_det, hU,
-    prod_diag_ofLists, prod_diag_ofLists, hl, hu, hs, hv]
+  rw [← hσ.mul_right_inj, ← mul_right_inj' hdiag, cert.prod_diag_mul_det, hU, prod_diag_ofLists,
+    prod_diag_ofLists, hl, hu, hs, hv]
 
 end Mathlib.Tactic.Determinant

@@ -40,19 +40,17 @@ the support `O ∩ -O` of `O` forms a prime ideal.
 structure IsOrdering (S : Subsemiring R) : Prop where
   isSpanning : S.IsSpanning
   support_ne_top : S.support ≠ ⊤
-  mem_support_or_mem_support :
-    ∀ {x y : R}, x * y ∈ S.support →
-      x ∈ S.support ∨ y ∈ S.support
+  mem_support_or_mem_support : ∀ {x y : R}, x * y ∈ S.support → x ∈ S.support ∨ y ∈ S.support
 
-theorem IsOrdering.isPrime_supportIdeal (hS : S.IsOrdering) :
-    (S.supportIdeal hS.isSpanning).IsPrime where
+theorem IsOrdering.isPrime_supportIdeal (hS : S.IsOrdering)
+    : (S.supportIdeal hS.isSpanning).IsPrime where
   ne_top' := by
     apply_fun Submodule.toAddSubgroup
     simpa using hS.support_ne_top
   mem_or_mem' := hS.mem_support_or_mem_support
 
-theorem IsOrdering.of_isPrime_supportIdeal (hS : S.IsSpanning)
-    (hS₂ : (S.supportIdeal hS).IsPrime) : S.IsOrdering where
+theorem IsOrdering.of_isPrime_supportIdeal (hS : S.IsSpanning) (hS₂ : (S.supportIdeal hS).IsPrime)
+    : S.IsOrdering where
   isSpanning := hS
   support_ne_top := by simpa [← Submodule.toAddSubgroup_inj] using hS₂.ne_top
   mem_support_or_mem_support := hS₂.mem_or_mem
@@ -80,7 +78,7 @@ theorem sumSq_le (hS : IsPreordering S) : .sumSq R ≤ S := by
   exact fun _ ↦ hS.mem_of_isSquare
 
 protected theorem mem_of_isSumSq (hS : IsPreordering S) {x : R} (hx : IsSumSq x) : x ∈ S := by
-   grind [membership, hS.sumSq_le, mem_sumSq]
+  grind [membership, hS.sumSq_le, mem_sumSq]
 
 grind_pattern [membership] IsPreordering.mem_of_isSumSq => S.IsPreordering, x ∈ S
 
@@ -99,9 +97,9 @@ theorem of_isSpanning (hS : S.IsSpanning) (h : S ≠ ⊤) : S.IsPreordering :=
 end IsPreordering
 
 /-- An ordering is a preordering. -/
-theorem IsOrdering.isPreordering (hS : S.IsOrdering) :
-    S.IsPreordering := .of_isSpanning hS.isSpanning <| fun hc ↦ by
-  simpa [hc, supportIdeal] using hS.isPrime_supportIdeal.ne_top
+theorem IsOrdering.isPreordering (hS : S.IsOrdering) : S.IsPreordering :=
+  .of_isSpanning hS.isSpanning <| fun hc ↦ by
+    simpa [hc, supportIdeal] using hS.isPrime_supportIdeal.ne_top
 
 end Subsemiring
 
@@ -109,8 +107,10 @@ end Subsemiring
 
 variable (R : Type*) [CommRing R]
 
-/-- A preordering on a ring `R` is a subsemiring of `R` containing all squares,
-but not containing `-1`. -/
+/--
+A preordering on a ring `R` is a subsemiring of `R` containing all squares,
+but not containing `-1`.
+-/
 @[deprecated Subsemiring.IsPreordering +typeChanged (since := "2026-10-28"), ext]
 structure RingPreordering extends Subsemiring R where
   mem_of_isSquare' {x : R} (hx : IsSquare x) : x ∈ carrier := by aesop
@@ -160,12 +160,14 @@ protected theorem neg_one_notMem (P : RingPreordering R) : -1 ∉ P :=
   RingPreordering.neg_one_notMem' _
 
 @[deprecated "no replacement" (since := "2026-10-28")]
-theorem toSubsemiring_injective :
-    Function.Injective (toSubsemiring : RingPreordering R → _) := fun A B h => by ext; rw [h]
+theorem toSubsemiring_injective
+    : Function.Injective (toSubsemiring : RingPreordering R → _) := fun A B h => by
+  ext; rw [h]
 
 @[deprecated "no replacement" (since := "2026-10-28"), simp]
-theorem toSubsemiring_inj {P₁ P₂ : RingPreordering R} :
-    P₁.toSubsemiring = P₂.toSubsemiring ↔ P₁ = P₂ := toSubsemiring_injective.eq_iff
+theorem toSubsemiring_inj {P₁ P₂ : RingPreordering R}
+    : P₁.toSubsemiring = P₂.toSubsemiring ↔ P₁ = P₂ :=
+  toSubsemiring_injective.eq_iff
 
 @[deprecated "no replacement" (since := "2026-10-28"), simp]
 theorem mem_toSubsemiring {P : RingPreordering R} {x : R} : x ∈ P.toSubsemiring ↔ x ∈ P := .rfl
@@ -174,17 +176,21 @@ theorem mem_toSubsemiring {P : RingPreordering R} {x : R} : x ∈ P.toSubsemirin
 theorem coe_toSubsemiring (P : RingPreordering R) : (P.toSubsemiring : Set R) = P := rfl
 
 @[deprecated "no replacement" (since := "2026-10-28"), simp]
-theorem mem_mk {toSubsemiring : Subsemiring R} (mem_of_isSquare neg_one_notMem) {x : R} :
-    x ∈ mk toSubsemiring mem_of_isSquare neg_one_notMem ↔ x ∈ toSubsemiring := .rfl
+theorem mem_mk {toSubsemiring : Subsemiring R} (mem_of_isSquare neg_one_notMem) {x : R}
+    : x ∈ mk toSubsemiring mem_of_isSquare neg_one_notMem ↔ x ∈ toSubsemiring :=
+  .rfl
 
 @[deprecated "no replacement" (since := "2026-10-28"), simp]
-theorem coe_set_mk (toSubsemiring : Subsemiring R) (mem_of_isSquare neg_one_notMem) :
-    (mk toSubsemiring mem_of_isSquare neg_one_notMem : Set R) = toSubsemiring := rfl
+theorem coe_set_mk (toSubsemiring : Subsemiring R) (mem_of_isSquare neg_one_notMem)
+    : (mk toSubsemiring mem_of_isSquare neg_one_notMem : Set R) = toSubsemiring :=
+  rfl
 
 section copy
 
-/-- Copy of a preordering with a new `carrier` equal to the old one. Useful to fix definitional
-equalities. -/
+/--
+Copy of a preordering with a new `carrier` equal to the old one. Useful to fix definitional
+equalities.
+-/
 @[deprecated "no replacement" (since := "2026-10-28"), simps]
 protected def copy (P : RingPreordering R) (S : Set R) (hS : S = P) : RingPreordering R where
   carrier := S
@@ -196,8 +202,8 @@ protected def copy (P : RingPreordering R) (S : Set R) (hS : S = P) : RingPreord
 attribute [deprecated "no replacement" (since := "2026-10-28"), norm_cast] coe_copy
 
 @[deprecated "no replacement" (since := "2026-10-28"), simp]
-theorem mem_copy (P : RingPreordering R) (S : Set R) (hS : S = P) {x} :
-    x ∈ P.copy S hS ↔ x ∈ S := .rfl
+theorem mem_copy (P : RingPreordering R) (S : Set R) (hS : S = P) {x} : x ∈ P.copy S hS ↔ x ∈ S :=
+  .rfl
 
 @[deprecated "no replacement" (since := "2026-10-28")]
 theorem copy_eq (P : RingPreordering R) (S : Set R) (hS : S = P) : P.copy S hS = S := rfl
@@ -222,26 +228,27 @@ def supportAddSubgroup (P : RingPreordering R) : AddSubgroup R where
   neg_mem' := by aesop
 
 @[deprecated AddSubmonoid.mem_support +typeChanged (since := "2026-10-28")]
-theorem mem_supportAddSubgroup {P : RingPreordering R} {x} :
-    x ∈ P.supportAddSubgroup ↔ x ∈ P ∧ -x ∈ P := .rfl
+theorem mem_supportAddSubgroup {P : RingPreordering R} {x}
+    : x ∈ P.supportAddSubgroup ↔ x ∈ P ∧ -x ∈ P :=
+  .rfl
 
 @[deprecated AddSubmonoid.coe_support +typeChanged (since := "2026-10-28")]
-theorem coe_supportAddSubgroup {P : RingPreordering R} :
-    P.supportAddSubgroup = (P ∩ -P : Set R) := rfl
+theorem coe_supportAddSubgroup {P : RingPreordering R} : P.supportAddSubgroup = (P ∩ -P : Set R) :=
+  rfl
 
 end supportAddSubgroup
 
 /-- Typeclass to track whether the support of a preordering forms an ideal. -/
 @[deprecated "no replacement" (since := "2026-10-28")]
 class HasIdealSupport (P : RingPreordering R) : Prop where
-  smul_mem_support (P) (x : R) {a : R} (ha : a ∈ P.supportAddSubgroup) :
-    x * a ∈ P.supportAddSubgroup
+  smul_mem_support (P) (x : R) {a : R} (ha : a ∈ P.supportAddSubgroup)
+    : x * a ∈ P.supportAddSubgroup
 
 export HasIdealSupport (smul_mem_support)
 
 @[deprecated "no replacement" (since := "2026-10-28")]
-theorem hasIdealSupport_iff {P : RingPreordering R} :
-    P.HasIdealSupport ↔ ∀ x a : R, a ∈ P → -a ∈ P → x * a ∈ P ∧ -(x * a) ∈ P where
+theorem hasIdealSupport_iff {P : RingPreordering R}
+    : P.HasIdealSupport ↔ ∀ x a : R, a ∈ P → -a ∈ P → x * a ∈ P ∧ -(x * a) ∈ P where
   mp _ := by simpa [mem_supportAddSubgroup] using P.smul_mem_support
   mpr _ := ⟨by simpa [mem_supportAddSubgroup]⟩
 
@@ -265,16 +272,19 @@ def support (P : RingPreordering R) [P.HasIdealSupport] : Ideal R where
   smul_mem' := by simpa using smul_mem_support P
 
 @[deprecated Subsemiring.mem_supportIdeal +typeChanged (since := "2026-10-28")]
-theorem mem_support {P : RingPreordering R} [P.HasIdealSupport] {x} :
-    x ∈ P.support ↔ x ∈ P ∧ -x ∈ P := .rfl
+theorem mem_support {P : RingPreordering R} [P.HasIdealSupport] {x}
+    : x ∈ P.support ↔ x ∈ P ∧ -x ∈ P :=
+  .rfl
 
 @[deprecated Subsemiring.coe_supportIdeal +typeChanged (since := "2026-10-28")]
-theorem coe_support {P : RingPreordering R} [P.HasIdealSupport] :
-    P.support = (P : Set R) ∩ -(P : Set R) := rfl
+theorem coe_support {P : RingPreordering R} [P.HasIdealSupport]
+    : P.support = (P : Set R) ∩ -(P : Set R) :=
+  rfl
 
 @[deprecated Subsemiring.supportIdeal_toAddSubgroup +typeChanged (since := "2026-10-28"), simp]
-theorem supportAddSubgroup_eq {P : RingPreordering R} [P.HasIdealSupport] :
-    P.supportAddSubgroup = P.support.toAddSubgroup := rfl
+theorem supportAddSubgroup_eq {P : RingPreordering R} [P.HasIdealSupport]
+    : P.supportAddSubgroup = P.support.toAddSubgroup :=
+  rfl
 
 end support
 

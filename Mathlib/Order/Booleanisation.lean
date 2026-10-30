@@ -36,10 +36,12 @@ open Function
 
 variable {α : Type*}
 
-/-- Boolean algebra containing a given generalised Boolean algebra `α` as a sublattice.
+/--
+Boolean algebra containing a given generalised Boolean algebra `α` as a sublattice.
 
 This should be thought of as made of a copy of `α` (representing elements of `α`) living under
-another copy of `α` (representing complements of elements of `α`). -/
+another copy of `α` (representing complements of elements of `α`).
+-/
 def Booleanisation (α : Type*) := α ⊕ α
 
 namespace Booleanisation
@@ -47,8 +49,10 @@ namespace Booleanisation
 instance instDecidableEq [DecidableEq α] : DecidableEq (Booleanisation α) :=
   inferInstanceAs <| DecidableEq (α ⊕ α)
 
-/-- The natural inclusion `a ↦ a` from a generalized Boolean algebra to its generated Boolean
-algebra. -/
+/--
+The natural inclusion `a ↦ a` from a generalized Boolean algebra to its generated Boolean
+algebra.
+-/
 @[match_pattern] def lift : α → Booleanisation α := Sum.inl
 
 /-- The inclusion `a ↦ aᶜ` from a generalized Boolean algebra to its generated Boolean algebra. -/
@@ -65,21 +69,25 @@ instance instCompl : Compl (Booleanisation α) where
 
 variable [GeneralizedBooleanAlgebra α]
 
-/-- The order on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The order on `Booleanisation α` is as follows: For `a b : α`,
 * `a ≤ b` iff `a ≤ b` in `α`
 * `a ≤ bᶜ` iff `a` and `b` are disjoint in `α`
 * `aᶜ ≤ bᶜ` iff `b ≤ a` in `α`
-* `¬ aᶜ ≤ b` -/
+* `¬ aᶜ ≤ b`
+-/
 protected inductive LE : Booleanisation α → Booleanisation α → Prop
   | protected lift {a b} : a ≤ b → Booleanisation.LE (lift a) (lift b)
   | protected comp {a b} : a ≤ b → Booleanisation.LE (comp b) (comp a)
   | protected sep {a b} : Disjoint a b → Booleanisation.LE (lift a) (comp b)
 
-/-- The order on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The order on `Booleanisation α` is as follows: For `a b : α`,
 * `a < b` iff `a < b` in `α`
 * `a < bᶜ` iff `a` and `b` are disjoint in `α`
 * `aᶜ < bᶜ` iff `b < a` in `α`
-* `¬ aᶜ < b` -/
+* `¬ aᶜ < b`
+-/
 protected inductive LT : Booleanisation α → Booleanisation α → Prop
   | protected lift {a b} : a < b → Booleanisation.LT (lift a) (lift b)
   | protected comp {a b} : a < b → Booleanisation.LT (comp b) (comp a)
@@ -93,11 +101,13 @@ instance instLE : LE (Booleanisation α) where
 instance instLT : LT (Booleanisation α) where
   lt := Booleanisation.LT
 
-/-- The supremum on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The supremum on `Booleanisation α` is as follows: For `a b : α`,
 * `a ⊔ b` is `a ⊔ b`
 * `a ⊔ bᶜ` is `(b \ a)ᶜ`
 * `aᶜ ⊔ b` is `(a \ b)ᶜ`
-* `aᶜ ⊔ bᶜ` is `(a ⊓ b)ᶜ` -/
+* `aᶜ ⊔ bᶜ` is `(a ⊓ b)ᶜ`
+-/
 instance instSup : Max (Booleanisation α) where
   max
     | lift a, lift b => lift (a ⊔ b)
@@ -105,11 +115,13 @@ instance instSup : Max (Booleanisation α) where
     | comp a, lift b => comp (a \ b)
     | comp a, comp b => comp (a ⊓ b)
 
-/-- The infimum on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The infimum on `Booleanisation α` is as follows: For `a b : α`,
 * `a ⊓ b` is `a ⊓ b`
 * `a ⊓ bᶜ` is `a \ b`
 * `aᶜ ⊓ b` is `b \ a`
-* `aᶜ ⊓ bᶜ` is `(a ⊔ b)ᶜ` -/
+* `aᶜ ⊓ bᶜ` is `(a ⊔ b)ᶜ`
+-/
 instance instInf : Min (Booleanisation α) where
   min
     | lift a, lift b => lift (a ⊓ b)
@@ -125,11 +137,13 @@ instance instBot : Bot (Booleanisation α) where
 instance instTop : Top (Booleanisation α) where
   top := comp ⊥
 
-/-- The difference operator on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The difference operator on `Booleanisation α` is as follows: For `a b : α`,
 * `a \ b` is `a \ b`
 * `a \ bᶜ` is `a ⊓ b`
 * `aᶜ \ b` is `(a ⊔ b)ᶜ`
-* `aᶜ \ bᶜ` is `b \ a` -/
+* `aᶜ \ bᶜ` is `b \ a`
+-/
 instance instSDiff : SDiff (Booleanisation α) where
   sdiff
     | lift a, lift b => lift (a \ b)
@@ -238,8 +252,8 @@ instance instDistribLattice : DistribLattice (Booleanisation α) where
   le_sup_inf
     | lift _, lift _, lift _ => LE.lift le_sup_inf
     | lift a, lift b, comp c => LE.lift <| by simp [sup_comm, sup_assoc]
-    | lift a, comp b, lift c => LE.lift <| by
-      simp [sup_left_comm (a := b \ a), sup_comm (a := b \ a)]
+    | lift a, comp b, lift c =>
+      LE.lift <| by simp [sup_left_comm (a := b \ a), sup_comm (a := b \ a)]
     | lift a, comp b, comp c => LE.comp <| by rw [sup_sdiff]
     | comp a, lift b, lift c => LE.comp <| by rw [sdiff_inf]
     | comp a, lift b, comp c => LE.comp <| by rw [sdiff_sdiff_right']

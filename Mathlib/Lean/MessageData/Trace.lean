@@ -6,7 +6,6 @@ Authors: Kim Morrison
 module
 
 public import Lean.Message
-
 import Mathlib.Init
 
 /-!
@@ -27,17 +26,20 @@ public section
 
 namespace Lean.MessageData
 
-/-- Extract the instance name from a rendered `apply @Foo to Goal` trace header.
+/--
+Extract the instance name from a rendered `apply @Foo to Goal` trace header.
 Returns the string between `"apply "` and `" to "`.
 
 Note: this is fragile string matching against Lean's `Meta.synthInstance` trace format.
 If the trace format changes, this function will silently return the original string.
 Once [lean4#12699](https://github.com/leanprover/lean4/pull/12699) is available,
 these nodes will have trace class `Meta.synthInstance.apply` and can be identified
-structurally via `td.cls` instead of string-matching on the header. -/
+structurally via `td.cls` instead of string-matching on the header.
+-/
 def extractInstName (s : String) : String :=
   match s.splitOn "apply " with
-  | [_, rest] => match rest.splitOn " to " with
+  | [_, rest] =>
+    match rest.splitOn " to " with
     | name :: _ => name.trimAscii.toString
     | _ => s
   | _ => s

@@ -55,8 +55,9 @@ instance : CanonicallyOrderedMul (Associates M) where
 variable [IsCancelMulZero M]
 
 instance instPartialOrder : PartialOrder (Associates M) where
-  le_antisymm := mk_surjective.forall₂.2 fun _a _b hab hba => mk_eq_mk_iff_associated.2 <|
-    associated_of_dvd_dvd (dvd_of_mk_le_mk hab) (dvd_of_mk_le_mk hba)
+  le_antisymm :=
+    mk_surjective.forall₂.2 fun _a _b hab hba =>
+      mk_eq_mk_iff_associated.2 <| associated_of_dvd_dvd (dvd_of_mk_le_mk hab) (dvd_of_mk_le_mk hba)
 
 lemma le_of_mul_le_mul_left (a b c : Associates M) (ha : a ≠ 0) : a * b ≤ a * c → b ≤ c
   | ⟨d, hd⟩ => ⟨d, mul_left_cancel₀ ha <| by rwa [← mul_assoc]⟩
@@ -64,8 +65,8 @@ lemma le_of_mul_le_mul_left (a b c : Associates M) (ha : a ≠ 0) : a * b ≤ a 
 lemma one_or_eq_of_le_of_prime (hp : Prime p) (hap : a ≤ p) : a = 1 ∨ a = p := by
   rcases mk_surjective p with ⟨p, rfl⟩
   rcases mk_surjective a with ⟨m, rfl⟩
-  simpa [mk_eq_mk_iff_associated, Associated.comm]
-    using (prime_mk.1 hp).irreducible.dvd_iff.mp (mk_le_mk_iff_dvd.1 hap)
+  simpa [mk_eq_mk_iff_associated, Associated.comm] using
+    (prime_mk.1 hp).irreducible.dvd_iff.mp (mk_le_mk_iff_dvd.1 hap)
 
 lemma dvdNotUnit_iff_lt : DvdNotUnit a b ↔ a < b := dvd_and_not_dvd_iff.symm
 

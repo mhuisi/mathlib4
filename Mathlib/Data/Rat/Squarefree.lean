@@ -22,9 +22,10 @@ This file gathers results about squarefreeness and rational numbers.
 public section
 
 /-- The squarefree integer `d` in a decomposition `q = r ^ 2 * d` is unique. -/
-theorem Rat.sq_mul_squarefree_unique {d₁ d₂ : ℤ} (h₁ : Squarefree d₁) (h₂ : Squarefree d₂)
-    (r₁ r₂ : ℚ) (hr₁ : r₁ ≠ 0) (h : r₁ ^ 2 * d₁ = r₂ ^ 2 * d₂) :
-    d₁ = d₂ := by
+theorem Rat.sq_mul_squarefree_unique
+    {d₁ d₂ : ℤ} (h₁ : Squarefree d₁) (h₂ : Squarefree d₂)
+    (r₁ r₂ : ℚ) (hr₁ : r₁ ≠ 0) (h : r₁ ^ 2 * d₁ = r₂ ^ 2 * d₂)
+    : d₁ = d₂ := by
   rw [mul_comm, ← div_eq_iff_mul_eq (pow_ne_zero 2 hr₁), mul_div_right_comm, ← div_pow] at h
   refine Int.eq_of_squarefree_of_isSquare_mul h₁ h₂ ?_
   rw [← Rat.isSquare_intCast_iff, Int.cast_mul, ← h, mul_assoc, ← sq, ← mul_pow]

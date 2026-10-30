@@ -57,56 +57,64 @@ def getConcreteInstanceAssumptions : Expr → List Expr
 def runConcreteLinter (constVal : ConstantVal) (bodyRef : Syntax) : CommandElabM Unit := do
   let classes := getConcreteInstanceAssumptions constVal.type
   if classes.isEmpty then return
-  /- Log the warning from the declaration's selection range (usually the declaration name,
+  /-
+  Log the warning from the declaration's selection range (usually the declaration name,
   or `instance`) to the body if possible. This underlines the hypotheses and type,
-  and makes the warning visible in the infoview when the cursor is within the body. -/
-  let ref := (← findDeclarationSyntaxRange? constVal.name).elim bodyRef
-    (mkNullNode #[.ofRange ·, bodyRef])
-  Command.liftCoreM do MetaM.run' do
-  for cls in classes do
-    let some clsName ← isClass? cls | continue
-    -- A seemingly redundant `Decidable` hypothesis can be added to make a declaration compatible
-    -- with all potential `Decidable` instance, so we allow this.
-    if clsName == ``Decidable then continue
-    if (← trySynthInstance cls) matches .some _ then
-      logLint linter.concreteInstances ref
-        m!"There exists a global instance of type class `{cls}`.\n\
-        Please rely on this instance and remove the `{.sbracket cls}` assumption."
-    else
-      logLint linter.concreteInstances ref
-        m!"The instance assumption `{.sbracket cls}` does not contain free variables.\n\
-        Instead of assuming it locally, please add a global instance with\n\
-        `instance : {cls} := ...`"
+  and makes the warning visible in the infoview when the cursor is within the body.
+  -/
+  let ref :=
+    (← findDeclarationSyntaxRange? constVal.name).elim bodyRef (mkNullNode #[.ofRange ·, bodyRef])
+  Command.liftCoreM do
+    MetaM.run' do
+      for cls in classes do
+        let some clsName ← isClass? cls
+          | continue
+        -- A seemingly redundant `Decidable` hypothesis can be added to make a declaration compatible
+        -- with all potential `Decidable` instance, so we allow this.
+        if clsName == ``Decidable then continue
+        if (← trySynthInstance cls) matches .some _ then
+          logLint linter.concreteInstances ref
+            m!"There exists a global instance of type class `{cls}`.\n\
+              Please rely on this instance and remove the `{.sbracket cls}` assumption."
+        else
+          logLint linter.concreteInstances ref
+            m!"The instance assumption `{.sbracket cls}` does not contain free variables.\n\
+              Instead of assuming it locally, please add a global instance with\n\
+              `instance : {cls} := ...`"
 
 end concreteInstances
 
 open OverlappingInstances UnusedInstancesInType
 
-/-- Run all of the instance parameter linters.
+/--
+Run all of the instance parameter linters.
 This linter collects the declaration bodies from the info trees,
-so that this work does not need to be duplicated. -/
+so that this work does not need to be duplicated.
+-/
 public def declTypeLinter : Linter where
-  run := withSetOptionIn fun cmd => do
-    let opts ← getLinterOptions
-    let overlap := getLinterValue linter.overlappingInstances opts
-    let concrete := getLinterValue linter.concreteInstances opts
-    let decidable := getLinterValue linter.unusedDecidableInType opts
-    let fintype := getLinterValue linter.unusedFintypeInType opts
-    unless overlap || concrete || decidable || fintype do return
-    profileitM Exception "declTypeLinter" (← getOptions) do
-    for t in ← getInfoTrees do
-      for (bodyRef, ctx, info) in t.getDeclBodyInfos do
-        if overlap then
-          overlappingInstances bodyRef ctx info
-        if let some declName := ctx.parentDecl? then
-          -- TODO: these linters don't work in an `example`,
-          -- because then `declName` is never added to the environment.
-          if let some (constVal, kind) := (← getEnv).findConstValWithKind? declName then
-            if concrete then runConcreteLinter constVal bodyRef
-            if kind matches .thm then
-              Command.liftCoreM do
-              if decidable then unusedDecidableInType constVal bodyRef
-              if fintype then unusedFintypeInType constVal bodyRef
+  run :=
+    withSetOptionIn fun cmd => do
+      let opts ← getLinterOptions
+      let overlap := getLinterValue linter.overlappingInstances opts
+      let concrete := getLinterValue linter.concreteInstances opts
+      let decidable := getLinterValue linter.unusedDecidableInType opts
+      let fintype := getLinterValue linter.unusedFintypeInType opts
+      unless overlap || concrete || decidable || fintype do
+        return
+      profileitM Exception "declTypeLinter" (← getOptions) do
+        for t in ← getInfoTrees do
+          for (bodyRef, ctx, info) in t.getDeclBodyInfos do
+            if overlap then
+              overlappingInstances bodyRef ctx info
+            if let some declName := ctx.parentDecl? then
+              -- TODO: these linters don't work in an `example`,
+              -- because then `declName` is never added to the environment.
+              if let some (constVal, kind) := (← getEnv).findConstValWithKind? declName then
+                if concrete then runConcreteLinter constVal bodyRef
+                if kind matches .thm then
+                  Command.liftCoreM do
+                    if decidable then unusedDecidableInType constVal bodyRef
+                    if fintype then unusedFintypeInType constVal bodyRef
 
 initialize addLinter declTypeLinter
 

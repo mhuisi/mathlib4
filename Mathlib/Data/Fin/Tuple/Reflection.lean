@@ -52,48 +52,43 @@ theorem seq_eq : ∀ {m} (f : Fin m → α → β) (v : Fin m → α), seq f v =
       · rw [Matrix.cons_val_succ]
         rfl
 
-example {f₁ f₂ : α → β} (a₁ a₂ : α) : seq ![f₁, f₂] ![a₁, a₂] = ![f₁ a₁, f₂ a₂] := rfl
+example {f₁ f₂ : α → β} (a₁ a₂ : α) : seq (![f₁, f₂]) ![a₁, a₂] = ![f₁ a₁, f₂ a₂] := rfl
 
 /-- `FinVec.map f v = ![f (v 0), f (v 1), ...]` -/
-def map (f : α → β) {m} : (Fin m → α) → Fin m → β :=
-  seq fun _ => f
+def map (f : α → β) {m} : (Fin m → α) → Fin m → β := seq fun _ => f
 
-/-- This can be used to prove
+/--
+This can be used to prove
 ```lean
 example {f : α → β} (a₁ a₂ : α) : f ∘ ![a₁, a₂] = ![f a₁, f a₂] :=
   (map_eq _ _).symm
 ```
 -/
-@[simp]
-theorem map_eq (f : α → β) {m} (v : Fin m → α) : map f v = f ∘ v :=
-  seq_eq _ _
+@[simp] theorem map_eq (f : α → β) {m} (v : Fin m → α) : map f v = f ∘ v := seq_eq _ _
 
-example {f : α → β} (a₁ a₂ : α) : f ∘ ![a₁, a₂] = ![f a₁, f a₂] :=
-  (map_eq _ _).symm
+example {f : α → β} (a₁ a₂ : α) : f ∘ ![a₁, a₂] = ![f a₁, f a₂] := (map_eq _ _).symm
 
 /-- Expand `v` to `![v 0, v 1, ...]` -/
-def etaExpand {m} (v : Fin m → α) : Fin m → α :=
-  map id v
+def etaExpand {m} (v : Fin m → α) : Fin m → α := map id v
 
-/-- This can be used to prove
+/--
+This can be used to prove
 ```lean
 example (a : Fin 2 → α) : a = ![a 0, a 1] :=
   (etaExpand_eq _).symm
 ```
 -/
-@[simp]
-theorem etaExpand_eq {m} (v : Fin m → α) : etaExpand v = v :=
-  map_eq id v
+@[simp] theorem etaExpand_eq {m} (v : Fin m → α) : etaExpand v = v := map_eq id v
 
-example (a : Fin 2 → α) : a = ![a 0, a 1] :=
-  (etaExpand_eq _).symm
+example (a : Fin 2 → α) : a = ![a 0, a 1] := (etaExpand_eq _).symm
 
 /-- `∀` with better defeq for `∀ x : Fin m → α, P x`. -/
 def Forall : ∀ {m} (_ : (Fin m → α) → Prop), Prop
   | 0, P => P ![]
   | _ + 1, P => ∀ x : α, Forall fun v => P (Matrix.vecCons x v)
 
-/-- This can be used to prove
+/--
+This can be used to prove
 ```lean
 example (P : (Fin 2 → α) → Prop) : (∀ f, P f) ↔ ∀ a₀ a₁, P ![a₀, a₁] :=
   (forall_iff _).symm
@@ -106,15 +101,15 @@ theorem forall_iff : ∀ {m} (P : (Fin m → α) → Prop), Forall P ↔ ∀ x, 
     rfl
   | .succ n, P => by simp only [Forall, forall_iff, Fin.forall_fin_succ_pi, Matrix.vecCons]
 
-example (P : (Fin 2 → α) → Prop) : (∀ f, P f) ↔ ∀ a₀ a₁, P ![a₀, a₁] :=
-  (forall_iff _).symm
+example (P : (Fin 2 → α) → Prop) : (∀ f, P f) ↔ ∀ a₀ a₁, P ![a₀, a₁] := (forall_iff _).symm
 
 /-- `∃` with better defeq for `∃ x : Fin m → α, P x`. -/
 def Exists : ∀ {m} (_ : (Fin m → α) → Prop), Prop
   | 0, P => P ![]
   | _ + 1, P => ∃ x : α, Exists fun v => P (Matrix.vecCons x v)
 
-/-- This can be used to prove
+/--
+This can be used to prove
 ```lean
 example (P : (Fin 2 → α) → Prop) : (∃ f, P f) ↔ ∃ a₀ a₁, P ![a₀, a₁] :=
   (exists_iff _).symm
@@ -126,8 +121,7 @@ theorem exists_iff : ∀ {m} (P : (Fin m → α) → Prop), Exists P ↔ ∃ x, 
     rfl
   | .succ n, P => by simp only [Exists, exists_iff, Fin.exists_fin_succ_pi, Matrix.vecCons]
 
-example (P : (Fin 2 → α) → Prop) : (∃ f, P f) ↔ ∃ a₀ a₁, P ![a₀, a₁] :=
-  (exists_iff _).symm
+example (P : (Fin 2 → α) → Prop) : (∃ f, P f) ↔ ∃ a₀ a₁, P ![a₀, a₁] := (exists_iff _).symm
 
 /-- `Finset.univ.sum` with better defeq for `Fin`. -/
 def sum [Add α] [Zero α] : ∀ {m} (_ : Fin m → α), α
@@ -144,14 +138,15 @@ def prod [Mul α] [One α] : ∀ {m} (_ : Fin m → α), α
   | 1, v => v 0
   | _ + 2, v => prod (fun i => v (Fin.castSucc i)) * v (Fin.last _)
 
-/-- This can be used to prove
+/--
+This can be used to prove
 ```lean
 example [CommMonoid α] (a : Fin 3 → α) : ∏ i, a i = a 0 * a 1 * a 2 :=
   (prod_eq _).symm
 ```
 -/
 @[to_additive (attr := simp)
-/-- This can be used to prove
+  /-- This can be used to prove
 ```lean
 example [AddCommMonoid α] (a : Fin 3 → α) : ∑ i, a i = a 0 + a 1 + a 2 :=
   (sum_eq _).symm
@@ -161,20 +156,20 @@ theorem prod_eq [CommMonoid α] : ∀ {m} (a : Fin m → α), prod a = ∏ i, a 
   | 1, a => (Fintype.prod_unique a).symm
   | n + 2, a => by rw [Fin.prod_univ_castSucc, prod, prod_eq]
 
-example [CommMonoid α] (a : Fin 3 → α) : ∏ i, a i = a 0 * a 1 * a 2 :=
-  (prod_eq _).symm
+example [CommMonoid α] (a : Fin 3 → α) : ∏ i, a i = a 0 * a 1 * a 2 := (prod_eq _).symm
 
-example [AddCommMonoid α] (a : Fin 3 → α) : ∑ i, a i = a 0 + a 1 + a 2 :=
-  (sum_eq _).symm
+example [AddCommMonoid α] (a : Fin 3 → α) : ∑ i, a i = a 0 + a 1 + a 2 := (sum_eq _).symm
 
 section Meta
 open Lean Qq
 
-/-- Produce a term of the form `f 0 * f 1 * ... * f (n - 1)` and an application of `FinVec.prod_eq`
-that shows it is equal to `∏ i, f i`. -/
-meta def mkProdEqQ {u : Level} {α : Q(Type u)}
-    (inst : Q(CommMonoid $α)) (n : ℕ) (f : Q(Fin $n → $α)) :
-    MetaM <| (val : Q($α)) × Q(∏ i, $f i = $val) :=
+/--
+Produce a term of the form `f 0 * f 1 * ... * f (n - 1)` and an application of `FinVec.prod_eq`
+that shows it is equal to `∏ i, f i`.
+-/
+meta def mkProdEqQ
+    {u : Level} {α : Q(Type u)} (inst : Q(CommMonoid $α)) (n : ℕ) (f : Q(Fin $n → $α))
+    : MetaM <| (val : Q($α)) × Q(∏ i, $f i = $val) :=
   match n with
   | 0 => do return ⟨q((1 : $α)), q(Fin.prod_univ_zero $f)⟩
   | m + 1 => do
@@ -185,19 +180,21 @@ meta def mkProdEqQ {u : Level} {α : Q(Type u)}
 where
   /-- Creates the expression `f 0 * f 1 * ... * f (n - 1)`. -/
   makeRHS (n : ℕ) (f : Q(Fin $n → $α)) (nezero : Q(NeZero $n)) (k : ℕ) : MetaM Q($α) := do
-  match k with
-  | 0 => failure
-  | 1 => pure q($f 0)
-  | m + 1 =>
-    let pre ← makeRHS n f nezero m
-    let mRaw : Q(ℕ) := mkRawNatLit m
-    pure q($pre * $f (OfNat.ofNat $mRaw))
+    match k with
+    | 0 => failure
+    | 1 => pure q($f 0)
+    | m + 1 =>
+      let pre ← makeRHS n f nezero m
+      let mRaw : Q(ℕ) := mkRawNatLit m
+      pure q($pre * $f (OfNat.ofNat $mRaw))
 
-/-- Produce a term of the form `f 0 + f 1 + ... + f (n - 1)` and an application of `FinVec.sum_eq`
-that shows it is equal to `∑ i, f i`. -/
-meta def mkSumEqQ {u : Level} {α : Q(Type u)}
-    (inst : Q(AddCommMonoid $α)) (n : ℕ) (f : Q(Fin $n → $α)) :
-    MetaM <| (val : Q($α)) × Q(∑ i, $f i = $val) :=
+/--
+Produce a term of the form `f 0 + f 1 + ... + f (n - 1)` and an application of `FinVec.sum_eq`
+that shows it is equal to `∑ i, f i`.
+-/
+meta def mkSumEqQ
+    {u : Level} {α : Q(Type u)} (inst : Q(AddCommMonoid $α)) (n : ℕ) (f : Q(Fin $n → $α))
+    : MetaM <| (val : Q($α)) × Q(∑ i, $f i = $val) :=
   match n with
   | 0 => return ⟨q((0 : $α)), q(Fin.sum_univ_zero $f)⟩
   | m + 1 => do
@@ -208,13 +205,13 @@ meta def mkSumEqQ {u : Level} {α : Q(Type u)}
 where
   /-- Creates the expression `f 0 + f 1 + ... + f (n - 1)`. -/
   makeRHS (n : ℕ) (f : Q(Fin $n → $α)) (nezero : Q(NeZero $n)) (k : ℕ) : MetaM Q($α) := do
-  match k with
-  | 0 => failure
-  | 1 => pure q($f 0)
-  | m + 1 =>
-    let pre ← makeRHS n f nezero m
-    let mRaw : Q(ℕ) := mkRawNatLit m
-    pure q($pre + $f (OfNat.ofNat $mRaw))
+    match k with
+    | 0 => failure
+    | 1 => pure q($f 0)
+    | m + 1 =>
+      let pre ← makeRHS n f nezero m
+      let mRaw : Q(ℕ) := mkRawNatLit m
+      pure q($pre + $f (OfNat.ofNat $mRaw))
 
 end Meta
 
@@ -224,31 +221,31 @@ namespace Fin
 open Qq Lean FinVec
 
 /-- Rewrites `∏ i : Fin n, f i` as `f 0 * f 1 * ... * f (n - 1)` when `n` is a numeral. -/
-simproc_decl prod_univ_ofNat (∏ _ : Fin _, _) := .ofQ fun u _ e => do
-  match u, e with
-  | .succ _, ~q(@Finset.prod (Fin $n) _ $inst (@Finset.univ _ $instF) $f) => do
-    match n.nat? with
-    | none =>
-      return .continue
-    | some nVal =>
-      let ⟨res, pf⟩ ← mkProdEqQ inst nVal f
-      let ⟨_⟩ ← assertDefEqQ q($instF) q(Fin.fintype _)
-      have _ : $n =Q $nVal := ⟨⟩
-      return .visit <| .mk q($res) <| some q($pf)
-  | _, _ => return .continue
+simproc_decl prod_univ_ofNat (∏ _ : Fin _, _) :=
+  .ofQ fun u _ e => do
+    match u, e with
+    | .succ _, ~q(@Finset.prod (Fin $n) _ $inst (@Finset.univ _ $instF) $f) => do
+      match n.nat? with
+      | none => return .continue
+      | some nVal =>
+        let ⟨res, pf⟩ ← mkProdEqQ inst nVal f
+        let ⟨_⟩ ← assertDefEqQ (q($instF)) q(Fin.fintype _)
+        have _ : $n =Q $nVal := ⟨⟩
+        return .visit <| .mk q($res) <| some q($pf)
+    | _, _ => return .continue
 
 /-- Rewrites `∑ i : Fin n, f i` as `f 0 + f 1 + ... + f (n - 1)` when `n` is a numeral. -/
-simproc_decl sum_univ_ofNat (∑ _ : Fin _, _) := .ofQ fun u _ e => do
-  match u, e with
-  | .succ _, ~q(@Finset.sum (Fin $n) _ $inst (@Finset.univ _ $instF) $f) => do
-    match n.nat? with
-    | none =>
-      return .continue
-    | some nVal =>
-      let ⟨res, pf⟩ ← mkSumEqQ inst nVal f
-      let ⟨_⟩ ← assertDefEqQ q($instF) q(Fin.fintype _)
-      have _ : $n =Q $nVal := ⟨⟩
-      return .visit <| .mk q($res) <| some q($pf)
-  | _, _ => return .continue
+simproc_decl sum_univ_ofNat (∑ _ : Fin _, _) :=
+  .ofQ fun u _ e => do
+    match u, e with
+    | .succ _, ~q(@Finset.sum (Fin $n) _ $inst (@Finset.univ _ $instF) $f) => do
+      match n.nat? with
+      | none => return .continue
+      | some nVal =>
+        let ⟨res, pf⟩ ← mkSumEqQ inst nVal f
+        let ⟨_⟩ ← assertDefEqQ (q($instF)) q(Fin.fintype _)
+        have _ : $n =Q $nVal := ⟨⟩
+        return .visit <| .mk q($res) <| some q($pf)
+    | _, _ => return .continue
 
 end Fin

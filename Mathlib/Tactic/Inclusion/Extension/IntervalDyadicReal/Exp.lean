@@ -39,17 +39,18 @@ namespace Inclusion
 
 namespace IntervalDyadicReal
 
-/-- The numerator of the partial Taylor sum `∑ m ∈ range n, (a / b) ^ m / m!` as an unreduced
-fraction over the common denominator `b ^ n * n!`. -/
+/--
+The numerator of the partial Taylor sum `∑ m ∈ range n, (a / b) ^ m / m!` as an unreduced
+fraction over the common denominator `b ^ n * n!`.
+-/
 @[expose]
 def expPartialSumNum (a : ℤ) (b n : ℕ) : ℤ :=
   match n with
   | 0 => 0
   | n + 1 => (expPartialSumNum a b n + a ^ n) * (b * (n + 1) : ℕ)
 
-theorem expPartialSumNum_div (a : ℤ) {b : ℕ} (hb : b ≠ 0) (n : ℕ) :
-    (expPartialSumNum a b n : ℝ) / (b ^ n * n !) =
-      ∑ m ∈ range n, ((a : ℝ) / b) ^ m / m ! := by
+theorem expPartialSumNum_div (a : ℤ) {b : ℕ} (hb : b ≠ 0) (n : ℕ)
+    : (expPartialSumNum a b n : ℝ) / (b ^ n * n !) = ∑ m ∈ range n, ((a : ℝ) / b) ^ m / m ! := by
   induction n with
   | zero => simp [expPartialSumNum]
   | succ n ih =>
@@ -58,15 +59,18 @@ theorem expPartialSumNum_div (a : ℤ) {b : ℕ} (hb : b ≠ 0) (n : ℕ) :
     field_simp
     ring
 
-/-- An enclosure of `exp (a / b)` by the first `n` terms of its Taylor series and the remainder
+/--
+An enclosure of `exp (a / b)` by the first `n` terms of its Taylor series and the remainder
 bound of `Real.exp_bound`, rounded outward to precision `prec`. This is only intended for use
-when `| a / b | ≤ 1`. -/
+when `| a / b | ≤ 1`.
+-/
 @[expose]
 def expRatTaylor (a : ℤ) (b n prec : ℕ) : Interval Dyadic :=
   ratBall (n * expPartialSumNum a b n) ((n + 1) * |a ^ n|) (n * (b ^ n * n !)) prec
 
-theorem expRatTaylor_mem (a : ℤ) {b : ℕ} (hb : b ≠ 0) (hab : a.natAbs ≤ b) {n : ℕ} (hn : 0 < n)
-    (prec : ℕ) : Real.exp (a / b) ∈ expRatTaylor a b n prec := by
+theorem expRatTaylor_mem
+    (a : ℤ) {b : ℕ} (hb : b ≠ 0) (hab : a.natAbs ≤ b) {n : ℕ} (hn : 0 < n) (prec : ℕ)
+    : Real.exp (a / b) ∈ expRatTaylor a b n prec := by
   have hy : |(a : ℝ) / b| ≤ 1 := by
     rw [abs_div, Nat.abs_cast, div_le_one (by positivity), ← Int.cast_abs, ← Int.natCast_natAbs]
     norm_cast
@@ -78,7 +82,8 @@ theorem expRatTaylor_mem (a : ℤ) {b : ℕ} (hb : b ≠ 0) (hab : a.natAbs ≤ 
   push_cast
   field_simp
 
-/-- An enclosure of `exp x` by rewriting as `exp (x / m) ^ m` so that `|x / m| < 1 / 32` to make
+/--
+An enclosure of `exp x` by rewriting as `exp (x / m) ^ m` so that `|x / m| < 1 / 32` to make
 the Taylor series converge quickly. The interval is rounded outward after the power to drop the
 redundant bits for the consumers.
 
@@ -126,16 +131,18 @@ theorem expPoint_mem (x : Dyadic) (prec : ℕ) : Real.exp x.toReal ∈ expPoint 
 /-- The exponential of an interval, from the enclosures `expPoint` at its endpoints. -/
 @[expose]
 def exp (I : Interval Dyadic) (prec : ℕ) : Interval Dyadic where
-  lb := match I.lb with
+  lb :=
+    match I.lb with
     | some l => (expPoint l prec).lb
     | ⊥ => 0
-  ub := match I.ub with
+  ub :=
+    match I.ub with
     | some u => (expPoint u prec).ub
     | ⊤ => ⊤
 
 @[inclusion_op interval_dyadic_real]
-theorem exp_mem {x : ℝ} {I : Interval Dyadic} (hx : x ∈ I) (prec : ℕ) :
-    Real.exp x ∈ exp I prec := by
+theorem exp_mem {x : ℝ} {I : Interval Dyadic} (hx : x ∈ I) (prec : ℕ)
+    : Real.exp x ∈ exp I prec := by
   rw [mem_iff_mem_map, Interval.mem_map_iff] at hx
   have h0 : Dyadic.toReal 0 ≤ Real.exp x := by simpa [Dyadic.toReal] using (Real.exp_pos x).le
   have h0I := Interval.mem_map_singleton (0 : Dyadic) Dyadic.toReal

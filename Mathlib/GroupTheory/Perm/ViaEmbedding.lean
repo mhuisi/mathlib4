@@ -18,7 +18,6 @@ set_option doc.verso.suggestions false
 
 @[expose] public section
 
-
 variable {α β : Type*}
 
 namespace Equiv
@@ -29,8 +28,7 @@ variable (e : Perm α) (ι : α ↪ β)
 
 open scoped Classical in
 /-- Noncomputable version of `Equiv.Perm.viaFintypeEmbedding` that does not assume `Fintype` -/
-noncomputable def viaEmbedding : Perm β :=
-  extendDomain e (ofInjective ι.1 ι.2)
+noncomputable def viaEmbedding : Perm β := extendDomain e (ofInjective ι.1 ι.2)
 
 theorem viaEmbedding_apply (x : α) : e.viaEmbedding ι (ι x) = ι (e x) := by
   classical
@@ -42,11 +40,9 @@ theorem viaEmbedding_apply_of_notMem (x : β) (hx : x ∉ Set.range ι) : e.viaE
 
 open scoped Classical in
 /-- `viaEmbedding` as a group homomorphism -/
-noncomputable def viaEmbeddingHom : Perm α →* Perm β :=
-  extendDomainHom (ofInjective ι.1 ι.2)
+noncomputable def viaEmbeddingHom : Perm α →* Perm β := extendDomainHom (ofInjective ι.1 ι.2)
 
-theorem viaEmbeddingHom_apply : viaEmbeddingHom ι e = viaEmbedding e ι :=
-  rfl
+theorem viaEmbeddingHom_apply : viaEmbeddingHom ι e = viaEmbedding e ι := rfl
 
 theorem viaEmbeddingHom_injective : Function.Injective (viaEmbeddingHom ι) := by
   classical

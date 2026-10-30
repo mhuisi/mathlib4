@@ -27,26 +27,26 @@ The fact that the real numbers are a (trivial) \*-ring has similarly been deferr
 
 @[expose] public section
 
-
 assert_not_exists Finset Module Submonoid FloorRing
 
-/-- The type `ℝ` of real numbers constructed as equivalence classes of Cauchy sequences of rational
-numbers. -/
+/--
+The type `ℝ` of real numbers constructed as equivalence classes of Cauchy sequences of rational
+numbers.
+-/
 @[wikidata Q12916, wikidata Q2584477]
-structure Real where ofCauchy ::
+structure Real where
+  ofCauchy ::
   /-- The underlying Cauchy completion -/
   cauchy : CauSeq.Completion.Cauchy (abs : ℚ → ℚ)
 
-@[inherit_doc]
-notation "ℝ" => Real
+@[inherit_doc] notation "ℝ" => Real
 
 namespace CauSeq.Completion
 
 -- this can't go in `Mathlib.Algebra.Order.CauSeq.Completion`
 -- as the structure on `ℚ` isn't available
 @[simp]
-theorem ofRat_rat {abv : ℚ → ℚ} [IsAbsoluteValue abv] (q : ℚ) :
-    ofRat (q : ℚ) = (q : Cauchy abv) :=
+theorem ofRat_rat {abv : ℚ → ℚ} [IsAbsoluteValue abv] (q : ℚ) : ofRat (q : ℚ) = (q : Cauchy abv) :=
   rfl
 
 end CauSeq.Completion
@@ -60,57 +60,45 @@ variable {x : ℝ}
 theorem ext_cauchy_iff : ∀ {x y : Real}, x = y ↔ x.cauchy = y.cauchy
   | ⟨a⟩, ⟨b⟩ => by rw [ofCauchy.injEq]
 
-theorem ext_cauchy {x y : Real} : x.cauchy = y.cauchy → x = y :=
-  ext_cauchy_iff.2
+theorem ext_cauchy {x y : Real} : x.cauchy = y.cauchy → x = y := ext_cauchy_iff.2
 
 /-- The real numbers are isomorphic to the quotient of Cauchy sequences on the rationals. -/
 def equivCauchy : ℝ ≃ CauSeq.Completion.Cauchy (abs : ℚ → ℚ) :=
   ⟨Real.cauchy, Real.ofCauchy, fun ⟨_⟩ => rfl, fun _ => rfl⟩
 
-@[no_expose] private def zero : ℝ :=
-  ⟨0⟩
+@[no_expose] private def zero : ℝ := ⟨0⟩
 
-@[no_expose] private def one : ℝ :=
-  ⟨1⟩
+@[no_expose] private def one : ℝ := ⟨1⟩
 
-@[no_expose] private def add : ℝ → ℝ → ℝ
+@[no_expose]
+private def add : ℝ → ℝ → ℝ
   | ⟨a⟩, ⟨b⟩ => ⟨a + b⟩
 
-@[no_expose] private def neg : ℝ → ℝ
+@[no_expose]
+private def neg : ℝ → ℝ
   | ⟨a⟩ => ⟨-a⟩
 
-@[no_expose] private def mul : ℝ → ℝ → ℝ
+@[no_expose]
+private def mul : ℝ → ℝ → ℝ
   | ⟨a⟩, ⟨b⟩ => ⟨a * b⟩
 
-@[no_expose] private noncomputable def inv' : ℝ → ℝ
+@[no_expose]
+private noncomputable def inv' : ℝ → ℝ
   | ⟨a⟩ => ⟨a⁻¹⟩
 
-@[no_expose]
-instance : Zero ℝ :=
-  ⟨zero⟩
+@[no_expose] instance : Zero ℝ := ⟨zero⟩
 
-@[no_expose]
-instance : One ℝ :=
-  ⟨one⟩
+@[no_expose] instance : One ℝ := ⟨one⟩
 
-@[no_expose]
-instance : Add ℝ :=
-  ⟨add⟩
+@[no_expose] instance : Add ℝ := ⟨add⟩
 
-@[no_expose]
-instance : Neg ℝ :=
-  ⟨neg⟩
+@[no_expose] instance : Neg ℝ := ⟨neg⟩
 
-@[no_expose]
-instance : Mul ℝ :=
-  ⟨mul⟩
+@[no_expose] instance : Mul ℝ := ⟨mul⟩
 
-instance : Sub ℝ :=
-  ⟨fun a b => a + -b⟩
+instance : Sub ℝ := ⟨fun a b => a + -b⟩
 
-@[no_expose]
-noncomputable instance : Inv ℝ :=
-  ⟨inv'⟩
+@[no_expose] noncomputable instance : Inv ℝ := ⟨inv'⟩
 
 theorem ofCauchy_zero : (⟨0⟩ : ℝ) = 0 := (rfl)
 
@@ -120,8 +108,7 @@ theorem ofCauchy_add (a b) : (⟨a + b⟩ : ℝ) = ⟨a⟩ + ⟨b⟩ := (rfl)
 
 theorem ofCauchy_neg (a) : (⟨-a⟩ : ℝ) = -⟨a⟩ := (rfl)
 
-theorem ofCauchy_sub (a b) : (⟨a - b⟩ : ℝ) = ⟨a⟩ - ⟨b⟩ := by
-  rw [sub_eq_add_neg]; rfl
+theorem ofCauchy_sub (a b) : (⟨a - b⟩ : ℝ) = ⟨a⟩ - ⟨b⟩ := by rw [sub_eq_add_neg]; rfl
 
 theorem ofCauchy_mul (a b) : (⟨a * b⟩ : ℝ) = ⟨a⟩ * ⟨b⟩ := (rfl)
 
@@ -142,10 +129,14 @@ theorem cauchy_sub (a b : ℝ) : (a - b : ℝ).cauchy = a.cauchy - b.cauchy := b
 
 theorem cauchy_inv (f : ℝ) : (f⁻¹ : ℝ).cauchy = f.cauchy⁻¹ := (rfl)
 
-instance instNatCast : NatCast ℝ where natCast n := ⟨n⟩
-instance instIntCast : IntCast ℝ where intCast z := ⟨z⟩
-instance instNNRatCast : NNRatCast ℝ where nnratCast q := ⟨q⟩
-instance instRatCast : RatCast ℝ where ratCast q := ⟨q⟩
+instance instNatCast : NatCast ℝ where
+  natCast n := ⟨n⟩
+instance instIntCast : IntCast ℝ where
+  intCast z := ⟨z⟩
+instance instNNRatCast : NNRatCast ℝ where
+  nnratCast q := ⟨q⟩
+instance instRatCast : RatCast ℝ where
+  ratCast q := ⟨q⟩
 
 lemma ofCauchy_natCast (n : ℕ) : (⟨n⟩ : ℝ) = n := rfl
 lemma ofCauchy_intCast (z : ℤ) : (⟨z⟩ : ℝ) = z := rfl
@@ -182,12 +173,13 @@ instance commRing : CommRing ℝ where
 
 /-- `Real.equivCauchy` as a ring equivalence. -/
 @[simps]
-def ringEquivCauchy : ℝ ≃+* CauSeq.Completion.Cauchy (abs : ℚ → ℚ) :=
-  { equivCauchy with
-    toFun := cauchy
-    invFun := ofCauchy
-    map_add' := cauchy_add
-    map_mul' := cauchy_mul }
+def ringEquivCauchy : ℝ ≃+* CauSeq.Completion.Cauchy (abs : ℚ → ℚ) := {
+  equivCauchy with
+  toFun := cauchy
+  invFun := ofCauchy
+  map_add' := cauchy_add
+  map_mul' := cauchy_mul
+}
 
 /-! Extra instances to short-circuit type class resolution.
 
@@ -229,31 +221,28 @@ instance : CommSemigroup ℝ := by infer_instance
 
 instance : Semigroup ℝ := by infer_instance
 
-instance : Inhabited ℝ :=
-  ⟨0⟩
+instance : Inhabited ℝ := ⟨0⟩
 
 /-- Make a real number from a Cauchy sequence of rationals (by taking the equivalence class). -/
-def mk (x : CauSeq ℚ abs) : ℝ :=
-  ⟨CauSeq.Completion.mk x⟩
+def mk (x : CauSeq ℚ abs) : ℝ := ⟨CauSeq.Completion.mk x⟩
 
 theorem mk_eq {f g : CauSeq ℚ abs} : mk f = mk g ↔ f ≈ g :=
   ext_cauchy_iff.trans CauSeq.Completion.mk_eq
 
-@[no_expose] private def lt : ℝ → ℝ → Prop
+@[no_expose]
+private def lt : ℝ → ℝ → Prop
   | ⟨x⟩, ⟨y⟩ =>
     (Quotient.liftOn₂ x y (· < ·)) fun _ _ _ _ hf hg =>
-      propext
-        ⟨fun h => lt_of_eq_of_lt (Setoid.symm hf) (lt_of_lt_of_eq h hg), fun h =>
-          lt_of_eq_of_lt hf (lt_of_lt_of_eq h (Setoid.symm hg))⟩
+      propext ⟨
+        fun h => lt_of_eq_of_lt (Setoid.symm hf) (lt_of_lt_of_eq h hg),
+        fun h => lt_of_eq_of_lt hf (lt_of_lt_of_eq h (Setoid.symm hg))
+      ⟩
 
-@[no_expose]
-instance : LT ℝ :=
-  ⟨lt⟩
+@[no_expose] instance : LT ℝ := ⟨lt⟩
 
 theorem lt_cauchy {f g} : (⟨⟦f⟧⟩ : ℝ) < ⟨⟦g⟧⟩ ↔ f < g := .rfl
 
-@[simp]
-theorem mk_lt {f g : CauSeq ℚ abs} : mk f < mk g ↔ f < g := .rfl
+@[simp] theorem mk_lt {f g : CauSeq ℚ abs} : mk f < mk g ↔ f < g := .rfl
 
 theorem mk_zero : mk 0 = 0 := (rfl)
 
@@ -263,7 +252,7 @@ theorem mk_add {f g : CauSeq ℚ abs} : mk (f + g) = mk f + mk g := (rfl)
 
 theorem mk_mul {f g : CauSeq ℚ abs} : mk (f * g) = mk f * mk g := (rfl)
 
-theorem mk_neg {f : CauSeq ℚ abs} : mk (-f) = -mk f := (rfl)
+theorem mk_neg {f : CauSeq ℚ abs} : mk (-f) = - mk f := (rfl)
 
 @[simp]
 theorem mk_pos {f : CauSeq ℚ abs} : 0 < mk f ↔ Pos f := by
@@ -272,12 +261,9 @@ theorem mk_pos {f : CauSeq ℚ abs} : 0 < mk f ↔ Pos f := by
 
 lemma mk_const {x : ℚ} : mk (const abs x) = x := rfl
 
-@[no_expose] private def le (x y : ℝ) : Prop :=
-  x < y ∨ x = y
+@[no_expose] private def le (x y : ℝ) : Prop := x < y ∨ x = y
 
-@[no_expose]
-instance : LE ℝ :=
-  ⟨le⟩
+@[no_expose] instance : LE ℝ := ⟨le⟩
 
 private theorem le_def' {x y : ℝ} : x ≤ y ↔ x < y ∨ x = y := .rfl
 
@@ -330,12 +316,15 @@ instance instIsOrderedAddMonoid : IsOrderedAddMonoid ℝ where
     rintro a b ⟨rfl, h⟩
     · simp only [lt_self_iff_false, or_false, forall_const]
     · refine fun c => Or.inr ?_
-      induction a using Real.ind_mk with | _ a =>
-      induction b using Real.ind_mk with | _ b =>
-      induction c using Real.ind_mk with | _ c =>
-      simp only [mk_lt, ← mk_add] at *
-      change Pos _ at *
-      rwa [add_sub_add_right_eq_sub]
+      induction a using Real.ind_mk with
+      | _ a =>
+        induction b using Real.ind_mk with
+        | _ b =>
+          induction c using Real.ind_mk with
+          | _ c =>
+            simp only [mk_lt, ← mk_add] at *
+            change Pos _ at *
+            rwa [add_sub_add_right_eq_sub]
 
 instance instIsStrictOrderedRing : IsStrictOrderedRing ℝ :=
   .of_mul_pos fun a b ↦ by
@@ -343,37 +332,29 @@ instance instIsStrictOrderedRing : IsStrictOrderedRing ℝ :=
     induction b using Real.ind_mk
     simpa only [mk_lt, mk_pos, ← mk_mul] using CauSeq.mul_pos
 
-instance instIsOrderedRing : IsOrderedRing ℝ :=
-  inferInstance
+instance instIsOrderedRing : IsOrderedRing ℝ := inferInstance
 
-instance instIsOrderedCancelAddMonoid : IsOrderedCancelAddMonoid ℝ :=
-  inferInstance
-
-@[no_expose] private def sup : ℝ → ℝ → ℝ
-  | ⟨x⟩, ⟨y⟩ => ⟨Quotient.map₂ (· ⊔ ·) (fun _ _ hx _ _ hy => sup_equiv_sup hx hy) x y⟩
+instance instIsOrderedCancelAddMonoid : IsOrderedCancelAddMonoid ℝ := inferInstance
 
 @[no_expose]
-instance : Max ℝ :=
-  ⟨sup⟩
+private def sup : ℝ → ℝ → ℝ
+  | ⟨x⟩, ⟨y⟩ => ⟨Quotient.map₂ (· ⊔ ·) (fun _ _ hx _ _ hy => sup_equiv_sup hx hy) x y⟩
+
+@[no_expose] instance : Max ℝ := ⟨sup⟩
 
 theorem ofCauchy_sup (a b) : (⟨⟦a ⊔ b⟧⟩ : ℝ) = ⟨⟦a⟧⟩ ⊔ ⟨⟦b⟧⟩ := (rfl)
 
-@[simp]
-theorem mk_sup (a b) : (mk (a ⊔ b) : ℝ) = mk a ⊔ mk b :=
-  ofCauchy_sup _ _
-
-@[no_expose] private def inf : ℝ → ℝ → ℝ
-  | ⟨x⟩, ⟨y⟩ => ⟨Quotient.map₂ (· ⊓ ·) (fun _ _ hx _ _ hy => inf_equiv_inf hx hy) x y⟩
+@[simp] theorem mk_sup (a b) : (mk (a ⊔ b) : ℝ) = mk a ⊔ mk b := ofCauchy_sup _ _
 
 @[no_expose]
-instance : Min ℝ :=
-  ⟨inf⟩
+private def inf : ℝ → ℝ → ℝ
+  | ⟨x⟩, ⟨y⟩ => ⟨Quotient.map₂ (· ⊓ ·) (fun _ _ hx _ _ hy => inf_equiv_inf hx hy) x y⟩
+
+@[no_expose] instance : Min ℝ := ⟨inf⟩
 
 theorem ofCauchy_inf (a b) : (⟨⟦a ⊓ b⟧⟩ : ℝ) = ⟨⟦a⟧⟩ ⊓ ⟨⟦b⟧⟩ := (rfl)
 
-@[simp]
-theorem mk_inf (a b) : (mk (a ⊓ b) : ℝ) = mk a ⊓ mk b :=
-  ofCauchy_inf _ _
+@[simp] theorem mk_inf (a b) : (mk (a ⊓ b) : ℝ) = mk a ⊓ mk b := ofCauchy_inf _ _
 
 instance : DistribLattice ℝ where
   sup := (· ⊔ ·)
@@ -426,25 +407,20 @@ instance : DistribLattice ℝ where
     congrm mk $((CauSeq.sup_inf_distrib_left ..).symm)
 
 -- Extra instances to short-circuit type class resolution
-instance lattice : Lattice ℝ :=
-  inferInstance
+instance lattice : Lattice ℝ := inferInstance
 
-instance : SemilatticeInf ℝ :=
-  inferInstance
+instance : SemilatticeInf ℝ := inferInstance
 
-instance : SemilatticeSup ℝ :=
-  inferInstance
+instance : SemilatticeSup ℝ := inferInstance
 
-instance leTotal_R : @Std.Total ℝ (· ≤ ·) :=
-  ⟨by
-    intro a b
-    induction a using Real.ind_mk
-    induction b using Real.ind_mk
-    simpa using CauSeq.le_total ..⟩
+instance leTotal_R : @Std.Total ℝ (· ≤ ·) := ⟨by
+  intro a b
+  induction a using Real.ind_mk
+  induction b using Real.ind_mk
+  simpa using CauSeq.le_total ..⟩
 
 open scoped Classical in
-noncomputable instance linearOrder : LinearOrder ℝ :=
-  Lattice.toLinearOrder ℝ
+noncomputable instance linearOrder : LinearOrder ℝ := Lattice.toLinearOrder ℝ
 
 instance : IsDomain ℝ := IsStrictOrderedRing.isDomain
 
@@ -457,8 +433,8 @@ noncomputable instance instField : Field ℝ where
   mul_inv_cancel := by
     rintro ⟨a⟩ h
     rw [mul_comm]
-    simp only [← ofCauchy_inv, ← ofCauchy_mul, ← ofCauchy_one, ← ofCauchy_zero,
-      Ne, ofCauchy.injEq] at *
+    simp only [← ofCauchy_inv, ← ofCauchy_mul, ← ofCauchy_one, ← ofCauchy_zero, Ne, ofCauchy.injEq]
+      at *
     exact CauSeq.Completion.inv_mul_cancel h
   inv_zero := by simp [← ofCauchy_zero, ← ofCauchy_inv]
   nnqsmul := _
@@ -479,7 +455,8 @@ noncomputable instance decidableLE (a b : ℝ) : Decidable (a ≤ b) := by infer
 
 noncomputable instance decidableEq (a b : ℝ) : Decidable (a = b) := by infer_instance
 
-/-- Show an underlying Cauchy sequence for real numbers.
+/--
+Show an underlying Cauchy sequence for real numbers.
 
 The representative chosen is the one passed in the VM to `Quot.mk`, so two Cauchy sequences
 converging to the same number may be printed differently.
@@ -500,20 +477,21 @@ theorem le_mk_of_forall_le {f : CauSeq ℚ abs} : (∃ i, ∀ j ≥ i, x ≤ f j
   have := add_le_add (H _ ij).2.1 (le_of_lt (abs_lt.1 <| (H _ le_rfl).2.2 _ ij).1)
   rwa [← sub_eq_add_neg, sub_self_div_two, sub_apply, sub_add_sub_cancel] at this
 
-theorem mk_le_of_forall_le {f : CauSeq ℚ abs} {x : ℝ} (h : ∃ i, ∀ j ≥ i, (f j : ℝ) ≤ x) :
-    mk f ≤ x := by
+theorem mk_le_of_forall_le {f : CauSeq ℚ abs} {x : ℝ} (h : ∃ i, ∀ j ≥ i, (f j : ℝ) ≤ x)
+    : mk f ≤ x := by
   obtain ⟨i, H⟩ := h
   rw [← neg_le_neg_iff, ← mk_neg]
   exact le_mk_of_forall_le ⟨i, fun j ij => by simp [H _ ij]⟩
 
-theorem mk_near_of_forall_near {f : CauSeq ℚ abs} {x : ℝ} {ε : ℝ}
-    (H : ∃ i, ∀ j ≥ i, |(f j : ℝ) - x| ≤ ε) : |mk f - x| ≤ ε :=
-  abs_sub_le_iff.2
-    ⟨sub_le_iff_le_add'.2 <|
-        mk_le_of_forall_le <|
-          H.imp fun _ h j ij => sub_le_iff_le_add'.1 (abs_sub_le_iff.1 <| h j ij).1,
-      sub_le_comm.1 <|
-        le_mk_of_forall_le <| H.imp fun _ h j ij => sub_le_comm.1 (abs_sub_le_iff.1 <| h j ij).2⟩
+theorem mk_near_of_forall_near
+    {f : CauSeq ℚ abs} {x : ℝ} {ε : ℝ} (H : ∃ i, ∀ j ≥ i, |(f j : ℝ) - x| ≤ ε)
+    : |mk f - x| ≤ ε :=
+  abs_sub_le_iff.2 ⟨
+    sub_le_iff_le_add'.2 <| mk_le_of_forall_le <|
+      H.imp fun _ h j ij => sub_le_iff_le_add'.1 (abs_sub_le_iff.1 <| h j ij).1,
+    sub_le_comm.1 <| le_mk_of_forall_le <|
+      H.imp fun _ h j ij => sub_le_comm.1 (abs_sub_le_iff.1 <| h j ij).2
+  ⟩
 
 lemma mul_add_one_le_add_one_pow {a : ℝ} (ha : 0 ≤ a) (b : ℕ) : a * b + 1 ≤ (a + 1) ^ b := by
   rcases ha.eq_or_lt with rfl | ha'
@@ -523,8 +501,8 @@ lemma mul_add_one_le_add_one_pow {a : ℝ} (ha : 0 ≤ a) (b : ℕ) : a * b + 1 
   | zero => simp
   | succ b hb =>
     calc
-      a * ↑(b + 1) + 1 = (0 + 1) ^ b * a + (a * b + 1) := by
-        simp [mul_add, add_assoc, add_left_comm]
+      a * ↑(b + 1) + 1
+        = (0 + 1) ^ b * a + (a * b + 1) := by simp [mul_add, add_assoc, add_left_comm]
       _ ≤ (a + 1) ^ b * a + (a + 1) ^ b := by
         gcongr
         · simp
@@ -533,20 +511,23 @@ lemma mul_add_one_le_add_one_pow {a : ℝ} (ha : 0 ≤ a) (b : ℕ) : a * b + 1 
 
 end Real
 
-/-- A function `f : R → ℝ` is power-multiplicative if for all `r ∈ R` and all positive `n ∈ ℕ`,
-`f (r ^ n) = (f r) ^ n`. -/
-def IsPowMul {R : Type*} [Pow R ℕ] (f : R → ℝ) :=
-  ∀ (a : R) {n : ℕ}, 1 ≤ n → f (a ^ n) = f a ^ n
+/--
+A function `f : R → ℝ` is power-multiplicative if for all `r ∈ R` and all positive `n ∈ ℕ`,
+`f (r ^ n) = (f r) ^ n`.
+-/
+def IsPowMul {R : Type*} [Pow R ℕ] (f : R → ℝ) := ∀ (a : R) {n : ℕ}, 1 ≤ n → f (a ^ n) = f a ^ n
 
-lemma IsPowMul.map_one_le_one {R : Type*} [Monoid R] {f : R → ℝ} (hf : IsPowMul f) :
-    f 1 ≤ 1 := by
+lemma IsPowMul.map_one_le_one {R : Type*} [Monoid R] {f : R → ℝ} (hf : IsPowMul f) : f 1 ≤ 1 := by
   have hf1 : (f 1) ^ 2 = f 1 := by conv_rhs => rw [← one_pow 2, hf _ one_le_two]
   rcases eq_zero_or_one_of_sq_eq_self hf1 with h | h <;> rw [h]
   exact zero_le_one
 
-/-- A ring homomorphism `f : α →+* β` is bounded with respect to the functions `nα : α → ℝ` and
-  `nβ : β → ℝ` if there exists a positive constant `C` such that for all `x` in `α`,
-  `nβ (f x) ≤ C * nα x`. -/
-def RingHom.IsBoundedWrt {α : Type*} [Ring α] {β : Type*} [Ring β] (nα : α → ℝ) (nβ : β → ℝ)
-    (f : α →+* β) : Prop :=
+/--
+A ring homomorphism `f : α →+* β` is bounded with respect to the functions `nα : α → ℝ` and
+`nβ : β → ℝ` if there exists a positive constant `C` such that for all `x` in `α`,
+`nβ (f x) ≤ C * nα x`.
+-/
+def RingHom.IsBoundedWrt
+    {α : Type*} [Ring α] {β : Type*} [Ring β] (nα : α → ℝ) (nβ : β → ℝ) (f : α →+* β)
+    : Prop :=
   ∃ C : ℝ, 0 < C ∧ ∀ x : α, nβ (f x) ≤ C * nα x

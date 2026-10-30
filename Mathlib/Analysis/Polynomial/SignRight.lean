@@ -56,42 +56,50 @@ public section
 namespace Polynomial
 
 /-- Immediately to the right of `x`, a polynomial has a constant sign. -/
-theorem exists_eventually_sign_eq (x : ℝ) (p : ℝ[X]) :
-    ∃ s : SignType, ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s := by
+theorem exists_eventually_sign_eq (x : ℝ) (p : ℝ[X])
+    : ∃ s : SignType, ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s := by
   rcases eq_or_ne p 0 with rfl | hp
   · exact ⟨0, Eventually.of_forall fun y => by simp⟩
-  obtain ⟨b, hb, hsub⟩ := mem_nhdsGT_iff_exists_Ioo_subset.mp
-    ((eventually_eval_ne_zero_codiscrete hp).filter_mono
+  obtain ⟨b, hb, hsub⟩ :=
+    mem_nhdsGT_iff_exists_Ioo_subset.mp ((eventually_eval_ne_zero_codiscrete hp).filter_mono
       ((nhdsGT_le_nhdsNE x).trans (nhdsNE_le_codiscrete x)))
   have hb : x < b := hb
   refine ⟨sign (eval ((x + b) / 2) p), mem_nhdsGT_iff_exists_Ioo_subset.mpr ⟨b, hb, fun y hy => ?_⟩⟩
-  exact isPreconnected_Ioo.sign_eq_of_continuousOn p.continuousOn (fun z hz => hsub hz) hy
-    ⟨by linarith, by linarith⟩
+  exact isPreconnected_Ioo.sign_eq_of_continuousOn p.continuousOn
+    (fun z hz => hsub hz)
+    hy ⟨by linarith, by linarith⟩
 
-/-- The sign of `p` immediately to the right of `x`: the eventual value of `sign (eval y p)` as
-`y → x` from the right. -/
+/--
+The sign of `p` immediately to the right of `x`: the eventual value of `sign (eval y p)` as
+`y → x` from the right.
+-/
 noncomputable def signRight (x : ℝ) (p : ℝ[X]) : SignType :=
   limUnder (𝓝[>] x) fun y => sign (eval y p)
 
-/-- The equation `sign (eval y p) = signRight x p` holds for all `y` in some interval
-`(x, x + ε)`. -/
-theorem eventually_sign_eq_signRight (x : ℝ) (p : ℝ[X]) :
-    ∀ᶠ y in 𝓝[>] x, sign (eval y p) = signRight x p := by
+/--
+The equation `sign (eval y p) = signRight x p` holds for all `y` in some interval
+`(x, x + ε)`.
+-/
+theorem eventually_sign_eq_signRight (x : ℝ) (p : ℝ[X])
+    : ∀ᶠ y in 𝓝[>] x, sign (eval y p) = signRight x p := by
   obtain ⟨s, hs⟩ := exists_eventually_sign_eq x p
   have ht : Tendsto (fun y => sign (eval y p)) (𝓝[>] x) (𝓝 s) := by
     rw [nhds_discrete SignType, tendsto_pure]; exact hs
   rw [signRight, ht.limUnder_eq]
   exact hs
 
-theorem signRight_eq_of_eventually {x : ℝ} {p : ℝ[X]} {s : SignType}
-    (h : ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s) : signRight x p = s := by
+theorem signRight_eq_of_eventually
+    {x : ℝ} {p : ℝ[X]} {s : SignType} (h : ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s)
+    : signRight x p = s := by
   obtain ⟨y, hy1, hy2⟩ := ((eventually_sign_eq_signRight x p).and h).exists
   rw [← hy1, hy2]
 
-/-- `signRight x p` is the unique sign `s` such that `sign (eval y p) = s` for all `y` in some
-interval `(x, x + ε)`. -/
-theorem signRight_eq_iff {x : ℝ} {p : ℝ[X]} {s : SignType} :
-    signRight x p = s ↔ ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s :=
+/--
+`signRight x p` is the unique sign `s` such that `sign (eval y p) = s` for all `y` in some
+interval `(x, x + ε)`.
+-/
+theorem signRight_eq_iff {x : ℝ} {p : ℝ[X]} {s : SignType}
+    : signRight x p = s ↔ ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s :=
   ⟨fun h => h ▸ eventually_sign_eq_signRight x p, signRight_eq_of_eventually⟩
 
 @[simp]
@@ -99,9 +107,10 @@ theorem signRight_zero (x : ℝ) : signRight x 0 = 0 :=
   signRight_eq_of_eventually (Eventually.of_forall fun _ => by simp)
 
 theorem signRight_ne_zero {x : ℝ} {p : ℝ[X]} (hp : p ≠ 0) : signRight x p ≠ 0 := by
-  obtain ⟨y, hy1, hy2⟩ := ((eventually_sign_eq_signRight x p).and
-    ((eventually_eval_ne_zero_codiscrete hp).filter_mono
-      ((nhdsGT_le_nhdsNE x).trans (nhdsNE_le_codiscrete x)))).exists
+  obtain ⟨y, hy1, hy2⟩ :=
+    ((eventually_sign_eq_signRight x p).and
+      ((eventually_eval_ne_zero_codiscrete hp).filter_mono
+        ((nhdsGT_le_nhdsNE x).trans (nhdsNE_le_codiscrete x)))).exists
   rw [← hy1]
   exact sign_ne_zero.mpr hy2
 
@@ -111,14 +120,13 @@ theorem signRight_eq_zero_iff {x : ℝ} {p : ℝ[X]} : signRight x p = 0 ↔ p =
   ⟨fun h => by_contra fun hp => signRight_ne_zero hp h, fun h => by rw [h, signRight_zero]⟩
 
 /-- `signRight` is a multiplicative function. -/
-theorem signRight_mul (x : ℝ) (p q : ℝ[X]) :
-    signRight x (p * q) = signRight x p * signRight x q :=
+theorem signRight_mul (x : ℝ) (p q : ℝ[X]) : signRight x (p * q) = signRight x p * signRight x q :=
   signRight_eq_of_eventually <|
     ((eventually_sign_eq_signRight x p).and (eventually_sign_eq_signRight x q)).mono
       fun y ⟨h1, h2⟩ => by rw [eval_mul, sign_mul, h1, h2]
 
 /-- `signRight` commutes with negation. -/
-theorem signRight_neg (x : ℝ) (p : ℝ[X]) : signRight x (-p) = -signRight x p :=
+theorem signRight_neg (x : ℝ) (p : ℝ[X]) : signRight x (-p) = - signRight x p :=
   signRight_eq_of_eventually <|
     (eventually_sign_eq_signRight x p).mono fun y hy => by rw [eval_neg, Left.sign_neg, hy]
 
@@ -141,19 +149,19 @@ theorem signRight_mul_self {x : ℝ} {p : ℝ[X]} (hp : p ≠ 0) : signRight x (
   exact (mul_eq_one_iff_inv_eq₀ this).mpr rfl
 
 /-- Away from its roots, the sign of `p` to the right of `x` is the sign of `p x`. -/
-theorem signRight_of_eval_ne_zero {x : ℝ} {p : ℝ[X]} (h : eval x p ≠ 0) :
-    signRight x p = sign (eval x p) := by
+theorem signRight_of_eval_ne_zero {x : ℝ} {p : ℝ[X]} (h : eval x p ≠ 0)
+    : signRight x p = sign (eval x p) := by
   apply signRight_eq_of_eventually
   have := (continuousAt_sign_of_ne_zero h).tendsto.comp (p.continuous.tendsto x)
   rw [nhds_discrete SignType, tendsto_pure] at this
   exact this.filter_mono nhdsWithin_le_nhds
 
 /-- At a root of `p`, the sign of `p` to the right of `x` is that of `derivative p`. -/
-theorem signRight_of_eval_eq_zero {x : ℝ} {p : ℝ[X]} (hev : eval x p = 0) :
-    signRight x p = signRight x (derivative p) := by
+theorem signRight_of_eval_eq_zero {x : ℝ} {p : ℝ[X]} (hev : eval x p = 0)
+    : signRight x p = signRight x (derivative p) := by
   apply signRight_eq_of_eventually
-  obtain ⟨b, hb, hb2⟩ := mem_nhdsGT_iff_exists_Ioo_subset.mp
-    (eventually_sign_eq_signRight x (derivative p))
+  obtain ⟨b, hb, hb2⟩ :=
+    mem_nhdsGT_iff_exists_Ioo_subset.mp (eventually_sign_eq_signRight x (derivative p))
   refine mem_nhdsGT_iff_exists_Ioo_subset.mpr ⟨b, hb, fun y hy => ?_⟩
   -- mean value theorem: `eval y p = (y - x) * eval c (derivative p)` for some `c ∈ (x, y)`
   obtain ⟨c, ⟨hc1, hc2⟩, hc3⟩ :=
@@ -164,19 +172,19 @@ theorem signRight_of_eval_eq_zero {x : ℝ} {p : ℝ[X]} (hev : eval x p = 0) :
   change sign (eval y p) = _
   rw [← hc3, sign_mul, sign_pos (sub_pos.mpr hy.1), mul_one, hc]
 
-theorem signRight_derivative_mul {x : ℝ} {p : ℝ[X]} (hp : p ≠ 0) (hev : eval x p = 0) :
-    signRight x (derivative p * p) = 1 := by
+theorem signRight_derivative_mul {x : ℝ} {p : ℝ[X]} (hp : p ≠ 0) (hev : eval x p = 0)
+    : signRight x (derivative p * p) = 1 := by
   rw [signRight_mul, ← signRight_of_eval_eq_zero hev]
   have := signRight_ne_zero (x := x) hp
   exact (mul_eq_one_iff_inv_eq₀ this).mpr rfl
 
-theorem signRight_add {x : ℝ} {p q : ℝ[X]} (hp : eval x p = 0) (hq : eval x q ≠ 0) :
-    signRight x (p + q) = signRight x q := by
+theorem signRight_add {x : ℝ} {p q : ℝ[X]} (hp : eval x p = 0) (hq : eval x q ≠ 0)
+    : signRight x (p + q) = signRight x q := by
   have h : eval x (p + q) ≠ 0 := by rw [eval_add, hp, zero_add]; exact hq
   rw [signRight_of_eval_ne_zero h, signRight_of_eval_ne_zero hq, eval_add, hp, zero_add]
 
-theorem signRight_mod {x : ℝ} {p q : ℝ[X]} (hp : eval x p = 0) (hq : eval x q ≠ 0) :
-    signRight x (q % p) = signRight x q := by
+theorem signRight_mod {x : ℝ} {p q : ℝ[X]} (hp : eval x p = 0) (hq : eval x q ≠ 0)
+    : signRight x (q % p) = signRight x q := by
   have h : eval x (q % p) ≠ 0 := by rw [eval_mod_eq_self_of_root hp]; exact hq
   rw [signRight_of_eval_ne_zero h, signRight_of_eval_ne_zero hq, eval_mod_eq_self_of_root hp]
 

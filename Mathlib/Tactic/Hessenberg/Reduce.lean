@@ -27,8 +27,10 @@ public meta section
 
 namespace Mathlib.Tactic.Hessenberg
 
-/-- A similarity `Aσ * L = L * H` of a rational matrix `A` to upper Hessenberg form, where
-`Aσ := A.submatrix σ σ` for the arrangement `σ` of the interchanges. -/
+/--
+A similarity `Aσ * L = L * H` of a rational matrix `A` to upper Hessenberg form, where
+`Aσ := A.submatrix σ σ` for the arrangement `σ` of the interchanges.
+-/
 structure Reduction where
   /-- The row and column interchanges, in order. The permutation `σ` is their product. -/
   swaps : Array (ℕ × ℕ)
@@ -37,20 +39,26 @@ structure Reduction where
   /-- The upper Hessenberg form. -/
   H : Array (Array ℚ)
 
-/-- The row and column swaps of a `Reduction` represented as an indexed array. An entry `e` at index
-`i` means that row and column `e` of the original matrix move to position `i`. -/
+/--
+The row and column swaps of a `Reduction` represented as an indexed array. An entry `e` at index
+`i` means that row and column `e` of the original matrix move to position `i`.
+-/
 def Reduction.perm (d : Reduction) : Array ℕ :=
   d.swaps.foldl (fun ord (a, b) => ord.swapIfInBounds a b) (Array.range d.L.size)
 
-/-- Arrange the rows and columns of the matrix `M`, given as an array of rows, by the interchanges
+/--
+Arrange the rows and columns of the matrix `M`, given as an array of rows, by the interchanges
 of the reduction: the entry at `(i, j)` of the result is the entry of `M` at
-`(d.perm[i], d.perm[j])`. -/
-def Reduction.arrange {β : Type} [Inhabited β] (d : Reduction) (M : Array (Array β)) :
-    Array (Array β) :=
+`(d.perm[i], d.perm[j])`.
+-/
+def Reduction.arrange {β : Type} [Inhabited β] (d : Reduction) (M : Array (Array β))
+    : Array (Array β) :=
   d.perm.map fun i => d.perm.map fun j => (M[i]!)[j]!
 
-/-- Reduce the `n × n` matrix `A` over `ℚ`, given as an array of rows, to upper Hessenberg form by
-Gaussian elimination with row and column swaps. -/
+/--
+Reduce the `n × n` matrix `A` over `ℚ`, given as an array of rows, to upper Hessenberg form by
+Gaussian elimination with row and column swaps.
+-/
 def reduce (n : ℕ) (A : Array (Array ℚ)) : Reduction := Id.run do
   let getEntry (M : Array (Array ℚ)) (i j : ℕ) : ℚ := (M.getD i #[]).getD j 0
   let mut H := A

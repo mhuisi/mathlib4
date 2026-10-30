@@ -5,7 +5,7 @@ Authors: Kim Morrison
 -/
 module
 
-public import Mathlib.CategoryTheory.Category.Basic  -- shake: keep (tactic output dependency)
+public import Mathlib.CategoryTheory.Category.Basic -- shake: keep (tactic output dependency)
 
 /-!
 # The `slice` tactic
@@ -43,15 +43,12 @@ syntax (name := slice) "slice " num ppSpace num : conv
   normal form
 -/
 def evalSlice (a b : Nat) : TacticM Unit := do
-  let _ ← iterateUntilFailureWithResults <|
-    evalTactic (← `(conv| rw [Category.assoc]))
+  let _ ← iterateUntilFailureWithResults <| evalTactic (← `(conv| rw [Category.assoc]))
   iterateRange (a - 1) (a - 1) <| evalTactic (← `(conv| rhs))
-  let k ← iterateUntilFailureCount <|
-    evalTactic (← `(conv| rw [← Category.assoc]))
-  let c := k+1+a-b
+  let k ← iterateUntilFailureCount <| evalTactic (← `(conv| rw [← Category.assoc]))
+  let c := k + 1 + a - b
   iterateRange c c <| evalTactic (← `(conv| lhs))
-  let _ ← iterateUntilFailureWithResults do
-    evalTactic (← `(conv| rw [Category.assoc]))
+  let _ ← iterateUntilFailureWithResults do evalTactic (← `(conv| rw [Category.assoc]))
 
 /-- `slice` is implemented by `evalSlice`. -/
 elab "slice " a:num ppSpace b:num : conv => evalSlice a.getNat b.getNat
@@ -62,8 +59,7 @@ composition as needed, zooms in on the `a`-th through `b`-th morphisms, and invo
 -/
 syntax (name := sliceLHS) "slice_lhs " num ppSpace num " => " convSeq : tactic
 macro_rules
-  | `(tactic| slice_lhs $a $b => $seq) =>
-    `(tactic| conv => lhs; slice $a $b; ($seq:convSeq))
+  | `(tactic| slice_lhs $a $b => $seq) => `(tactic| conv => lhs; slice $a $b; ($seq:convSeq))
 
 /--
 `slice_rhs a b => tac` zooms to the right-hand side, uses associativity for categorical
@@ -71,8 +67,7 @@ composition as needed, zooms in on the `a`-th through `b`-th morphisms, and invo
 -/
 syntax (name := sliceRHS) "slice_rhs " num ppSpace num " => " convSeq : tactic
 macro_rules
-  | `(tactic| slice_rhs $a $b => $seq) =>
-    `(tactic| conv => rhs; slice $a $b; ($seq:convSeq))
+  | `(tactic| slice_rhs $a $b => $seq) => `(tactic| conv => rhs; slice $a $b; ($seq:convSeq))
 
 /- Porting note: update when `add_tactic_doc` is supported` -/
 -- add_tactic_doc
@@ -80,5 +75,4 @@ macro_rules
 --     category := DocCategory.tactic
 --     declNames := [`tactic.interactive.sliceLHS, `tactic.interactive.sliceRHS]
 --     tags := ["category theory"] }
---
 end Mathlib.Tactic.Slice

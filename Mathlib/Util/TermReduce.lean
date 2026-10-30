@@ -30,14 +30,16 @@ The purpose of this is to support substitutions in notations such as
 `∀ i, beta% p i` so that `p i` gets beta reduced when `p` is a lambda.
 -/
 
-/-- `beta% t` elaborates `t` and then if the result is in the form
+/--
+`beta% t` elaborates `t` and then if the result is in the form
 `f x1 ... xn` where `f` is a (nested) lambda expression,
 it will substitute all of its arguments by beta reduction.
 This does not recursively do beta reduction, nor will it do
 beta reduction of subexpressions.
 
 In particular, `t` is elaborated, its metavariables are instantiated,
-and then `Lean.Expr.headBeta` is applied. -/
+and then `Lean.Expr.headBeta` is applied.
+-/
 syntax (name := betaStx) "beta% " term : term
 
 @[term_elab betaStx, inherit_doc betaStx]
@@ -55,11 +57,11 @@ syntax (name := deltaStx) "delta% " term : term
 def elabDelta : TermElab := fun stx expectedType? =>
   match stx with
   | `(delta% $t) => do
-    let t ← withSynthesize (postpone := .partial) do
-      elabTerm t expectedType?
+    let t ← withSynthesize (postpone := .partial) do elabTerm t expectedType?
     synthesizeSyntheticMVars
     let t ← instantiateMVars t
-    let some t ← withoutExporting do delta? t | throwError "cannot delta reduce {t}"
+    let some t ← withoutExporting do delta? t
+      | throwError "cannot delta reduce {t}"
     pure t
   | _ => throwUnsupportedSyntax
 
@@ -70,8 +72,7 @@ syntax (name := zetaStx) "zeta% " term : term
 def elabZeta : TermElab := fun stx expectedType? =>
   match stx with
   | `(zeta% $t) => do
-    let t ← withSynthesize (postpone := .partial) do
-      elabTerm t expectedType?
+    let t ← withSynthesize (postpone := .partial) do elabTerm t expectedType?
     synthesizeSyntheticMVars
     let t ← instantiateMVars t
     let t ← zetaReduce t
@@ -85,12 +86,10 @@ syntax (name := reduceProjStx) "reduceProj% " term : term
 def elabReduceProj : TermElab := fun stx expectedType? =>
   match stx with
   | `(reduceProj% $t) => do
-    let t ← withSynthesize (postpone := .partial) do
-      elabTerm t expectedType?
+    let t ← withSynthesize (postpone := .partial) do elabTerm t expectedType?
     synthesizeSyntheticMVars
     let t ← instantiateMVars t
-    let t ← Lean.Core.transform t (post := fun e ↦ do
-      return .continue (← Expr.reduceProjStruct? e))
+    let t ← Lean.Core.transform t (post := fun e ↦ do return .continue (← Expr.reduceProjStruct? e))
     pure t
   | _ => throwUnsupportedSyntax
 

@@ -26,7 +26,6 @@ the usual way this is considered.
 
 public section
 
-
 variable {x y : ℂ}
 
 namespace Complex
@@ -43,8 +42,10 @@ theorem sameRay_iff : SameRay ℝ x y ↔ x = 0 ∨ y = 0 ∨ x.arg = y.arg := b
 
 theorem sameRay_iff_arg_div_eq_zero : SameRay ℝ x y ↔ arg (x / y) = 0 := by
   rw [← Real.Angle.toReal_zero, ← arg_coe_angle_eq_iff_eq_toReal, sameRay_iff]
-  by_cases hx : x = 0; · simp [hx]
-  by_cases hy : y = 0; · simp [hy]
+  by_cases hx : x = 0
+  · simp [hx]
+  by_cases hy : y = 0
+  · simp [hy]
   simp [hx, hy, arg_div_coe_angle, sub_eq_zero]
 
 theorem norm_add_eq_iff : ‖x + y‖ = ‖x‖ + ‖y‖ ↔ x = 0 ∨ y = 0 ∨ x.arg = y.arg :=
@@ -56,14 +57,12 @@ theorem norm_sub_eq_iff : ‖x - y‖ = |‖x‖ - ‖y‖| ↔ x = 0 ∨ y = 0 
 theorem sameRay_of_arg_eq (h : x.arg = y.arg) : SameRay ℝ x y :=
   sameRay_iff.mpr <| Or.inr <| Or.inr h
 
-theorem norm_add_eq (h : x.arg = y.arg) : ‖x + y‖ = ‖x‖ + ‖y‖ :=
-  (sameRay_of_arg_eq h).norm_add
+theorem norm_add_eq (h : x.arg = y.arg) : ‖x + y‖ = ‖x‖ + ‖y‖ := (sameRay_of_arg_eq h).norm_add
 
-theorem norm_sub_eq (h : x.arg = y.arg) : ‖x - y‖ = ‖‖x‖ - ‖y‖‖ :=
-  (sameRay_of_arg_eq h).norm_sub
+theorem norm_sub_eq (h : x.arg = y.arg) : ‖x - y‖ = ‖‖x‖ - ‖y‖‖ := (sameRay_of_arg_eq h).norm_sub
 
 lemma normalize_mul_star (z : ℂ) : NormedSpace.normalize z * star z = ‖z‖ := by
-  rw [NormedSpace.normalize, real_smul, ofReal_inv, mul_assoc, ← div_eq_inv_mul, star_def,
-    mul_conj, normSq_eq_norm_sq, ofReal_pow, pow_two, mul_self_div_self]
+  rw [NormedSpace.normalize, real_smul, ofReal_inv, mul_assoc, ← div_eq_inv_mul, star_def, mul_conj,
+    normSq_eq_norm_sq, ofReal_pow, pow_two, mul_self_div_self]
 
 end Complex

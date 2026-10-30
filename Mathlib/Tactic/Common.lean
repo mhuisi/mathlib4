@@ -5,26 +5,21 @@ Authors: Kim Morrison
 -/
 
 -- First import Aesop, Qq, and Plausible
-module  -- shake: keep-all, shake: keep-downstream
+module -- shake: keep-all, shake: keep-downstream
 
 public meta import Aesop
 public meta import Qq
 public meta import Plausible
-
 -- Import common Batteries tactics and commands
 public import Batteries.Tactic.Basic
 public import Batteries.Tactic.Case
 public import Batteries.Tactic.GeneralizeProofs
-
 -- Import Batteries code actions
 public meta import Batteries.CodeAction
-
 -- Import syntax for leansearch
 public import LeanSearchClient
-
 -- Import Mathlib-specific linters.
 public import Mathlib.Tactic.Linter.Lint
-
 -- Now import all tactics defined in Mathlib that do not require theory files.
 public import Mathlib.Tactic.ApplyCongr
 -- ApplyFun imports `Mathlib/Order/Monotone/Basic.lean`

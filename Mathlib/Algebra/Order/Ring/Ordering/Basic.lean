@@ -6,7 +6,6 @@ Authors: Florent Schaffhauser, Artie Khovanov
 module
 
 public import Mathlib.Algebra.Order.Ring.Ordering.Defs
-
 import Mathlib.Algebra.Field.IsField
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
@@ -28,8 +27,8 @@ namespace Subsemiring
 
 section CommRing
 
-variable {R S : Type*} [CommRing R] [CommRing S] (f : R →+* S)
-        {P : Subsemiring R} {P' : Subsemiring S}
+variable
+  {R S : Type*} [CommRing R] [CommRing S] (f : R →+* S) {P : Subsemiring R} {P' : Subsemiring S}
 
 namespace IsPreordering
 
@@ -43,13 +42,14 @@ theorem one_notMem_support (hP : P.IsPreordering) : 1 ∉ P.support := fun h ↦
 theorem support_ne_top (hP : P.IsPreordering) : P.support ≠ ⊤ := fun h ↦
   one_notMem_support hP (by simp [h])
 
-theorem isOrdering_iff (hP : P.IsPreordering) :
-    P.IsOrdering ↔ ∀ a b : R, -(a * b) ∈ P → a ∈ P ∨ b ∈ P where
+theorem isOrdering_iff (hP : P.IsPreordering)
+    : P.IsOrdering ↔ ∀ a b : R, -(a * b) ∈ P → a ∈ P ∨ b ∈ P where
   mp hP a b _ := by
     by_contra
-    have : a ∈ P.support ∨ b ∈ P.support := hP.isPrime_supportIdeal.mem_or_mem <| by
-      grind [membership, mul_neg, neg_mul, neg_neg, isSpanning_def.mp hP.isSpanning,
-        mem_supportIdeal, mem_support]
+    have : a ∈ P.support ∨ b ∈ P.support :=
+      hP.isPrime_supportIdeal.mem_or_mem <| by
+        grind [membership, mul_neg, neg_mul, neg_neg, isSpanning_def.mp hP.isSpanning,
+          mem_supportIdeal, mem_support]
     grind [mem_support]
   mpr h := by
     refine ⟨?_, hP.support_ne_top, fun {x y} ↦ ?_⟩
@@ -57,16 +57,19 @@ theorem isOrdering_iff (hP : P.IsPreordering) :
     · have := h (-x) y
       grind [membership, mul_neg, neg_mul, neg_neg, mem_support]
 
-theorem mul_mem_support_of_right (hP : P.IsPreordering) (h : IsUnit (2 : R))
-    (x : R) {a : R} (ha : a ∈ P.support) : x * a ∈ P.support := by
+theorem mul_mem_support_of_right
+    (hP : P.IsPreordering) (h : IsUnit (2 : R)) (x : R) {a : R} (ha : a ∈ P.support)
+    : x * a ∈ P.support := by
   rcases h.exists_right_inv with ⟨half, h2⟩
   rw [mem_support] at *
-  suffices ((1 + x) * half) ^ 2 * a + ((1 - x) * half) ^ 2 * (- a) ∈ P ∧
-           ((1 + x) * half) ^ 2 * (- a) + ((1 - x) * half) ^ 2 * a ∈ P by grind
+  suffices ((1 + x) * half) ^ 2 * a + ((1 - x) * half) ^ 2 * (-a) ∈ P
+      ∧ ((1 + x) * half) ^ 2 * (-a) + ((1 - x) * half) ^ 2 * a ∈ P by
+    grind
   membership
 
-theorem mul_mem_support_of_left (hP : P.IsPreordering) (h : IsUnit (2 : R))
-    (x : R) {a : R} (ha : a ∈ P.support) : a * x ∈ P.support :=
+theorem mul_mem_support_of_left
+    (hP : P.IsPreordering) (h : IsUnit (2 : R)) (x : R) {a : R} (ha : a ∈ P.support)
+    : a * x ∈ P.support :=
   (mul_comm _ x) ▸ hP.mul_mem_support_of_right h _ ha
 
 end IsPreordering
@@ -85,8 +88,7 @@ theorem inv_mem (hP : IsPreordering P) {a : F} (ha : a ∈ P) : a⁻¹ ∈ P := 
 
 grind_pattern [membership] inv_mem => P.IsPreordering, a⁻¹ ∈ P
 
-theorem isPointed (hP : IsPreordering P) : P.IsPointed := by
-  grind [membership, isPointed_def]
+theorem isPointed (hP : IsPreordering P) : P.IsPointed := by grind [membership, isPointed_def]
 
 end IsPreordering
 
@@ -101,20 +103,21 @@ variable {R : Type*} [CommRing R]
 namespace RingPreordering
 
 @[deprecated "no replacement" (since := "2026-10-28"), gcongr]
-theorem toSubsemiring_le_toSubsemiring {P₁ P₂ : RingPreordering R} :
-    P₁.toSubsemiring ≤ P₂.toSubsemiring ↔ P₁ ≤ P₂ := .rfl
+theorem toSubsemiring_le_toSubsemiring {P₁ P₂ : RingPreordering R}
+    : P₁.toSubsemiring ≤ P₂.toSubsemiring ↔ P₁ ≤ P₂ :=
+  .rfl
 
 @[deprecated "no replacement" (since := "2026-10-28"), gcongr]
-theorem toSubsemiring_lt_toSubsemiring {P₁ P₂ : RingPreordering R} :
-    P₁.toSubsemiring < P₂.toSubsemiring ↔ P₁ < P₂ := .rfl
+theorem toSubsemiring_lt_toSubsemiring {P₁ P₂ : RingPreordering R}
+    : P₁.toSubsemiring < P₂.toSubsemiring ↔ P₁ < P₂ :=
+  .rfl
 
 @[deprecated "no replacement" (since := "2026-10-28"), mono]
-theorem toSubsemiring_mono : Monotone (toSubsemiring : RingPreordering R → _) :=
-  fun _ _ => id
+theorem toSubsemiring_mono : Monotone (toSubsemiring : RingPreordering R → _) := fun _ _ => id
 
 @[deprecated "no replacement" (since := "2026-10-28"), mono]
-theorem toSubsemiring_strictMono : StrictMono (toSubsemiring : RingPreordering R → _) :=
-  fun _ _ => id
+theorem toSubsemiring_strictMono : StrictMono (toSubsemiring : RingPreordering R → _) := fun _ _ =>
+  id
 
 set_option linter.deprecated false in
 @[deprecated Subsemiring.IsPreordering.unitsInv_mem +typeChanged (since := "2026-10-28"),
@@ -126,8 +129,7 @@ theorem unitsInv_mem {P : RingPreordering R} {a : Rˣ} (ha : ↑a ∈ P) : ↑a�
 set_option linter.deprecated false in
 @[deprecated Subsemiring.IsPreordering.inv_mem +typeChanged (since := "2026-10-28"),
   aesop unsafe 90% apply (rule_sets := [SetLike])]
-theorem inv_mem {F : Type*} [Field F] {P : RingPreordering F} {a : F} (ha : a ∈ P) :
-    a⁻¹ ∈ P := by
+theorem inv_mem {F : Type*} [Field F] {P : RingPreordering F} {a : F} (ha : a ∈ P) : a⁻¹ ∈ P := by
   have mem : a * (a⁻¹ * a⁻¹) ∈ P := by aesop
   field_simp at mem
   simp_all
@@ -144,12 +146,11 @@ variable {R : Type*} [CommRing R] {P : Set R} {add} {mul} {sq} {neg_one}
 
 /-- Construct a preordering from a minimal set of axioms. -/
 @[deprecated "no replacement" (since := "2026-10-28")]
-def mk' {R : Type*} [CommRing R] (P : Set R)
-    (add : ∀ {x y : R}, x ∈ P → y ∈ P → x + y ∈ P)
-    (mul : ∀ {x y : R}, x ∈ P → y ∈ P → x * y ∈ P)
-    (sq : ∀ x : R, x * x ∈ P)
-    (neg_one : -1 ∉ P) :
-    RingPreordering R where
+def mk'
+    {R : Type*} [CommRing R]
+    (P : Set R) (add : ∀ {x y : R}, x ∈ P → y ∈ P → x + y ∈ P)
+    (mul : ∀ {x y : R}, x ∈ P → y ∈ P → x * y ∈ P) (sq : ∀ x : R, x * x ∈ P) (neg_one : -1 ∉ P)
+    : RingPreordering R where
   carrier := P
   add_mem' {x y} := by simpa using add
   mul_mem' {x y} := by simpa using mul
@@ -167,26 +168,30 @@ end mk'
 section ne_top
 
 @[deprecated Subsemiring.IsPreordering.one_notMem_support +typeChanged (since := "2026-10-28")]
-theorem one_notMem_supportAddSubgroup (P : RingPreordering R) : 1 ∉ P.supportAddSubgroup :=
-  fun h => RingPreordering.neg_one_notMem P h.2
+theorem one_notMem_supportAddSubgroup (P : RingPreordering R) : 1 ∉ P.supportAddSubgroup := fun h =>
+  RingPreordering.neg_one_notMem P h.2
 
 @[deprecated Subsemiring.IsPreordering.one_notMem_support +typeChanged (since := "2026-10-28")]
 theorem one_notMem_support (P : RingPreordering R) [P.HasIdealSupport] : 1 ∉ P.support := by
   simpa using one_notMem_supportAddSubgroup P
 
 @[deprecated Subsemiring.IsPreordering.support_ne_top +typeChanged (since := "2026-10-28")]
-theorem supportAddSubgroup_ne_top (P : RingPreordering R) : P.supportAddSubgroup ≠ ⊤ :=
-  fun h => RingPreordering.neg_one_notMem P (by simp [h] : 1 ∈ P.supportAddSubgroup).2
+theorem supportAddSubgroup_ne_top (P : RingPreordering R) : P.supportAddSubgroup ≠ ⊤ := fun h =>
+  RingPreordering.neg_one_notMem P (by simp [h] : 1 ∈ P.supportAddSubgroup).2
 
 @[deprecated Subsemiring.IsPreordering.support_ne_top +typeChanged (since := "2026-10-28")]
 theorem support_ne_top (P : RingPreordering R) [P.HasIdealSupport] : P.support ≠ ⊤ := by
   apply_fun Submodule.toAddSubgroup
   simpa using supportAddSubgroup_ne_top P
 
-@[deprecated "use the default constructor and
-`Subsemiring.IsPreordering.support_ne_top`" (since := "2026-10-28")]
-theorem IsOrdering.mk' (P : RingPreordering R) [HasMemOrNegMem P]
-    (h : ∀ {x y}, x * y ∈ P.support → x ∈ P.support ∨ y ∈ P.support) : P.IsOrdering where
+@[deprecated
+  "use the default constructor and\
+    \n`Subsemiring.IsPreordering.support_ne_top`"
+  (since := "2026-10-28")]
+theorem IsOrdering.mk'
+    (P : RingPreordering R) [HasMemOrNegMem P]
+    (h : ∀ {x y}, x * y ∈ P.support → x ∈ P.support ∨ y ∈ P.support)
+    : P.IsOrdering where
   ne_top' := support_ne_top P
   mem_or_mem' := h
 
@@ -195,37 +200,38 @@ end ne_top
 namespace HasIdealSupport
 
 @[deprecated "no replacement" (since := "2026-10-28")]
-theorem smul_mem (P : RingPreordering R) [P.HasIdealSupport]
-    (x : R) {a : R} (h₁a : a ∈ P) (h₂a : -a ∈ P) : x * a ∈ P := by
+theorem smul_mem
+    (P : RingPreordering R) [P.HasIdealSupport] (x : R) {a : R} (h₁a : a ∈ P) (h₂a : -a ∈ P)
+    : x * a ∈ P := by
   rw [hasIdealSupport_iff] at ‹P.HasIdealSupport›
   simp [*]
 
 @[deprecated "no replacement" (since := "2026-10-28")]
-theorem neg_smul_mem (P : RingPreordering R) [P.HasIdealSupport]
-    (x : R) {a : R} (h₁a : a ∈ P) (h₂a : -a ∈ P) : -(x * a) ∈ P := by
+theorem neg_smul_mem
+    (P : RingPreordering R) [P.HasIdealSupport] (x : R) {a : R} (h₁a : a ∈ P) (h₂a : -a ∈ P)
+    : -(x * a) ∈ P := by
   rw [hasIdealSupport_iff] at ‹P.HasIdealSupport›
   simp [*]
 
 end HasIdealSupport
 
-@[deprecated
-Subsemiring.IsPreordering.mul_mem_support_of_right +typeChanged (since := "2026-10-28")]
-theorem hasIdealSupport_of_isUnit_two {P : RingPreordering R} (h : IsUnit (2 : R)) :
-    P.HasIdealSupport := by
+@[deprecated Subsemiring.IsPreordering.mul_mem_support_of_right +typeChanged
+  (since := "2026-10-28")]
+theorem hasIdealSupport_of_isUnit_two {P : RingPreordering R} (h : IsUnit (2 : R))
+    : P.HasIdealSupport := by
   rw [hasIdealSupport_iff]
   intro x a _ _
   rcases h.exists_right_inv with ⟨half, h2⟩
   set y := (1 + x) * half
   set z := (1 - x) * half
-  rw [show x = y ^ 2 - z ^ 2 by
-    linear_combination (-x - x * half * 2) * h2]
+  rw [show x = y ^ 2 - z ^ 2 by linear_combination (-x - x * half * 2) * h2]
   ring_nf
   aesop (add simp sub_eq_add_neg)
 
-@[deprecated
-Subsemiring.IsPreordering.mul_mem_support_of_right +typeChanged (since := "2026-10-28")]
+@[deprecated Subsemiring.IsPreordering.mul_mem_support_of_right +typeChanged
+  (since := "2026-10-28")]
 instance (P : RingPreordering R) [h : Fact (IsUnit (2 : R))] : P.HasIdealSupport :=
-    hasIdealSupport_of_isUnit_two h.out
+  hasIdealSupport_of_isUnit_two h.out
 
 section Field
 
@@ -234,8 +240,8 @@ variable {F : Type*} [Field F]
 set_option linter.deprecated false in
 @[deprecated Subsemiring.IsPreordering.isPointed +typeChanged (since := "2026-10-28"),
   aesop unsafe 70% apply]
-protected theorem eq_zero_of_mem_of_neg_mem
-    {P : RingPreordering F} {x} (h : x ∈ P) (h2 : -x ∈ P) : x = 0 := by
+protected theorem eq_zero_of_mem_of_neg_mem {P : RingPreordering F} {x} (h : x ∈ P) (h2 : -x ∈ P)
+    : x = 0 := by
   by_contra
   have mem : -x * x⁻¹ ∈ P := by aesop (erase simp neg_mul)
   field_simp at mem
@@ -259,8 +265,8 @@ instance (P : RingPreordering F) : P.support.IsPrime := by simpa using Ideal.isP
 end Field
 
 @[deprecated Subsemiring.IsPreordering.isOrdering_iff +typeChanged (since := "2026-10-28")]
-theorem isOrdering_iff {P : RingPreordering R} :
-    P.IsOrdering ↔ ∀ a b : R, -(a * b) ∈ P → a ∈ P ∨ b ∈ P := by
+theorem isOrdering_iff {P : RingPreordering R}
+    : P.IsOrdering ↔ ∀ a b : R, -(a * b) ∈ P → a ∈ P ∨ b ∈ P := by
   refine ⟨fun _ a b _ => ?_, fun h => ?_⟩
   · by_contra
     have : a * b ∈ P := by simpa using mul_mem (by aesop : -a ∈ P) (by aesop : -b ∈ P)

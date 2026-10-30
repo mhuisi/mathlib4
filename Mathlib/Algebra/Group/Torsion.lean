@@ -66,8 +66,7 @@ section HasUniqueRoots
 variable [HasUniqueRoots M] {n : ℕ} {a b : M}
 
 @[to_additive nsmul_right_inj]
-lemma pow_left_inj (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b :=
-  (pow_left_injective hn).eq_iff
+lemma pow_left_inj (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b := (pow_left_injective hn).eq_iff
 
 end HasUniqueRoots
 
@@ -77,8 +76,8 @@ section CancelMonoid
 variable [CancelMonoid M] [IsMulTorsionFree M] {a : M}
 
 @[to_additive IsAddTorsionFree.nsmul_left_injective]
-theorem IsMulTorsionFree.pow_right_injective (ha : a ≠ 1) :
-    Function.Injective (fun n : ℕ ↦ a ^ n) := by
+theorem IsMulTorsionFree.pow_right_injective (ha : a ≠ 1)
+    : Function.Injective (fun n : ℕ ↦ a ^ n) := by
   suffices ∀ {m n : ℕ} (hmn : m ≤ n) (h : a ^ m = a ^ n), m = n from fun m n h ↦
     (Nat.le_or_le m n).elim (this · h) fun hnm ↦ (this hnm h.symm).symm
   intro m _ hmn h
@@ -86,8 +85,7 @@ theorem IsMulTorsionFree.pow_right_injective (ha : a ≠ 1) :
   simpa [pow_add, left_eq_mul, ha] using h
 
 @[to_additive IsAddTorsionFree.nsmul_left_injective_iff]
-theorem IsMulTorsionFree.pow_right_injective_iff :
-    Function.Injective (fun n : ℕ ↦ a ^ n) ↔ a ≠ 1 :=
+theorem IsMulTorsionFree.pow_right_injective_iff : Function.Injective (fun n : ℕ ↦ a ^ n) ↔ a ≠ 1 :=
   ⟨fun h ha ↦ by simpa using @h 0 1 (by simp [ha]), pow_right_injective⟩
 
 @[to_additive (attr := simp) IsAddTorsionFree.nsmul_left_inj]
@@ -96,10 +94,12 @@ theorem IsMulTorsionFree.pow_right_inj (ha : a ≠ 1) {n m : ℕ} : a ^ n = a ^ 
 
 end CancelMonoid
 
-/-- A commutative torsion-free monoid has unique roots.
+/--
+A commutative torsion-free monoid has unique roots.
 
 This is not an instance, to avoid an expensive instance loop with
-`HasUniqueRoots M → IsMulTorsionFree M`. -/
+`HasUniqueRoots M → IsMulTorsionFree M`.
+-/
 @[to_additive /-- A commutative torsion-free additive monoid has unique divisibility.
 
 This is not an instance, to avoid an expensive instance loop with
@@ -115,8 +115,8 @@ section IsMulTorsionFree
 variable [IsMulTorsionFree G]
 
 @[to_additive]
-lemma Commute.eq_of_zpow_eq_zpow (hab : Commute a b) (hn : n ≠ 0) (habn : a ^ n = b ^ n) :
-    a = b := by
+lemma Commute.eq_of_zpow_eq_zpow (hab : Commute a b) (hn : n ≠ 0) (habn : a ^ n = b ^ n)
+    : a = b := by
   cases n
   · exact hab.eq_of_pow_eq_pow (by simpa using hn) (by simpa using habn)
   · exact hab.eq_of_pow_eq_pow (Nat.add_one_ne_zero _) (by simpa using habn)
@@ -172,8 +172,7 @@ lemma zpow_left_injective (hn : n ≠ 0) : Injective fun a : G ↦ a ^ n := by
     exact inv_injective.comp (pow_left_injective (Nat.add_one_ne_zero _))
 
 @[to_additive zsmul_right_inj]
-lemma zpow_left_inj (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b :=
-  (zpow_left_injective hn).eq_iff
+lemma zpow_left_inj (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b := (zpow_left_injective hn).eq_iff
 
 @[to_additive (attr := deprecated (since := "2026-09-30"))] alias zpow_eq_zpow_iff' := zpow_left_inj
 

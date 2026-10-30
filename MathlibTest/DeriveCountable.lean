@@ -16,7 +16,7 @@ Structure
 structure S (α β : Type*) where
   x : α
   y : List β
-  deriving Countable
+deriving Countable
 
 example : Countable (S Nat Bool) := inferInstance
 
@@ -27,7 +27,7 @@ inductive T (α : Type)
   | a (n : Option α)
   | b (n m : α) (t : T α)
   | c
-  deriving Countable
+deriving Countable
 
 example : Countable (T Nat) := inferInstance
 
@@ -37,7 +37,7 @@ Motivating example for writing the deriving handler
 inductive PreCantor' : Type
   | zero : PreCantor'
   | oadd : PreCantor' → ℕ+ → PreCantor' → PreCantor'
-  deriving Countable
+deriving Countable
 
 example : Countable PreCantor' := inferInstance
 
@@ -47,7 +47,7 @@ Sort
 inductive PList (α : Sort _) where
   | nil
   | cons (x : α) (xs : PList α)
-  deriving Countable
+deriving Countable
 
 example : Countable (PList (1 = 2)) := inferInstance
 
@@ -58,7 +58,7 @@ Recursive type with indices
 inductive I : Nat → Type
   | a (n : Nat) : I n
   | b (n : Nat) (x : Nat) (c : I x) : I (n + 1)
-  deriving Countable
+deriving Countable
 
 example : Countable (I 37) := inferInstance
 example : Countable (Σ i, I i) := inferInstance
@@ -70,16 +70,15 @@ mutual
 inductive T1 where
   | a
   | b (x : T1) (y : T2)
-  deriving Countable
+deriving Countable
 inductive T2 where
   | c (n : Nat)
   | d (x y : T1)
-  deriving Countable
+deriving Countable
 end
 
 example : Countable T1 := inferInstance
 example : Countable T2 := inferInstance
-
 
 /-!
 Not supported: nested inductive types
@@ -88,7 +87,7 @@ Not supported: nested inductive types
 #guard_msgs in
 inductive Nested where
   | mk (xs : List Nested)
-  deriving Countable
+deriving Countable
 
 /-!
 Not supported: reflexive inductive types
@@ -97,4 +96,4 @@ Not supported: reflexive inductive types
 #guard_msgs in
 inductive Reflex where
   | mk (f : Bool → Reflex)
-  deriving Countable
+deriving Countable

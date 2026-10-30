@@ -36,7 +36,8 @@ build) just pins the default behavior and warrants no warning.
 `false` when no scope is set or HEAD cannot be determined.
 -/
 def scopeIsHead : IO.CacheM Bool := do
-  let some scope ← getRepoScope | return false
+  let some scope ← getRepoScope
+    | return false
   let head ← try getGitCommitHash catch _ => return false
   return head == scope
 
@@ -56,17 +57,19 @@ probed once per command); it is `none` if it could not be determined.
 
 Otherwise returns `false` (default lookup chain, no warning needed).
 -/
-def shouldWarnNonDefaultScope (repoExplicit? detectedRepo? : Option String)
-    (cliCacheFromOverride? : Option (List Container)) (resolvedRepo : String)
-    (unsafeWindow? : Option Nat := none) :
-    IO.CacheM Bool := do
+def shouldWarnNonDefaultScope
+    (repoExplicit? detectedRepo? : Option String) (cliCacheFromOverride? : Option (List Container))
+    (resolvedRepo : String)
+    (unsafeWindow? : Option Nat := none)
+    : IO.CacheM Bool := do
   -- Condition 0: `--unsafe` (with its SHA window) — the most permissive read.
   if unsafeWindow?.isSome then return true
 
   -- Condition 1: `--scope=` flag or `MATHLIB_CACHE_REPO_SCOPE` env var supplied.
   -- A HEAD scope is exempt: trust-equivalent to no scope (see `scopeIsHead`).
   if (← getRepoScope).isSome then
-    unless (← scopeIsHead) do return true
+    unless (← scopeIsHead) do
+      return true
 
   -- Condition 2: --cache-from CLI override widens the lookup chain
   match cliCacheFromOverride? with
@@ -107,7 +110,7 @@ def printNonDefaultScopeWarning (repo : String) (triggerReason : String) : IO Un
     "",
     s!"Repository: {repo}",
     s!"Reason: {triggerReason}",
-    "=================================================================",
+    "================================================================="
   ]
   for line in lines do
     IO.eprintln line
@@ -117,10 +120,11 @@ Determine the reason why a non-default scope warning is being issued.
 
 Returns a human-readable string describing which condition triggered the warning.
 -/
-def getNonDefaultScopeReason (repoExplicit? detectedRepo? : Option String)
-    (cliCacheFromOverride? : Option (List Container)) (resolvedRepo : String)
-    (unsafeWindow? : Option Nat := none) :
-    IO.CacheM String := do
+def getNonDefaultScopeReason
+    (repoExplicit? detectedRepo? : Option String) (cliCacheFromOverride? : Option (List Container))
+    (resolvedRepo : String)
+    (unsafeWindow? : Option Nat := none)
+    : IO.CacheM String := do
   -- Check conditions in order; return the first that matches.
 
   -- Condition 0: `--unsafe` walks up to `window` fork commits, trusting each.
@@ -159,15 +163,16 @@ Print the non-default-scope warning if any of the three conditions hold.
 Called before a read (`cache get`). The warning is informational only — it
 never prompts, so it stays safe to run in CI.
 -/
-def warnIfNonDefaultScope (repoExplicit? detectedRepo? : Option String)
-    (cliCacheFromOverride? : Option (List Container)) (resolvedRepo : String)
-    (unsafeWindow? : Option Nat := none) :
-    IO.CacheM Unit := do
+def warnIfNonDefaultScope
+    (repoExplicit? detectedRepo? : Option String) (cliCacheFromOverride? : Option (List Container))
+    (resolvedRepo : String)
+    (unsafeWindow? : Option Nat := none)
+    : IO.CacheM Unit := do
   if (← shouldWarnNonDefaultScope repoExplicit? detectedRepo? cliCacheFromOverride? resolvedRepo
-        unsafeWindow?)
-    then
-    let reason ← getNonDefaultScopeReason repoExplicit? detectedRepo? cliCacheFromOverride?
-      resolvedRepo unsafeWindow?
+      unsafeWindow?) then
+    let reason ←
+      getNonDefaultScopeReason repoExplicit? detectedRepo? cliCacheFromOverride? resolvedRepo
+        unsafeWindow?
     printNonDefaultScopeWarning resolvedRepo reason
 
 /--
@@ -192,7 +197,7 @@ def missingFilesForkLines (repo sha : String) (missing : Nat) : List String := [
   "Important: using another commit's scope means trusting the artifacts",
   "produced at that commit. `cache get` will print a security notice",
   "when you do.",
-  "",
+  ""
 ]
 
 /--
@@ -207,7 +212,7 @@ def missingFilesGenericLines (missing : Nat) : List String := [
   "    (use a draft PR if it is not ready for review),",
   "    then CI will build the oleans and they will be available later.",
   "  * If you have already opened a PR, this may mean",
-  "    the CI build has failed part-way through building.",
+  "    the CI build has failed part-way through building."
 ]
 
 /--
@@ -255,10 +260,11 @@ even though no fork cache exists for its commits — its absence has no
 consequence. When files are missing, reads that `forkHintSHA?` accepts get
 the fork-workflow hint; every other read gets the generic divergence warning.
 -/
-def warnIfMissingFiles (repo : String) (missing : Nat) (unsafeMode : Bool := false) :
-    IO.CacheM Unit := do
+def warnIfMissingFiles (repo : String) (missing : Nat) (unsafeMode : Bool := false)
+    : IO.CacheM Unit := do
   if missing == 0 then return
-  let lines ← match ← forkHintSHA? repo unsafeMode with
+  let lines ←
+    match ← forkHintSHA? repo unsafeMode with
     | some sha => pure (missingFilesForkLines repo sha missing)
     | none => pure (missingFilesGenericLines missing)
   for line in lines do

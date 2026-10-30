@@ -6,7 +6,6 @@ Authors: Floris van Doorn
 module
 
 public import Lean.ScopedEnvExtension
-
 import Mathlib.Init
 
 set_option doc.verso true
@@ -20,4 +19,4 @@ public section
 
 open Lean
 
-instance {σ : Type} [Inhabited σ] : Inhabited (ScopedEnvExtension.State σ) := ⟨{state := default}⟩
+instance {σ : Type} [Inhabited σ] : Inhabited (ScopedEnvExtension.State σ) := ⟨{ state := default }⟩

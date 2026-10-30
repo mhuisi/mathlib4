@@ -6,7 +6,6 @@ Authors: Peter Nelson
 module
 
 public meta import Aesop
-
 import Mathlib.Init
 
 set_option doc.verso true

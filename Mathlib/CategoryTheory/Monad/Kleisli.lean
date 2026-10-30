@@ -21,7 +21,6 @@ the monad `(T, η_ T, μ_ T)` as well as the co-Kleisli adjunction which gives r
 
 @[expose] public section
 
-
 namespace CategoryTheory
 
 universe v u
@@ -29,18 +28,22 @@ universe v u
 -- morphism levels before object levels. See note [category theory universes].
 variable {C : Type u} [Category.{v} C]
 
-/-- The objects for the Kleisli category of the monad `T : Monad C`, which are the same
+/--
+The objects for the Kleisli category of the monad `T : Monad C`, which are the same
 thing as objects of the base category `C`.
 -/
-structure Kleisli (T : Monad C) where mk (T) ::
+structure Kleisli (T : Monad C) where
+  mk (T) ::
   /-- The underlying object of the base category. -/
   of : C
 
-/-- The objects for the co-Kleisli category of the comonad `U : Comonad C`, which are the same
+/--
+The objects for the co-Kleisli category of the comonad `U : Comonad C`, which are the same
 thing as objects of the base category `C`.
 -/
 @[to_dual]
-structure Cokleisli (U : Comonad C) where mk (U) ::
+structure Cokleisli (U : Comonad C) where
+  mk (U) ::
   /-- The underlying object of the base category. -/
   of : C
 
@@ -48,17 +51,22 @@ namespace Kleisli
 
 variable {T : Monad C}
 
-@[to_dual (attr := simp)] lemma mk_of (c : Kleisli T) : Kleisli.mk T c.of = c := rfl
+@[to_dual (attr := simp)]
+lemma mk_of (c : Kleisli T) : Kleisli.mk T c.of = c := rfl
 @[to_dual] lemma of_mk (c : C) : (Kleisli.mk T c).of = c := rfl
 
-/-- For (T : Monad C), morphisms `c ⟶ c'` in the Kleisli category of `T` are
-morphisms ` c ⟶ T.obj c'` in `C`. -/
+/--
+For (T : Monad C), morphisms `c ⟶ c'` in the Kleisli category of `T` are
+morphisms ` c ⟶ T.obj c'` in `C`.
+-/
 structure Hom (c c' : Kleisli T) where
   /-- The morphism in C underlying the morphism in the Kleisli category. -/
   of : c.of ⟶ T.obj c'.of
 
-/-- For (U : Comonad C), morphisms `c ⟶ c'` in the Cokleisli category of `U` are
-morphisms ` U.obj c ⟶ c'` in `C`. -/
+/--
+For (U : Comonad C), morphisms `c ⟶ c'` in the Cokleisli category of `U` are
+morphisms ` U.obj c ⟶ c'` in `C`.
+-/
 @[to_dual (reorder := c c')]
 structure _root_.CategoryTheory.Cokleisli.Hom {U : Comonad C} (c c' : Cokleisli U) where
   /-- The morphism in C underlying the morphism in the Kleisli category. -/
@@ -67,14 +75,15 @@ structure _root_.CategoryTheory.Cokleisli.Hom {U : Comonad C} (c c' : Cokleisli 
 attribute [local ext] Hom Cokleisli.Hom
 attribute [to_dual existing] Hom.ext
 
-@[to_dual]
-instance [Inhabited C] (T : Monad C) : Inhabited (Kleisli T) := ⟨.mk T default⟩
+@[to_dual] instance [Inhabited C] (T : Monad C) : Inhabited (Kleisli T) := ⟨.mk T default⟩
 
 variable (T)
 
 set_option linter.translate.warnInvalid false in
-/-- The Kleisli category on a monad `T`.
-cf Definition 5.2.9 in [Riehl][riehl2017]. -/
+/--
+The Kleisli category on a monad `T`.
+cf Definition 5.2.9 in [Riehl][riehl2017].
+-/
 @[to_dual (attr := simps!) /-- The co-Kleisli category on a comonad `T`. -/]
 instance category : Category (Kleisli T) where
   Hom X Y := Hom X Y
@@ -85,19 +94,17 @@ instance category : Category (Kleisli T) where
     dsimp
     rw [← T.η.naturality_assoc f.of, T.left_unit]
     apply Category.comp_id
-  assoc f g h := by
-    simp [Monad.assoc, T.mu_naturality_assoc]
+  assoc f g h := by simp [Monad.assoc, T.mu_naturality_assoc]
 
 variable {T} in
 @[to_dual (attr := ext)]
-lemma hom_ext {x y : Kleisli T} {f g : x ⟶ y} (h : f.of = g.of) : f = g :=
-  Hom.ext h
+lemma hom_ext {x y : Kleisli T} {f g : x ⟶ y} (h : f.of = g.of) : f = g := Hom.ext h
 
 namespace Adjunction
 
 /-- The left adjoint of the adjunction which induces the monad `(T, η_ T, μ_ T)`. -/
 @[to_dual (attr := simps, implicit_reducible)
-/-- The right adjoint of the adjunction which induces the comonad `(T, ε_ T, δ_ T)`. -/]
+  /-- The right adjoint of the adjunction which induces the comonad `(T, ε_ T, δ_ T)`. -/]
 def toKleisli : C ⥤ Kleisli T where
   obj X := .mk T X
   map {X} {Y} f := .mk <| f ≫ T.η.app Y
@@ -107,22 +114,24 @@ def toKleisli : C ⥤ Kleisli T where
 
 /-- The right adjoint of the adjunction which induces the monad `(T, η_ T, μ_ T)`. -/
 @[to_dual (attr := simps, implicit_reducible)
-/-- The left adjoint of the adjunction which induces the comonad `(T, ε_ T, δ_ T)`. -/]
+  /-- The left adjoint of the adjunction which induces the comonad `(T, ε_ T, δ_ T)`. -/]
 def fromKleisli : Kleisli T ⥤ C where
   obj X := T.obj X.of
   map {_} {Y} f := T.map f.of ≫ T.μ.app Y.of
   map_id _ := T.right_unit _
-  map_comp {X} {Y} {Z} f g := by
-    simp [← T.μ.naturality_assoc g.of, T.assoc]
+  map_comp {X} {Y} {Z} f g := by simp [← T.μ.naturality_assoc g.of, T.assoc]
 
-/-- The Kleisli adjunction which gives rise to the monad `(T, η_ T, μ_ T)`.
-cf Lemma 5.2.11 of [Riehl][riehl2017]. -/
+/--
+The Kleisli adjunction which gives rise to the monad `(T, η_ T, μ_ T)`.
+cf Lemma 5.2.11 of [Riehl][riehl2017].
+-/
 def adj : toKleisli T ⊣ fromKleisli T :=
-  Adjunction.mkOfHomEquiv
-    { homEquiv X Y := { toFun f := f.of, invFun f := .mk f }
-      homEquiv_naturality_left_symm := fun {X} {Y} {Z} f g => by
-        ext
-        simp [← T.η.naturality_assoc g] }
+  Adjunction.mkOfHomEquiv {
+    homEquiv X Y := { toFun f := f.of, invFun f := .mk f }
+    homEquiv_naturality_left_symm := fun {X} {Y} {Z} f g => by
+      ext
+      simp [← T.η.naturality_assoc g]
+  }
 
 /-- The composition of the adjunction gives the original functor. -/
 @[to_dual /-- The composition of the adjunction gives the original functor. -/]
@@ -135,8 +144,9 @@ end Kleisli
 
 /-- The co-Kleisli adjunction which gives rise to the comonad `(T, ε_ T, δ_ T)`. -/
 def Cokleisli.Adjunction.adj (T : Comonad C) : fromCokleisli T ⊣ toCokleisli T :=
-  Adjunction.mkOfHomEquiv
-    { homEquiv X Y := { toFun f := .mk f, invFun f := f.of }
-      homEquiv_naturality_right := fun {X} {Y} {_} f g => by cat_disch }
+  Adjunction.mkOfHomEquiv {
+    homEquiv X Y := { toFun f := .mk f, invFun f := f.of }
+    homEquiv_naturality_right := fun {X} {Y} {_} f g => by cat_disch
+  }
 
 end CategoryTheory

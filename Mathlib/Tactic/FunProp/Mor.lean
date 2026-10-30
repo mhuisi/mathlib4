@@ -30,21 +30,26 @@ open Lean Meta
 
 namespace Meta.FunProp
 
-/-- An abbreviation of `∀ x, p x`. It is used by `fun_prop` to represent Pi types as function
-applications and should not occur in any place other than the implementation of `fun_prop`. -/
+/--
+An abbreviation of `∀ x, p x`. It is used by `fun_prop` to represent Pi types as function
+applications and should not occur in any place other than the implementation of `fun_prop`.
+-/
 abbrev Forall {α : Sort*} (p : α → Sort*) := ∀ x, p x
 
 namespace Mor
 
 /-- Is `name` a coercion from some function space to functions? -/
 def isCoeFunName (name : Name) : CoreM Bool := do
-  let some info ← getCoeFnInfo? name | return false
+  let some info ← getCoeFnInfo? name
+    | return false
   return info.type == .coeFun
 
 /-- Is `e` a coercion from some function space to functions? -/
 def isCoeFun (e : Expr) : MetaM Bool := do
-  let some (name, _) := e.getAppFn.const? | return false
-  let some info ← getCoeFnInfo? name | return false
+  let some (name, _) := e.getAppFn.const?
+    | return false
+  let some info ← getCoeFnInfo? name
+    | return false
   return e.getAppNumArgs' + 1 == info.numArgs
 
 /-- Morphism application -/
@@ -52,29 +57,33 @@ structure App where
   /-- morphism coercion -/
   coe : Expr
   /-- bundled morphism -/
-  fn  : Expr
+  fn : Expr
   /-- morphism argument -/
   arg : Expr
 
 /-- Is `e` morphism application? -/
 def isMorApp? (e : Expr) : MetaM (Option App) := do
-
-  let .app (.app coe f) x := e | return none
+  let .app (.app coe f) x := e
+    | return none
   if ← isCoeFun coe then
     return some { coe := coe, fn := f, arg := x }
   else
     return none
 
-/-- Previously, `fun_prop` incorrectly switched to default transparency when reducing an
+/--
+Previously, `fun_prop` incorrectly switched to default transparency when reducing an
 expression if a projection was applied to it. Setting this option to true restores this
 behavior.
 
-Note that this option is only for backward compatibility and will be removed in the future. -/
+Note that this option is only for backward compatibility and will be removed in the future.
+-/
 register_option fun_prop.projDefaultTransparency : Bool := {
-  descr := "Previously, `fun_prop` incorrectly switched to default transparency when reducing an \
-    expression if a projection was applied to it. Setting this option to true restores this \
-    behavior.\n\n\
-    Note that this option is only for backward compatibility and will be removed in the future."
+  descr :=
+    "Previously, `fun_prop` incorrectly switched to default transparency when reducing an \
+      expression if a projection was applied to it. Setting this option to true restores this \
+      behavior.\
+      \n\n\
+      Note that this option is only for backward compatibility and will be removed in the future."
   defValue := false
 }
 
@@ -89,7 +98,8 @@ protected partial def whnf (e : Expr) : MetaM Expr := do
     let e' ← whnfCore e
     if e != e' then
       return ← Mor.whnf e'
-  let some ⟨coe,f,x⟩ ← isMorApp? e | return e
+  let some ⟨coe, f, x⟩ ← isMorApp? e
+    | return e
   let f ← Mor.whnf f
   if (← getConfig).zeta then
     return (coe.app f).app x
@@ -102,7 +112,7 @@ structure Arg where
   expr : Expr
   /-- coercion `F → α → β` -/
   coe : Option Expr := none
-  deriving Inhabited
+deriving Inhabited
 
 /-- Morphism application -/
 def app (f : Expr) (arg : Arg) : Expr :=
@@ -110,34 +120,33 @@ def app (f : Expr) (arg : Arg) : Expr :=
   | none => f.app arg.expr
   | some coe => (coe.app f).app arg.expr
 
+/--
+Given `e = f a₁ a₂ ... aₙ`, returns `k f #[a₁, ..., aₙ]` where `f` can be bundled morphism.
 
-/-- Given `e = f a₁ a₂ ... aₙ`, returns `k f #[a₁, ..., aₙ]` where `f` can be bundled morphism.
-
-`∀ x, p x` is represented as `Forall p`. -/
-partial def withApp {α} (e : Expr) (k : Expr → Array Arg → MetaM α) : MetaM α :=
-  go e #[]
+`∀ x, p x` is represented as `Forall p`.
+-/
+partial def withApp {α} (e : Expr) (k : Expr → Array Arg → MetaM α) : MetaM α := go e #[]
 where
   /-- -/
-  go : Expr → Array Arg →  MetaM α
+  go : Expr → Array Arg → MetaM α
     | .mdata _ b, as => go b as
     | .app (.app c f) x, as => do
       if ← isCoeFun c then
-        go f (as.push { coe := c, expr := x})
+        go f (as.push { coe := c, expr := x })
       else
-        go (.app c f) (as.push { expr := x})
+        go (.app c f) (as.push { expr := x })
     | .app (.proj n i f) x, as => do
       -- convert proj back to function application
       let env ← getEnv
       let info := getStructureInfo? env n |>.get!
       let projFn := getProjFnForField? env n (info.fieldNames[i]!) |>.get!
-      let .app c f ← mkAppM projFn #[f] | panic! "bug in Mor.withApp"
+      let .app c f ← mkAppM projFn #[f]
+        | panic! "bug in Mor.withApp"
 
       go (.app (.app c f) x) as
     | .app f a, as => go f (as.push { expr := a })
-    | .forallE x t b bi, _ => do
-      go (← mkAppM ``Forall #[.lam x t b bi]) #[]
+    | .forallE x t b bi, _ => do go (← mkAppM ``Forall #[.lam x t b bi]) #[]
     | f, as => k f as.reverse
-
 
 /--
 If the given expression is a sequence of morphism applications `f a₁ .. aₙ`, return `f`.
@@ -151,8 +160,7 @@ def getAppFn (e : Expr) : MetaM Expr :=
       getAppFn f
     else
       getAppFn (.app c f)
-  | .app f _ =>
-    getAppFn f
+  | .app f _ => getAppFn f
   | e => return e
 
 /-- Given `f a₁ a₂ ... aₙ`, returns `#[a₁, ..., aₙ]` where `f` can be bundled morphism. -/

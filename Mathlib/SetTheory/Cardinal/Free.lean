@@ -8,7 +8,6 @@ module
 public import Mathlib.Algebra.FreeAbelianGroup.Finsupp
 public import Mathlib.Algebra.MonoidAlgebra.Cardinal
 public import Mathlib.RingTheory.FreeCommRing
-
 import Mathlib.Algebra.Ring.TransferInstance
 import Mathlib.Data.Finsupp.Fintype
 import Mathlib.Data.ZMod.Defs
@@ -52,11 +51,9 @@ section Countable
 
 variable [Countable α]
 
-@[to_additive]
-instance : Countable (FreeMonoid α) := .of_equiv _ FreeMonoid.toListEquiv.symm
+@[to_additive] instance : Countable (FreeMonoid α) := .of_equiv _ FreeMonoid.toListEquiv.symm
 
-@[to_additive]
-instance : Countable (FreeGroup α) := inferInstanceAs <| Countable (Quot _)
+@[to_additive] instance : Countable (FreeGroup α) := inferInstanceAs <| Countable (Quot _)
 
 instance : Countable (FreeAbelianGroup α) := inferInstanceAs <| Countable (Quot _)
 
@@ -70,12 +67,11 @@ end Countable
 
 namespace Cardinal
 
-theorem mk_abelianization_le (G : Type u) [Group G] :
-    #(Abelianization G) ≤ #G := Cardinal.mk_le_of_surjective Quotient.mk_surjective
+theorem mk_abelianization_le (G : Type u) [Group G] : #(Abelianization G) ≤ #G :=
+  Cardinal.mk_le_of_surjective Quotient.mk_surjective
 
 @[to_additive]
-lemma mk_freeMonoid_eq_mk_list : #(FreeMonoid α) = #(List α) :=
-  mk_congr FreeMonoid.toListEquiv
+lemma mk_freeMonoid_eq_mk_list : #(FreeMonoid α) = #(List α) := mk_congr FreeMonoid.toListEquiv
 
 @[to_additive (attr := simp)]
 theorem mk_freeMonoid [Nonempty α] : #(FreeMonoid α) = max #α ℵ₀ := by
@@ -115,16 +111,19 @@ end Cardinal
 
 section Nonempty
 
-/-- A commutative ring can be constructed on any non-empty type.
+/--
+A commutative ring can be constructed on any non-empty type.
 
-See also `Infinite.nonempty_field`. -/
+See also `Infinite.nonempty_field`.
+-/
 instance nonempty_commRing [Nonempty α] : Nonempty (CommRing α) := by
   obtain hR | hR := finite_or_infinite α
   · obtain ⟨x⟩ := nonempty_fintype α
     have : NeZero (Fintype.card α) := ⟨by simp⟩
     classical
     obtain ⟨e⟩ := Fintype.truncEquivFin α
-    exact ⟨open scoped Fin.CommRing in e.commRing⟩
+    exact ⟨open scoped Fin.CommRing in
+      e.commRing⟩
   · have ⟨e⟩ : Nonempty (α ≃ FreeCommRing α) := by simp [← Cardinal.eq]
     exact ⟨e.commRing⟩
 

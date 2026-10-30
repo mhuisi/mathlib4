@@ -22,17 +22,19 @@ subsemirings `S` of `R` such that `S ∩ -S = 0`.
 
 variable (R : Type*) [Ring R]
 
-protected theorem Subsemiring.IsPointed.nonneg [PartialOrder R] [IsOrderedRing R] :
-    (Subsemiring.nonneg R).IsPointed := AddSubmonoid.IsPointed.nonneg R
+protected theorem Subsemiring.IsPointed.nonneg [PartialOrder R] [IsOrderedRing R]
+    : (Subsemiring.nonneg R).IsPointed :=
+  AddSubmonoid.IsPointed.nonneg R
 
-protected theorem Subsemiring.IsSpanning.nonneg [LinearOrder R] [IsOrderedRing R] :
-    (Subsemiring.nonneg R).IsSpanning := AddSubmonoid.IsSpanning.nonneg R
+protected theorem Subsemiring.IsSpanning.nonneg [LinearOrder R] [IsOrderedRing R]
+    : (Subsemiring.nonneg R).IsSpanning :=
+  AddSubmonoid.IsSpanning.nonneg R
 
 variable {R} {S : Subsemiring R} (hS : S.IsPointed)
 
-theorem IsOrderedRing.ofSubsemiring :
-    letI _ := PartialOrder.ofAddSubmonoid hS
-    IsOrderedRing R :=
+theorem IsOrderedRing.ofSubsemiring
+    : letI _ := PartialOrder.ofAddSubmonoid hS
+      IsOrderedRing R :=
   letI _ := PartialOrder.ofAddSubmonoid hS
   haveI := IsOrderedAddMonoid.ofAddSubmonoid hS
   haveI : ZeroLEOneClass R := ⟨by simp⟩
@@ -41,12 +43,14 @@ theorem IsOrderedRing.ofSubsemiring :
 /-- `RingConeClass S R` says that `S` is a type of cones in `R`. -/
 @[deprecated AddSubmonoid.IsPointed +typeChanged (since := "2026-10-28")]
 class RingConeClass (S : Type*) (R : outParam Type*) [Ring R] [SetLike S R] : Prop
-    extends AddGroupConeClass S R, SubsemiringClass S R
+  extends AddGroupConeClass S R, SubsemiringClass S R
 
-/-- A (positive) cone in a ring is a subsemiring that
+/--
+A (positive) cone in a ring is a subsemiring that
 does not contain both `a` and `-a` for any nonzero `a`.
 This is equivalent to being the set of non-negative elements of
-some order making the ring into a partially ordered ring. -/
+some order making the ring into a partially ordered ring.
+-/
 @[deprecated AddSubmonoid.IsPointed +typeChanged (since := "2026-10-28")]
 structure RingCone (R : Type*) [Ring R] extends Subsemiring R, AddGroupCone R
 
@@ -62,8 +66,7 @@ instance RingCone.instSetLike (R : Type*) [Ring R] : SetLike (RingCone R) R wher
 instance (R : Type*) [Ring R] : PartialOrder (RingCone R) := .ofSetLike (RingCone R)
 
 @[deprecated "no replacement" (since := "2026-10-28")]
-instance RingCone.instRingConeClass (R : Type*) [Ring R] :
-    RingConeClass (RingCone R) R where
+instance RingCone.instRingConeClass (R : Type*) [Ring R] : RingConeClass (RingCone R) R where
   add_mem {C} := C.add_mem'
   zero_mem {C} := C.zero_mem'
   mul_mem {C} := C.mul_mem'
@@ -71,14 +74,16 @@ instance RingCone.instRingConeClass (R : Type*) [Ring R] :
   eq_zero_of_mem_of_neg_mem {C} := C.eq_zero_of_mem_of_neg_mem'
 
 @[simp, deprecated "no replacement" (since := "2026-10-28")]
-theorem RingCone.mem_mk {R : Type*} [Ring R] {toSubsemiring : Subsemiring R}
-    (eq_zero_of_mem_of_neg_mem) {x : R} :
-    x ∈ mk toSubsemiring eq_zero_of_mem_of_neg_mem ↔ x ∈ toSubsemiring := .rfl
+theorem RingCone.mem_mk
+    {R : Type*} [Ring R] {toSubsemiring : Subsemiring R} (eq_zero_of_mem_of_neg_mem) {x : R}
+    : x ∈ mk toSubsemiring eq_zero_of_mem_of_neg_mem ↔ x ∈ toSubsemiring :=
+  .rfl
 
 @[simp, deprecated "no replacement" (since := "2026-10-28")]
-theorem RingCone.coe_set_mk {R : Type*} [Ring R] {toSubsemiring : Subsemiring R}
-    (eq_zero_of_mem_of_neg_mem) :
-    (mk toSubsemiring eq_zero_of_mem_of_neg_mem : Set R) = toSubsemiring := rfl
+theorem RingCone.coe_set_mk
+    {R : Type*} [Ring R] {toSubsemiring : Subsemiring R} (eq_zero_of_mem_of_neg_mem)
+    : (mk toSubsemiring eq_zero_of_mem_of_neg_mem : Set R) = toSubsemiring :=
+  rfl
 
 namespace RingCone
 
@@ -104,8 +109,8 @@ lemma mem_nonneg : a ∈ nonneg T ↔ 0 ≤ a := Iff.rfl
 lemma coe_nonneg : nonneg T = {x : T | 0 ≤ x} := rfl
 
 @[deprecated Subsemiring.IsSpanning.nonneg +typeChanged (since := "2026-10-28")]
-instance nonneg.hasMemOrNegMem {T : Type*} [Ring T] [LinearOrder T] [IsOrderedRing T] :
-    HasMemOrNegMem (nonneg T) where
+instance nonneg.hasMemOrNegMem {T : Type*} [Ring T] [LinearOrder T] [IsOrderedRing T]
+    : HasMemOrNegMem (nonneg T) where
   mem_or_neg_mem := mem_or_neg_mem (AddGroupCone.nonneg T)
 
 end RingCone
@@ -114,9 +119,9 @@ variable {S R : Type*} [Ring R] [SetLike S R] (C : S)
 
 /-- Construct a partially ordered ring by designating a cone in a ring. -/
 @[deprecated IsOrderedRing.ofSubsemiring +typeChanged (since := "2026-10-28")]
-lemma IsOrderedRing.mkOfCone [RingConeClass S R] :
-    letI _ : PartialOrder R := .mkOfAddGroupCone C
-    IsOrderedRing R :=
+lemma IsOrderedRing.mkOfCone [RingConeClass S R]
+    : letI _ : PartialOrder R := .mkOfAddGroupCone C
+      IsOrderedRing R :=
   letI _ : PartialOrder R := .mkOfAddGroupCone C
   haveI : IsOrderedAddMonoid R := .mkOfCone C
   haveI : ZeroLEOneClass R := ⟨show _ ∈ C by simp⟩

@@ -6,7 +6,6 @@ Authors: Bolton Bailey
 module
 
 public meta import Mathlib.Data.String.Defs
-
 import Mathlib.Init
 
 /-!
@@ -38,10 +37,12 @@ def String.justify (s : String) (a : Alignment) (width : Nat) : String :=
 Render a two-dimensional array of `String`s into a markdown-compliant table.
 `headers` is a list of column headers,
 `table` is a 2D array of cell contents,
-`alignments` describes how to align each table column (default: left-aligned). -/
-def formatTable (headers : Array String) (table : Array (Array String))
-    (alignments : Option (Array Alignment) := none) :
-    String := Id.run do
+`alignments` describes how to align each table column (default: left-aligned).
+-/
+def formatTable
+    (headers : Array String) (table : Array (Array String))
+    (alignments : Option (Array Alignment) := none)
+    : String := Id.run do
   -- If no alignments are provided, default to left alignment for all columns.
   let alignments := alignments.getD (Array.replicate headers.size Alignment.left)
   -- Escape all vertical bar characters inside a table cell,
@@ -55,23 +56,22 @@ def formatTable (headers : Array String) (table : Array (Array String))
       widths := widths.set! i (max widths[i]! ((row[i]?.map (·.length)).getD 0))
   -- Pad each cell with spaces to match the column width.
   let paddedHeaders := escapedHeaders.mapIdx fun i h => h.rightpad widths[i]!
-  let paddedTable := escapedTable.map fun row => row.mapIdx fun i cell =>
-    cell.justify alignments[i]! widths[i]!
+  let paddedTable :=
+    escapedTable.map fun row => row.mapIdx fun i cell => cell.justify alignments[i]! widths[i]!
   -- Construct the lines of the table
   let headerLine := "| " ++ String.intercalate " | " (paddedHeaders.toList) ++ " |"
   -- Construct the separator line, with colons to indicate alignment
   let separatorLine :=
     "| "
-    ++ String.intercalate " | "
+      ++ String.intercalate " | "
         (((widths.zip alignments).map fun ⟨w, a⟩ =>
-              match w, a with
-              | 0, _ => ""
-              | 1, _ => "-"
-              | _ + 2, Alignment.left => ":" ++ String.replicate (w-1) '-'
-              | _ + 2, Alignment.right => String.replicate (w-1) '-' ++ ":"
-              | _ + 2, Alignment.center => ":" ++ String.replicate (w-2) '-' ++ ":"
-              ).toList)
-    ++ " |"
+          match w, a with
+          | 0, _ => ""
+          | 1, _ => "-"
+          | _ + 2, Alignment.left => ":" ++ String.replicate (w - 1) '-'
+          | _ + 2, Alignment.right => String.replicate (w - 1) '-' ++ ":"
+          | _ + 2, Alignment.center => ":" ++ String.replicate (w - 2) '-' ++ ":").toList)
+      ++ " |"
   let rowLines := paddedTable.map (fun row => "| " ++ String.intercalate " | " (row.toList) ++ " |")
   -- Return the table
   return String.intercalate "\n" (headerLine :: separatorLine :: rowLines.toList)

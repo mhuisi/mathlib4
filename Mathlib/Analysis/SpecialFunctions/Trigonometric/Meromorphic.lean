@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Analysis.Meromorphic.NormalForm
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
-
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
 set_option doc.verso true
@@ -33,8 +32,7 @@ theorem meromorphicAt_tan (z : ℂ) : MeromorphicAt tan z :=
   (meromorphicNFOn_tan (Set.mem_univ z)).meromorphicAt
 
 /-- The function `tan` is meromorphic. -/
-@[fun_prop]
-theorem meromorphic_tan : Meromorphic tan := meromorphicAt_tan
+@[fun_prop] theorem meromorphic_tan : Meromorphic tan := meromorphicAt_tan
 
 /-- The function `tanh` is meromorphic in normal form on `Set.univ`. -/
 theorem meromorphicNFOn_tanh : MeromorphicNFOn tanh Set.univ := by
@@ -48,7 +46,6 @@ theorem meromorphicAt_tanh (z : ℂ) : MeromorphicAt tanh z :=
   (meromorphicNFOn_tanh (Set.mem_univ z)).meromorphicAt
 
 /-- The function `tanh` is meromorphic. -/
-@[fun_prop]
-theorem meromorphic_tanh : Meromorphic tanh := meromorphicAt_tanh
+@[fun_prop] theorem meromorphic_tanh : Meromorphic tanh := meromorphicAt_tanh
 
 end Complex

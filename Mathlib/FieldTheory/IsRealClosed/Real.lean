@@ -14,7 +14,8 @@ public import Mathlib.FieldTheory.IsRealClosed.Basic
 
 public instance : IsRealClosed ℝ :=
   .of_linearOrderedField Real.isSquare_iff.mpr fun {f} hf ↦ by
-    wlog h : 0 ≤ f.leadingCoeff; · simpa using this (f := -f) (by simpa) (by simp; linarith)
+    wlog h : 0 ≤ f.leadingCoeff
+    · simpa using this (f := -f) (by simpa) (by simp; linarith)
     by_contra! contra
     have : 0 < f.eval 0 := f.zero_lt_eval_of_roots_lt_of_leadingCoeff_nonneg (by aesop) h
     have : f.eval 0 < 0 := by

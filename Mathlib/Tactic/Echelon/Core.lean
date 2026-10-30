@@ -74,39 +74,51 @@ structure RingOps (V : Type) where
   isZero : V → Bool
 deriving Nonempty
 
-/-- Decomposition data with entries in `V`, the carrier of the elimination or `Expr` once the
-entries are encoded. -/
+/--
+Decomposition data with entries in `V`, the carrier of the elimination or `Expr` once the
+entries are encoded.
+-/
 structure BareissData (V : Type) where
   /-- The lower-triangular transform. -/
   L : Array (Array V)
   /-- The echelon form, the final working matrix `L * A_σ` of the elimination. -/
   U : Array (Array V)
-  /-- The row swaps, in order. Swaps are infrequent in common cases, so their product is a
-  smaller term for the kernel than a row permutation. -/
+  /--
+  The row swaps, in order. Swaps are infrequent in common cases, so their product is a
+  smaller term for the kernel than a row permutation.
+  -/
   swaps : Array (Nat × Nat)
-  /-- The pivot columns. The `k`-th entry is the column of the pivot in row `k` of the
-  final echelon form. -/
+  /--
+  The pivot columns. The `k`-th entry is the column of the pivot in row `k` of the
+  final echelon form.
+  -/
   pivot : Array Nat
 
 /-- Map over the entries of the transform. -/
-def BareissData.mapM {V W : Type} (f : V → MetaM W) (d : BareissData V) :
-    MetaM (BareissData W) :=
-  return { L := ← d.L.mapM (·.mapM f), U := ← d.U.mapM (·.mapM f),
-           swaps := d.swaps, pivot := d.pivot }
+def BareissData.mapM {V W : Type} (f : V → MetaM W) (d : BareissData V) : MetaM (BareissData W) :=
+  return {
+    L := ← d.L.mapM (·.mapM f)
+    U := ← d.U.mapM (·.mapM f)
+    swaps := d.swaps
+    pivot := d.pivot
+  }
 
-/-- The row arrangement of the swaps: the entry at position `i` is the original row index
-that the swaps move to position `i`, that is, `σ i`. -/
+/--
+The row arrangement of the swaps: the entry at position `i` is the original row index
+that the swaps move to position `i`, that is, `σ i`.
+-/
 def BareissData.rowOrder {V : Type} (d : BareissData V) : Array Nat :=
   d.swaps.foldl (fun ord (a, b) => ord.swapIfInBounds a b) (Array.range d.L.size)
 
-/-- Core algorithm of fraction-free Gaussian elimination, with the arithmetic supplied
+/--
+Core algorithm of fraction-free Gaussian elimination, with the arithmetic supplied
 by the model.
 
 A single sweep accumulates the transform `L` alongside the working matrix `W`, maintaining
 `L * (A.submatrix σ id) = W` for the row arrangement `σ` so far. The divisions are exact
-by Sylvester's identity, although the data-only computation does not prove that. -/
-def bareissDecomp {V : Type} (ops : RingOps V) (A : Array (Array V)) :
-    MetaM (BareissData V) := do
+by Sylvester's identity, although the data-only computation does not prove that.
+-/
+def bareissDecomp {V : Type} (ops : RingOps V) (A : Array (Array V)) : MetaM (BareissData V) := do
   let rows := A.size
   let cols := (A.getD 0 #[]).size
   let getEntry (M : Array (Array V)) (i j : Nat) : V := (M.getD i #[]).getD j ops.zero
@@ -122,15 +134,17 @@ def bareissDecomp {V : Type} (ops : RingOps V) (A : Array (Array V)) :
   let mut r : Nat := 0
   -- the exact divisor of the elimination step
   let mut prevPivot : V := ops.one
-  /- TODO: if we're handling larger matrices (beyond 10⁴ entries), add a checkSystem call
+  /-
+  TODO: if we're handling larger matrices (beyond 10⁴ entries), add a checkSystem call
   per column to honor user interruption. At current realistic sizes this computation is
-  almost instant. -/
+  almost instant.
+  -/
   for c in 0...cols do
     if r == rows then break
     -- find the first row at or below `r` with a nonzero entry in column `c`
     let mut p? : Option Nat := none
     for q in r...rows do
-      if !ops.isZero (getEntry W q c) then
+      if ! ops.isZero (getEntry W q c) then
         p? := some q
         break
     if let some p := p? then
@@ -154,7 +168,8 @@ def bareissDecomp {V : Type} (ops : RingOps V) (A : Array (Array V)) :
       r := r + 1
   return { L, U := W, swaps, pivot := pivotCols }
 
-/-- An entry certifier proves arithmetic facts about expressions of the ring `α` that the
+/--
+An entry certifier proves arithmetic facts about expressions of the ring `α` that the
 certificates need. `eq` proves an equation `a = b`, such as an unreduced entry of a matrix
 product equal to its computed value, and `neZero` proves `a ≠ 0`, such as for a pivot entry.
 
@@ -176,21 +191,27 @@ structure field causes the structure to live in `Type 1`, which doesn't work in 
 structure ModelAux {u : Level} (α : Q(Type u)) (V : Type) where
   /-- The arithmetic of the carrier. -/
   ops : RingOps V
-  /-- Evaluate an entry to a value with an optional denominator for the row scaling.
-  `(n, some d)` denotes `n / d` with `d` nonzero, and `(n, none)` denotes `n`. -/
+  /--
+  Evaluate an entry to a value with an optional denominator for the row scaling.
+  `(n, some d)` denotes `n / d` with `d` nonzero, and `(n, none)` denotes `n`.
+  -/
   evalEntry : Q($α) → MetaM (V × Option V)
-  /-- A nonzero common multiple for eliminating the denominators (`ops.mul` by default). A
+  /--
+  A nonzero common multiple for eliminating the denominators (`ops.mul` by default). A
   carrier type with a cheap lcm could supply it as an optimisation to keep the scaled entries
-  small. -/
+  small.
+  -/
   commonMultiple : V → V → V := ops.mul
   /-- The expression of the ring denoting a value. -/
   mkEntry : V → MetaM Q($α)
-  /-- An optional certifier for the ring, or `none` to leave the conditions to the kernel.
+  /--
+  An optional certifier for the ring, or `none` to leave the conditions to the kernel.
   With `none`, the kernel checks the decomposition product `L * A_σ = U` by evaluating the
   list-based form as a whole without assembling it from per-entry proofs, which is faster than
   applying `decideCertifier` on every entry. As a result this field is optional rather than
   taking a default value, so that `Mathlib.Tactic.Matrix.certifyProductEq` can perform this
-  optimization. -/
+  optimization.
+  -/
   entryCertifier? : Option (EntryCertifier α) := none
 deriving Nonempty
 
@@ -199,8 +220,10 @@ section unsafeCast
 -- Analogous to the opaque type `Lean.EnvExtensionState`
 private opaque ModelValueTypeSpec {u : Level} (α : Q(Type u)) : {β : Type // Nonempty β} :=
   ⟨Unit, ⟨()⟩⟩
-/-- An opaque model type that is used in place of the actual model type.
-We artificially add a parameter `α` to avoid mixing model types of different rings. -/
+/--
+An opaque model type that is used in place of the actual model type.
+We artificially add a parameter `α` to avoid mixing model types of different rings.
+-/
 def ModelType {u : Level} (α : Q(Type u)) : Type := (ModelValueTypeSpec α).1
 instance {u : Level} (α : Q(Type u)) : Nonempty (ModelType α) := (ModelValueTypeSpec α).2
 /-- A computation model of a ring `α`. It should be constructed using `Model.mk`. -/
@@ -215,35 +238,49 @@ def Model.mk {u : Level} {α : Q(Type u)} (V : Type) (model : ModelAux α V) : M
 end unsafeCast
 
 /-- Clear the denominators of the rows before the decomposition algorithm. -/
-def scaleRows {V : Type} (ops : RingOps V) (commonMultiple : V → V → V)
-    (rows : Array (Array (V × Option V))) : Array (Array V) × Array (Option V) :=
-  let scales := rows.map fun row =>
-    row.foldl (init := none) fun scale? entry => Option.merge commonMultiple scale? entry.2
-  let scaled := rows.zipWith (bs := scales) fun row scale? =>
-    match scale? with
-    | none => row.map Prod.fst
-    | some scale => row.map fun entry =>
-      match entry.2 with
-      | none => ops.mul entry.1 scale
-      | some den => ops.mul entry.1 (ops.divExact scale den)
+def scaleRows
+    {V : Type} (ops : RingOps V) (commonMultiple : V → V → V) (rows : Array (Array (V × Option V)))
+    : Array (Array V) × Array (Option V) :=
+  let scales :=
+    rows.map fun row =>
+      row.foldl (init := none) fun scale? entry => Option.merge commonMultiple scale? entry.2
+  let scaled :=
+    rows.zipWith (bs := scales) fun row scale? =>
+      match scale? with
+      | none => row.map Prod.fst
+      | some scale =>
+        row.map fun entry =>
+          match entry.2 with
+          | none => ops.mul entry.1 scale
+          | some den => ops.mul entry.1 (ops.divExact scale den)
   (scaled, scales)
 
-/-- Fold the row scales into the transform after the decomposition algorithm. Column `j` of
-`L` is multiplied by the scale of the row that ends up in position `j` after permutation. -/
-def restoreScaling {V : Type} (ops : RingOps V) (scales : Array (Option V))
-    (d : BareissData V) : BareissData V :=
-  if scales.all Option.isNone then d
+/--
+Fold the row scales into the transform after the decomposition algorithm. Column `j` of
+`L` is multiplied by the scale of the row that ends up in position `j` after permutation.
+-/
+def restoreScaling {V : Type} (ops : RingOps V) (scales : Array (Option V)) (d : BareissData V)
+    : BareissData V :=
+  if scales.all Option.isNone then
+    d
   else
     let colScale := d.rowOrder.map fun i => scales.getD i none
-    { d with L := d.L.map fun row => row.zipWith (bs := colScale) fun a scale? =>
-        match scale? with
-        | none => a
-        | some scale => ops.mul a scale }
+    {
+      d with
+      L :=
+        d.L.map fun row =>
+          row.zipWith (bs := colScale) fun a scale? =>
+            match scale? with
+            | none => a
+            | some scale => ops.mul a scale
+    }
 
 /-- An extension of the Bareiss ring computation model. -/
 structure BareissExt where
-  /-- The model for the element type `α` and its carrier, or `none` if the extension does not
-  handle `α`. -/
+  /--
+  The model for the element type `α` and its carrier, or `none` if the extension does not
+  handle `α`.
+  -/
   model? {u : Level} (α : Q(Type u)) : MetaM (Option (Model α))
 
 /-- Read a `bareiss_ext` extension from a declaration of the right type. -/
@@ -251,8 +288,10 @@ def mkBareissExt (n : Name) : ImportM BareissExt := do
   let { env, opts, .. } ← read
   IO.ofExcept <| unsafe env.evalConstCheck BareissExt opts ``BareissExt n
 
-/-- Environment extension for the `bareiss_ext` computation models.
-Uses a simple array to store the name-extension pairs for now. -/
+/--
+Environment extension for the `bareiss_ext` computation models.
+Uses a simple array to store the name-extension pairs for now.
+-/
 initialize bareissExt : ScopedEnvExtension Name (Name × BareissExt) (Array (Name × BareissExt)) ←
   registerScopedEnvExtension {
     mkInitial := pure #[]
@@ -261,19 +300,20 @@ initialize bareissExt : ScopedEnvExtension Name (Name × BareissExt) (Array (Nam
     addEntry := fun s e => s.push e
   }
 
-initialize registerBuiltinAttribute {
-  name := `bareiss_ext
-  descr := "adds a computation model to the Bareiss elimination"
-  applicationTime := .afterCompilation
-  add := fun declName _ kind => do
-    ensureAttrDeclIsMeta `bareiss_ext declName kind
-    let env ← getEnv
-    unless (env.getModuleIdxFor? declName).isNone do
-      throwError "invalid attribute 'bareiss_ext', declaration is in an imported module"
-    -- this ignores in-progress definitions
-    if (IR.getSorryDep env declName).isSome then return
-    bareissExt.add (declName, ← mkBareissExt declName) kind
-    recordExtraRevUseOfCurrentModule
-}
+initialize
+  registerBuiltinAttribute {
+    name := `bareiss_ext
+    descr := "adds a computation model to the Bareiss elimination"
+    applicationTime := .afterCompilation
+    add := fun declName _ kind => do
+      ensureAttrDeclIsMeta `bareiss_ext declName kind
+      let env ← getEnv
+      unless (env.getModuleIdxFor? declName).isNone do
+        throwError "invalid attribute 'bareiss_ext', declaration is in an imported module"
+      -- this ignores in-progress definitions
+      if (IR.getSorryDep env declName).isSome then return
+      bareissExt.add (declName, ← mkBareissExt declName) kind
+      recordExtraRevUseOfCurrentModule
+  }
 
 end Mathlib.Tactic.Echelon

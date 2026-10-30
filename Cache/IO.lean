@@ -7,7 +7,6 @@ module
 
 public import Cache.Lean
 public import Lake.Load.Toml
-
 import Batteries.Tactic.OpenPrivate
 
 public section
@@ -20,42 +19,45 @@ namespace Cache.IO
 open System (FilePath)
 
 /-- Target directory for build files -/
-def LIBDIR : FilePath :=
-  ".lake" / "build" / "lib" / "lean"
+def LIBDIR : FilePath := ".lake" / "build" / "lib" / "lean"
 
 /-- Target directory for IR files -/
-def IRDIR : FilePath :=
-  ".lake" / "build" / "ir"
+def IRDIR : FilePath := ".lake" / "build" / "ir"
 
-/-- Determine if the package `mod` is part of the mathlib cache.
+/--
+Determine if the package `mod` is part of the mathlib cache.
 
-TODO: write a better predicate. -/
-def isPartOfMathlibCache (mod : Name) : Bool := #[
-  `Mathlib,
-  `Batteries,
-  `BatteriesRecycling,
-  `Aesop,
-  `Cli,
-  `ImportGraph,
-  `LeanSearchClient,
-  `Plausible,
-  `Qq,
-  `ProofWidgets,
-  `Archive,
-  `Counterexamples,
-  `Wanted,
-  `MathlibTest,
-  -- Allow PRs to upload oleans for Reap for testing.
-  `Requests,
-  `OpenAIClient,
-  `Reap,
-  -- Allow PRs to upload oleans for Canonical for testing.
-  `Canonical,
-  -- Allow PRs to upload oleans for LeanHammer for testing.
-  `Duper,
-  `Auto,
-  `PremiseSelection,
-  `Hammer].contains mod.getRoot
+TODO: write a better predicate.
+-/
+def isPartOfMathlibCache (mod : Name) : Bool :=
+  #[
+    `Mathlib,
+    `Batteries,
+    `BatteriesRecycling,
+    `Aesop,
+    `Cli,
+    `ImportGraph,
+    `LeanSearchClient,
+    `Plausible,
+    `Qq,
+    `ProofWidgets,
+    `Archive,
+    `Counterexamples,
+    `Wanted,
+    `MathlibTest,
+    -- Allow PRs to upload oleans for Reap for testing.
+    `Requests,
+    `OpenAIClient,
+    `Reap,
+    -- Allow PRs to upload oleans for Canonical for testing.
+    `Canonical,
+    -- Allow PRs to upload oleans for LeanHammer for testing.
+    `Duper,
+    `Auto,
+    `PremiseSelection,
+    `Hammer
+  ].contains
+    mod.getRoot
 
 /-- Target directory for caching -/
 initialize CACHEDIR : FilePath ← do
@@ -65,11 +67,13 @@ initialize CACHEDIR : FilePath ← do
     match ← IO.getEnv "XDG_CACHE_HOME" with
     | some path => return path / "mathlib"
     | none =>
-      let home ← if System.Platform.isWindows then
-        let drive ← IO.getEnv "HOMEDRIVE"
-        let path ← IO.getEnv "HOMEPATH"
-        pure <| return (← drive) ++ (← path)
-      else IO.getEnv "HOME"
+      let home ←
+        if System.Platform.isWindows then
+          let drive ← IO.getEnv "HOMEDRIVE"
+          let path ← IO.getEnv "HOMEPATH"
+          pure <| return (← drive) ++ (← path)
+        else
+          IO.getEnv "HOME"
       match home with
       | some path => return path / ".cache" / "mathlib"
       | none => pure ⟨".cache"⟩
@@ -90,23 +94,19 @@ actually asked for as missing and rebuilt them), and, worse, two curls writing o
 initialize PROCTAG : String ← toString <$> IO.Process.getPID
 
 /-- The curl configuration file this process writes under `dir`; see `PROCTAG`. -/
-def curlConfigIn (dir : FilePath) : FilePath :=
-  dir / s!"curl-{PROCTAG}.cfg"
+def curlConfigIn (dir : FilePath) : FilePath := dir / s!"curl-{PROCTAG}.cfg"
 
 /-- This process's curl configuration file in the local cache directory (`curlConfigIn`). -/
-def CURLCFG :=
-  curlConfigIn IO.CACHEDIR
+def CURLCFG := curlConfigIn IO.CACHEDIR
 
 /--
 Suffix for a download still in flight, before it is renamed to `<hash>.ltar`. One per process; see
 `PROCTAG`.
 -/
-def PARTSUFFIX :=
-  s!".{PROCTAG}.part"
+def PARTSUFFIX := s!".{PROCTAG}.part"
 
 /-- curl version at https://github.com/leanprover-community/static-curl -/
-def CURLVERSION :=
-  "8.23.0"
+def CURLVERSION := "8.23.0"
 
 def CURLBIN :=
   -- The file name carries the version, so a bump triggers a fresh download.
@@ -114,31 +114,39 @@ def CURLBIN :=
 
 def EXE := if System.Platform.isWindows then ".exe" else ""
 
-/-- The platform's null device, for discarding a command's output: `NUL` on
-Windows, `/dev/null` elsewhere. -/
+/--
+The platform's null device, for discarding a command's output: `NUL` on
+Windows, `/dev/null` elsewhere.
+-/
 def nullDevice : String := if System.Platform.isWindows then "NUL" else "/dev/null"
 
-def LAKEPACKAGESDIR : FilePath :=
-  ".lake" / "packages"
+def LAKEPACKAGESDIR : FilePath := ".lake" / "packages"
 
-/-- The curl binary to run: the system curl for uploads; for downloads, the cached
-static binary when it exists. -/
+/--
+The curl binary to run: the system curl for uploads; for downloads, the cached
+static binary when it exists.
+-/
 def getCurl (upload := false) : BaseIO String := do
   return if !upload && (← CURLBIN.pathExists) then CURLBIN.toString else "curl"
 
-/-- Path to the `leantar` binary bundled with the Lean toolchain.
-    This has been bundled since `nightly-2026-03-09` (lean4#12822). -/
+/--
+Path to the `leantar` binary bundled with the Lean toolchain.
+This has been bundled since `nightly-2026-03-09` (lean4#12822).
+-/
 private initialize leantarSysrootBin : String ← do
   let out ← IO.Process.output { cmd := "lean", args := #["--print-prefix"] }
   if out.exitCode == 0 then
     let path : FilePath := out.stdout.trimAscii.toString / "bin" / s!"leantar{EXE}"
     if ← path.pathExists then return path.toString
-  throw <| IO.userError "leantar not found in Lean sysroot. This toolchain may predate nightly-2026-03-09."
+  throw <|
+    IO.userError "leantar not found in Lean sysroot. This toolchain may predate nightly-2026-03-09."
 
 def getLeanTar : BaseIO String := return leantarSysrootBin
 
-/-- Spawn a `leantar` process for decompression, writing the given JSON config to its stdin.
-    Returns the process exit code. -/
+/--
+Spawn a `leantar` process for decompression, writing the given JSON config to its stdin.
+Returns the process exit code.
+-/
 def spawnLeanTarDecompress (config : Array Lean.Json) (force : Bool) : IO UInt32 := do
   let args := (if force then #["-f"] else #[]) ++ #["-x", "--delete-corrupted", "-j", "-"]
   let child ← IO.Process.spawn { cmd := ← getLeanTar, args, stdin := .piped }
@@ -146,14 +154,16 @@ def spawnLeanTarDecompress (config : Array Lean.Json) (force : Bool) : IO UInt32
   stdin.putStr <| Lean.Json.compress <| .arr config
   child.wait
 
-/-- Bump this number to invalidate the cache, in case the existing hashing inputs are insufficient.
+/--
+Bump this number to invalidate the cache, in case the existing hashing inputs are insufficient.
 It is not a global counter, and can be reset to 0 as long as the lean githash or lake manifest has
 changed since the last time this counter was touched.
 
 NOTE: making changes to the generated `.ltar` files invalidates them while it *does not* change
 the file hash! This means any such change needs to be accompanied by a change
 to the root hash affecting *all* files
-(e.g. any modification to lakefile, lean-toolchain or manifest). -/
+(e.g. any modification to lakefile, lean-toolchain or manifest).
+-/
 def rootHashGeneration : UInt64 := 5
 
 /--
@@ -177,8 +187,7 @@ structure CacheM.Context where
 abbrev CacheM := ReaderT CacheM.Context IO
 
 /-- Whether this is running on Mathlib repo or not -/
-def isMathlibRoot : BaseIO Bool :=
-  FilePath.mk "Mathlib" |>.pathExists
+def isMathlibRoot : BaseIO Bool := FilePath.mk "Mathlib" |>.pathExists
 
 section
 
@@ -197,9 +206,7 @@ def _root_.Lean.SearchPath.relativize (sp : SearchPath) : IO SearchPath := do
 private def CacheM.getContext : IO CacheM.Context := do
   let sp ← (← getSrcSearchPath).relativize
   let mathlibSource ← CacheM.mathlibDepPath sp
-  return {
-    mathlibDepPath := mathlibSource,
-    srcSearchPath := sp}
+  return { mathlibDepPath := mathlibSource, srcSearchPath := sp }
 
 /-- Run a `CacheM` in `IO` by loading the context from `LEAN_SRC_PATH`. -/
 def CacheM.run (f : CacheM α) : IO α := do ReaderT.run f (← getContext)
@@ -216,16 +223,19 @@ the file should be located at `(← getSrcDir _) / "Mathlib" / "Init.lean`.
 Usually it is either `.` or something like `./.lake/packages/mathlib/`
 -/
 def getSrcDir (sp : SearchPath) (mod : Name) : IO FilePath := do
-
-  let some srcDir ← sp.findWithExtBase "lean" mod |
-    throw <| IO.userError s!"Unknown package directory for {mod}\nsearch paths: {sp}"
+  let some srcDir ← sp.findWithExtBase "lean" mod
+    | throw <| IO.userError s!"Unknown package directory for {mod}\
+        \nsearch paths: {sp}"
 
   return srcDir
 
-/-- Run curl and pass each stdout line to `processLine`. Return the final state,
-curl's exit code, and its stderr. -/
-partial def runCurlStreaming (args : Array String) (init : α)
-    (processLine : α → String → IO α) (upload := false) : IO (α × UInt32 × String) := do
+/--
+Run curl and pass each stdout line to `processLine`. Return the final state,
+curl's exit code, and its stderr.
+-/
+partial def runCurlStreaming
+    (args : Array String) (init : α) (processLine : α → String → IO α) (upload := false)
+    : IO (α × UInt32 × String) := do
   let child ← IO.Process.spawn { cmd := ← getCurl upload, args, stdout := .piped, stderr := .piped }
   -- Drain stderr concurrently: a full stderr pipe blocks curl.
   let stderr ← IO.asTask (prio := .dedicated) child.stderr.readToEnd
@@ -242,42 +252,51 @@ where
       loop h (← processLine a line)
 
 /-- Runs a terminal command and retrieves its output -/
-def runCmd (cmd : String) (args : Array String)
-    (throwFailure stderrAsErr showArgsOnError := true) : IO String := do
+def runCmd (cmd : String) (args : Array String) (throwFailure stderrAsErr showArgsOnError := true)
+    : IO String := do
   let out ← IO.Process.output { cmd := cmd, args := args }
   if (out.exitCode != 0 || stderrAsErr && !out.stderr.isEmpty) && throwFailure then
     let invocation := if showArgsOnError then s!"{cmd} {args}" else cmd
-    throw <| IO.userError s!"failure in {invocation}:\n{out.stderr}"
+    throw <| IO.userError s!"failure in {invocation}:\
+      \n{out.stderr}"
   else if !out.stderr.isEmpty then
     IO.eprintln out.stderr
   return out.stdout
 
-def runCurl (args : Array String) (throwFailure stderrAsErr showArgsOnError := true)
-    (upload := false) : IO String := do
-  runCmd (← getCurl upload) (#["--no-progress-meter"] ++ args)
-    throwFailure stderrAsErr showArgsOnError
+def runCurl
+    (args : Array String) (throwFailure stderrAsErr showArgsOnError := true) (upload := false)
+    : IO String := do
+  runCmd (← getCurl upload) (#["--no-progress-meter"] ++ args) throwFailure stderrAsErr
+    showArgsOnError
 
 /-- The major and minor version of the curl binary `curl`, read from `curl --version`. -/
 def curlVersion (curl : String) : IO (Nat × Nat) := do
   match (← runCmd curl #["--version"]).splitOn " " with
-  | "curl" :: v :: _ => match v.splitOn "." with
+  | "curl" :: v :: _ =>
+    match v.splitOn "." with
     | maj :: min :: _ =>
-      let some majN := String.toNat? maj | throw <| IO.userError "Invalidly formatted version of `curl`"
-      let some minN := String.toNat? min | throw <| IO.userError "Invalidly formatted version of `curl`"
+      let some majN := String.toNat? maj
+        | throw <| IO.userError "Invalidly formatted version of `curl`"
+      let some minN := String.toNat? min
+        | throw <| IO.userError "Invalidly formatted version of `curl`"
       return (majN, minN)
     | _ => throw <| IO.userError "Invalidly formatted version of `curl`"
   | _ => throw <| IO.userError "Invalidly formatted response from `curl --version`"
 
-/-- How `cache get` drives curl: every transfer in one parallel curl run, with or
-without curl's retry flags, or one curl run per file. -/
+/--
+How `cache get` drives curl: every transfer in one parallel curl run, with or
+without curl's retry flags, or one curl run per file.
+-/
 structure CurlMode where
   parallel : Bool
   retry : Bool := true
 
-/-- For uploads, require a system curl of 8.20 or later. For downloads, choose the
+/--
+For uploads, require a system curl of 8.20 or later. For downloads, choose the
 `CurlMode`: the cached static binary or a system curl of 7.84 or later runs in
 parallel, without retries on 8.18 and 8.19. For an older curl, the tool downloads
-a static binary on Linux x86_64 and aarch64, and runs serially elsewhere. -/
+a static binary on Linux x86_64 and aarch64, and runs serially elsewhere.
+-/
 def validateCurl (upload := false) : IO CurlMode := do
   if !upload && (← CURLBIN.pathExists) then return { parallel := true }
   let version ← curlVersion "curl"
@@ -298,9 +317,13 @@ def validateCurl (upload := false) : IO CurlMode := do
   if kernel == "Linux" && arch ∈ ["x86_64", "aarch64"] then
     IO.println s!"Downloading curl {CURLVERSION} (found {found})"
     IO.FS.createDirAll IO.CACHEDIR
-    let _ ← runCmd "curl" (stderrAsErr := false) #[
-      s!"https://github.com/leanprover-community/static-curl/releases/download/v{CURLVERSION}/curl-{arch}-linux-static",
-      "-L", "-o", CURLBIN.toString]
+    let _ ←
+      runCmd "curl" (stderrAsErr := false) #[
+        s!"https://github.com/leanprover-community/static-curl/releases/download/v\
+          {CURLVERSION}\
+          /curl-{arch}-linux-static",
+        "-L", "-o", CURLBIN.toString
+      ]
     let _ ← runCmd "chmod" #["u+x", CURLBIN.toString]
     return { parallel := true }
   IO.println s!"Warning: curl {found} is too old for parallel cache downloads, so files download \
@@ -308,21 +331,20 @@ def validateCurl (upload := false) : IO CurlMode := do
   return { parallel := false }
 
 /-- Recursively gets all files from a directory with a certain extension -/
-partial def getFilesWithExtension
-    (fp : FilePath) (extension : String) (acc : Array FilePath := #[]) :
-    IO <| Array FilePath := do
+partial def getFilesWithExtension (fp : FilePath) (extension : String) (acc : Array FilePath := #[])
+    : IO <| Array FilePath := do
   if ← fp.isDir then
     (← fp.readDir).foldlM (fun acc dir => getFilesWithExtension dir.path extension acc) acc
-  else return if fp.extension == some extension then acc.push fp else acc
+  else
+    return if fp.extension == some extension then acc.push fp else acc
 
-/--
-The Hash map of the cache.
--/
+/-- The Hash map of the cache. -/
 abbrev ModuleHashMap := Std.HashMap Name UInt64
 
 namespace ModuleHashMap
 
-/-- Filter the hashmap by whether the entries exist as files in the cache directory.
+/--
+Filter the hashmap by whether the entries exist as files in the cache directory.
 
 If `keep` is true, the result will contain the entries that do exist;
 if `keep` is false, the result will contain the entries that do not exist.
@@ -377,9 +399,10 @@ def mkBuildPaths (mod : Name) : CacheM <| List (FilePath × Bool) := do
     (packageDir / LIBDIR / path.withExtension "ir.sig.hash", false),
     (packageDir / LIBDIR / path.withExtension "ir", false),
     (packageDir / LIBDIR / path.withExtension "ir.hash", false),
-    (packageDir / IRDIR  / path.withExtension "c", true),
-    (packageDir / IRDIR  / path.withExtension "c.hash", true),
-    (packageDir / LIBDIR / path.withExtension "extra", false)]
+    (packageDir / IRDIR / path.withExtension "c", true),
+    (packageDir / IRDIR / path.withExtension "c.hash", true),
+    (packageDir / LIBDIR / path.withExtension "extra", false)
+  ]
 
 /-- Check that all required build files exist. -/
 def allExist (paths : List (FilePath × Bool)) : BaseIO Bool := do
@@ -393,9 +416,10 @@ private structure PackTask where
   task? : Option (Task (Except IO.Error Unit))
 
 /-- Compresses build files into the local cache and returns an array with the compressed files -/
-def packCache (hashMap : ModuleHashMap) (overwrite verbose unpackedOnly : Bool)
-    (comment : Option String := none) :
-    CacheM <| Array String := do
+def packCache
+    (hashMap : ModuleHashMap) (overwrite verbose unpackedOnly : Bool)
+    (comment : Option String := none)
+    : CacheM <| Array String := do
   IO.FS.createDirAll CACHEDIR
   IO.println "Compressing cache"
   let sp := (← read).srcSearchPath
@@ -407,18 +431,20 @@ def packCache (hashMap : ModuleHashMap) (overwrite verbose unpackedOnly : Bool)
     let buildPaths ← mkBuildPaths mod
     if ← allExist buildPaths then
       if overwrite || !(← zipPath.pathExists) then
-        let task ← IO.asTask do
-          -- Note here we require that the `.trace` file is first
-          -- in the list generated by `mkBuildPaths`.
-          let trace :: args := (← buildPaths.filterM (·.1.pathExists)) |>.map (·.1.toString)
-            | unreachable!
-          discard <| runCmd (← getLeanTar) <| #[zipPath.toString, trace] ++
-            (if let some c := comment then #["-c", s!"git=mathlib4@{c}"] else #[]) ++ args
-        acc := acc.push {sourceFile, zip, task? := some task}
+        let task ←
+          IO.asTask do
+            -- Note here we require that the `.trace` file is first
+            -- in the list generated by `mkBuildPaths`.
+            let trace :: args := (← buildPaths.filterM (·.1.pathExists)) |>.map (·.1.toString)
+              | unreachable!
+            discard <| runCmd (← getLeanTar) <|
+              #[zipPath.toString, trace]
+                ++ (if let some c := comment then #["-c", s!"git=mathlib4@{c}"] else #[]) ++ args
+        acc := acc.push { sourceFile, zip, task? := some task }
       else if !unpackedOnly then
-        acc := acc.push {sourceFile, zip, task? := none}
+        acc := acc.push { sourceFile, zip, task? := none }
   acc := acc.qsort (·.sourceFile.toString < ·.sourceFile.toString)
-  acc.mapM fun {sourceFile, zip, task?} => do
+  acc.mapM fun { sourceFile, zip, task? } => do
     if let some task := task? then
       if verbose then
         IO.println s!"packing {sourceFile} as {zip}"
@@ -430,8 +456,7 @@ def getLocalCacheSet : IO <| Std.TreeSet String compare := do
   let paths ← getFilesWithExtension CACHEDIR "ltar"
   return .ofList (paths.toList.map (·.withoutParent CACHEDIR |>.toString)) _
 
-def isFromMathlib (mod : Name) : Bool :=
-  mod.getRoot == `Mathlib
+def isFromMathlib (mod : Name) : Bool := mod.getRoot == `Mathlib
 
 /-- Get the trace file path for a module. -/
 def getTracePath (mod : Name) : CacheM FilePath := do
@@ -440,23 +465,35 @@ def getTracePath (mod : Name) : CacheM FilePath := do
   let path := (System.mkFilePath <| mod.components.map toString)
   return packageDir / LIBDIR / path.withExtension "trace"
 
-/-- Read the `depHash` from a trace file, if it exists and is valid.
-    Returns the hash as a UInt64. -/
+/--
+Read the `depHash` from a trace file, if it exists and is valid.
+Returns the hash as a UInt64.
+-/
 def readTraceHash (tracePath : FilePath) : IO (Option UInt64) := do
-  let contents ← try IO.FS.readFile tracePath
-                  catch _ => return none
+  let contents ←
+    try
+      IO.FS.readFile tracePath
+    catch _ =>
+      return none
   -- Try to parse as JSON and extract depHash
-  let some json := Lean.Json.parse contents |>.toOption | return none
-  let some depHashStr := json.getObjValAs? String "depHash" |>.toOption | return none
+  let some json := Lean.Json.parse contents |>.toOption
+    | return none
+  let some depHashStr := json.getObjValAs? String "depHash" |>.toOption
+    | return none
   -- Parse hex string to UInt64
   return depHashStr.parseHexToUInt64?
 
-/-- Read the Lake depHash from an ltar file header.
-    The ltar format is: 4-byte magic (LTAR/LTR2/LTR3) + 8-byte little-endian u64 hash. -/
+/--
+Read the Lake depHash from an ltar file header.
+The ltar format is: 4-byte magic (LTAR/LTR2/LTR3) + 8-byte little-endian u64 hash.
+-/
 def readLtarHash (ltarPath : FilePath) : IO (Option UInt64) := do
-  let some handle ← try
-      some <$> IO.FS.Handle.mk ltarPath .read
-    catch _ => pure none | return none
+  let some handle ←
+      try
+        some <$> IO.FS.Handle.mk ltarPath .read
+      catch _ =>
+        pure none
+    | return none
   -- Read 12 bytes: 4 magic + 8 hash
   let bytes ← handle.read 12
   if bytes.size < 12 then return none
@@ -469,21 +506,27 @@ def readLtarHash (ltarPath : FilePath) : IO (Option UInt64) := do
     hash := hash ||| ((bytes.get! (4 + i)).toUInt64 <<< (i * 8).toUInt64)
   return some hash
 
-/-- Check if a module's trace file indicates it is already decompressed with the correct hash.
-    The hash to compare comes from the ltar file header, not the mathlib cache hash.
-    Returns `true` if the module needs decompression, `false` if it can be skipped. -/
+/--
+Check if a module's trace file indicates it is already decompressed with the correct hash.
+The hash to compare comes from the ltar file header, not the mathlib cache hash.
+Returns `true` if the module needs decompression, `false` if it can be skipped.
+-/
 def needsDecompression (mod : Name) (mathlibHash : UInt64) : CacheM Bool := do
   -- Read the Lake depHash from the ltar file header
   let ltarPath := CACHEDIR / mathlibHash.asLTar
-  let some ltarHash ← readLtarHash ltarPath | return true
+  let some ltarHash ← readLtarHash ltarPath
+    | return true
   -- Read the trace file hash
   let tracePath ← getTracePath mod
-  let some traceHash ← readTraceHash tracePath | return true
+  let some traceHash ← readTraceHash tracePath
+    | return true
   -- They should match if the file is already decompressed
   return ltarHash != traceHash
 
-/-- Filter the hashmap to only include modules that need decompression.
-    A module needs decompression if its trace file doesn't exist or has a different hash. -/
+/--
+Filter the hashmap to only include modules that need decompression.
+A module needs decompression if its trace file doesn't exist or has a different hash.
+-/
 def ModuleHashMap.filterNeedsDecompression (hashMap : ModuleHashMap) : CacheM ModuleHashMap :=
   hashMap.foldM (init := ∅) fun acc mod hash => do
     if ← needsDecompression mod hash then
@@ -491,15 +534,17 @@ def ModuleHashMap.filterNeedsDecompression (hashMap : ModuleHashMap) : CacheM Mo
     else
       return acc
 
-/-- Build the leantar JSON config array from a module hash map.
-    Each entry is either a plain path string, or an object with `"file"` and `"base"` fields
-    for mathlib dependency files that need path redirection. -/
+/--
+Build the leantar JSON config array from a module hash map.
+Each entry is either a plain path string, or an object with `"file"` and `"base"` fields
+for mathlib dependency files that need path redirection.
+-/
 def mkLeanTarConfig (hashMap : ModuleHashMap) : CacheM (Array Lean.Json) := do
   let isMathlibRoot ← isMathlibRoot
   let mathlibDepPath := (← read).mathlibDepPath.toString
   return hashMap.fold (init := #[]) fun config mod hash =>
     let pathStr := s!"{CACHEDIR / hash.asLTar}"
-    if isMathlibRoot || !isFromMathlib mod then
+    if isMathlibRoot || ! isFromMathlib mod then
       config.push <| .str pathStr
     else
       config.push <| .mkObj [("file", pathStr), ("base", mathlibDepPath)]
@@ -513,10 +558,11 @@ structure DecompPlan where
   /-- Number of cached files already decompressed (skipped). -/
   alreadyDecompressed : Nat
 
-/-- Determine which cached files need decompression and build a plan.
-    Returns `none` if no cached files need decompression. -/
-def prepareDecompConfig (hashMap : ModuleHashMap) (force : Bool) :
-    CacheM (Option DecompPlan) := do
+/--
+Determine which cached files need decompression and build a plan.
+Returns `none` if no cached files need decompression.
+-/
+def prepareDecompConfig (hashMap : ModuleHashMap) (force : Bool) : CacheM (Option DecompPlan) := do
   let cached ← hashMap.filterExists true
   if cached.isEmpty then return none
   let toDecomp ← if force then pure cached else cached.filterNeedsDecompression
@@ -558,14 +604,17 @@ instance : Ord FilePath where
 /-- Removes all cache files except for what's in the `keep` set -/
 def cleanCache (keep : Std.TreeSet FilePath compare := ∅) : IO Unit := do
   for path in ← getFilesWithExtension CACHEDIR "ltar" do
-    if !keep.contains path then IO.FS.removeFile path
+    if ! keep.contains path then IO.FS.removeFile path
 
-/-- Prints the LTAR file and embedded comments (in particular, the mathlib commit that built the
-file) regarding the specified modules. -/
+/--
+Prints the LTAR file and embedded comments (in particular, the mathlib commit that built the
+file) regarding the specified modules.
+-/
 def lookup (hashMap : ModuleHashMap) (modules : List Name) : IO Unit := do
   let mut err := false
   for mod in modules do
-    let some hash := hashMap[mod]? | err := true
+    let some hash := hashMap[mod]?
+      | err := true
     let ltar := CACHEDIR / hash.asLTar
     IO.println s!"{mod}: {ltar}"
     for line in (← runCmd (← getLeanTar) #["-k", ltar.toString]).splitOn "\n" |>.dropLast do
@@ -594,14 +643,13 @@ Not supported yet:
 
 Note: An argument like `Archive` is treated as module, not a path.
 -/
-def leanModulesFromSpec (sp : SearchPath) (argₛ : String) :
-    IO <| Except String <| Array (Name × FilePath) := do
+def leanModulesFromSpec (sp : SearchPath) (argₛ : String)
+    : IO <| Except String <| Array (Name × FilePath) := do
   if argₛ.startsWith "-" then
     -- provided option after command
     return .error s!"Invalid argument: option must come before command {argₛ}"
   -- TODO: This could be just `FilePath.normalize` if the TODO there was addressed
-  let arg : FilePath := System.mkFilePath <|
-    (argₛ : FilePath).normalize.components.filter (· != "")
+  let arg : FilePath := System.mkFilePath <| (argₛ : FilePath).normalize.components.filter (· != "")
   if arg.components.length > 1 || arg.extension == "lean" then
     -- provided file name of a Lean file
     let mod : Name := arg.withExtension "" |>.components.foldl .str .anonymous
@@ -621,31 +669,31 @@ def leanModulesFromSpec (sp : SearchPath) (argₛ : String) :
     -- provided a module
     -- user might provide `.*` or `.+` to include folders
     match Lake.Glob.ofString? argₛ with
-    | none =>
-      return .error s!"Invalid argument: expected path or module name, not {argₛ}"
+    | none => return .error s!"Invalid argument: expected path or module name, not {argₛ}"
     | some glob =>
-      let modules ← match glob with
-      | .one mod =>
-        let sourceFile ← Lean.findLean sp mod
-        pure #[(mod, sourceFile)]
-      | .submodules mod =>
-        let sourceFile ← Lean.findLean sp mod
-        let folder := sourceFile.withExtension ""
-        if ← folder.pathExists then
-          IO.println s!"Searching directory {folder} for .lean files"
-          let leanModulesInFolder ← walkDir sp folder mod
-          pure leanModulesInFolder
-        else
-          pure #[]
-      | .andSubmodules mod =>
-        let sourceFile ← Lean.findLean sp mod
-        let folder := sourceFile.withExtension ""
-        if ← folder.pathExists then
-          IO.println s!"Searching directory {folder} for .lean files"
-          let leanModulesInFolder ← walkDir sp folder mod
-          pure <| #[(mod, sourceFile)] ++ leanModulesInFolder
-        else
-          pure #[]
+      let modules ←
+        match glob with
+        | .one mod =>
+          let sourceFile ← Lean.findLean sp mod
+          pure #[(mod, sourceFile)]
+        | .submodules mod =>
+          let sourceFile ← Lean.findLean sp mod
+          let folder := sourceFile.withExtension ""
+          if ← folder.pathExists then
+            IO.println s!"Searching directory {folder} for .lean files"
+            let leanModulesInFolder ← walkDir sp folder mod
+            pure leanModulesInFolder
+          else
+            pure #[]
+        | .andSubmodules mod =>
+          let sourceFile ← Lean.findLean sp mod
+          let folder := sourceFile.withExtension ""
+          if ← folder.pathExists then
+            IO.println s!"Searching directory {folder} for .lean files"
+            let leanModulesInFolder ← walkDir sp folder mod
+            pure <| #[(mod, sourceFile)] ++ leanModulesInFolder
+          else
+            pure #[]
       if !modules.isEmpty then
         return .ok modules
       else
@@ -683,13 +731,13 @@ The remaining arguments are parsed as either module name or file path, see `lean
 def parseArgs (args : List String) : CacheM <| Std.HashMap Name FilePath := do
   match args with
   | [] => pure ∅
-  | _ :: args₀ => args₀.foldlM (init := ∅) fun acc (arg : String) => do
-    let sp := (← read).srcSearchPath
-    match (← leanModulesFromSpec sp arg) with
-    | .ok mods =>
-      pure <| acc.insertMany mods
-    | .error msg =>
-      IO.eprintln msg
-      IO.Process.exit 1
+  | _ :: args₀ =>
+    args₀.foldlM (init := ∅) fun acc (arg : String) => do
+      let sp := (← read).srcSearchPath
+      match (← leanModulesFromSpec sp arg) with
+      | .ok mods => pure <| acc.insertMany mods
+      | .error msg =>
+        IO.eprintln msg
+        IO.Process.exit 1
 
 end Cache.IO

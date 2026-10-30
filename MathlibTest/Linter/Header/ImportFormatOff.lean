@@ -7,10 +7,7 @@ module
 
 import Mathlib.Init
 meta import Mathlib.Init
-
-
-   public meta   import Mathlib.Init
-
+public meta import Mathlib.Init
 public import Mathlib.Init
 import Lean.Elab.Command
 
