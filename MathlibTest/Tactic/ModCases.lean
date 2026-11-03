@@ -1,4 +1,5 @@
 module
+
 import Mathlib.Tactic.ModCases
 
 private axiom test_sorry : ∀ {a}, a
@@ -19,6 +20,6 @@ example (n : ℕ) (z : ℤ) : n = n := by
   induction n with
   | zero => rfl
   | succ n _ih =>
-     mod_cases _h : z % 2
-     · exact test_sorry
-     · exact test_sorry
+    mod_cases _h : z % 2
+    · exact test_sorry
+    · exact test_sorry

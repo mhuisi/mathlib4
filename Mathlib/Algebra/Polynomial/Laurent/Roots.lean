@@ -6,7 +6,6 @@ Authors: Riccardo Brasca
 module
 
 public import Mathlib.Algebra.Polynomial.Laurent
-
 import Mathlib.Algebra.Polynomial.Roots
 
 /-!
@@ -32,8 +31,8 @@ namespace LaurentPolynomial
 variable {R S : Type*} [CommSemiring R] [CommRing S] [IsDomain S] [Algebra R S] [FaithfulSMul R S]
 
 /-- A Laurent polynomial vanishing at infinitely many units is zero. -/
-theorem eq_zero_of_infinite_smeval_eq_zero (p : R[T;T⁻¹])
-    (h : {x : Sˣ | p.smeval x = 0}.Infinite) : p = 0 := by
+theorem eq_zero_of_infinite_smeval_eq_zero (p : R[T;T⁻¹]) (h : {x : Sˣ | p.smeval x = 0}.Infinite)
+    : p = 0 := by
   obtain ⟨n, q, hq⟩ := exists_T_pow p
   have hq0 : q = 0 := by
     rw [← Polynomial.map_eq_zero_iff (FaithfulSMul.algebraMap_injective R S)]
@@ -45,8 +44,8 @@ theorem eq_zero_of_infinite_smeval_eq_zero (p : R[T;T⁻¹])
   exact (isUnit_T (n : ℤ)).mul_left_eq_zero.mp hq.symm
 
 /-- Two Laurent polynomials agreeing at infinitely many units are equal. -/
-theorem eq_of_infinite_smeval_eq {p q : R[T;T⁻¹]}
-    (h : {x : Sˣ | p.smeval x = q.smeval x}.Infinite) : p = q := by
+theorem eq_of_infinite_smeval_eq {p q : R[T;T⁻¹]} (h : {x : Sˣ | p.smeval x = q.smeval x}.Infinite)
+    : p = q := by
   have hinj : Function.Injective (AddMonoidAlgebra.mapRingHom ℤ (algebraMap R S)) :=
     AddMonoidAlgebra.map_injective _ (FaithfulSMul.algebraMap_injective R S)
   refine hinj <| sub_eq_zero.mp <| eq_zero_of_infinite_smeval_eq_zero (S := S) _ ?_

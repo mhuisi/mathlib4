@@ -38,22 +38,24 @@ open Set
 
 variable {α : Type*}
 
-/-- `memPartition f n` is the partition containing at most `2^(n+1)` sets, where each set contains
-the points that for all `i` belong to one of `f i` or its complement. -/
+/--
+`memPartition f n` is the partition containing at most `2^(n+1)` sets, where each set contains
+the points that for all `i` belong to one of `f i` or its complement.
+-/
 def memPartition (f : ℕ → Set α) : ℕ → Set (Set α)
   | 0 => {univ}
   | n + 1 => {s | ∃ u ∈ memPartition f n, s = u ∩ f n ∨ s = u \ f n}
 
-@[simp]
-lemma memPartition_zero (f : ℕ → Set α) : memPartition f 0 = {univ} := rfl
+@[simp] lemma memPartition_zero (f : ℕ → Set α) : memPartition f 0 = {univ} := rfl
 
-lemma memPartition_succ (f : ℕ → Set α) (n : ℕ) :
-    memPartition f (n + 1) = {s | ∃ u ∈ memPartition f n, s = u ∩ f n ∨ s = u \ f n} :=
+lemma memPartition_succ (f : ℕ → Set α) (n : ℕ)
+    : memPartition f (n + 1) = {s | ∃ u ∈ memPartition f n, s = u ∩ f n ∨ s = u \ f n} :=
   rfl
 
-lemma disjoint_memPartition (f : ℕ → Set α) (n : ℕ) {u v : Set α}
-    (hu : u ∈ memPartition f n) (hv : v ∈ memPartition f n) (huv : u ≠ v) :
-    Disjoint u v := by
+lemma disjoint_memPartition
+    (f : ℕ → Set α) (n : ℕ)
+    {u v : Set α} (hu : u ∈ memPartition f n) (hv : v ∈ memPartition f n) (huv : u ≠ v)
+    : Disjoint u v := by
   revert u v
   induction n with
   | zero =>
@@ -82,8 +84,7 @@ lemma sUnion_memPartition (f : ℕ → Set α) (n : ℕ) : ⋃₀ memPartition f
     rw [memPartition_succ]
     ext x
     have : x ∈ ⋃₀ memPartition f n := by simp [ih]
-    simp only [mem_sUnion, mem_univ,
-      iff_true] at this ⊢
+    simp only [mem_sUnion, mem_univ, iff_true] at this ⊢
     obtain ⟨t, ht, hxt⟩ := this
     by_cases hxf : x ∈ f n
     · exact ⟨t ∩ f n, ⟨t, ht, Or.inl rfl⟩, hxt, hxf⟩
@@ -104,8 +105,8 @@ lemma finite_memPartition (f : ℕ → Set α) (n : ℕ) : Set.Finite (memPartit
 instance instFinite_memPartition (f : ℕ → Set α) (n : ℕ) : Finite (memPartition f n) :=
   Set.finite_coe_iff.mp (finite_memPartition _ _)
 
-noncomputable
-instance instFintype_memPartition (f : ℕ → Set α) (n : ℕ) : Fintype (memPartition f n) :=
+noncomputable instance instFintype_memPartition (f : ℕ → Set α) (n : ℕ)
+    : Fintype (memPartition f n) :=
   (finite_memPartition f n).fintype
 
 open scoped Classical in
@@ -120,13 +121,13 @@ noncomputable def memPartitionSet (f : ℕ → Set α) : ℕ → α → Set α
 lemma memPartitionSet_zero (f : ℕ → Set α) (a : α) : memPartitionSet f 0 a = univ := by
   simp [memPartitionSet]
 
-lemma memPartitionSet_succ (f : ℕ → Set α) (n : ℕ) (a : α) [Decidable (a ∈ f n)] :
-    memPartitionSet f (n + 1) a
+lemma memPartitionSet_succ (f : ℕ → Set α) (n : ℕ) (a : α) [Decidable (a ∈ f n)]
+    : memPartitionSet f (n + 1) a
       = if a ∈ f n then memPartitionSet f n a ∩ f n else memPartitionSet f n a \ f n := by
   simp [memPartitionSet]
 
-lemma memPartitionSet_mem (f : ℕ → Set α) (n : ℕ) (a : α) :
-    memPartitionSet f n a ∈ memPartition f n := by
+lemma memPartitionSet_mem (f : ℕ → Set α) (n : ℕ) (a : α)
+    : memPartitionSet f n a ∈ memPartition f n := by
   induction n with
   | zero => simp [memPartitionSet]
   | succ n ih =>
@@ -143,9 +144,8 @@ lemma mem_memPartitionSet (f : ℕ → Set α) (n : ℕ) (a : α) : a ∈ memPar
     rw [memPartitionSet_succ]
     split_ifs with h <;> exact ⟨ih, h⟩
 
-lemma memPartitionSet_eq_iff {f : ℕ → Set α} {n : ℕ} (a : α) {s : Set α}
-    (hs : s ∈ memPartition f n) :
-    memPartitionSet f n a = s ↔ a ∈ s := by
+lemma memPartitionSet_eq_iff {f : ℕ → Set α} {n : ℕ} (a : α) {s : Set α} (hs : s ∈ memPartition f n)
+    : memPartitionSet f n a = s ↔ a ∈ s := by
   refine ⟨fun h ↦ h ▸ mem_memPartitionSet f n a, fun h ↦ ?_⟩
   by_contra h_ne
   have h_disj : Disjoint s (memPartitionSet f n a) :=
@@ -154,7 +154,7 @@ lemma memPartitionSet_eq_iff {f : ℕ → Set α} {n : ℕ} (a : α) {s : Set α
   rw [not_disjoint_iff_nonempty_inter]
   exact ⟨a, h, mem_memPartitionSet f n a⟩
 
-lemma memPartitionSet_of_mem {f : ℕ → Set α} {n : ℕ} {a : α} {s : Set α}
-    (hs : s ∈ memPartition f n) (ha : a ∈ s) :
-    memPartitionSet f n a = s :=
+lemma memPartitionSet_of_mem
+    {f : ℕ → Set α} {n : ℕ} {a : α} {s : Set α} (hs : s ∈ memPartition f n) (ha : a ∈ s)
+    : memPartitionSet f n a = s :=
   (memPartitionSet_eq_iff a hs).mpr ha

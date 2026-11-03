@@ -118,30 +118,33 @@ namespace Mathlib.Tactic.Hessenberg
 
 variable {R : Type*} [CommRing R] (n : ℕ) (H : Array R)
 
-/-- The characteristic polynomial of the leading `k × k` block of the `n × n` Hessenberg
-matrix represented by an array of entries in row-major ordering. -/
+/--
+The characteristic polynomial of the leading `k × k` block of the `n × n` Hessenberg
+matrix represented by an array of entries in row-major ordering.
+-/
 noncomputable def hessP : ℕ → R[X]
   | 0 => 1
   | k + 1 =>
-    (X - C (H.getD (n * k + k) 0)) * hessP k -
-      ∑ t : Fin k, C (H.getD (n * (t : ℕ) + k) 0 *
-        ∏ j ∈ Finset.Ico (t : ℕ) k, H.getD (n * (j + 1) + j) 0) * hessP (t : ℕ)
+    (X - C (H.getD (n * k + k) 0)) * hessP k
+      - ∑ t : Fin k, C (H.getD (n * (t : ℕ) + k) 0 *
+          ∏ j ∈ Finset.Ico (t : ℕ) k, H.getD (n * (j + 1) + j) 0) * hessP (t : ℕ)
 
-/-- The characteristic polynomial of an `n × n` Hessenberg matrix represented by an array of
-entries in row-major ordering. -/
+/--
+The characteristic polynomial of an `n × n` Hessenberg matrix represented by an array of
+entries in row-major ordering.
+-/
 noncomputable abbrev hessCharpoly : R[X] := hessP n H n
 
 variable {n H}
 
-theorem hessP_zero : hessP n H 0 = 1 := by
-  simp only [hessP]
+theorem hessP_zero : hessP n H 0 = 1 := by simp only [hessP]
 
-theorem hessP_succ (k : ℕ) :
-    hessP n H (k + 1) =
-      (X - C (H.getD (n * k + k) 0)) * hessP n H k -
-        ∑ t : Fin k, C (H.getD (n * (t : ℕ) + k) 0 *
-          ∏ j ∈ Finset.Ico (t : ℕ) k, H.getD (n * (j + 1) + j) 0) *
-          hessP n H (t : ℕ) := by
+theorem hessP_succ (k : ℕ)
+    : hessP n H (k + 1)
+      = (X - C (H.getD (n * k + k) 0)) * hessP n H k
+        - ∑ t : Fin k, C (H.getD (n * (t : ℕ) + k) 0 *
+            ∏ j ∈ Finset.Ico (t : ℕ) k, H.getD (n * (j + 1) + j) 0) *
+            hessP n H (t : ℕ) := by
   simp only [hessP]
 
 theorem hessCharpoly_eq : hessCharpoly n H = hessP n H n := rfl
@@ -154,30 +157,38 @@ kernel can compute.
 
 variable (n H)
 
-/-- Compute the coefficients of `∑_{t ≤ i} H[t][k] · r · (∏_{j=t}^{i-1} H[j+1][j]) · p_t` by
+/--
+Compute the coefficients of `∑_{t ≤ i} H[t][k] · r · (∏_{j=t}^{i-1} H[j+1][j]) · p_t` by
 recursion on `i`, where `p_t` is the polynomial defined in the coefficient list `ps[t]`. `r`
-accumulates the product of `H[i+1][i]` entries at each step. -/
+accumulates the product of `H[i+1][i]` entries at each step.
+-/
 @[expose]
-def coeffHessSum (k : ℕ) :
-    (i : ℕ) → (r : R) → (ps : Array (List R)) → List R
+def coeffHessSum (k : ℕ) : (i : ℕ) → (r : R) → (ps : Array (List R)) → List R
   | 0, r, ps => (ps.getD 0 []).map (H.getD (n * 0 + k) 0 * r * ·)
   | i + 1, r, ps =>
-    List.zipWithAll (fun a b => a.getD 0 + b.getD 0)
+    List.zipWithAll
+      (fun a b => a.getD 0 + b.getD 0)
       ((ps.getD (i + 1) []).map (H.getD (n * (i + 1) + k) 0 * r * ·))
       (coeffHessSum k i (r * H.getD (n * (i + 1) + i) 0) ps)
 
-/-- Compute the coefficients of `pₖ` from the coefficient lists of `p₀, ..., p_{k-1}`. The
-coefficients of each polynomial are stored as a `List R` in `ps`. -/
+/--
+Compute the coefficients of `pₖ` from the coefficient lists of `p₀, ..., p_{k-1}`. The
+coefficients of each polynomial are stored as a `List R` in `ps`.
+-/
 @[expose]
 def coeffHessStep (k : ℕ) (ps : Array (List R)) : List R :=
   match k with
   | 0 => [1]
   | 1 =>
-    List.zipWithAll (fun a b => a.getD 0 - b.getD 0) (0 :: ps.getD 0 [])
-      ((ps.getD 0 []).map (H.getD (n * 0 + 0) 0 * ·))
+    List.zipWithAll
+      (fun a b => a.getD 0 - b.getD 0)
+      (0 :: ps.getD 0 []) ((ps.getD 0 []).map (H.getD (n * 0 + 0) 0 * ·))
   | k' + 2 =>
-    List.zipWithAll (fun a b => a.getD 0 - b.getD 0)
-      (List.zipWithAll (fun a b => a.getD 0 - b.getD 0) (0 :: ps.getD (k' + 1) [])
+    List.zipWithAll
+      (fun a b => a.getD 0 - b.getD 0)
+      (List.zipWithAll
+        (fun a b => a.getD 0 - b.getD 0)
+        (0 :: ps.getD (k' + 1) [])
         ((ps.getD (k' + 1) []).map (H.getD (n * (k' + 1) + (k' + 1)) 0 * ·)))
       (coeffHessSum n H (k' + 1) k' (H.getD (n * (k' + 1) + k') 0) ps)
 
@@ -188,13 +199,13 @@ def coeffHessCharpoly : List R :=
 
 variable {n H}
 
-theorem ofCoeffList_coeffHessSum (k : ℕ) :
-    ∀ (i : ℕ) (r : R) (ps : Array (List R)),
-      ofCoeffList (coeffHessSum n H k i r ps) =
-        ∑ t : Fin (i + 1),
-          C (H.getD (n * (t : ℕ) + k) 0 *
-              (r * ∏ j ∈ Finset.Ico (t : ℕ) i, H.getD (n * (j + 1) + j) 0)) *
-            ofCoeffList (ps.getD (t : ℕ) [])
+theorem ofCoeffList_coeffHessSum (k : ℕ)
+    : ∀ (i : ℕ) (r : R) (ps : Array (List R)),
+      ofCoeffList (coeffHessSum n H k i r ps)
+        = ∑ t : Fin (i + 1),
+            C (H.getD (n * (t : ℕ) + k) 0 *
+                (r * ∏ j ∈ Finset.Ico (t : ℕ) i, H.getD (n * (j + 1) + j) 0)) *
+              ofCoeffList (ps.getD (t : ℕ) [])
   | 0, r, ps => by simp [coeffHessSum]
   | i + 1, r, ps => by
     rw [coeffHessSum, ofCoeffList_zipWithAll_add, ofCoeffList_coeffHessSum,
@@ -202,15 +213,14 @@ theorem ofCoeffList_coeffHessSum (k : ℕ) :
     congrm ?_ + ∑ t, ?_ <;> simp [Finset.prod_Ico_succ_top, Fin.is_le]
     ring
 
-theorem ofCoeffList_coeffHessStep (k : ℕ) (ps : Array (List R)) :
-    ofCoeffList (coeffHessStep n H (k + 1) ps) =
-      (X - C (H.getD (n * k + k) 0)) * ofCoeffList (ps.getD k []) -
-        ∑ t : Fin k,
-          C (H.getD (n * (t : ℕ) + k) 0 * ∏ j ∈ Finset.Ico (t : ℕ) k, H.getD (n * (j + 1) + j) 0) *
-            ofCoeffList (ps.getD (t : ℕ) []) := by
+theorem ofCoeffList_coeffHessStep (k : ℕ) (ps : Array (List R))
+    : ofCoeffList (coeffHessStep n H (k + 1) ps)
+      = (X - C (H.getD (n * k + k) 0)) * ofCoeffList (ps.getD k [])
+        - ∑ t : Fin k,
+            C (H.getD (n * (t : ℕ) + k) 0 * ∏ j ∈ Finset.Ico (t : ℕ) k, H.getD (n * (j + 1) + j) 0) *
+              ofCoeffList (ps.getD (t : ℕ) []) := by
   cases k with
-  | zero =>
-    simp [coeffHessStep, sub_mul]
+  | zero => simp [coeffHessStep, sub_mul]
   | succ k =>
     rw [coeffHessStep, ofCoeffList_zipWithAll_sub, ofCoeffList_zipWithAll_sub,
       ofCoeffList_zero_cons, ofCoeffList_map_mul, ofCoeffList_coeffHessSum, sub_mul]
@@ -220,8 +230,7 @@ theorem ofCoeffList_coeffHessStep (k : ℕ) (ps : Array (List R)) :
     ring
 
 @[simp]
-theorem ofCoeffList_coeffHessCharpoly :
-    ofCoeffList (coeffHessCharpoly n H) = hessCharpoly n H := by
+theorem ofCoeffList_coeffHessCharpoly : ofCoeffList (coeffHessCharpoly n H) = hessCharpoly n H := by
   let f (ps : Array (List R)) := ps.push (coeffHessStep n H ps.size ps)
   have hsize k : (f^[k] #[[1]]).size = k + 1 := by
     induction k with
@@ -256,52 +265,57 @@ def leadingBlock (M : Matrix (Fin n) (Fin n) α) (h : k ≤ n) : Matrix (Fin k) 
   M.submatrix (Fin.castLE h) (Fin.castLE h)
 
 @[simp]
-theorem leadingBlock_apply (M : Matrix (Fin n) (Fin n) α) (h : k ≤ n) (i j : Fin k) :
-    M.leadingBlock h i j = M (Fin.castLE h i) (Fin.castLE h j) := rfl
+theorem leadingBlock_apply (M : Matrix (Fin n) (Fin n) α) (h : k ≤ n) (i j : Fin k)
+    : M.leadingBlock h i j = M (Fin.castLE h i) (Fin.castLE h j) :=
+  rfl
 
-@[simp]
-theorem leadingBlock_self (M : Matrix (Fin n) (Fin n) α) : M.leadingBlock le_rfl = M := rfl
+@[simp] theorem leadingBlock_self (M : Matrix (Fin n) (Fin n) α) : M.leadingBlock le_rfl = M := rfl
 
 /-- The minor `Hᵢ` formed from `M` by deleting the `i`th row and the last column. -/
-abbrev lastColMinor (M : Matrix (Fin (n + 1)) (Fin (n + 1)) α) (i : Fin n) :
-    Matrix (Fin n) (Fin n) α :=
+abbrev lastColMinor (M : Matrix (Fin (n + 1)) (Fin (n + 1)) α) (i : Fin n)
+    : Matrix (Fin n) (Fin n) α :=
   M.submatrix i.castSucc.succAbove Fin.castSucc
 
-/-- The leading block `Mᵢ` formed from the first `i` rows and columns of `M.lastColMinor i` is equal
-to the leading `i×i` block of `M`. -/
-theorem toSquareBlockProp_lastColMinor (M : Matrix (Fin (n + 1)) (Fin (n + 1)) α) (i : Fin n) :
-    ((M.lastColMinor i).toSquareBlockProp (· < i)).submatrix
-      (Fin.castLEquiv i.isLt.le) (Fin.castLEquiv i.isLt.le) =
-        M.leadingBlock i.castSucc.isLt.le := by
-  have hrow (a : Fin i) :
-      i.castSucc.succAbove (Fin.castLE i.isLt.le a) = (Fin.castLE i.isLt.le a).castSucc :=
+/--
+The leading block `Mᵢ` formed from the first `i` rows and columns of `M.lastColMinor i` is equal
+to the leading `i×i` block of `M`.
+-/
+theorem toSquareBlockProp_lastColMinor (M : Matrix (Fin (n + 1)) (Fin (n + 1)) α) (i : Fin n)
+    : ((M.lastColMinor i).toSquareBlockProp (· < i)).submatrix (Fin.castLEquiv i.isLt.le)
+        (Fin.castLEquiv i.isLt.le)
+      = M.leadingBlock i.castSucc.isLt.le := by
+  have hrow (a : Fin i)
+      : i.castSucc.succAbove (Fin.castLE i.isLt.le a) = (Fin.castLE i.isLt.le a).castSucc :=
     Fin.succAbove_castSucc_of_lt _ _ a.isLt
   ext a b
   simp [toSquareBlockProp_def, hrow]
 
-/-- The block `Tᵢ` formed from the last `n-1-i` rows and columns of `M.lastColMinor i` is equal to
-rows `[i+1 ... n-1]` and columns `[i ... n-2]` of `M`. -/
-theorem toSquareBlockProp_lastColMinor_not_lt (M : Matrix (Fin (n + 1)) (Fin (n + 1)) α)
-    (i : Fin n) : (M.lastColMinor i).toSquareBlockProp (¬ · < i) =
-      of fun a b => M a.1.succ b.1.castSucc := by
+/--
+The block `Tᵢ` formed from the last `n-1-i` rows and columns of `M.lastColMinor i` is equal to
+rows `[i+1 ... n-1]` and columns `[i ... n-2]` of `M`.
+-/
+theorem toSquareBlockProp_lastColMinor_not_lt (M : Matrix (Fin (n + 1)) (Fin (n + 1)) α) (i : Fin n)
+    : (M.lastColMinor i).toSquareBlockProp (¬ · < i) = of fun a b => M a.1.succ b.1.castSucc := by
   have hrow (a : {j : Fin n // ¬ j < i}) : i.castSucc.succAbove a = a.1.succ :=
     Fin.succAbove_castSucc_of_le _ _ (not_lt.mp a.2)
   ext a b
   simp [toSquareBlockProp_def, hrow]
 
-theorem charmatrix_leadingBlock [CommRing α] (M : Matrix (Fin n) (Fin n) α)
-    (h : k ≤ n) : (M.leadingBlock h).charmatrix = M.charmatrix.leadingBlock h := by
+theorem charmatrix_leadingBlock [CommRing α] (M : Matrix (Fin n) (Fin n) α) (h : k ≤ n)
+    : (M.leadingBlock h).charmatrix = M.charmatrix.leadingBlock h := by
   ext i j
   by_cases hij : i = j <;> simp [hij]
 
-theorem IsUpperHessenberg.leadingBlock [Zero α] {M : Matrix (Fin n) (Fin n) α}
-    (hM : M.IsUpperHessenberg) (h : k ≤ n) : (M.leadingBlock h).IsUpperHessenberg := by
+theorem IsUpperHessenberg.leadingBlock
+    [Zero α] {M : Matrix (Fin n) (Fin n) α} (hM : M.IsUpperHessenberg) (h : k ≤ n)
+    : (M.leadingBlock h).IsUpperHessenberg := by
   rw [isUpperHessenberg_iff] at hM ⊢
   intro _ _ hij
   exact hM (by simpa [Fin.orderSucc_lt_iff] using hij)
 
-theorem IsUpperHessenberg.charmatrix [CommRing α] {M : Matrix (Fin n) (Fin n) α}
-    (hM : M.IsUpperHessenberg) : M.charmatrix.IsUpperHessenberg := by
+theorem IsUpperHessenberg.charmatrix
+    [CommRing α] {M : Matrix (Fin n) (Fin n) α} (hM : M.IsUpperHessenberg)
+    : M.charmatrix.IsUpperHessenberg := by
   rw [isUpperHessenberg_iff] at hM ⊢
   intro _ j hij
   rw [charmatrix_apply_ne _ _ _ ((Order.le_succ j).trans_lt hij).ne', hM hij, map_zero, neg_zero]
@@ -320,15 +334,15 @@ section Expansion
 
 variable {k : ℕ} (M : Matrix (Fin (k + 1)) (Fin (k + 1)) R)
 
-theorem lastColMinor_eq_zero (hM : M.IsUpperHessenberg) {i a b : Fin k} (ha : i ≤ a) (hab : b < a) :
-    M.lastColMinor i a b = 0 := by
+theorem lastColMinor_eq_zero (hM : M.IsUpperHessenberg) {i a b : Fin k} (ha : i ≤ a) (hab : b < a)
+    : M.lastColMinor i a b = 0 := by
   rw [lastColMinor, submatrix_apply, Fin.succAbove_castSucc_of_le i a ha,
     isUpperHessenberg_iff.mp hM]
   simpa only [Fin.orderSucc_castSucc, Fin.succ_lt_succ_iff] using hab
 
 /-- `Tᵢ` is upper triangular, so its determinant is the product of its diagonal. -/
-theorem det_toSquareBlockProp_not_lt (hM : M.IsUpperHessenberg) (i : Fin k) :
-    ((M.lastColMinor i).toSquareBlockProp (¬ · < i)).det = ∏ j ∈ Ici i, M j.succ j.castSucc := by
+theorem det_toSquareBlockProp_not_lt (hM : M.IsUpperHessenberg) (i : Fin k)
+    : ((M.lastColMinor i).toSquareBlockProp (¬ · < i)).det = ∏ j ∈ Ici i, M j.succ j.castSucc := by
   rw [toSquareBlockProp_lastColMinor_not_lt, det_of_isUpperTriangular]
   · simp only [of_apply]
     symm
@@ -337,19 +351,20 @@ theorem det_toSquareBlockProp_not_lt (hM : M.IsUpperHessenberg) (i : Fin k) :
   · exact fun a b hab => isUpperHessenberg_iff.mp hM (by simpa [Fin.orderSucc_castSucc] using hab)
 
 /-- `Hᵢ` is block triangular, so `det Hᵢ = det Mᵢ · det Tᵢ`. -/
-theorem det_lastColMinor (hM : M.IsUpperHessenberg) (i : Fin k) :
-    (M.lastColMinor i).det =
-      (M.leadingBlock i.castSucc.isLt.le).det * ∏ j ∈ Ici i, M j.succ j.castSucc := by
+theorem det_lastColMinor (hM : M.IsUpperHessenberg) (i : Fin k)
+    : (M.lastColMinor i).det
+      = (M.leadingBlock i.castSucc.isLt.le).det * ∏ j ∈ Ici i, M j.succ j.castSucc := by
   rw [twoBlockTriangular_det _ (· < i) fun a ha b hb =>
       lastColMinor_eq_zero M hM (not_lt.mp ha) (hb.trans_le (not_lt.mp ha)),
     ← det_submatrix_equiv_self (Fin.castLEquiv i.isLt.le), toSquareBlockProp_lastColMinor,
     det_toSquareBlockProp_not_lt M hM i]
 
 /-- The determinant of an upper Hessenberg matrix, expanded along its last column. -/
-theorem det_eq_sum_of_isUpperHessenberg (hM : M.IsUpperHessenberg) :
-    M.det = M (Fin.last k) (Fin.last k) * (M.leadingBlock k.le_succ).det +
-      ∑ i : Fin k, M i.castSucc (Fin.last k) *
-        ((M.leadingBlock i.castSucc.isLt.le).det * ∏ j ∈ Ici i, -M j.succ j.castSucc) := by
+theorem det_eq_sum_of_isUpperHessenberg (hM : M.IsUpperHessenberg)
+    : M.det
+      = M (Fin.last k) (Fin.last k) * (M.leadingBlock k.le_succ).det
+        + ∑ i : Fin k, M i.castSucc (Fin.last k) *
+            ((M.leadingBlock i.castSucc.isLt.le).det * ∏ j ∈ Ici i, -M j.succ j.castSucc) := by
   rw [det_succ_column M (Fin.last k), Fin.sum_univ_castSucc, Fin.succAbove_last, add_comm]
   congrm ?_ + ∑ i, ?_
   · rw [Even.neg_one_pow, one_mul]
@@ -365,27 +380,33 @@ variable {n : ℕ}
 
 /-! ## The recurrence computes the characteristic polynomial -/
 
-/-- Computation of the characteristic polynomial of an upper Hessenberg matrix by Laplace expansion
-of the determinant of its characteristic matrix. -/
-theorem charpoly_isUpperHessenberg {k : ℕ} (M : Matrix (Fin (k + 1)) (Fin (k + 1)) R)
-    (hM : M.IsUpperHessenberg) :
-    M.charpoly = (X - C (M (Fin.last k) (Fin.last k))) * (M.leadingBlock k.le_succ).charpoly -
-      ∑ t : Fin k, C (M t.castSucc (Fin.last k) * ∏ j ∈ Ici t, M j.succ j.castSucc) *
-        (M.leadingBlock t.castSucc.isLt.le).charpoly := by
-  have hlast (t : Fin k) : M.charmatrix t.castSucc (Fin.last k) = -C (M t.castSucc (Fin.last k)) :=
+/--
+Computation of the characteristic polynomial of an upper Hessenberg matrix by Laplace expansion
+of the determinant of its characteristic matrix.
+-/
+theorem charpoly_isUpperHessenberg
+    {k : ℕ} (M : Matrix (Fin (k + 1)) (Fin (k + 1)) R) (hM : M.IsUpperHessenberg)
+    : M.charpoly
+      = (X - C (M (Fin.last k) (Fin.last k))) * (M.leadingBlock k.le_succ).charpoly
+        - ∑ t : Fin k, C (M t.castSucc (Fin.last k) * ∏ j ∈ Ici t, M j.succ j.castSucc) *
+            (M.leadingBlock t.castSucc.isLt.le).charpoly := by
+  have hlast (t : Fin k) : M.charmatrix t.castSucc (Fin.last k) = - C (M t.castSucc (Fin.last k)) :=
     charmatrix_apply_ne _ _ _ (Fin.castSucc_ne_last t)
-  have hsub (j : Fin k) : M.charmatrix j.succ j.castSucc = -C (M j.succ j.castSucc) :=
+  have hsub (j : Fin k) : M.charmatrix j.succ j.castSucc = - C (M j.succ j.castSucc) :=
     charmatrix_apply_ne _ _ _ Fin.castSucc_lt_succ.ne'
   simp only [charpoly, charmatrix_leadingBlock, det_eq_sum_of_isUpperHessenberg _ hM.charmatrix,
     charmatrix_apply_eq, hlast, hsub, neg_neg, C_mul, map_prod, sub_eq_add_neg, ← sum_neg_distrib]
   congrm _ + ∑ t, ?_
   ring
 
-/-- The recurrence formula computes the characteristic polynomial of an upper Hessenberg matrix
-represented by an array of entries stored in row-major order. -/
-theorem hessP_eq_charpoly {H : Array R} (hsize : H.size = n * n)
-    (hH : (ofArray H hsize).IsUpperHessenberg) (k : ℕ) (hk : k ≤ n) :
-    hessP n H k = ((ofArray H hsize).leadingBlock hk).charpoly := by
+/--
+The recurrence formula computes the characteristic polynomial of an upper Hessenberg matrix
+represented by an array of entries stored in row-major order.
+-/
+theorem hessP_eq_charpoly
+    {H : Array R} (hsize : H.size = n * n) (hH : (ofArray H hsize).IsUpperHessenberg)
+    (k : ℕ) (hk : k ≤ n)
+    : hessP n H k = ((ofArray H hsize).leadingBlock hk).charpoly := by
   induction k using Nat.strong_induction_on with
   | _ k ih =>
     cases k with
@@ -396,10 +417,12 @@ theorem hessP_eq_charpoly {H : Array R} (hsize : H.size = n * n)
         ih k (by lia) (by lia), ih', ofArray_eq_of_getD, ← Fin.map_valEmbedding_Ici, prod_map]
       aesop
 
-/-- The characteristic polynomial of an upper Hessenberg matrix is computed by the
-leading-principal-block recurrence on the row-major array of its entries. -/
-public theorem charpoly_eq_hessCharpoly (H : Matrix (Fin n) (Fin n) R) (hH : H.IsUpperHessenberg) :
-    H.charpoly = hessCharpoly n H.toArray := by
+/--
+The characteristic polynomial of an upper Hessenberg matrix is computed by the
+leading-principal-block recurrence on the row-major array of its entries.
+-/
+public theorem charpoly_eq_hessCharpoly (H : Matrix (Fin n) (Fin n) R) (hH : H.IsUpperHessenberg)
+    : H.charpoly = hessCharpoly n H.toArray := by
   rw [hessCharpoly_eq, hessP_eq_charpoly H.size_toArray (by rwa [ofArray_toArray]) n le_rfl,
     ofArray_toArray, leadingBlock_self]
 

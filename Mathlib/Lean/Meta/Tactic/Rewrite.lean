@@ -6,7 +6,6 @@ Authors: Kim Morrison, Patrick Massot, Kyle Miller
 module
 
 public import Lean.Meta.Tactic.Rewrite
-
 import Mathlib.Init
 
 set_option doc.verso true
@@ -39,7 +38,6 @@ Rewrites the type of `e` via some `eq`, then moves `e` into the new type via `Eq
 Rewrites with a fresh metavariable as the ambient goal.
 Fails if the rewrite produces any subgoals.
 -/
-def rewriteType (e eq : Expr) : MetaM Expr := do
-  mkEqMP (← (← inferType e).rewrite eq) e
+def rewriteType (e eq : Expr) : MetaM Expr := do mkEqMP (← (← inferType e).rewrite eq) e
 
 end Lean.Expr

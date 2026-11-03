@@ -16,7 +16,6 @@ set_option doc.verso.suggestions false
 
 @[expose] public section
 
-
 namespace Equiv
 
 /-- The natural equivalence between arrays and lists. -/
@@ -26,14 +25,16 @@ def arrayEquivList (α : Type*) : Array α ≃ List α where
 
 end Equiv
 
-/- Porting note: removed instances for what would be ported as `Traversable (Array α)` and
+/-
+Porting note: removed instances for what would be ported as `Traversable (Array α)` and
 `LawfulTraversable (Array α)`. These would
 
 1. be implemented directly in terms of `Array` functionality for efficiency, rather than being the
 traversal of some other type transported along an equivalence to `Array α` (as the traversable
 instance for `array` was)
 
-2. belong in `Mathlib/Control/Traversable/Instances.lean` instead of this file. -/
+2. belong in `Mathlib/Control/Traversable/Instances.lean` instead of this file.
+-/
 
 -- namespace Array'
 

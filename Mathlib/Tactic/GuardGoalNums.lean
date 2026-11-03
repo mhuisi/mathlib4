@@ -6,7 +6,6 @@ Authors: Robert Y. Lewis
 module
 
 public meta import Lean.Elab.Tactic.Basic
-
 import Mathlib.Init
 
 set_option doc.verso true
@@ -25,5 +24,4 @@ open Lean Meta Elab Tactic
 /-- `guard_goal_nums n` succeeds if there are exactly `n` goals and fails otherwise. -/
 elab (name := guardGoalNums) "guard_goal_nums " n:num : tactic => do
   let numGoals := (← getGoals).length
-  guard (numGoals = n.getNat) <|>
-    throwError "expected {n.getNat} goals but found {numGoals}"
+  guard (numGoals = n.getNat) <|> throwError "expected {n.getNat} goals but found {numGoals}"

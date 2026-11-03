@@ -8,7 +8,6 @@ module
 public import Mathlib.Algebra.Group.End
 public import Mathlib.Data.Finset.Sort
 public import Mathlib.Order.Prod.Lex.Basic
-
 import Mathlib.Data.Fintype.Fin
 import Mathlib.Order.Interval.Finset.Fin
 
@@ -34,19 +33,19 @@ This file provides an API for doing so, with the sorted `n`-tuple given by
 
 @[expose] public section
 
-
 namespace Tuple
 
 variable {n : ℕ}
 variable {α : Type*} [LinearOrder α]
 
-/-- `graph f` produces the finset of pairs `(f i, i)`
+/--
+`graph f` produces the finset of pairs `(f i, i)`
 equipped with the lexicographic order.
 -/
-def graph (f : Fin n → α) : Finset (α ×ₗ Fin n) :=
-  Finset.univ.image fun i => (f i, i)
+def graph (f : Fin n → α) : Finset (α ×ₗ Fin n) := Finset.univ.image fun i => (f i, i)
 
-/-- Given `p : α ×ₗ (Fin n) := (f i, i)` with `p ∈ graph f`,
+/--
+Given `p : α ×ₗ (Fin n) := (f i, i)` with `p ∈ graph f`,
 `graph.proj p` is defined to be `f i`.
 -/
 def graph.proj {f : Fin n → α} : graph f → α := fun p => p.1.1
@@ -62,30 +61,26 @@ theorem graph.card (f : Fin n → α) : (graph f).card = n := by
     simp
 
 set_option backward.isDefEq.respectTransparency false in
-/-- `graphEquiv₁ f` is the natural equivalence between `Fin n` and `graph f`,
-mapping `i` to `(f i, i)`. -/
+/--
+`graphEquiv₁ f` is the natural equivalence between `Fin n` and `graph f`,
+mapping `i` to `(f i, i)`.
+-/
 def graphEquiv₁ (f : Fin n → α) : Fin n ≃ graph f where
   toFun i := ⟨(f i, i), by simp [graph]⟩
   invFun p := p.1.2
   left_inv i := by simp
-  right_inv := fun ⟨⟨x, i⟩, h⟩ => by
-    simpa [graph, eq_comm, eqComm] using h
+  right_inv := fun ⟨⟨x, i⟩, h⟩ => by simpa [graph, eq_comm, eqComm] using h
 
-@[simp]
-theorem proj_equiv₁' (f : Fin n → α) : graph.proj ∘ graphEquiv₁ f = f :=
-  rfl
+@[simp] theorem proj_equiv₁' (f : Fin n → α) : graph.proj ∘ graphEquiv₁ f = f := rfl
 
-/-- `graphEquiv₂ f` is an equivalence between `Fin n` and `graph f` that respects the order.
--/
-def graphEquiv₂ (f : Fin n → α) : Fin n ≃o graph f :=
-  Finset.orderIsoOfFin _ (by simp)
+/-- `graphEquiv₂ f` is an equivalence between `Fin n` and `graph f` that respects the order. -/
+def graphEquiv₂ (f : Fin n → α) : Fin n ≃o graph f := Finset.orderIsoOfFin _ (by simp)
 
 /-- `sort f` is the permutation that orders `Fin n` according to the order of the outputs of `f`. -/
-def sort (f : Fin n → α) : Equiv.Perm (Fin n) :=
-  (graphEquiv₂ f).toEquiv.trans (graphEquiv₁ f).symm
+def sort (f : Fin n → α) : Equiv.Perm (Fin n) := (graphEquiv₂ f).toEquiv.trans (graphEquiv₁ f).symm
 
-theorem graphEquiv₂_apply (f : Fin n → α) (i : Fin n) :
-    graphEquiv₂ f i = graphEquiv₁ f (sort f i) :=
+theorem graphEquiv₂_apply (f : Fin n → α) (i : Fin n)
+    : graphEquiv₂ f i = graphEquiv₁ f (sort f i) :=
   ((graphEquiv₁ f).apply_symm_apply _).symm
 
 theorem self_comp_sort (f : Fin n → α) : f ∘ sort f = graph.proj ∘ graphEquiv₂ f :=
@@ -100,16 +95,17 @@ theorem monotone_sort (f : Fin n → α) : Monotone (f ∘ sort f) := by
   rw [self_comp_sort]
   exact (monotone_proj f).comp (graphEquiv₂ f).monotone
 
-/-- `sortDesc f` is the permutation that orders `Fin n` according to the reverse order of the
+/--
+`sortDesc f` is the permutation that orders `Fin n` according to the reverse order of the
 outputs of `f`, so that `f ∘ sortDesc f` is decreasing.
 
 Unlike `sort f ∘ Fin.revPerm`, which also arranges `f` in decreasing order, `sortDesc f` is a
 *stable* sort: among indices with equal `f`-value it keeps their original order
 (`isStable_sortDesc`), whereas `sort f ∘ Fin.revPerm` reverses it and so is stable only when `f`
 is injective (`isStable_sort_comp_rev_iff`), in which case the two coincide
-(`sort_comp_rev_eq_sortDesc_of_injective`). -/
-def sortDesc (f : Fin n → α) : Equiv.Perm (Fin n) :=
-  sort (OrderDual.toDual ∘ f)
+(`sort_comp_rev_eq_sortDesc_of_injective`).
+-/
+def sortDesc (f : Fin n → α) : Equiv.Perm (Fin n) := sort (OrderDual.toDual ∘ f)
 
 theorem antitone_sortDesc (f : Fin n → α) : Antitone (f ∘ sortDesc f) := by
   have hmono : Monotone ((OrderDual.toDual ∘ f) ∘ sort (OrderDual.toDual ∘ f)) := monotone_sort _
@@ -130,44 +126,50 @@ open Finset
 
 variable {j : Fin n} {f : Fin n → α} [Preorder α] {a : α}
 
-/-- If `f₀ ≤ f₁ ≤ f₂ ≤ ⋯` is a sorted `n`-tuple of elements of `α`, then for any `j : Fin n` and
-`a : α` we have `j < #{i | fᵢ ≤ a}` iff `fⱼ ≤ a`. -/
-theorem lt_card_le_iff_apply_le_of_monotone [DecidableLE α] (h_sorted : Monotone f) :
-    j < #{i | f i ≤ a} ↔ f j ≤ a :=
+/--
+If `f₀ ≤ f₁ ≤ f₂ ≤ ⋯` is a sorted `n`-tuple of elements of `α`, then for any `j : Fin n` and
+`a : α` we have `j < #{i | fᵢ ≤ a}` iff `fⱼ ≤ a`.
+-/
+theorem lt_card_le_iff_apply_le_of_monotone [DecidableLE α] (h_sorted : Monotone f)
+    : j < # {i | f i ≤ a} ↔ f j ≤ a :=
   Fin.lt_card_filter_univ_iff_apply_of_imp (f · ≤ a) (by grind [Monotone])
 
-theorem lt_card_ge_iff_apply_ge_of_antitone [DecidableLE α] (h_sorted : Antitone f) :
-    j < #{i | a ≤ f i} ↔ a ≤ f j :=
+theorem lt_card_ge_iff_apply_ge_of_antitone [DecidableLE α] (h_sorted : Antitone f)
+    : j < # {i | a ≤ f i} ↔ a ≤ f j :=
   Fin.lt_card_filter_univ_iff_apply_of_imp (a ≤ f ·) (by grind [Antitone])
 
-theorem lt_card_lt_iff_apply_lt_of_monotone [DecidableLT α] (h_sorted : Monotone f) :
-    j < #{i | f i < a} ↔ f j < a :=
+theorem lt_card_lt_iff_apply_lt_of_monotone [DecidableLT α] (h_sorted : Monotone f)
+    : j < # {i | f i < a} ↔ f j < a :=
   Fin.lt_card_filter_univ_iff_apply_of_imp (f · < a) (by grind [Monotone])
 
-theorem lt_card_gt_iff_apply_gt_of_antitone [DecidableLT α] (h_sorted : Antitone f) :
-    j < #{i | a < f i} ↔ a < f j :=
+theorem lt_card_gt_iff_apply_gt_of_antitone [DecidableLT α] (h_sorted : Antitone f)
+    : j < # {i | a < f i} ↔ a < f j :=
   Fin.lt_card_filter_univ_iff_apply_of_imp (a < f ·) (by grind [Antitone])
 
 end
 
 /-- If two permutations of a tuple `f` are both monotone, then they are equal. -/
-theorem unique_monotone [PartialOrder α] {f : Fin n → α} {σ τ : Equiv.Perm (Fin n)}
-    (hfσ : Monotone (f ∘ σ)) (hfτ : Monotone (f ∘ τ)) : f ∘ σ = f ∘ τ :=
-  ofFn_injective <|
-    ((σ.ofFn_comp_perm f).trans (τ.ofFn_comp_perm f).symm).eq_of_pairwise'
-      hfσ.sortedLE_ofFn.pairwise hfτ.sortedLE_ofFn.pairwise
+theorem unique_monotone
+    [PartialOrder α]
+    {f : Fin n → α} {σ τ : Equiv.Perm (Fin n)} (hfσ : Monotone (f ∘ σ)) (hfτ : Monotone (f ∘ τ))
+    : f ∘ σ = f ∘ τ :=
+  ofFn_injective <| ((σ.ofFn_comp_perm f).trans (τ.ofFn_comp_perm f).symm).eq_of_pairwise'
+    hfσ.sortedLE_ofFn.pairwise hfτ.sortedLE_ofFn.pairwise
 
 /-- If two permutations of a tuple `f` are both antitone, then they are equal. -/
-theorem unique_antitone [PartialOrder α] {f : Fin n → α} {σ τ : Equiv.Perm (Fin n)}
-    (hfσ : Antitone (f ∘ σ)) (hfτ : Antitone (f ∘ τ)) : f ∘ σ = f ∘ τ :=
-  ofFn_injective <|
-    ((σ.ofFn_comp_perm f).trans (τ.ofFn_comp_perm f).symm).eq_of_pairwise'
-      hfσ.sortedGE_ofFn.pairwise hfτ.sortedGE_ofFn.pairwise
+theorem unique_antitone
+    [PartialOrder α]
+    {f : Fin n → α} {σ τ : Equiv.Perm (Fin n)} (hfσ : Antitone (f ∘ σ)) (hfτ : Antitone (f ∘ τ))
+    : f ∘ σ = f ∘ τ :=
+  ofFn_injective <| ((σ.ofFn_comp_perm f).trans (τ.ofFn_comp_perm f).symm).eq_of_pairwise'
+    hfσ.sortedGE_ofFn.pairwise hfτ.sortedGE_ofFn.pairwise
 
 variable [LinearOrder α] {f : Fin n → α} {σ : Equiv.Perm (Fin n)}
 
-/-- A permutation `σ` equals `sort f` if and only if the map `i ↦ (f (σ i), σ i)` is
-strictly monotone (w.r.t. the lexicographic ordering on the target). -/
+/--
+A permutation `σ` equals `sort f` if and only if the map `i ↦ (f (σ i), σ i)` is
+strictly monotone (w.r.t. the lexicographic ordering on the target).
+-/
 theorem eq_sort_iff' : σ = sort f ↔ StrictMono (σ.trans <| graphEquiv₁ f) := by
   constructor <;> intro h
   · rw [h, sort, Equiv.trans_assoc, Equiv.symm_trans_self]
@@ -176,9 +178,11 @@ theorem eq_sort_iff' : σ = sort f ↔ StrictMono (σ.trans <| graphEquiv₁ f) 
     ext1 x
     exact (graphEquiv₁ f).eq_symm_apply.2 congr($this x).symm
 
-/-- A permutation `σ` equals `sort f` if and only if `f ∘ σ` is monotone and `σ` is stable, i.e.
+/--
+A permutation `σ` equals `sort f` if and only if `f ∘ σ` is monotone and `σ` is stable, i.e.
 whenever `i ≤ j` and `f (σ i) = f (σ j)`, then `σ i ≤ σ j`. This means that `sort f` is the
-lexicographically smallest permutation `σ` such that `f ∘ σ` is monotone. -/
+lexicographically smallest permutation `σ` such that `f ∘ σ` is monotone.
+-/
 theorem eq_sort_iff : σ = sort f ↔ Monotone (f ∘ σ) ∧ IsStable f σ := by
   rw [eq_sort_iff']
   refine ⟨fun h => ⟨(monotone_proj f).comp h.monotone, fun i j hij hfij => ?_⟩, fun h i j hij => ?_⟩
@@ -188,8 +192,10 @@ theorem eq_sort_iff : σ = sort f ↔ Monotone (f ∘ σ) ∧ IsStable f σ := b
   · obtain he | hl := (h.1 hij.le).eq_or_lt <;> apply Prod.Lex.toLex_lt_toLex.2
     exacts [Or.inr ⟨he, lt_of_le_of_ne (h.2 hij.le he) (σ.injective.ne hij.ne)⟩, Or.inl hl]
 
-/-- A permutation `σ` equals `sortDesc f` if and only if `f ∘ σ` is antitone and `σ` is stable,
-i.e. `σ` breaks ties by increasing index. This is the descending analogue of `eq_sort_iff`. -/
+/--
+A permutation `σ` equals `sortDesc f` if and only if `f ∘ σ` is antitone and `σ` is stable,
+i.e. `σ` breaks ties by increasing index. This is the descending analogue of `eq_sort_iff`.
+-/
 theorem eq_sortDesc_iff : σ = sortDesc f ↔ Antitone (f ∘ σ) ∧ IsStable f σ := by
   have h := eq_sort_iff (σ := σ) (f := OrderDual.toDual ∘ f)
   rwa [Function.comp_assoc, monotone_toDual_comp_iff, isStable_toDual_comp_iff] at h
@@ -210,8 +216,7 @@ theorem comp_perm_comp_sort_eq_comp_sort : (f ∘ σ) ∘ sort (f ∘ σ) = f �
   exact unique_monotone (monotone_sort (f ∘ σ)) (monotone_sort f)
 
 /-- The sorted-descending versions of a tuple `f` and of any permutation of `f` agree. -/
-theorem comp_perm_comp_sortDesc_eq_comp_sortDesc :
-    (f ∘ σ) ∘ sortDesc (f ∘ σ) = f ∘ sortDesc f := by
+theorem comp_perm_comp_sortDesc_eq_comp_sortDesc : (f ∘ σ) ∘ sortDesc (f ∘ σ) = f ∘ sortDesc f := by
   rw [Function.comp_assoc, ← Equiv.Perm.coe_mul]
   exact unique_antitone (antitone_sortDesc (f ∘ σ)) (antitone_sortDesc f)
 
@@ -225,57 +230,65 @@ theorem comp_sortDesc_comp_rev_eq_comp_sort : f ∘ sortDesc f ∘ Fin.rev = f �
   rw [show ⇑(sortDesc f) ∘ Fin.rev = ⇑(sortDesc f * Fin.revPerm : Equiv.Perm (Fin n)) from rfl]
   exact unique_monotone ((antitone_sortDesc f).comp Fin.rev_anti) (monotone_sort f)
 
-/-- When `f` is injective there are no ties, so sorting descending agrees with sorting ascending
-then reversing, already as an equality of permutations. -/
-theorem sort_comp_rev_eq_sortDesc_of_injective (inj : Function.Injective f) :
-    sort f ∘ Fin.rev = sortDesc f :=
+/--
+When `f` is injective there are no ties, so sorting descending agrees with sorting ascending
+then reversing, already as an equality of permutations.
+-/
+theorem sort_comp_rev_eq_sortDesc_of_injective (inj : Function.Injective f)
+    : sort f ∘ Fin.rev = sortDesc f :=
   inj.comp_left comp_sort_comp_rev_eq_comp_sortDesc
 
-theorem sortDesc_comp_rev_eq_sort_of_injective (inj : Function.Injective f) :
-    sortDesc f ∘ Fin.rev = sort f :=
+theorem sortDesc_comp_rev_eq_sort_of_injective (inj : Function.Injective f)
+    : sortDesc f ∘ Fin.rev = sort f :=
   inj.comp_left comp_sortDesc_comp_rev_eq_comp_sort
 
-/-- If a permutation `f ∘ σ` of the tuple `f` is not the same as `f ∘ sort f`, then `f ∘ σ`
-has a pair of strictly decreasing entries. -/
-theorem antitone_pair_of_not_sorted' (h : f ∘ σ ≠ f ∘ sort f) :
-    ∃ i j, i < j ∧ (f ∘ σ) j < (f ∘ σ) i := by
+/--
+If a permutation `f ∘ σ` of the tuple `f` is not the same as `f ∘ sort f`, then `f ∘ σ`
+has a pair of strictly decreasing entries.
+-/
+theorem antitone_pair_of_not_sorted' (h : f ∘ σ ≠ f ∘ sort f)
+    : ∃ i j, i < j ∧ (f ∘ σ) j < (f ∘ σ) i := by
   contrapose! h
   exact comp_sort_eq_comp_iff_monotone.mpr (monotone_iff_forall_lt.mpr h)
 
-/-- If the tuple `f` is not the same as `f ∘ sort f`, then `f` has a pair of strictly decreasing
-entries. -/
+/--
+If the tuple `f` is not the same as `f ∘ sort f`, then `f` has a pair of strictly decreasing
+entries.
+-/
 theorem antitone_pair_of_not_sorted (h : f ≠ f ∘ sort f) : ∃ i j, i < j ∧ f j < f i :=
   antitone_pair_of_not_sorted' (id h : f ∘ Equiv.refl _ ≠ _)
 
 /-- The sorted version of a permutation `σ` is its inverse `σ⁻¹`. -/
 @[simp]
-theorem sort_perm (σ : Equiv.Perm (Fin n)) :
-    sort σ = σ⁻¹ := by
-  apply (eq_sort_iff.2 ⟨?_ , ?_⟩).symm
+theorem sort_perm (σ : Equiv.Perm (Fin n)) : sort σ = σ⁻¹ := by
+  apply (eq_sort_iff.2 ⟨?_, ?_⟩).symm
   · simpa using monotone_id
   · intro i j _ h
     exact le_of_eq (congrArg _ (by simpa using h))
 
-theorem isStable_sort (f : Fin n → α) : IsStable f (sort f) :=
-  (eq_sort_iff.mp rfl).2
+theorem isStable_sort (f : Fin n → α) : IsStable f (sort f) := (eq_sort_iff.mp rfl).2
 
 theorem isStable_sortDesc (f : Fin n → α) : IsStable f (sortDesc f) :=
   (eq_sort_iff (f := OrderDual.toDual ∘ f) (σ := sortDesc f)).mp rfl |>.2
 
-/-- `IsStable f σ` says exactly that `σ⁻¹` reflects the order of any two indices sharing an
-`f`-value. -/
-theorem isStable_iff_imp {α γ : Type*} [Preorder α] (f : α → γ) (σ : Equiv.Perm α) :
-    IsStable f σ ↔ ∀ ⦃i j⦄, f i = f j → σ⁻¹ i ≤ σ⁻¹ j → i ≤ j := by
+/--
+`IsStable f σ` says exactly that `σ⁻¹` reflects the order of any two indices sharing an
+`f`-value.
+-/
+theorem isStable_iff_imp {α γ : Type*} [Preorder α] (f : α → γ) (σ : Equiv.Perm α)
+    : IsStable f σ ↔ ∀ ⦃i j⦄, f i = f j → σ⁻¹ i ≤ σ⁻¹ j → i ≤ j := by
   constructor
   · intro h i j hfij hij
     simpa using h hij (by simp [hfij])
   · intro h i j hij hfij
     exact h hfij (by simpa using hij)
 
-/-- `IsStable f σ` says exactly that `σ⁻¹` preserves the order of any two indices sharing an
-`f`-value. -/
-theorem isStable_iff {α γ : Type*} [LinearOrder α] (f : α → γ) (σ : Equiv.Perm α) :
-    IsStable f σ ↔ ∀ ⦃i j⦄, f i = f j → (i ≤ j ↔ σ⁻¹ i ≤ σ⁻¹ j) := by
+/--
+`IsStable f σ` says exactly that `σ⁻¹` preserves the order of any two indices sharing an
+`f`-value.
+-/
+theorem isStable_iff {α γ : Type*} [LinearOrder α] (f : α → γ) (σ : Equiv.Perm α)
+    : IsStable f σ ↔ ∀ ⦃i j⦄, f i = f j → (i ≤ j ↔ σ⁻¹ i ≤ σ⁻¹ j) := by
   rw [isStable_iff_imp]
   constructor
   · intro h i j hfij
@@ -286,23 +299,22 @@ theorem isStable_iff {α γ : Type*} [LinearOrder α] (f : α → γ) (σ : Equi
   · intro h i j hfij
     exact (h hfij).mpr
 
-/-- `sort f ∘ Fin.rev` is a stable sort exactly when `f` is injective: on tied values it orders
-them by *decreasing* index, the opposite of the stable `sortDesc f`. -/
-theorem isStable_sort_comp_rev_iff :
-    IsStable f (sort f ∘ Fin.rev) ↔ Function.Injective f := by
+/--
+`sort f ∘ Fin.rev` is a stable sort exactly when `f` is injective: on tied values it orders
+them by *decreasing* index, the opposite of the stable `sortDesc f`.
+-/
+theorem isStable_sort_comp_rev_iff : IsStable f (sort f ∘ Fin.rev) ↔ Function.Injective f := by
   refine ⟨fun hσ => ?_, fun inj => ?_⟩
   · intro a b hfab
     wlog! hle : (sort f).symm a ≤ (sort f).symm b generalizing a b
     · exact (this hfab.symm hle.le).symm
     -- `sort f` and its reversal order any tied `x, y` oppositely, so `f` can have no tie.
-    exact le_antisymm
-      (by simpa using isStable_sort f hle (by simp [hfab]))
+    exact le_antisymm (by simpa using isStable_sort f hle (by simp [hfab]))
       (by simpa using hσ (Fin.rev_anti hle) (by simp [hfab]))
   · rw [sort_comp_rev_eq_sortDesc_of_injective inj]
     exact isStable_sortDesc f
 
 end Tuple
 
-theorem Equiv.Perm.monotone_iff {n : ℕ} (σ : Perm (Fin n)) :
-    Monotone σ ↔ σ = 1 := by
+theorem Equiv.Perm.monotone_iff {n : ℕ} (σ : Perm (Fin n)) : Monotone σ ↔ σ = 1 := by
   rw [← Tuple.sort_eq_refl_iff_monotone, Tuple.sort_perm, ← inv_eq_one, one_def]

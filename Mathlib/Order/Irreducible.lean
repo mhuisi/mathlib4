@@ -32,55 +32,48 @@ Both hold for all (non-minimal) elements in a linear order.
 
 @[expose] public section
 
-
 open Finset OrderDual
 
 variable {ι α : Type*}
 
 /-! ### Irreducible and prime elements -/
 
-
 section SemilatticeSup
 
 variable [SemilatticeSup α] {a b c : α}
 
-/-- A sup-irreducible element is a non-bottom element which isn't the supremum of anything smaller.
+/--
+A sup-irreducible element is a non-bottom element which isn't the supremum of anything smaller.
 -/
 @[to_dual
-/-- An inf-irreducible element is a non-top element which isn't the infimum of anything bigger. -/]
-def SupIrred (a : α) : Prop :=
-  ¬IsMin a ∧ ∀ ⦃b c⦄, b ⊔ c = a → b = a ∨ c = a
+  /-- An inf-irreducible element is a non-top element which isn't the infimum of anything bigger. -/]
+def SupIrred (a : α) : Prop := ¬ IsMin a ∧ ∀ ⦃b c⦄, b ⊔ c = a → b = a ∨ c = a
 
-/-- A sup-prime element is a non-bottom element which isn't less than the supremum of anything
-smaller. -/
+/--
+A sup-prime element is a non-bottom element which isn't less than the supremum of anything
+smaller.
+-/
 @[to_dual
-/-- An inf-irreducible element is a non-top element which isn't the infimum of anything bigger. -/]
-def SupPrime (a : α) : Prop :=
-  ¬IsMin a ∧ ∀ ⦃b c⦄, a ≤ b ⊔ c → a ≤ b ∨ a ≤ c
+  /-- An inf-irreducible element is a non-top element which isn't the infimum of anything bigger. -/]
+def SupPrime (a : α) : Prop := ¬ IsMin a ∧ ∀ ⦃b c⦄, a ≤ b ⊔ c → a ≤ b ∨ a ≤ c
 
-@[to_dual]
-theorem SupIrred.not_isMin (ha : SupIrred a) : ¬IsMin a :=
-  ha.1
+@[to_dual] theorem SupIrred.not_isMin (ha : SupIrred a) : ¬ IsMin a := ha.1
 
-@[to_dual]
-theorem SupPrime.not_isMin (ha : SupPrime a) : ¬IsMin a :=
-  ha.1
+@[to_dual] theorem SupPrime.not_isMin (ha : SupPrime a) : ¬ IsMin a := ha.1
 
-@[to_dual]
-theorem IsMin.not_supIrred (ha : IsMin a) : ¬SupIrred a := fun h => h.1 ha
+@[to_dual] theorem IsMin.not_supIrred (ha : IsMin a) : ¬ SupIrred a := fun h => h.1 ha
 
-@[to_dual]
-theorem IsMin.not_supPrime (ha : IsMin a) : ¬SupPrime a := fun h => h.1 ha
+@[to_dual] theorem IsMin.not_supPrime (ha : IsMin a) : ¬ SupPrime a := fun h => h.1 ha
 
 @[to_dual (attr := simp)]
-theorem not_supIrred : ¬SupIrred a ↔ IsMin a ∨ ∃ b c, b ⊔ c = a ∧ b < a ∧ c < a := by
+theorem not_supIrred : ¬ SupIrred a ↔ IsMin a ∨ ∃ b c, b ⊔ c = a ∧ b < a ∧ c < a := by
   rw [SupIrred, not_and_or]
   push Not
   rw [exists₂_congr]
   simp +contextual [@eq_comm _ _ a]
 
 @[to_dual (attr := simp)]
-theorem not_supPrime : ¬SupPrime a ↔ IsMin a ∨ ∃ b c, a ≤ b ⊔ c ∧ ¬a ≤ b ∧ ¬a ≤ c := by
+theorem not_supPrime : ¬ SupPrime a ↔ IsMin a ∨ ∃ b c, a ≤ b ⊔ c ∧ ¬ a ≤ b ∧ ¬ a ≤ c := by
   rw [SupPrime, not_and_or]; push Not; rfl
 
 @[to_dual]
@@ -94,12 +87,10 @@ theorem SupPrime.le_sup (ha : SupPrime a) : a ≤ b ⊔ c ↔ a ≤ b ∨ a ≤ 
 variable [OrderBot α] {s : Finset ι} {f : ι → α}
 
 @[to_dual (attr := simp)]
-theorem not_supIrred_bot : ¬SupIrred (⊥ : α) :=
-  isMin_bot.not_supIrred
+theorem not_supIrred_bot : ¬ SupIrred (⊥ : α) := isMin_bot.not_supIrred
 
 @[to_dual (attr := simp)]
-theorem not_supPrime_bot : ¬SupPrime (⊥ : α) :=
-  isMin_bot.not_supPrime
+theorem not_supPrime_bot : ¬ SupPrime (⊥ : α) := isMin_bot.not_supPrime
 
 @[to_dual]
 theorem SupIrred.ne_bot (ha : SupIrred a) : a ≠ ⊥ := by rintro rfl; exact not_supIrred_bot ha
@@ -126,13 +117,15 @@ theorem SupPrime.le_finset_sup (ha : SupPrime a) : a ≤ s.sup f ↔ ∃ i ∈ s
 
 variable [WellFoundedLT α]
 
-/-- In a well-founded lattice, any element is the supremum of finitely many sup-irreducible
-elements. This is the order-theoretic analogue of prime factorisation. -/
+/--
+In a well-founded lattice, any element is the supremum of finitely many sup-irreducible
+elements. This is the order-theoretic analogue of prime factorisation.
+-/
 @[to_dual
-/-- In a cowell-founded lattice, any element is the infimum of finitely many inf-irreducible
+  /-- In a cowell-founded lattice, any element is the infimum of finitely many inf-irreducible
 elements. This is the order-theoretic analogue of prime factorisation. -/]
-theorem exists_supIrred_decomposition (a : α) :
-    ∃ s : Finset α, s.sup id = a ∧ ∀ ⦃b⦄, b ∈ s → SupIrred b := by
+theorem exists_supIrred_decomposition (a : α)
+    : ∃ s : Finset α, s.sup id = a ∧ ∀ ⦃b⦄, b ∈ s → SupIrred b := by
   classical
   apply WellFoundedLT.induction a _
   clear a
@@ -153,20 +146,16 @@ section SemilatticeSup
 variable [SemilatticeSup α]
 
 @[to_dual (attr := simp)]
-theorem infIrred_toDual {a : α} : InfIrred (toDual a) ↔ SupIrred a :=
-  Iff.rfl
+theorem infIrred_toDual {a : α} : InfIrred (toDual a) ↔ SupIrred a := Iff.rfl
 
 @[to_dual (attr := simp)]
-theorem infPrime_toDual {a : α} : InfPrime (toDual a) ↔ SupPrime a :=
-  Iff.rfl
+theorem infPrime_toDual {a : α} : InfPrime (toDual a) ↔ SupPrime a := Iff.rfl
 
 @[to_dual (attr := simp)]
-theorem supIrred_ofDual {a : αᵒᵈ} : SupIrred (ofDual a) ↔ InfIrred a :=
-  Iff.rfl
+theorem supIrred_ofDual {a : αᵒᵈ} : SupIrred (ofDual a) ↔ InfIrred a := Iff.rfl
 
 @[to_dual (attr := simp)]
-theorem supPrime_ofDual {a : αᵒᵈ} : SupPrime (ofDual a) ↔ InfPrime a :=
-  Iff.rfl
+theorem supPrime_ofDual {a : αᵒᵈ} : SupPrime (ofDual a) ↔ InfPrime a := Iff.rfl
 
 @[to_dual] alias ⟨_, SupIrred.dual⟩ := infIrred_toDual
 
@@ -183,9 +172,10 @@ section DistribLattice
 variable [DistribLattice α] {a : α}
 
 @[to_dual (attr := simp)]
-theorem supPrime_iff_supIrred : SupPrime a ↔ SupIrred a :=
-  ⟨SupPrime.supIrred,
-    And.imp_right fun h b c => by simp_rw [← inf_eq_left, inf_sup_left]; exact @h _ _⟩
+theorem supPrime_iff_supIrred : SupPrime a ↔ SupIrred a := ⟨
+  SupPrime.supIrred,
+  And.imp_right fun h b c => by simp_rw [← inf_eq_left, inf_sup_left]; exact @h _ _
+⟩
 
 @[to_dual] protected alias ⟨_, SupIrred.supPrime⟩ := supPrime_iff_supIrred
 
@@ -195,12 +185,10 @@ section LinearOrder
 
 variable [LinearOrder α] {a : α}
 
-@[to_dual]
-theorem supPrime_iff_not_isMin : SupPrime a ↔ ¬IsMin a :=
-  and_iff_left <| by simp
+@[to_dual] theorem supPrime_iff_not_isMin : SupPrime a ↔ ¬ IsMin a := and_iff_left <| by simp
 
 @[to_dual (attr := simp)]
-theorem supIrred_iff_not_isMin : SupIrred a ↔ ¬IsMin a :=
+theorem supIrred_iff_not_isMin : SupIrred a ↔ ¬ IsMin a :=
   and_iff_left fun _ _ => by simpa only [max_eq_iff] using Or.imp And.left And.left
 
 end LinearOrder

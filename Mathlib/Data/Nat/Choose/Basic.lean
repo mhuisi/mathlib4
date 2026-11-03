@@ -44,9 +44,11 @@ binomial coefficient, combination, multicombination, stars and bars
 
 namespace Nat
 
-/-- `choose n k` is the number of `k`-element subsets in an `n`-element set. Also known as binomial
+/--
+`choose n k` is the number of `k`-element subsets in an `n`-element set. Also known as binomial
 coefficients. For the fact that this is the number of `k`-element-subsets of an `n`-element
-set, see `Finset.card_powersetCard`. -/
+set, see `Finset.card_powersetCard`.
+-/
 @[oeis A007318]
 def choose : ℕ → ℕ → ℕ
   | _, 0 => 1
@@ -57,28 +59,26 @@ def choose : ℕ → ℕ → ℕ
 theorem choose_zero_right (n : ℕ) : choose n 0 = 1 := by cases n <;> rfl
 
 @[simp, grind =]
-theorem choose_zero_succ (k : ℕ) : choose 0 (succ k) = 0 :=
-  rfl
+theorem choose_zero_succ (k : ℕ) : choose 0 (succ k) = 0 := rfl
 
 @[grind =]
 theorem choose_succ_succ (n k : ℕ) : choose (succ n) (succ k) = choose n k + choose n (succ k) :=
   rfl
 
-theorem choose_succ_succ' (n k : ℕ) : choose (n + 1) (k + 1) = choose n k + choose n (k + 1) :=
-  rfl
+theorem choose_succ_succ' (n k : ℕ) : choose (n + 1) (k + 1) = choose n k + choose n (k + 1) := rfl
 
-theorem choose_succ_left (n k : ℕ) (hk : 0 < k) :
-    choose (n + 1) k = choose n (k - 1) + choose n k := by
+theorem choose_succ_left (n k : ℕ) (hk : 0 < k)
+    : choose (n + 1) k = choose n (k - 1) + choose n k := by
   obtain ⟨l, rfl⟩ : ∃ l, k = l + 1 := Nat.exists_eq_add_of_le' hk
   rfl
 
-theorem choose_succ_right (n k : ℕ) (hn : 0 < n) :
-    choose n (k + 1) = choose (n - 1) k + choose (n - 1) (k + 1) := by
+theorem choose_succ_right (n k : ℕ) (hn : 0 < n)
+    : choose n (k + 1) = choose (n - 1) k + choose (n - 1) (k + 1) := by
   obtain ⟨l, rfl⟩ : ∃ l, n = l + 1 := Nat.exists_eq_add_of_le' hn
   rfl
 
-theorem choose_eq_choose_pred_add {n k : ℕ} (hn : 0 < n) (hk : 0 < k) :
-    choose n k = choose (n - 1) (k - 1) + choose (n - 1) k := by
+theorem choose_eq_choose_pred_add {n k : ℕ} (hn : 0 < n) (hk : 0 < k)
+    : choose n k = choose (n - 1) (k - 1) + choose (n - 1) k := by
   obtain ⟨l, rfl⟩ : ∃ l, k = l + 1 := Nat.exists_eq_add_of_le' hk
   rw [choose_succ_right _ _ hn, Nat.add_one_sub_one]
 
@@ -91,13 +91,10 @@ theorem choose_eq_zero_of_lt : ∀ {n k}, n < k → choose n k = 0
     have hnk1 : n < k + 1 := lt_of_succ_lt hk
     rw [choose_succ_succ, choose_eq_zero_of_lt hnk, choose_eq_zero_of_lt hnk1]
 
-@[simp]
-theorem choose_self (n : ℕ) : choose n n = 1 := by
-  induction n <;> grind
+@[simp] theorem choose_self (n : ℕ) : choose n n = 1 := by induction n <;> grind
 
 @[simp]
-theorem choose_succ_self (n : ℕ) : choose n (succ n) = 0 :=
-  choose_eq_zero_of_lt (lt_succ_self _)
+theorem choose_succ_self (n : ℕ) : choose n (succ n) = 0 := choose_eq_zero_of_lt (lt_succ_self _)
 
 @[simp]
 lemma choose_one_right (n : ℕ) : choose n 1 = n := by induction n <;> simp [*, choose, Nat.add_comm]
@@ -105,7 +102,8 @@ lemma choose_one_right (n : ℕ) : choose n 1 = n := by induction n <;> simp [*,
 -- The `n + 1`-st triangle number is `n` more than the `n`-th triangle number
 theorem triangle_succ (n : ℕ) : (n + 1) * (n + 1 - 1) / 2 = n * (n - 1) / 2 + n := by
   rw [← add_mul_div_left, Nat.mul_comm 2 n, ← Nat.mul_add, Nat.add_sub_cancel, Nat.mul_comm]
-  cases n <;> rfl; apply zero_lt_succ
+  cases n <;> rfl
+  apply zero_lt_succ
 
 /-- `choose n 2` is the `n`-th triangle number. -/
 theorem choose_two_right (n : ℕ) : choose n 2 = n * (n - 1) / 2 := by
@@ -126,8 +124,7 @@ theorem choose_eq_zero_iff {n k : ℕ} : n.choose k = 0 ↔ n < k :=
 theorem choose_ne_zero_iff {n k : ℕ} : n.choose k ≠ 0 ↔ k ≤ n :=
   not_iff_not.1 <| by simp [choose_eq_zero_iff]
 
-lemma choose_ne_zero {n k : ℕ} (h : k ≤ n) : n.choose k ≠ 0 :=
-  (choose_pos h).ne'
+lemma choose_ne_zero {n k : ℕ} (h : k ≤ n) : n.choose k ≠ 0 := (choose_pos h).ne'
 
 theorem add_one_mul_choose_eq : ∀ n k, (n + 1) * choose n k = choose (n + 1) (k + 1) * (k + 1)
   | 0, 0 => by decide
@@ -157,8 +154,8 @@ theorem choose_mul_factorial_mul_factorial : ∀ {n k}, k ≤ n → choose n k *
         ← Nat.add_mul, Nat.add_sub_cancel_left, Nat.add_comm]
     · rw [hk₁]; simp [Nat.mul_comm, choose, Nat.sub_self]
 
-theorem choose_mul {n k s : ℕ} (hsk : s ≤ k) :
-    n.choose k * k.choose s = n.choose s * (n - s).choose (k - s) := by
+theorem choose_mul {n k s : ℕ} (hsk : s ≤ k)
+    : n.choose k * k.choose s = n.choose s * (n - s).choose (k - s) := by
   obtain hnk | hkn := lt_or_ge n k
   · grind
   have h : 0 < (n - k)! * (k - s)! * s ! := by apply_rules [factorial_pos, Nat.mul_pos]
@@ -166,11 +163,10 @@ theorem choose_mul {n k s : ℕ} (hsk : s ≤ k) :
   calc
     _ = n.choose s * s ! * ((n - s).choose (k - s) * (k - s)! * (n - s - (k - s))!) := by
       grind [choose_mul_factorial_mul_factorial]
-    _ = n.choose s * (n - s).choose (k - s) * ((n - k)! * (k - s)! * s !) := by
-      grind
+    _ = n.choose s * (n - s).choose (k - s) * ((n - k)! * (k - s)! * s !) := by grind
 
-theorem choose_eq_factorial_div_factorial {n k : ℕ} (hk : k ≤ n) :
-    choose n k = n ! / (k ! * (n - k)!) := by
+theorem choose_eq_factorial_div_factorial {n k : ℕ} (hk : k ≤ n)
+    : choose n k = n ! / (k ! * (n - k)!) := by
   rw [← choose_mul_factorial_mul_factorial hk, Nat.mul_assoc]
   exact (mul_div_left _ (Nat.mul_pos (factorial_pos _) (factorial_pos _))).symm
 
@@ -178,8 +174,8 @@ theorem add_choose (i j : ℕ) : (i + j).choose j = (i + j)! / (i ! * j !) := by
   rw [choose_eq_factorial_div_factorial (Nat.le_add_left j i), Nat.add_sub_cancel_right,
     Nat.mul_comm]
 
-theorem add_choose_mul_factorial_mul_factorial (i j : ℕ) :
-    (i + j).choose j * i ! * j ! = (i + j)! := by
+theorem add_choose_mul_factorial_mul_factorial (i j : ℕ)
+    : (i + j).choose j * i ! * j ! = (i + j)! := by
   rw [← choose_mul_factorial_mul_factorial (Nat.le_add_left _ _), Nat.add_sub_cancel_right,
     Nat.mul_right_comm]
 
@@ -187,8 +183,7 @@ theorem factorial_mul_factorial_dvd_factorial {n k : ℕ} (hk : k ≤ n) : k ! *
   rw [← choose_mul_factorial_mul_factorial hk, Nat.mul_assoc]; exact Nat.dvd_mul_left _ _
 
 theorem factorial_mul_factorial_dvd_factorial_add (i j : ℕ) : i ! * j ! ∣ (i + j)! := by
-  suffices i ! * (i + j - i)! ∣ (i + j)! by
-    rwa [Nat.add_sub_cancel_left i j] at this
+  suffices i ! * (i + j - i)! ∣ (i + j)! by rwa [Nat.add_sub_cancel_left i j] at this
   exact factorial_mul_factorial_dvd_factorial (Nat.le_add_right _ _)
 
 @[simp]
@@ -197,12 +192,10 @@ theorem choose_symm {n k : ℕ} (hk : k ≤ n) : choose n (n - k) = choose n k :
     Nat.sub_sub_self hk, Nat.mul_comm]
 
 theorem choose_symm_of_eq_add {n a b : ℕ} (h : n = a + b) : Nat.choose n a = Nat.choose n b := by
-  suffices choose n (n - b) = choose n b by
-    rw [h, Nat.add_sub_cancel_right] at this; rwa [h]
+  suffices choose n (n - b) = choose n b by rw [h, Nat.add_sub_cancel_right] at this; rwa [h]
   exact choose_symm (h ▸ le_add_left _ _)
 
-theorem choose_symm_add {a b : ℕ} : choose (a + b) a = choose (a + b) b :=
-  choose_symm_of_eq_add rfl
+theorem choose_symm_add {a b : ℕ} : choose (a + b) a = choose (a + b) b := choose_symm_of_eq_add rfl
 
 theorem choose_symm_half (m : ℕ) : choose (2 * m + 1) (m + 1) = choose (2 * m + 1) m := by
   apply choose_symm_of_eq_add
@@ -228,8 +221,8 @@ theorem choose_mul_succ_eq (n k : ℕ) : n.choose k * (n + 1) = (n + 1).choose k
     · rw [choose_eq_zero_of_lt hk, choose_eq_zero_of_lt (n.lt_succ_self.trans hk), Nat.zero_mul,
         Nat.zero_mul]
 
-theorem choose_mul_add {m n : ℕ} (hn : n ≠ 0) :
-    (m * n + n).choose n = (m + 1) * (m * n + n - 1).choose (n - 1) := by
+theorem choose_mul_add {m n : ℕ} (hn : n ≠ 0)
+    : (m * n + n).choose n = (m + 1) * (m * n + n - 1).choose (n - 1) := by
   rw [← Nat.mul_left_inj (Nat.mul_ne_zero (factorial_ne_zero (m * n)) (factorial_ne_zero n))]
   set p := n - 1
   have hp : n = p + 1 := (succ_pred_eq_of_ne_zero hn).symm
@@ -247,43 +240,44 @@ theorem choose_mul_add {m n : ℕ} (hn : n ≠ 0) :
     _ = (m * (p + 1) + p).choose p * (m * (p + 1))! * ((p + 1)! * (m + 1)) := by rw [factorial_succ]
     _ = (m + 1) * (m * (p + 1) + p).choose p * ((m * (p + 1))! * (p + 1)!) := by lia
 
-theorem choose_mul_right {m n : ℕ} (hn : n ≠ 0) :
-    (m * n).choose n = m * (m * n - 1).choose (n - 1) := by
+theorem choose_mul_right {m n : ℕ} (hn : n ≠ 0)
+    : (m * n).choose n = m * (m * n - 1).choose (n - 1) := by
   by_cases hm : m = 0
   · simp only [hm, Nat.zero_mul, Nat.choose_eq_zero_iff]
     exact Nat.pos_of_ne_zero hn
-  · set p := m - 1; have hp : m = p + 1 := (succ_pred_eq_of_ne_zero hm).symm
+  · set p := m - 1
+    have hp : m = p + 1 := (succ_pred_eq_of_ne_zero hm).symm
     simp only [hp]
     rw [Nat.add_mul, Nat.one_mul, choose_mul_add hn]
 
-theorem ascFactorial_eq_factorial_mul_choose (n k : ℕ) :
-    (n + 1).ascFactorial k = k ! * (n + k).choose k := by
+theorem ascFactorial_eq_factorial_mul_choose (n k : ℕ)
+    : (n + 1).ascFactorial k = k ! * (n + k).choose k := by
   rw [Nat.mul_comm]
   apply Nat.mul_right_cancel (n + k - k).factorial_pos
   rw [choose_mul_factorial_mul_factorial <| Nat.le_add_left k n, Nat.add_sub_cancel_right,
     ← factorial_mul_ascFactorial, Nat.mul_comm]
 
-theorem ascFactorial_eq_factorial_mul_choose' (n k : ℕ) :
-    n.ascFactorial k = k ! * (n + k - 1).choose k := by
+theorem ascFactorial_eq_factorial_mul_choose' (n k : ℕ)
+    : n.ascFactorial k = k ! * (n + k - 1).choose k := by
   cases n
   · cases k
     · rw [ascFactorial_zero, choose_zero_right, factorial_zero, Nat.mul_one]
-    · simp only [zero_ascFactorial, Nat.zero_add, succ_sub_succ_eq_sub,
-        Nat.sub_zero, choose_succ_self, Nat.mul_zero]
+    · simp only [zero_ascFactorial, Nat.zero_add, succ_sub_succ_eq_sub, Nat.sub_zero,
+        choose_succ_self, Nat.mul_zero]
   rw [ascFactorial_eq_factorial_mul_choose]
   simp only [succ_add_sub_one]
 
 theorem factorial_dvd_ascFactorial (n k : ℕ) : k ! ∣ n.ascFactorial k :=
   ⟨(n + k - 1).choose k, ascFactorial_eq_factorial_mul_choose' _ _⟩
 
-theorem choose_eq_asc_factorial_div_factorial (n k : ℕ) :
-    (n + k).choose k = (n + 1).ascFactorial k / k ! := by
+theorem choose_eq_asc_factorial_div_factorial (n k : ℕ)
+    : (n + k).choose k = (n + 1).ascFactorial k / k ! := by
   apply Nat.mul_left_cancel k.factorial_pos
   rw [← ascFactorial_eq_factorial_mul_choose]
   exact (Nat.mul_div_cancel' <| factorial_dvd_ascFactorial _ _).symm
 
-theorem choose_eq_asc_factorial_div_factorial' (n k : ℕ) :
-    (n + k - 1).choose k = n.ascFactorial k / k ! :=
+theorem choose_eq_asc_factorial_div_factorial' (n k : ℕ)
+    : (n + k - 1).choose k = n.ascFactorial k / k ! :=
   Nat.eq_div_of_mul_eq_right k.factorial_ne_zero (ascFactorial_eq_factorial_mul_choose' _ _).symm
 
 theorem descFactorial_eq_factorial_mul_choose (n k : ℕ) : n.descFactorial k = k ! * n.choose k := by
@@ -299,20 +293,21 @@ theorem factorial_dvd_descFactorial (n k : ℕ) : k ! ∣ n.descFactorial k :=
 theorem choose_eq_descFactorial_div_factorial (n k : ℕ) : n.choose k = n.descFactorial k / k ! :=
   Nat.eq_div_of_mul_eq_right k.factorial_ne_zero (descFactorial_eq_factorial_mul_choose _ _).symm
 
-/-- A faster implementation of `choose`, to be used during bytecode evaluation
-and in compiled code. -/
+/--
+A faster implementation of `choose`, to be used during bytecode evaluation
+and in compiled code.
+-/
 def fast_choose n k := Nat.descFactorial n k / Nat.factorial k
 
-@[csimp] lemma choose_eq_fast_choose : Nat.choose = fast_choose :=
+@[csimp]
+lemma choose_eq_fast_choose : Nat.choose = fast_choose :=
   funext (fun _ => funext (Nat.choose_eq_descFactorial_div_factorial _))
-
 
 /-! ### Inequalities -/
 
-
 /-- Show that `Nat.choose` is increasing for small values of the right argument. -/
-theorem choose_le_succ_of_lt_half_left {r n : ℕ} (h : r < n / 2) :
-    choose n r ≤ choose n (r + 1) := by
+theorem choose_le_succ_of_lt_half_left {r n : ℕ} (h : r < n / 2)
+    : choose n r ≤ choose n (r + 1) := by
   refine Nat.le_of_mul_le_mul_right ?_ (Nat.sub_pos_of_lt (h.trans_le (n.div_le_self 2)))
   rw [← choose_succ_right_eq]
   apply Nat.mul_le_mul_left
@@ -320,8 +315,8 @@ theorem choose_le_succ_of_lt_half_left {r n : ℕ} (h : r < n / 2) :
   exact lt_of_lt_of_le (Nat.mul_lt_mul_of_pos_right h Nat.zero_lt_two) (n.div_mul_le_self 2)
 
 /-- Show that for small values of the right argument, the middle value is largest. -/
-private theorem choose_le_middle_of_le_half_left {n r : ℕ} (hr : r ≤ n / 2) :
-    choose n r ≤ choose n (n / 2) := by
+private theorem choose_le_middle_of_le_half_left {n r : ℕ} (hr : r ≤ n / 2)
+    : choose n r ≤ choose n (n / 2) := by
   induction hr using decreasingInduction with
   | self => rfl
   | of_succ k hk ih => exact (choose_le_succ_of_lt_half_left hk).trans ih
@@ -339,9 +334,7 @@ theorem choose_le_middle (r n : ℕ) : choose n r ≤ choose n (n / 2) := by
 
 /-! #### Inequalities about increasing the first argument -/
 
-
-theorem choose_le_succ (a c : ℕ) : choose a c ≤ choose a.succ c := by
-  cases c <;> grind
+theorem choose_le_succ (a c : ℕ) : choose a c ≤ choose a.succ c := by cases c <;> grind
 
 theorem choose_le_add (a b c : ℕ) : choose a c ≤ choose (a + b) c := by
   induction b with
@@ -376,22 +369,21 @@ in terms of multinomial coefficients. For details see https://mathworld.wolfram.
 -/
 
 /--
-`multichoose n k` is the number of multisets of cardinality `k` from a type of cardinality `n`. -/
+`multichoose n k` is the number of multisets of cardinality `k` from a type of cardinality `n`.
+-/
 @[oeis A059481]
 def multichoose : ℕ → ℕ → ℕ
   | _, 0 => 1
   | 0, _ + 1 => 0
-  | n + 1, k + 1 =>
-    multichoose n (k + 1) + multichoose (n + 1) k
+  | n + 1, k + 1 => multichoose n (k + 1) + multichoose (n + 1) k
 
 @[simp]
 theorem multichoose_zero_right (n : ℕ) : multichoose n 0 = 1 := by cases n <;> simp [multichoose]
 
-@[simp]
-theorem multichoose_zero_succ (k : ℕ) : multichoose 0 (k + 1) = 0 := by simp [multichoose]
+@[simp] theorem multichoose_zero_succ (k : ℕ) : multichoose 0 (k + 1) = 0 := by simp [multichoose]
 
-theorem multichoose_succ_succ (n k : ℕ) :
-    multichoose (n + 1) (k + 1) = multichoose n (k + 1) + multichoose (n + 1) k := by
+theorem multichoose_succ_succ (n k : ℕ)
+    : multichoose (n + 1) (k + 1) = multichoose n (k + 1) + multichoose (n + 1) k := by
   simp [multichoose]
 
 @[simp]

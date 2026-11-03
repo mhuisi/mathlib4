@@ -6,7 +6,6 @@ Authors: David Ledvinka
 module
 
 public import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Basic
-
 import Mathlib.Data.Rat.Cast.Lemmas
 
 /-!
@@ -62,11 +61,11 @@ theorem ratCast_mem (q : ℚ) (prec : ℕ) : (q : ℝ) ∈ rat q prec := by
 def ratBall (c r : ℤ) (d prec : ℕ) : Interval Dyadic :=
   Interval.Icc (rat (mkRat (c - r) d) prec).lb (rat (mkRat (c + r) d) prec).ub
 
-theorem ratBall_mem {x : ℝ} {c r : ℤ} {d : ℕ} (hx : |x - c / d| ≤ r / d) (prec : ℕ) :
-    x ∈ ratBall c r d prec := by
+theorem ratBall_mem {x : ℝ} {c r : ℤ} {d : ℕ} (hx : |x - c / d| ≤ r / d) (prec : ℕ)
+    : x ∈ ratBall c r d prec := by
   obtain ⟨h₁, h₂⟩ := abs_sub_le_iff.mp hx
-  refine mem_iff_mem_map.mpr
-    (Interval.mem_Icc_of_le (ratCast_mem _ prec) ?_ ?_ (ratCast_mem _ prec))
+  refine mem_iff_mem_map.mpr (Interval.mem_Icc_of_le (ratCast_mem _ prec) ?_ ?_
+    (ratCast_mem _ prec))
   · push_cast [Rat.mkRat_eq_div, sub_div]
     exact sub_le_comm.mp h₂
   · push_cast [Rat.mkRat_eq_div, add_div]
@@ -80,16 +79,14 @@ def natDiv (m d prec : ℕ) : Interval Dyadic :=
   let upper := if quotient * d = scaled then lower else lower + Dyadic.step prec
   Interval.Icc lower upper
 
-theorem natDiv_eq_rat (m : ℕ) {d : ℕ} (prec : ℕ) (hd : 0 < d) :
-    natDiv m d prec = rat (mkRat m d) prec := by
+theorem natDiv_eq_rat (m : ℕ) {d : ℕ} (prec : ℕ) (hd : 0 < d)
+    : natDiv m d prec = rat (mkRat m d) prec := by
   rw [natDiv, rat]
-  congr 2 <;>
-    simp [Rat.toDyadic_mkRat, Dyadic.toRat_ofIntWithPrec_eq_mkRat, Rat.mkRat_eq_iff,
-      Int.shiftLeft_eq, Nat.shiftLeft_eq, hd.ne']
+  congr 2 <;> simp [Rat.toDyadic_mkRat, Dyadic.toRat_ofIntWithPrec_eq_mkRat, Rat.mkRat_eq_iff,
+    Int.shiftLeft_eq, Nat.shiftLeft_eq, hd.ne']
   norm_cast
 
-theorem natDiv_mem (m : ℕ) {d : ℕ} (prec : ℕ) (hd : 0 < d) :
-    (m : ℝ) / d ∈ natDiv m d prec := by
+theorem natDiv_mem (m : ℕ) {d : ℕ} (prec : ℕ) (hd : 0 < d) : (m : ℝ) / d ∈ natDiv m d prec := by
   rw [natDiv_eq_rat m prec hd]
   simpa [Rat.cast_mkRat_of_ne_zero, hd.ne'] using ratCast_mem (mkRat m d) prec
 
@@ -101,8 +98,8 @@ def scientific (m : ℕ) (s : Bool) (e prec : ℕ) : Interval Dyadic :=
     Interval.singleton (m * (10 : Dyadic) ^ e)
 
 @[inclusion_op interval_dyadic_real]
-theorem scientific_mem (m : ℕ) (s : Bool) (e prec : ℕ) :
-    (OfScientific.ofScientific (α := ℝ) m s e) ∈ scientific m s e prec := by
+theorem scientific_mem (m : ℕ) (s : Bool) (e prec : ℕ)
+    : (OfScientific.ofScientific (α := ℝ) m s e) ∈ scientific m s e prec := by
   cases s
   · simpa [scientific, NNRatCast.ofScientific_eq_ite, mem_iff_mem_map] using
       Interval.mem_map_singleton (m * (10 : Dyadic) ^ e) Dyadic.toReal

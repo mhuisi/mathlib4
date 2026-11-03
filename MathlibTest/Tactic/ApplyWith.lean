@@ -1,4 +1,5 @@
 module
+
 import Mathlib.Tactic.ApplyWith
 
 set_option autoImplicit true
@@ -24,12 +25,11 @@ def foo : Foo where
   val := 37
 
 set_option linter.concreteInstances false in
-def takeImplicit [f : Foo] : Nat :=
-  f.val
+def takeImplicit [f : Foo] : Nat := f.val
 
 example : Nat := by
   fail_if_success apply takeImplicit -- Default behaviour is `-allowSynthFailures`
-  fail_if_success apply -allowSynthFailures takeImplicit
+  fail_if_success apply - allowSynthFailures takeImplicit
   apply +allowSynthFailures takeImplicit
   apply foo
 

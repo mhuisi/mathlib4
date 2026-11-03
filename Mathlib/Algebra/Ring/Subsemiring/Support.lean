@@ -48,11 +48,15 @@ def supportIdeal (hS : S.IsSpanning) : Ideal R where
     simp_all [isSpanning_def]
     grind [mul_mem, neg_mul_mem, mul_neg_mem]
 
-@[simp] theorem mem_supportIdeal {S : Subsemiring R} (hS : S.IsSpanning) {x : R} :
-    x ∈ S.supportIdeal hS ↔ x ∈ S.support := .rfl
+@[simp]
+theorem mem_supportIdeal {S : Subsemiring R} (hS : S.IsSpanning) {x : R}
+    : x ∈ S.supportIdeal hS ↔ x ∈ S.support :=
+  .rfl
 
-@[simp] theorem supportIdeal_toAddSubgroup {S : Subsemiring R} (hS : S.IsSpanning) :
-    (S.supportIdeal hS).toAddSubgroup = S.support := rfl
+@[simp]
+theorem supportIdeal_toAddSubgroup {S : Subsemiring R} (hS : S.IsSpanning)
+    : (S.supportIdeal hS).toAddSubgroup = S.support :=
+  rfl
 
 end Subsemiring
 
@@ -62,8 +66,8 @@ section CommRing
 
 variable {R : Type*} [CommRing R] (S : Subsemiring R)
 
-theorem AddSubmonoid.IsSpanning.mem_of_isSquare (hS : S.IsSpanning) {x : R} :
-    IsSquare x → x ∈ S := by
+theorem AddSubmonoid.IsSpanning.mem_of_isSquare (hS : S.IsSpanning) {x : R}
+    : IsSquare x → x ∈ S := by
   rintro ⟨y, rfl⟩
   rcases (Subsemiring.isSpanning_def.mp hS) y with hy | hy
   · exact mul_mem hy hy
@@ -75,8 +79,8 @@ theorem AddSubmonoid.IsSpanning.sumSq_le (hS : S.IsSpanning) : .sumSq R ≤ S :=
   rw [← Subsemiring.closure_isSquare, Subsemiring.closure_le]
   exact fun _ ↦ hS.mem_of_isSquare
 
-theorem AddSubmonoid.IsSpanning.mem_of_isSumSq (hS : S.IsSpanning)
-    {x : R} (hx : IsSumSq x) : x ∈ S := by
+theorem AddSubmonoid.IsSpanning.mem_of_isSumSq (hS : S.IsSpanning) {x : R} (hx : IsSumSq x)
+    : x ∈ S := by
   grind [membership, hS.sumSq_le, Subsemiring.mem_sumSq]
 
 grind_pattern [membership] AddSubmonoid.IsSpanning.mem_of_isSumSq => S.IsSpanning, x ∈ S

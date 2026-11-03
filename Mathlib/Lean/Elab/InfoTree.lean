@@ -8,11 +8,10 @@ module
 public import Lean.Elab.InfoTree.Util
 public import Lean.Meta.TryThis
 public import Mathlib.Lean.Environment
-
 import Lean.Elab.Term.TermElabM
 -- Import this linter explicitly to ensure that
 -- this file has a valid copyright header and module docstring.
-import Mathlib.Tactic.Linter.Header  -- shake: keep
+import Mathlib.Tactic.Linter.Header -- shake: keep
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
@@ -39,7 +38,8 @@ where
   go (acc : Array Suggestion) : InfoTree → Array Suggestion
     | .context _ t => go acc t
     | .node i children =>
-      let acc := match i with
+      let acc :=
+        match i with
         | .ofCustomInfo ci =>
           match ci.value.get? TryThisInfo with
           | some tti => acc.push tti.suggestion
@@ -59,22 +59,26 @@ provided via the `ctx?` argument if invoking `findSomeM?` during a larger traver
 infotree. A failure to provide `ctx? := some ctx` when `t` is not the outermost `InfoTree` is thus
 likely to cause `findSomeM?` to always return `none`.
 -/
-partial def findSomeM? {m : Type → Type} [Monad m] {α}
-    (f : ContextInfo → Info → PersistentArray InfoTree → m (Option α))
-    (t : InfoTree) (ctx? : Option ContextInfo := none) : m (Option α) :=
+partial def findSomeM?
+    {m : Type → Type} [Monad m]
+    {α} (f : ContextInfo → Info → PersistentArray InfoTree → m (Option α))
+    (t : InfoTree)
+    (ctx? : Option ContextInfo := none)
+    : m (Option α) :=
   go ctx? t
 where
   /-- Accumulates contexts and visits nodes if `ctx?` is not `none`. -/
   go ctx?
-  | context ctx t => go (ctx.mergeIntoOuter? ctx?) t
-  | node i ts => do
-    let a ← match ctx? with
-      | none => pure none
-      | some ctx => f ctx i ts
-    match a with
-    | some a => pure a
-    | none => ts.findSomeM? (go <| i.updateContext? ctx?)
-  | hole _ => pure none
+    | context ctx t => go (ctx.mergeIntoOuter? ctx?) t
+    | node i ts => do
+      let a ←
+        match ctx? with
+        | none => pure none
+        | some ctx => f ctx i ts
+      match a with
+      | some a => pure a
+      | none => ts.findSomeM? (go <| i.updateContext? ctx?)
+    | hole _ => pure none
 
 /--
 Finds the first result of `f ctx info children` which is `some a`, descending the
@@ -85,8 +89,11 @@ provided via the `ctx?` argument if invoking `findSome?` during a larger travers
 A failure to provide `ctx? := some ctx` when `t` is not the outermost `InfoTree` is thus likely to
 cause `findSome?` to always return `none`.
 -/
-def findSome? {α} (f : ContextInfo → Info → PersistentArray InfoTree → Option α)
-    (t : InfoTree) (ctx? : Option ContextInfo := none) : Option α :=
+def findSome?
+    {α} (f : ContextInfo → Info → PersistentArray InfoTree → Option α)
+    (t : InfoTree)
+    (ctx? : Option ContextInfo := none)
+    : Option α :=
   Id.run <| t.findSomeM? f ctx?
 
 /--
@@ -97,8 +104,11 @@ If `ctx?` is `some ctx`, `ctx` is used as an initial context. A `ctx?` of `none`
 used when operating on the first node of the entire infotree. Otherwise, it is likely that no
 context will be found.
 -/
-def onHighestNode? {α} (t : InfoTree) (ctx? : Option ContextInfo)
-    (f : ContextInfo → Info → PersistentArray InfoTree → α) : Option α :=
+def onHighestNode?
+    {α}
+    (t : InfoTree) (ctx? : Option ContextInfo)
+    (f : ContextInfo → Info → PersistentArray InfoTree → α)
+    : Option α :=
   t.findSome? (ctx? := ctx?) fun ctx i ch => some (f ctx i ch)
 
 /--
@@ -112,9 +122,11 @@ context will be found.
 def getHighestInfo? (t : InfoTree) (ctx? : Option ContextInfo) : Option (ContextInfo × Info) :=
   t.onHighestNode? ctx? fun ctx i _ => (ctx, i)
 
-/-- Gets the first child info of each `Lean.Elab.BodyInfo`, which should be the only child, and
+/--
+Gets the first child info of each `Lean.Elab.BodyInfo`, which should be the only child, and
 should be a `TermInfo`, `PartialTermInfo`, or `TacticInfo`. `getDeclBodyInfos` does not validate
-either of these conditions. -/
+either of these conditions.
+-/
 def getDeclBodyInfos (t : InfoTree) : List (Syntax × ContextInfo × Info) :=
   t.foldInfoTree (init := []) fun ctx t acc =>
     match t with
@@ -145,8 +157,10 @@ def getDeclsByBody (t : InfoTree) : List Name :=
       if i.value.typeName == ``Lean.Elab.Term.BodyInfo then
         if let some decl := ctx.parentDecl? then
           decl :: decls
-        else decls
-      else decls
+        else
+          decls
+      else
+        decls
     | _ => decls
 
 /--
@@ -162,17 +176,18 @@ end InfoTree
 
 namespace Info
 
-/-- Gets the local context, and the expected type of the `Info`.
+/--
+Gets the local context, and the expected type of the `Info`.
 Handles `TacticInfo`s (looking at the first goal), `TermInfo`s, and `PartialTermInfo`s.
 Does not get the metavariable context; assumes that the caller has accumulated an ambient
-`ContextInfo` at this point which is sufficient. -/
+`ContextInfo` at this point which is sufficient.
+-/
 def getLCtx? : Info → Option (LocalContext × Option Expr)
   | .ofTacticInfo i => do
     let g ← i.goalsBefore.head?
     let decl ← i.mctxBefore.findDecl? g
     some (decl.lctx, decl.type)
-  | .ofTermInfo i
-  | .ofPartialTermInfo i => some (i.lctx, i.expectedType?)
+  | .ofTermInfo i | .ofPartialTermInfo i => some (i.lctx, i.expectedType?)
   | _ => none
 
 end Lean.Elab.Info

@@ -29,8 +29,7 @@ open CategoryTheory Localization
 
 namespace CochainComplex.HomComplex
 
-variable {C : Type u} [Category.{v} C] [Abelian C]
-  {K L : CochainComplex C ℤ} {n : ℤ}
+variable {C : Type u} [Category.{v} C] [Abelian C] {K L : CochainComplex C ℤ} {n : ℤ}
 
 namespace CohomologyClass
 
@@ -40,21 +39,26 @@ open DerivedCategory
 
 variable [HasDerivedCategory C]
 
-/-- This is the morphism `Q.obj K ⟶ (Q.obj L)⟦n⟧` in the derived category that is
-attached to a class in `CohomologyClass K L n`. -/
+/--
+This is the morphism `Q.obj K ⟶ (Q.obj L)⟦n⟧` in the derived category that is
+attached to a class in `CohomologyClass K L n`.
+-/
 noncomputable def toShiftedHom (x : CohomologyClass K L n) : Q.obj K ⟶ (Q.obj L)⟦n⟧ :=
-  Quotient.lift (fun y ↦ ShiftedHom.map (Cocycle.equivHomShift.symm y) Q) (fun y₁ y₂ h ↦ by
-    dsimp [ShiftedHom.map]
-    rw [cancel_mono]
-    refine DerivedCategory.Q_map_eq_of_homotopy _
-      (HomotopyCategory.homotopyOfEq _ _ ?_)
-    simp only [← toHom_mk]
-    congr 1
-    exact Quotient.sound h) x
+  Quotient.lift
+    (fun y ↦ ShiftedHom.map (Cocycle.equivHomShift.symm y) Q)
+    (fun y₁ y₂ h ↦ by
+      dsimp [ShiftedHom.map]
+      rw [cancel_mono]
+      refine DerivedCategory.Q_map_eq_of_homotopy _ (HomotopyCategory.homotopyOfEq _ _ ?_)
+      simp only [← toHom_mk]
+      congr 1
+      exact Quotient.sound h)
+    x
 
 @[simp]
-lemma toShiftedHom_mk (y : Cocycle K L n) :
-    toShiftedHom (mk y) = ShiftedHom.map (Cocycle.equivHomShift.symm y) Q := rfl
+lemma toShiftedHom_mk (y : Cocycle K L n)
+    : toShiftedHom (mk y) = ShiftedHom.map (Cocycle.equivHomShift.symm y) Q :=
+  rfl
 
 end
 
@@ -62,26 +66,31 @@ section
 
 variable [HasSmallLocalizedShiftedHom.{w} (HomologicalComplex.quasiIso C (.up ℤ)) ℤ K L]
 
-/-- Given `x : CohomologyClass K L n`, this is the element in the type
-`SmallShiftedHom` relatively to quasi-isomorphisms that is associated to `x`. -/
-noncomputable def toSmallShiftedHom (x : CohomologyClass K L n) :
-    SmallShiftedHom.{w} (HomologicalComplex.quasiIso C (.up ℤ)) K L n :=
-  Quotient.lift (fun y ↦ SmallShiftedHom.mk _ (Cocycle.equivHomShift.symm y)) (fun y₁ y₂ h ↦ by
-    let := HasDerivedCategory.standard C
-    refine (SmallShiftedHom.equiv _ DerivedCategory.Q).injective ?_
-    simp only [SmallShiftedHom.equiv_mk]
-    change toShiftedHom (mk y₁) = toShiftedHom (mk y₂)
-    congr 1
-    exact Quotient.sound h) x
+/--
+Given `x : CohomologyClass K L n`, this is the element in the type
+`SmallShiftedHom` relatively to quasi-isomorphisms that is associated to `x`.
+-/
+noncomputable def toSmallShiftedHom (x : CohomologyClass K L n)
+    : SmallShiftedHom.{w} (HomologicalComplex.quasiIso C (.up ℤ)) K L n :=
+  Quotient.lift
+    (fun y ↦ SmallShiftedHom.mk _ (Cocycle.equivHomShift.symm y))
+    (fun y₁ y₂ h ↦ by
+      let := HasDerivedCategory.standard C
+      refine (SmallShiftedHom.equiv _ DerivedCategory.Q).injective ?_
+      simp only [SmallShiftedHom.equiv_mk]
+      change toShiftedHom (mk y₁) = toShiftedHom (mk y₂)
+      congr 1
+      exact Quotient.sound h)
+    x
 
-lemma toSmallShiftedHom_mk (x : Cocycle K L n) :
-    (mk x).toSmallShiftedHom =
-      SmallShiftedHom.mk _ (Cocycle.equivHomShift.symm x) := rfl
+lemma toSmallShiftedHom_mk (x : Cocycle K L n)
+    : (mk x).toSmallShiftedHom = SmallShiftedHom.mk _ (Cocycle.equivHomShift.symm x) :=
+  rfl
 
 @[simp]
-lemma equiv_toSmallShiftedHom_mk [HasDerivedCategory C] (x : Cocycle K L n) :
-    SmallShiftedHom.equiv _ DerivedCategory.Q (mk x).toSmallShiftedHom =
-      ShiftedHom.map (Cocycle.equivHomShift.symm x) DerivedCategory.Q := by
+lemma equiv_toSmallShiftedHom_mk [HasDerivedCategory C] (x : Cocycle K L n)
+    : SmallShiftedHom.equiv _ DerivedCategory.Q (mk x).toSmallShiftedHom
+      = ShiftedHom.map (Cocycle.equivHomShift.symm x) DerivedCategory.Q := by
   simp [toSmallShiftedHom_mk]
 
 end

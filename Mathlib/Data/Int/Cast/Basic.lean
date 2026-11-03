@@ -25,7 +25,6 @@ By contrast, this file's only import beyond `Mathlib.Data.Int.Cast.Defs` is
 
 public section
 
-
 universe u
 
 namespace Nat
@@ -50,8 +49,8 @@ namespace Int
 variable {R : Type u}
 
 @[simp, norm_cast]
-theorem cast_ite [IntCast R] (P : Prop) [Decidable P] (m n : ℤ) :
-    ((ite P m n : ℤ) : R) = ite P (m : R) (n : R) :=
+theorem cast_ite [IntCast R] (P : Prop) [Decidable P] (m n : ℤ)
+    : ((ite P m n : ℤ) : R) = ite P (m : R) (n : R) :=
   apply_ite _ _ _ _
 
 variable [AddGroupWithOne R]
@@ -59,26 +58,21 @@ variable [AddGroupWithOne R]
 -- TODO: I don't like that `norm_cast` is used here, because it results in `norm_cast`
 -- introducing the "implementation detail" `Int.negSucc`.
 @[simp, norm_cast squash]
-theorem cast_negSucc (n : ℕ) : (-[n+1] : R) = -(n + 1 : ℕ) :=
-  AddGroupWithOne.intCast_negSucc n
+theorem cast_negSucc (n : ℕ) : (-[n+1] : R) = -(n + 1 : ℕ) := AddGroupWithOne.intCast_negSucc n
 
 @[simp, norm_cast]
-theorem cast_zero : ((0 : ℤ) : R) = 0 :=
-  (AddGroupWithOne.intCast_ofNat 0).trans Nat.cast_zero
+theorem cast_zero : ((0 : ℤ) : R) = 0 := (AddGroupWithOne.intCast_ofNat 0).trans Nat.cast_zero
 
 -- This lemma competes with `Int.ofNat_eq_natCast` to come later
 @[simp high, norm_cast]
-theorem cast_natCast (n : ℕ) : ((n : ℤ) : R) = n :=
-  AddGroupWithOne.intCast_ofNat _
+theorem cast_natCast (n : ℕ) : ((n : ℤ) : R) = n := AddGroupWithOne.intCast_ofNat _
 
 @[simp, norm_cast]
-theorem cast_ofNat (n : ℕ) [n.AtLeastTwo] :
-    ((ofNat(n) : ℤ) : R) = ofNat(n) := by
+theorem cast_ofNat (n : ℕ) [n.AtLeastTwo] : ((ofNat(n) : ℤ) : R) = ofNat(n) := by
   simpa only [OfNat.ofNat] using! AddGroupWithOne.intCast_ofNat (R := R) n
 
 @[simp, norm_cast]
-theorem cast_one : ((1 : ℤ) : R) = 1 := by
-  rw [← Int.natCast_one, cast_natCast, Nat.cast_one]
+theorem cast_one : ((1 : ℤ) : R) = 1 := by rw [← Int.natCast_one, cast_natCast, Nat.cast_one]
 
 @[simp, norm_cast]
 theorem cast_neg : ∀ n, ((-n : ℤ) : R) = -n

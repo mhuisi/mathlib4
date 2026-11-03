@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Control.Traversable.Basic
 public import Mathlib.Data.Tree.Basic
-
 import Mathlib.Control.Applicative
 
 /-!
@@ -29,10 +28,12 @@ instance : Traversable BinaryTree where
   traverse := traverse
 
 lemma comp_traverse
-    {F : Type u → Type v} {G : Type v → Type w} [Applicative F] [Applicative G]
-    [LawfulApplicative G] {β : Type v} {γ : Type u} (f : β → F γ) (g : α → G β)
-    (t : BinaryTree α) : t.traverse (Functor.Comp.mk ∘ (f <$> ·) ∘ g) =
-      Functor.Comp.mk ((·.traverse f) <$> (t.traverse g)) := by
+    {F : Type u → Type v} {G : Type v → Type w}
+    [Applicative F] [Applicative G] [LawfulApplicative G]
+    {β : Type v} {γ : Type u} (f : β → F γ) (g : α → G β)
+    (t : BinaryTree α)
+    : t.traverse (Functor.Comp.mk ∘ (f <$> ·) ∘ g)
+      = Functor.Comp.mk ((·.traverse f) <$> (t.traverse g)) := by
   induction t with
   | nil => rw [traverse, traverse, map_pure, traverse]; rfl
   | node v l r hl hr =>
@@ -41,17 +42,21 @@ lemma comp_traverse
       Comp.seq_mk, seq_map_assoc, map_seq]
     rfl
 
-lemma traverse_eq_map_id (f : α → β) (t : BinaryTree α) :
-    t.traverse ((pure : β → Id β) ∘ f) = pure (t.map f) := by
+lemma traverse_eq_map_id (f : α → β) (t : BinaryTree α)
+    : t.traverse ((pure : β → Id β) ∘ f) = pure (t.map f) := by
   induction t with
   | nil => rw [traverse, map]
   | node v l r hl hr =>
     rw [traverse, map, hl, hr, Function.comp_apply, map_pure, pure_seq, map_pure, pure_seq,
       map_pure]
 
-lemma naturality {F G : Type u → Type*} [Applicative F] [Applicative G] [LawfulApplicative F]
-    [LawfulApplicative G] (η : ApplicativeTransformation F G) {β : Type u} (f : α → F β)
-    (t : BinaryTree α) : η (t.traverse f) = t.traverse (η.app β ∘ f : α → G β) := by
+lemma naturality
+    {F G : Type u → Type*}
+    [Applicative F] [Applicative G] [LawfulApplicative F] [LawfulApplicative G]
+    (η : ApplicativeTransformation F G)
+    {β : Type u} (f : α → F β)
+    (t : BinaryTree α)
+    : η (t.traverse f) = t.traverse (η.app β ∘ f : α → G β) := by
   induction t with
   | nil => rw [traverse, traverse, η.preserves_pure]
   | node v l r hl hr =>

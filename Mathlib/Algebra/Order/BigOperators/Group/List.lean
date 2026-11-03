@@ -28,25 +28,28 @@ section Monoid
 variable [Monoid M]
 
 @[to_additive]
-lemma Forall₂.prod_le_prod [Preorder M] [MulRightMono M]
-    [MulLeftMono M] {l₁ l₂ : List M} (h : Forall₂ (· ≤ ·) l₁ l₂) :
-    l₁.prod ≤ l₂.prod := by
+lemma Forall₂.prod_le_prod
+    [Preorder M] [MulRightMono M] [MulLeftMono M] {l₁ l₂ : List M} (h : Forall₂ (· ≤ ·) l₁ l₂)
+    : l₁.prod ≤ l₂.prod := by
   induction h with
   | nil => rfl
   | cons hab ih ih' => simpa only [prod_cons] using mul_le_mul' hab ih'
 
 @[deprecated (since := "2026-09-01")] alias Forall₂.prod_le_prod' := Forall₂.prod_le_prod
 
-/-- If `l₁` is a sublist of `l₂` and all elements of `l₂` are greater than or equal to one, then
+/--
+If `l₁` is a sublist of `l₂` and all elements of `l₂` are greater than or equal to one, then
 `l₁.prod ≤ l₂.prod`. One can prove a stronger version assuming `∀ a ∈ l₂.diff l₁, 1 ≤ a` instead
-of `∀ a ∈ l₂, 1 ≤ a` but this lemma is not yet in `mathlib`. -/
+of `∀ a ∈ l₂, 1 ≤ a` but this lemma is not yet in `mathlib`.
+-/
 @[to_additive /-- If `l₁` is a sublist of `l₂` and all elements of `l₂` are nonnegative,
   then `l₁.sum ≤ l₂.sum`.
   One can prove a stronger version assuming `∀ a ∈ l₂.diff l₁, 0 ≤ a` instead of `∀ a ∈ l₂, 0 ≤ a`
   but this lemma is not yet in `mathlib`. -/]
-lemma Sublist.prod_le_prod [Preorder M] [MulRightMono M]
-    [MulLeftMono M] {l₁ l₂ : List M} (h : l₁ <+ l₂)
-    (h₁ : ∀ a ∈ l₂, (1 : M) ≤ a) : l₁.prod ≤ l₂.prod := by
+lemma Sublist.prod_le_prod
+    [Preorder M] [MulRightMono M] [MulLeftMono M]
+    {l₁ l₂ : List M} (h : l₁ <+ l₂) (h₁ : ∀ a ∈ l₂, (1 : M) ≤ a)
+    : l₁.prod ≤ l₂.prod := by
   induction h with
   | slnil => rfl
   | cons a _ ih =>
@@ -59,10 +62,10 @@ lemma Sublist.prod_le_prod [Preorder M] [MulRightMono M]
 @[deprecated (since := "2026-09-01")] alias Sublist.prod_le_prod' := Sublist.prod_le_prod
 
 @[to_additive]
-lemma SublistForall₂.prod_le_prod [Preorder M]
-    [MulRightMono M] [MulLeftMono M]
-    {l₁ l₂ : List M} (h : SublistForall₂ (· ≤ ·) l₁ l₂) (h₁ : ∀ a ∈ l₂, (1 : M) ≤ a) :
-    l₁.prod ≤ l₂.prod :=
+lemma SublistForall₂.prod_le_prod
+    [Preorder M] [MulRightMono M] [MulLeftMono M]
+    {l₁ l₂ : List M} (h : SublistForall₂ (· ≤ ·) l₁ l₂) (h₁ : ∀ a ∈ l₂, (1 : M) ≤ a)
+    : l₁.prod ≤ l₂.prod :=
   let ⟨_, hall, hsub⟩ := sublistForall₂_iff.1 h
   hall.prod_le_prod.trans <| hsub.prod_le_prod h₁
 
@@ -70,18 +73,19 @@ lemma SublistForall₂.prod_le_prod [Preorder M]
 alias SublistForall₂.prod_le_prod' := SublistForall₂.prod_le_prod
 
 @[to_additive]
-lemma prod_le_prod [Preorder M] [MulRightMono M]
-    [MulLeftMono M] {l : List ι} {f g : ι → M} (h : ∀ i ∈ l, f i ≤ g i) :
-    (l.map f).prod ≤ (l.map g).prod :=
+lemma prod_le_prod
+    [Preorder M] [MulRightMono M] [MulLeftMono M]
+    {l : List ι} {f g : ι → M} (h : ∀ i ∈ l, f i ≤ g i)
+    : (l.map f).prod ≤ (l.map g).prod :=
   Forall₂.prod_le_prod <| by simpa
 
 @[deprecated (since := "2026-09-01")] alias prod_le_prod' := prod_le_prod
 
 @[to_additive]
-lemma prod_lt_prod [Preorder M] [MulLeftStrictMono M]
-    [MulLeftMono M] [MulRightStrictMono M]
-    [MulRightMono M] {l : List ι} (f g : ι → M)
-    (h₁ : ∀ i ∈ l, f i ≤ g i) (h₂ : ∃ i ∈ l, f i < g i) : (l.map f).prod < (l.map g).prod := by
+lemma prod_lt_prod
+    [Preorder M] [MulLeftStrictMono M] [MulLeftMono M] [MulRightStrictMono M] [MulRightMono M]
+    {l : List ι} (f g : ι → M) (h₁ : ∀ i ∈ l, f i ≤ g i) (h₂ : ∃ i ∈ l, f i < g i)
+    : (l.map f).prod < (l.map g).prod := by
   induction l with
   | nil => simp at h₂
   | cons i l ihl =>
@@ -94,53 +98,56 @@ lemma prod_lt_prod [Preorder M] [MulLeftStrictMono M]
 @[deprecated (since := "2026-09-01")] alias prod_lt_prod' := prod_lt_prod
 
 @[to_additive]
-lemma prod_lt_prod_of_ne_nil [Preorder M] [MulLeftStrictMono M]
-    [MulLeftMono M] [MulRightStrictMono M]
-    [MulRightMono M] {l : List ι} (hl : l ≠ []) (f g : ι → M)
-    (hlt : ∀ i ∈ l, f i < g i) : (l.map f).prod < (l.map g).prod :=
+lemma prod_lt_prod_of_ne_nil
+    [Preorder M] [MulLeftStrictMono M] [MulLeftMono M] [MulRightStrictMono M] [MulRightMono M]
+    {l : List ι} (hl : l ≠ [])
+    (f g : ι → M) (hlt : ∀ i ∈ l, f i < g i)
+    : (l.map f).prod < (l.map g).prod :=
   (prod_lt_prod f g fun i hi => (hlt i hi).le) <|
     (exists_mem_of_ne_nil l hl).imp fun i hi => ⟨hi, hlt i hi⟩
 
 @[to_additive sum_le_length_nsmul]
-lemma prod_le_pow_length [Preorder M] [MulRightMono M]
-    [MulLeftMono M] (l : List M) (n : M) (h : ∀ x ∈ l, x ≤ n) :
-    l.prod ≤ n ^ l.length := by
+lemma prod_le_pow_length
+    [Preorder M] [MulRightMono M] [MulLeftMono M] (l : List M) (n : M) (h : ∀ x ∈ l, x ≤ n)
+    : l.prod ≤ n ^ l.length := by
   simpa only [map_id', map_const', prod_replicate] using prod_le_prod h
 
 @[to_additive (attr := deprecated (since := "2026-08-26")) sum_le_card_nsmul]
 alias prod_le_pow_card := prod_le_pow_length
 
 @[to_additive length_nsmul_le_sum]
-lemma pow_length_le_prod [Preorder M] [MulRightMono M]
-    [MulLeftMono M] (l : List M) (n : M) (h : ∀ x ∈ l, n ≤ x) :
-    n ^ l.length ≤ l.prod :=
-  @prod_le_pow_length Mᵒᵈ _ _ _ _ l n h
+lemma pow_length_le_prod
+    [Preorder M] [MulRightMono M] [MulLeftMono M] (l : List M) (n : M) (h : ∀ x ∈ l, n ≤ x)
+    : n ^ l.length ≤ l.prod :=
+  @prod_le_pow_length (Mᵒᵈ) _ _ _ _ l n h
 
 @[to_additive (attr := deprecated (since := "2026-08-26")) card_nsmul_le_sum]
 alias pow_card_le_prod := pow_length_le_prod
 
 @[to_additive]
-lemma exists_lt_of_prod_lt [LinearOrder M] [MulRightMono M]
-    [MulLeftMono M] {l : List ι} (f g : ι → M)
-    (h : (l.map f).prod < (l.map g).prod) : ∃ i ∈ l, f i < g i := by
+lemma exists_lt_of_prod_lt
+    [LinearOrder M] [MulRightMono M] [MulLeftMono M]
+    {l : List ι} (f g : ι → M) (h : (l.map f).prod < (l.map g).prod)
+    : ∃ i ∈ l, f i < g i := by
   contrapose! h
   exact prod_le_prod h
 
 @[deprecated (since := "2026-09-01")] alias exists_lt_of_prod_lt' := exists_lt_of_prod_lt
 
 @[to_additive]
-lemma exists_le_of_prod_le [LinearOrder M] [MulLeftStrictMono M]
-    [MulLeftMono M] [MulRightStrictMono M]
-    [MulRightMono M] {l : List ι} (hl : l ≠ []) (f g : ι → M)
-    (h : (l.map f).prod ≤ (l.map g).prod) : ∃ x ∈ l, f x ≤ g x := by
+lemma exists_le_of_prod_le
+    [LinearOrder M] [MulLeftStrictMono M] [MulLeftMono M] [MulRightStrictMono M] [MulRightMono M]
+    {l : List ι} (hl : l ≠ [])
+    (f g : ι → M) (h : (l.map f).prod ≤ (l.map g).prod)
+    : ∃ x ∈ l, f x ≤ g x := by
   contrapose! h
   exact prod_lt_prod_of_ne_nil hl _ _ h
 
 @[deprecated (since := "2026-09-01")] alias exists_le_of_prod_le' := exists_le_of_prod_le
 
 @[to_additive sum_nonneg]
-lemma one_le_prod_of_one_le [Preorder M] [MulLeftMono M] {l : List M}
-    (hl₁ : ∀ x ∈ l, (1 : M) ≤ x) : 1 ≤ l.prod := by
+lemma one_le_prod_of_one_le [Preorder M] [MulLeftMono M] {l : List M} (hl₁ : ∀ x ∈ l, (1 : M) ≤ x)
+    : 1 ≤ l.prod := by
   -- We don't use `pow_length_le_prod` to avoid having to assume `[MulRightMono M]`
   induction l with
   | nil => rfl
@@ -149,18 +156,16 @@ lemma one_le_prod_of_one_le [Preorder M] [MulLeftMono M] {l : List M}
     exact one_le_mul (hl₁ hd mem_cons_self) (ih fun x h => hl₁ x (mem_cons_of_mem hd h))
 
 @[to_additive]
-lemma max_prod_le (l : List α) (f g : α → M) [LinearOrder M]
-    [MulLeftMono M] [MulRightMono M] :
-    max (l.map f).prod (l.map g).prod ≤ (l.map fun i ↦ max (f i) (g i)).prod := by
+lemma max_prod_le (l : List α) (f g : α → M) [LinearOrder M] [MulLeftMono M] [MulRightMono M]
+    : max (l.map f).prod (l.map g).prod ≤ (l.map fun i ↦ max (f i) (g i)).prod := by
   rw [max_le_iff]
   constructor <;> apply List.prod_le_prod <;> intros
   · apply le_max_left
   · apply le_max_right
 
 @[to_additive]
-lemma prod_min_le [LinearOrder M] [MulLeftMono M]
-    [MulRightMono M] (l : List α) (f g : α → M) :
-    (l.map fun i ↦ min (f i) (g i)).prod ≤ min (l.map f).prod (l.map g).prod := by
+lemma prod_min_le [LinearOrder M] [MulLeftMono M] [MulRightMono M] (l : List α) (f g : α → M)
+    : (l.map fun i ↦ min (f i) (g i)).prod ≤ min (l.map f).prod (l.map g).prod := by
   rw [le_min_iff]
   constructor <;> apply List.prod_le_prod <;> intros
   · apply min_le_left
@@ -168,7 +173,8 @@ lemma prod_min_le [LinearOrder M] [MulLeftMono M]
 
 variable [Preorder M] [CanonicallyOrderedMul M]
 
-@[to_additive] lemma monotone_prod_take (L : List M) : Monotone fun i ↦ (L.take i).prod := by
+@[to_additive]
+lemma monotone_prod_take (L : List M) : Monotone fun i ↦ (L.take i).prod := by
   refine monotone_nat_of_le_succ fun n => ?_
   rcases lt_or_ge n L.length with h | h
   · rw [prod_take_succ _ _ h]
@@ -194,10 +200,13 @@ section
 variable {α β : Type*} [Monoid α] [CommMonoid β] [Preorder β] [IsOrderedMonoid β]
 
 @[to_additive le_sum_of_subadditive_on_pred]
-lemma le_prod_of_submultiplicative_on_pred (f : α → β)
-    (p : α → Prop) (h_one : f 1 ≤ 1) (hp_one : p 1)
-    (h_mul : ∀ a b, p a → p b → f (a * b) ≤ f a * f b) (hp_mul : ∀ a b, p a → p b → p (a * b))
-    (l : List α) (hpl : ∀ a, a ∈ l → p a) : f l.prod ≤ (l.map f).prod := by
+lemma le_prod_of_submultiplicative_on_pred
+    (f : α → β)
+    (p : α → Prop)
+    (h_one : f 1 ≤ 1) (hp_one : p 1) (h_mul : ∀ a b, p a → p b → f (a * b) ≤ f a * f b)
+    (hp_mul : ∀ a b, p a → p b → p (a * b))
+    (l : List α) (hpl : ∀ a, a ∈ l → p a)
+    : f l.prod ≤ (l.map f).prod := by
   induction l with
   | nil => simp [h_one]
   | cons a s ih =>
@@ -206,15 +215,21 @@ lemma le_prod_of_submultiplicative_on_pred (f : α → β)
     grw [prod_cons, map_cons, prod_cons, h_mul a s.prod (hpl _ mem_cons_self) hp_prod, ih hpla]
 
 @[to_additive le_sum_of_subadditive]
-lemma le_prod_of_submultiplicative (f : α → β) (h_one : f 1 ≤ 1)
-    (h_mul : ∀ a b, f (a * b) ≤ f a * f b) (l : List α) : f l.prod ≤ (l.map f).prod :=
-  le_prod_of_submultiplicative_on_pred f (fun _ => True) h_one trivial (fun x y _ _ => h_mul x y)
+lemma le_prod_of_submultiplicative
+    (f : α → β) (h_one : f 1 ≤ 1) (h_mul : ∀ a b, f (a * b) ≤ f a * f b) (l : List α)
+    : f l.prod ≤ (l.map f).prod :=
+  le_prod_of_submultiplicative_on_pred f
+    (fun _ => True)
+    h_one trivial
+    (fun x y _ _ => h_mul x y)
     (by simp) l (by simp)
 
 @[to_additive le_sum_nonempty_of_subadditive_on_pred]
-lemma le_prod_nonempty_of_submultiplicative_on_pred (f : α → β) (p : α → Prop)
+lemma le_prod_nonempty_of_submultiplicative_on_pred
+    (f : α → β) (p : α → Prop)
     (h_mul : ∀ a b, p a → p b → f (a * b) ≤ f a * f b) (hp_mul : ∀ a b, p a → p b → p (a * b))
-    (l : List α) (hl_nonempty : l ≠ []) (hl : ∀ a, a ∈ l → p a) : f l.prod ≤ (l.map f).prod := by
+    (l : List α) (hl_nonempty : l ≠ []) (hl : ∀ a, a ∈ l → p a)
+    : f l.prod ≤ (l.map f).prod := by
   induction l with
   | nil => simp at hl_nonempty
   | cons a l ih =>
@@ -227,16 +242,21 @@ lemma le_prod_nonempty_of_submultiplicative_on_pred (f : α → β) (p : α → 
     grw [h_mul a _ hp_a hp_sup, ← ih hl_empty hla_restrict]
 
 @[to_additive le_sum_nonempty_of_subadditive]
-lemma le_prod_nonempty_of_submultiplicative (f : α → β) (h_mul : ∀ a b, f (a * b) ≤ f a * f b)
-    (l : List α) (hs_nonempty : l ≠ ∅) : f l.prod ≤ (l.map f).prod :=
-  le_prod_nonempty_of_submultiplicative_on_pred f (fun _ => True) (by simp [h_mul]) (by simp) l
-    hs_nonempty (by simp)
+lemma le_prod_nonempty_of_submultiplicative
+    (f : α → β) (h_mul : ∀ a b, f (a * b) ≤ f a * f b) (l : List α) (hs_nonempty : l ≠ ∅)
+    : f l.prod ≤ (l.map f).prod :=
+  le_prod_nonempty_of_submultiplicative_on_pred f
+    (fun _ => True)
+    (by simp [h_mul]) (by simp) l hs_nonempty (by simp)
 
 end
 
 -- TODO: develop theory of tropical rings
-lemma sum_le_foldr_max [AddZeroClass M] [Zero N] [LinearOrder N] (f : M → N) (h0 : f 0 ≤ 0)
-    (hadd : ∀ x y, f (x + y) ≤ max (f x) (f y)) (l : List M) : f l.sum ≤ (l.map f).foldr max 0 := by
+lemma sum_le_foldr_max
+    [AddZeroClass M] [Zero N] [LinearOrder N]
+    (f : M → N) (h0 : f 0 ≤ 0) (hadd : ∀ x y, f (x + y) ≤ max (f x) (f y))
+    (l : List M)
+    : f l.sum ≤ (l.map f).foldr max 0 := by
   induction l with
   | nil => simpa using h0
   | cons hd tl IH =>
@@ -244,8 +264,8 @@ lemma sum_le_foldr_max [AddZeroClass M] [Zero N] [LinearOrder N] (f : M → N) (
     exact (hadd _ _).trans (max_le_max le_rfl IH)
 
 @[to_additive sum_pos]
-lemma one_lt_prod_of_one_lt [CommMonoid M] [Preorder M] [IsOrderedMonoid M] :
-    ∀ l : List M, (∀ x ∈ l, (1 : M) < x) → l ≠ [] → 1 < l.prod
+lemma one_lt_prod_of_one_lt [CommMonoid M] [Preorder M] [IsOrderedMonoid M]
+    : ∀ l : List M, (∀ x ∈ l, (1 : M) < x) → l ≠ [] → 1 < l.prod
   | [], _, h => (h rfl).elim
   | [b], h, _ => by simpa using h
   | a :: b :: l, hl₁, _ => by
@@ -257,9 +277,9 @@ lemma one_lt_prod_of_one_lt [CommMonoid M] [Preorder M] [IsOrderedMonoid M] :
 
 /-- See also `List.le_prod_of_mem`. -/
 @[to_additive /-- See also `List.le_sum_of_mem`. -/]
-lemma single_le_prod [CommMonoid M] [Preorder M] [IsOrderedMonoid M]
-    {l : List M} (hl₁ : ∀ x ∈ l, (1 : M) ≤ x) :
-    ∀ x ∈ l, x ≤ l.prod := by
+lemma single_le_prod
+    [CommMonoid M] [Preorder M] [IsOrderedMonoid M] {l : List M} (hl₁ : ∀ x ∈ l, (1 : M) ≤ x)
+    : ∀ x ∈ l, x ≤ l.prod := by
   induction l
   · simp
   simp_rw [prod_cons, forall_mem_cons] at hl₁ ⊢
@@ -268,30 +288,37 @@ lemma single_le_prod [CommMonoid M] [Preorder M] [IsOrderedMonoid M]
   case cons.right hd tl ih => exact fun x H => le_mul_of_one_le_of_le hl₁.1 (ih hl₁.right x H)
 
 @[to_additive all_zero_of_le_zero_le_of_sum_eq_zero]
-lemma all_one_of_le_one_le_of_prod_eq_one [CommMonoid M] [PartialOrder M] [IsOrderedMonoid M]
-    {l : List M} (hl₁ : ∀ x ∈ l, (1 : M) ≤ x) (hl₂ : l.prod = 1) {x : M} (hx : x ∈ l) : x = 1 :=
+lemma all_one_of_le_one_le_of_prod_eq_one
+    [CommMonoid M] [PartialOrder M] [IsOrderedMonoid M]
+    {l : List M} (hl₁ : ∀ x ∈ l, (1 : M) ≤ x) (hl₂ : l.prod = 1)
+    {x : M} (hx : x ∈ l)
+    : x = 1 :=
   _root_.le_antisymm (hl₂ ▸ single_le_prod hl₁ _ hx) (hl₁ x hx)
 
-@[to_additive] lemma prod_eq_one_iff [CommMonoid M] [PartialOrder M] [IsOrderedMonoid M]
-     [CanonicallyOrderedMul M] {l : List M} : l.prod = 1 ↔ ∀ x ∈ l, x = (1 : M) :=
-  ⟨all_one_of_le_one_le_of_prod_eq_one fun _ _ => one_le, fun h => by
+@[to_additive]
+lemma prod_eq_one_iff
+    [CommMonoid M] [PartialOrder M] [IsOrderedMonoid M] [CanonicallyOrderedMul M] {l : List M}
+    : l.prod = 1 ↔ ∀ x ∈ l, x = (1 : M) := ⟨
+  all_one_of_le_one_le_of_prod_eq_one fun _ _ => one_le,
+  fun h => by
     rw [List.eq_replicate_iff.2 ⟨_, h⟩, prod_replicate, one_pow]
     · exact (length l)
-    · rfl⟩
+    · rfl
+⟩
 
 section ProdSum
 
-variable {α β : Type*} [Monoid α] [AddMonoid β] [Preorder β] [AddLeftMono β]
-  (l : List α) (f : α → β)
+variable
+  {α β : Type*} [Monoid α] [AddMonoid β] [Preorder β] [AddLeftMono β] (l : List α) (f : α → β)
 
-theorem apply_prod_le_sum_map (h_one : f 1 ≤ 0) (h_mul : ∀ (a b : α), f (a * b) ≤ f a + f b) :
-    f l.prod ≤ (l.map f).sum := by
+theorem apply_prod_le_sum_map (h_one : f 1 ≤ 0) (h_mul : ∀ (a b : α), f (a * b) ≤ f a + f b)
+    : f l.prod ≤ (l.map f).sum := by
   induction l with
   | nil => simp [h_one]
   | cons hd tl IH => grw [prod_cons, h_mul, IH]; simp
 
-theorem sum_map_le_apply_prod (h_one : 0 ≤ f 1) (h_mul : ∀ (a b : α), f a + f b ≤ f (a * b)) :
-    (l.map f).sum ≤ f l.prod :=
+theorem sum_map_le_apply_prod (h_one : 0 ≤ f 1) (h_mul : ∀ (a b : α), f a + f b ≤ f (a * b))
+    : (l.map f).sum ≤ f l.prod :=
   apply_prod_le_sum_map (β := βᵒᵈ) l f h_one h_mul
 
 end ProdSum

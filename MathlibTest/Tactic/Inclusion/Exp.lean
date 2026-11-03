@@ -6,7 +6,6 @@ Authors: Rao Xiaojia
 module
 
 meta import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
-
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Tactic
 

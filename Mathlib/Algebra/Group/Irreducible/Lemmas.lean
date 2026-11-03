@@ -8,7 +8,6 @@ module
 public import Mathlib.Algebra.Group.Even
 public import Mathlib.Algebra.Group.Irreducible.Defs
 public import Mathlib.Algebra.Group.Units.Equiv
-
 import Mathlib.Algebra.Group.Commute.Units
 
 /-!
@@ -66,8 +65,8 @@ lemma irreducible_mul_isUnit (h : IsUnit x) : Irreducible (y * x) ↔ Irreducibl
   hx ▸ irreducible_mul_units x
 
 @[to_additive]
-lemma irreducible_mul_iff :
-    Irreducible (x * y) ↔ Irreducible x ∧ IsUnit y ∨ Irreducible y ∧ IsUnit x := by
+lemma irreducible_mul_iff
+    : Irreducible (x * y) ↔ Irreducible x ∧ IsUnit y ∨ Irreducible y ∧ IsUnit x := by
   constructor
   · refine fun h => Or.imp (fun h' => ⟨?_, h'⟩) (fun h' => ⟨?_, h'⟩) (h.isUnit_or_isUnit rfl).symm
     · rwa [irreducible_mul_isUnit h'] at h
@@ -94,19 +93,20 @@ alias ⟨_, Irreducible.map⟩ := MulEquiv.irreducible_iff
 
 end MulEquivClass
 
-lemma Irreducible.of_map [FunLike F M N] [MonoidHomClass F M N] [IsLocalHom f]
-    (hfx : Irreducible (f x)) : Irreducible x where
+lemma Irreducible.of_map
+    [FunLike F M N] [MonoidHomClass F M N] [IsLocalHom f] (hfx : Irreducible (f x))
+    : Irreducible x where
   not_isUnit hu := hfx.not_isUnit <| hu.map f
   isUnit_or_isUnit := by
     rintro p q rfl; exact (hfx.isUnit_or_isUnit <| map_mul f p q).imp (.of_map f _) (.of_map f _)
 
 @[to_additive]
-lemma Irreducible.not_isSquare (ha : Irreducible x) : ¬IsSquare x := by
+lemma Irreducible.not_isSquare (ha : Irreducible x) : ¬ IsSquare x := by
   rw [isSquare_iff_exists_sq]
   rintro ⟨y, rfl⟩
   exact not_irreducible_pow (by decide) ha
 
 @[to_additive]
-lemma IsSquare.not_irreducible (ha : IsSquare x) : ¬Irreducible x := fun h => h.not_isSquare ha
+lemma IsSquare.not_irreducible (ha : IsSquare x) : ¬ Irreducible x := fun h => h.not_isSquare ha
 
 end Monoid

@@ -47,7 +47,8 @@ attribute [aesop (rule_sets := [finiteness]) safe -50] assumption intros
 
 add_aesop_rules safe tactic (rule_sets := [finiteness]) (by positivity)
 
-/-- `finiteness` proves goals of the form `*** < ∞` and (equivalently) `*** ≠ ∞` in the extended
+/--
+`finiteness` proves goals of the form `*** < ∞` and (equivalently) `*** ≠ ∞` in the extended
 nonnegative reals (`ℝ≥0∞`). If the goal cannot be proven, `finiteness` prints a warning and shows
 its intermediate progress.
 
@@ -72,42 +73,43 @@ This tactic is extensible. By adding more rules, `finiteness` can prove more goa
 syntax (name := finiteness) "finiteness" Aesop.tactic_clause* (ppSpace "[" term,* "]")? : tactic
 
 macro_rules
-| `(tactic | finiteness $c:Aesop.tactic_clause*) => `(tactic|
-  classical
-  aesop $c*
-    (config := { introsTransparency? := some .reducible, terminal := true, enableSimp := false })
-    (rule_sets := [$(Lean.mkIdent `finiteness):ident, -default, -builtin]))
-| `(tactic| finiteness $c:Aesop.tactic_clause* [$h,*]) =>
-  `(tactic| · ($[have := $h];*); finiteness $c*)
+  | `(tactic | finiteness $c:Aesop.tactic_clause*) =>
+    `(tactic|
+      classical
+      aesop $c*
+        (config := { introsTransparency? := some .reducible, terminal := true, enableSimp := false })
+        (rule_sets := [$(Lean.mkIdent `finiteness):ident, -default, -builtin]))
+  | `(tactic| finiteness $c:Aesop.tactic_clause* [$h,*]) =>
+    `(tactic| · ($[have := $h];*); finiteness $c*)
 
 @[tactic_alt finiteness]
 syntax (name := finiteness?) "finiteness?" Aesop.tactic_clause* (ppSpace "[" term,* "]")? : tactic
 
 macro_rules
-| `(tactic | finiteness? $c:Aesop.tactic_clause*) =>
-`(tactic|
-  classical
-  aesop? $c*
-    (config := { introsTransparency? := some .reducible, terminal := true, enableSimp := false })
-    (rule_sets := [$(Lean.mkIdent `finiteness):ident, -default, -builtin]))
-| `(tactic| finiteness? $c:Aesop.tactic_clause* [$h,*]) =>
-  `(tactic| · ($[have := $h];*); finiteness? $c*)
-
+  | `(tactic | finiteness? $c:Aesop.tactic_clause*) =>
+    `(tactic|
+      classical
+      aesop? $c*
+        (config := { introsTransparency? := some .reducible, terminal := true, enableSimp := false })
+        (rule_sets := [$(Lean.mkIdent `finiteness):ident, -default, -builtin]))
+  | `(tactic| finiteness? $c:Aesop.tactic_clause* [$h,*]) =>
+    `(tactic| · ($[have := $h];*); finiteness? $c*)
 
 @[tactic_alt finiteness]
 syntax (name := finiteness_nonterminal)
-"finiteness_nonterminal" Aesop.tactic_clause* (ppSpace "[" term,* "]")? : tactic
+  "finiteness_nonterminal" Aesop.tactic_clause* (ppSpace "[" term,* "]")?
+  : tactic
 
 macro_rules
-| `(tactic | finiteness_nonterminal $c:Aesop.tactic_clause*) =>
-`(tactic|
-  classical
-  aesop $c*
-    (config := { introsTransparency? := some .reducible, terminal := false, enableSimp := false,
-                 warnOnNonterminal := false })
-    (rule_sets := [$(Lean.mkIdent `finiteness):ident, -default, -builtin]))
-| `(tactic| finiteness_nonterminal $c:Aesop.tactic_clause* [$h,*]) =>
-  `(tactic| · ($[have := $h];*); finiteness_nonterminal $c*)
+  | `(tactic | finiteness_nonterminal $c:Aesop.tactic_clause*) =>
+    `(tactic|
+      classical
+      aesop $c*
+        (config := { introsTransparency? := some .reducible, terminal := false, enableSimp := false,
+                     warnOnNonterminal := false })
+        (rule_sets := [$(Lean.mkIdent `finiteness):ident, -default, -builtin]))
+  | `(tactic| finiteness_nonterminal $c:Aesop.tactic_clause* [$h,*]) =>
+    `(tactic| · ($[have := $h];*); finiteness_nonterminal $c*)
 
 /-!
 We register `finiteness` with the `hint` tactic.

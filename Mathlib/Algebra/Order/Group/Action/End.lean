@@ -30,7 +30,8 @@ instance applyMulAction : MulAction (r →r r) α where
 
 @[simp] lemma smul_def (f : r →r r) (a : α) : f • a = f a := rfl
 
-instance apply_faithfulSMul : FaithfulSMul (r →r r) α where eq_of_smul_eq_smul h := RelHom.ext h
+instance apply_faithfulSMul : FaithfulSMul (r →r r) α where
+  eq_of_smul_eq_smul h := RelHom.ext h
 
 end RelHom
 
@@ -45,7 +46,8 @@ instance applyMulAction : MulAction (r ↪r r) α where
 
 @[simp] lemma smul_def (f : r ↪r r) (a : α) : f • a = f a := rfl
 
-instance apply_faithfulSMul : FaithfulSMul (r ↪r r) α where eq_of_smul_eq_smul h := ext h
+instance apply_faithfulSMul : FaithfulSMul (r ↪r r) α where
+  eq_of_smul_eq_smul h := ext h
 
 end RelEmbedding
 
@@ -60,6 +62,7 @@ instance applyMulAction : MulAction (r ≃r r) α where
 
 @[simp] lemma smul_def (f : r ≃r r) (a : α) : f • a = f a := rfl
 
-instance apply_faithfulSMul : FaithfulSMul (r ≃r r) α where eq_of_smul_eq_smul h := RelIso.ext h
+instance apply_faithfulSMul : FaithfulSMul (r ≃r r) α where
+  eq_of_smul_eq_smul h := RelIso.ext h
 
 end RelIso

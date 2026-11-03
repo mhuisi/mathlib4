@@ -8,7 +8,6 @@ module
 public meta import Batteries.Util.LibraryNote
 public meta import Lean.Elab.DocString
 public meta import Mathlib.Tactic.Linter.Style -- To silence `defsWithUnderscore` linter
-
 import Mathlib.Tactic.Linter.Header -- Since this file is imported by `Mathlib.Init`.
 
 set_option doc.verso true
@@ -52,10 +51,12 @@ Extracts the single code literal from the contents of a role, such as the {lit}`
 in {lit}`` {role}`x` ``.
 -/
 def soleCode (xs : Array VersoInline) : DocM VersoCode := do
-  let xs := xs.filter fun x => match VersoInline.view x with
-    | .text s => !s.getVersoText.all Char.isWhitespace
-    | .linebreak _ => false
-    | _ => true
+  let xs :=
+    xs.filter fun x =>
+      match VersoInline.view x with
+      | .text s => ! s.getVersoText.all Char.isWhitespace
+      | .linebreak _ => false
+      | _ => true
   if h : xs.size ≠ 1 then
     throwErrorAt (mkNullNode xs) "Expected a single code element"
   else
@@ -63,15 +64,16 @@ def soleCode (xs : Array VersoInline) : DocM VersoCode := do
     | .code c => return c.content
     | other => throwErrorAt other.stx "Expected a code element"
 
-/-- Whether {name}`bib` (the contents of {lit}`docs/references.bib`) contains an entry with
-the given key. -/
+/--
+Whether {name}`bib` (the contents of {lit}`docs/references.bib`) contains an entry with
+the given key.
+-/
 def bibContainsKey (bib : String) (key : String) : Bool := Id.run do
   for line in bib.splitOn "\n" do
     let line := line.trimAscii.copy
     if line.startsWith "@" then
       match line.splitOn "{" with
-      | _ :: rest :: _ =>
-        if (rest.takeWhile (· != ',')).trimAscii.copy == key then return true
+      | _ :: rest :: _ => if (rest.takeWhile (· != ',')).trimAscii.copy == key then return true
       | _ => pure ()
   return false
 
@@ -89,11 +91,12 @@ def url (xs : TSyntaxArray `Lean.Doc.Parser.inline) : DocM (Inline ElabInline) :
   let target := s.view
   return .link #[.text target] target
 
-/-- If {name}`doc.verso.libraryNote.warnOnMissing` is enabled, a {lit}`{library_note}`
+/--
+If {name}`doc.verso.libraryNote.warnOnMissing` is enabled, a {lit}`{library_note}`
 reference that is not in scope generates a warning.
 -/
 register_option doc.verso.libraryNote.warnOnMissing : Bool := {
-  defValue := true,
+  defValue := true
   descr := "whether to warn if a `{library_note}` reference cannot be resolved"
 }
 
@@ -111,12 +114,16 @@ def «library_note» (xs : TSyntaxArray `Lean.Doc.Parser.inline) : DocM (Inline 
   let s ← Mathlib.VersoRoles.soleCode xs
   let label := s.view
   if ← doc.verso.libraryNote.warnOnMissing.getM then
-    /- Note that `Batteries.Util.LibraryNote.libraryNoteExt` initializes its state by flattening
-    all imported library notes into the state array. -/
+    /-
+    Note that `Batteries.Util.LibraryNote.libraryNoteExt` initializes its state by flattening
+    all imported library notes into the state array.
+    -/
     let labels := Batteries.Util.LibraryNote.libraryNoteExt.getState (← getEnv)
-    if !labels.any (·.toString (escape := false) == label) then
-      logWarningAt s m!"No library note with label `{label}`.{.note m!"This warning can be \
-        disabled with `set_option {doc.verso.libraryNote.warnOnMissing.name} false`."}"
+    if ! labels.any (·.toString (escape := false) == label) then
+      logWarningAt s
+        m!"No library note with label `{label}`.\
+          {.note m!"This warning can be \
+            disabled with `set_option {doc.verso.libraryNote.warnOnMissing.name} false`."}"
   return .code label
 
 attribute [nolint defsWithUnderscore] «library_note».getArgs
@@ -141,9 +148,7 @@ def cite (key : StrLit) (xs : TSyntaxArray `Lean.Doc.Parser.inline) : DocM (Inli
     let bib ← IO.FS.readFile path
     unless Mathlib.VersoRoles.bibContainsKey bib k do
       logWarningAt key m!"No bibliography entry `{k}` in `docs/references.bib`."
-  return .other
-    (.custom (.mk (Mathlib.VersoRoles.Citation.mk k)))
-    rendered
+  return .other (.custom (.mk (Mathlib.VersoRoles.Citation.mk k))) rendered
 
 /--
 A verbatim code listing in the language named by the positional argument, as
@@ -153,8 +158,7 @@ The language is recorded for later use; the listing itself is rendered verbatim.
 -/
 @[doc_code_block]
 def code (language : Ident) (content : VersoCodeBlock) : DocM (Block ElabInline ElabBlock) := do
-  return .other
-    (.custom (.mk (Mathlib.VersoRoles.CodeWithLanguage.mk language.getId.toString)))
+  return .other (.custom (.mk (Mathlib.VersoRoles.CodeWithLanguage.mk language.getId.toString)))
     #[.code content.view]
 
 end

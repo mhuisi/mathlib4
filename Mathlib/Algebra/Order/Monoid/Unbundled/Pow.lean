@@ -70,8 +70,7 @@ theorem pow_le_pow_right_of_le_one' {n m : ℕ} (ha : a ≤ 1) (h : n ≤ m) : a
   pow_le_pow_right' (M := Mᵒᵈ) ha h
 
 @[to_additive nsmul_pos]
-theorem one_lt_pow' (ha : 1 < a) {k : ℕ} (hk : k ≠ 0) : 1 < a ^ k :=
-  pow_lt_one' (M := Mᵒᵈ) ha hk
+theorem one_lt_pow' (ha : 1 < a) {k : ℕ} (hk : k ≠ 0) : 1 < a ^ k := pow_lt_one' (M := Mᵒᵈ) ha hk
 
 @[to_additive]
 lemma le_self_pow (ha : 1 ≤ a) (hn : n ≠ 0) : a ≤ a ^ n := by
@@ -88,8 +87,7 @@ theorem pow_right_strictMono' (ha : 1 < a) : StrictMono ((a ^ ·) : ℕ → M) :
   strictMono_nat_of_lt_succ fun n ↦ by rw [pow_succ]; exact lt_mul_of_one_lt_right' (a ^ n) ha
 
 @[to_additive (attr := gcongr) nsmul_lt_nsmul_left]
-theorem pow_lt_pow_right' (ha : 1 < a) (h : n < m) : a ^ n < a ^ m :=
-  pow_right_strictMono' ha h
+theorem pow_lt_pow_right' (ha : 1 < a) (h : n < m) : a ^ n < a ^ m := pow_right_strictMono' ha h
 
 end LeftLt
 
@@ -116,13 +114,14 @@ theorem Right.pow_lt_one_of_lt {n : ℕ} {x : M} (hn : 0 < n) (h : x < 1) : x ^ 
 
 /-- This lemma is useful in non-cancellative monoids, like sets under pointwise operations. -/
 @[to_additive
-/-- This lemma is useful in non-cancellative monoids, like sets under pointwise operations. -/]
-lemma pow_le_pow_mul_of_sq_le_mul [MulLeftMono M] {a b : M} (hab : a ^ 2 ≤ b * a) :
-    ∀ {n}, n ≠ 0 → a ^ n ≤ b ^ (n - 1) * a
+  /-- This lemma is useful in non-cancellative monoids, like sets under pointwise operations. -/]
+lemma pow_le_pow_mul_of_sq_le_mul [MulLeftMono M] {a b : M} (hab : a ^ 2 ≤ b * a)
+    : ∀ {n}, n ≠ 0 → a ^ n ≤ b ^ (n - 1) * a
   | 1, _ => by simp
   | n + 2, _ => by
     calc
-      a ^ (n + 2) = a ^ (n + 1) * a := by rw [pow_succ]
+      a ^ (n + 2)
+        = a ^ (n + 1) * a := by rw [pow_succ]
       _ ≤ b ^ n * a * a := by grw [pow_le_pow_mul_of_sq_le_mul hab (by lia)]; simp
       _ = b ^ n * a ^ 2 := by rw [mul_assoc, sq]
       _ ≤ b ^ n * (b * a) := by grw [hab]
@@ -278,17 +277,18 @@ theorem le_max_of_sq_le_mul {a b c : M} (h : a ^ 2 ≤ b * c) : a ≤ max b c :=
 end CovariantLTSwap
 
 @[to_additive Left.nsmul_neg_iff]
-theorem Left.pow_lt_one_iff' [MulLeftStrictMono M] {n : ℕ} {x : M} (hn : 0 < n) :
-    x ^ n < 1 ↔ x < 1 :=
+theorem Left.pow_lt_one_iff' [MulLeftStrictMono M] {n : ℕ} {x : M} (hn : 0 < n)
+    : x ^ n < 1 ↔ x < 1 :=
   haveI := mulLeftMono_of_mulLeftStrictMono M
   pow_lt_one_iff hn.ne'
 
-theorem Left.pow_lt_one_iff [MulLeftStrictMono M] {n : ℕ} {x : M} (hn : 0 < n) :
-    x ^ n < 1 ↔ x < 1 := Left.pow_lt_one_iff' hn
+theorem Left.pow_lt_one_iff [MulLeftStrictMono M] {n : ℕ} {x : M} (hn : 0 < n)
+    : x ^ n < 1 ↔ x < 1 :=
+  Left.pow_lt_one_iff' hn
 
 @[to_additive]
-theorem Right.pow_lt_one_iff [MulRightStrictMono M] {n : ℕ} {x : M}
-    (hn : 0 < n) : x ^ n < 1 ↔ x < 1 :=
+theorem Right.pow_lt_one_iff [MulRightStrictMono M] {n : ℕ} {x : M} (hn : 0 < n)
+    : x ^ n < 1 ↔ x < 1 :=
   haveI := mulRightMono_of_mulRightStrictMono M
   ⟨fun H => not_le.mp fun k => H.not_ge <| Right.one_le_pow_of_le k, Right.pow_lt_one_of_lt hn⟩
 

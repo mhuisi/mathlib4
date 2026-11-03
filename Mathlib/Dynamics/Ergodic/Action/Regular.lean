@@ -6,7 +6,6 @@ Authors: Yury Kudryashov
 module
 
 public import Mathlib.Dynamics.Ergodic.Action.Basic
-
 import Mathlib.MeasureTheory.Group.Prod
 
 set_option doc.verso true
@@ -23,7 +22,8 @@ public section
 open MeasureTheory Measure Filter Set
 open scoped Pointwise
 
-variable {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+variable
+  {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
   {μ : Measure G} [SFinite μ]
 
 @[to_additive]

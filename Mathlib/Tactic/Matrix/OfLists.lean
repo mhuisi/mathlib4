@@ -52,8 +52,10 @@ theorem ofList_apply [Zero α] (n : ℕ) (l : List α) (i : Fin n) : ofList n l 
   | zero => exact i.elim0
   | succ n ih => cases l <;> refine Fin.cases ?_ ?_ i <;> simp [ofList, ih]
 
-/-- The first `n` elements of the first `m` lists as a function of two indices, padded with
-`0`. -/
+/--
+The first `n` elements of the first `m` lists as a function of two indices, padded with
+`0`.
+-/
 def ofListsFun [Zero α] : (m n : ℕ) → List (List α) → Fin m → Fin n → α
   | 0, _, _ => ![]
   | m + 1, n, [] => vecCons (ofList n []) (ofListsFun m n [])
@@ -64,35 +66,35 @@ def ofLists [Zero α] (m n : ℕ) (rows : List (List α)) : Matrix (Fin m) (Fin 
   of (ofListsFun m n rows)
 
 @[simp]
-theorem ofLists_apply [Zero α] (m n : ℕ) (rows : List (List α)) (i : Fin m) :
-    ofLists m n rows i = ofList n (rows.getD i []) := by
+theorem ofLists_apply [Zero α] (m n : ℕ) (rows : List (List α)) (i : Fin m)
+    : ofLists m n rows i = ofList n (rows.getD i []) := by
   induction m generalizing rows with
   | zero => exact i.elim0
   | succ m ih => cases rows <;> exact Fin.cases rfl (ih _) i
 
 @[simp]
-theorem ListMatrix.dotProduct_eq [Mul α] [AddCommMonoid α] (n : ℕ) (l₁ l₂ : List α) :
-    ListMatrix.dotProduct n l₁ l₂ = ofList n l₁ ⬝ᵥ ofList n l₂ := by
+theorem ListMatrix.dotProduct_eq [Mul α] [AddCommMonoid α] (n : ℕ) (l₁ l₂ : List α)
+    : ListMatrix.dotProduct n l₁ l₂ = ofList n l₁ ⬝ᵥ ofList n l₂ := by
   induction n generalizing l₁ l₂ with
   | zero => simp [ListMatrix.dotProduct_zero]
   | succ n ih => cases l₁ <;> cases l₂ <;> simp [ofList, ListMatrix.dotProduct_add_one, ← ih]
 
 @[simp]
-theorem ofLists_transpose [Zero α] (m n : ℕ) (rows : List (List α)) :
-    ofLists n m (ListMatrix.transpose n rows) = (ofLists m n rows)ᵀ := by
+theorem ofLists_transpose [Zero α] (m n : ℕ) (rows : List (List α))
+    : ofLists n m (ListMatrix.transpose n rows) = (ofLists m n rows)ᵀ := by
   ext j i
   simpa using ListMatrix.getD_transpose rows i j.isLt
 
-theorem ofLists_mul [Mul α] [AddCommMonoid α] (l m n : ℕ) (A B : List (List α)) :
-    ofLists l m A * ofLists m n B = ofLists l n (ListMatrix.mul l m n A B) := by
+theorem ofLists_mul [Mul α] [AddCommMonoid α] (l m n : ℕ) (A B : List (List α))
+    : ofLists l m A * ofLists m n B = ofLists l n (ListMatrix.mul l m n A B) := by
   ext i j
   rw [mul_apply', ← col_apply' (ofLists m n B) j]
   simp only [← row_transpose, ← ofLists_transpose, row_apply', ofLists_apply, ofList_apply,
     ← ListMatrix.dotProduct_eq, ListMatrix.getD_mul A B i.isLt j.isLt]
 
-private theorem getD_flatten_of_forall_length_eq {n i j : ℕ} {rows : List (List α)}
-    (hrows : ∀ row ∈ rows, row.length = n) (hj : j < n) (d : α) :
-    rows.flatten.getD (n * i + j) d = (rows.getD i []).getD j d := by
+private theorem getD_flatten_of_forall_length_eq
+    {n i j : ℕ} {rows : List (List α)} (hrows : ∀ row ∈ rows, row.length = n) (hj : j < n) (d : α)
+    : rows.flatten.getD (n * i + j) d = (rows.getD i []).getD j d := by
   induction rows generalizing i with
   | nil => simp
   | cons row rows ih =>
@@ -101,11 +103,15 @@ private theorem getD_flatten_of_forall_length_eq {n i j : ℕ} {rows : List (Lis
     | zero => grind
     | succ i => grind [ih (i := i) hrows]
 
-/-- The row-major array of the entries of the matrix of `m` rows of `n` entries is the array of
-their concatenation. -/
-theorem toArray_ofLists [Zero α] {m n : ℕ} {rows : List (List α)}
-    (hrows : ∀ row ∈ rows, row.length = n) (hl : rows.flatten.toArray.size = m * n) :
-    (ofLists m n rows).toArray = rows.flatten.toArray := by
+/--
+The row-major array of the entries of the matrix of `m` rows of `n` entries is the array of
+their concatenation.
+-/
+theorem toArray_ofLists
+    [Zero α]
+    {m n : ℕ} {rows : List (List α)}
+    (hrows : ∀ row ∈ rows, row.length = n) (hl : rows.flatten.toArray.size = m * n)
+    : (ofLists m n rows).toArray = rows.flatten.toArray := by
   rw [← Matrix.toArray_ofArray _ hl]
   congrm Matrix.toArray ?_
   ext i j

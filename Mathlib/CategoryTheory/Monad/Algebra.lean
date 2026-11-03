@@ -24,7 +24,6 @@ cofree functors, respectively from and to the original category.
 
 @[expose] public section
 
-
 namespace CategoryTheory
 
 open Category
@@ -36,8 +35,10 @@ variable {C : Type u₁} [Category.{v₁} C]
 
 to_dual_name_hint Algebra Coalgebra, Free Cofree, Mono Epi, Right Left
 
-/-- An Eilenberg-Moore algebra for a monad `T`.
-cf Definition 5.2.3 in [Riehl][riehl2017]. -/
+/--
+An Eilenberg-Moore algebra for a monad `T`.
+cf Definition 5.2.3 in [Riehl][riehl2017].
+-/
 structure Monad.Algebra (T : Monad C) : Type max u₁ v₁ where
   /-- The underlying object associated to an algebra. -/
   A : C
@@ -90,14 +91,15 @@ namespace Hom
 
 /-- The identity homomorphism for an Eilenberg–Moore algebra. -/
 @[to_dual /-- The identity homomorphism for an Eilenberg–Moore coalgebra. -/]
-def id (A : Algebra T) : Hom A A where f := 𝟙 A.A
+def id (A : Algebra T) : Hom A A where
+  f := 𝟙 A.A
 
-instance (A : Algebra T) : Inhabited (Hom A A) :=
-  ⟨{ f := 𝟙 _ }⟩
+instance (A : Algebra T) : Inhabited (Hom A A) := ⟨{ f := 𝟙 _ }⟩
 
 /-- Composition of Eilenberg–Moore algebra homomorphisms. -/
 @[to_dual (reorder := f g) /-- Composition of Eilenberg–Moore coalgebra homomorphisms. -/]
-def comp {P Q R : Algebra T} (f : Hom P Q) (g : Hom Q R) : Hom P R where f := f.f ≫ g.f
+def comp {P Q R : Algebra T} (f : Hom P Q) (g : Hom Q R) : Hom P R where
+  f := f.f ≫ g.f
 
 end Hom
 
@@ -111,24 +113,23 @@ instance : CategoryStruct (Algebra T) where
 lemma Hom.ext' (X Y : Algebra T) (f g : X ⟶ Y) (h : f.f = g.f) : f = g := Hom.ext h
 
 @[to_dual (attr := simp) (reorder := f g)]
-theorem comp_eq_comp {A A' A'' : Algebra T} (f : A ⟶ A') (g : A' ⟶ A'') :
-    Algebra.Hom.comp f g = f ≫ g :=
+theorem comp_eq_comp {A A' A'' : Algebra T} (f : A ⟶ A') (g : A' ⟶ A'')
+    : Algebra.Hom.comp f g = f ≫ g :=
   rfl
 
 @[to_dual (attr := simp)]
-theorem id_eq_id (A : Algebra T) : Algebra.Hom.id A = 𝟙 A :=
-  rfl
+theorem id_eq_id (A : Algebra T) : Algebra.Hom.id A = 𝟙 A := rfl
 
 @[to_dual (attr := simp)]
-theorem id_f (A : Algebra T) : (𝟙 A : A ⟶ A).f = 𝟙 A.A :=
-  rfl
+theorem id_f (A : Algebra T) : (𝟙 A : A ⟶ A).f = 𝟙 A.A := rfl
 
 @[to_dual (attr := simp) (reorder := f g)]
-theorem comp_f {A A' A'' : Algebra T} (f : A ⟶ A') (g : A' ⟶ A'') : (f ≫ g).f = f.f ≫ g.f :=
-  rfl
+theorem comp_f {A A' A'' : Algebra T} (f : A ⟶ A') (g : A' ⟶ A'') : (f ≫ g).f = f.f ≫ g.f := rfl
 
-/-- The category of Eilenberg-Moore algebras for a monad.
-cf Definition 5.2.4 in [Riehl][riehl2017]. -/
+/--
+The category of Eilenberg-Moore algebras for a monad.
+cf Definition 5.2.4 in [Riehl][riehl2017].
+-/
 @[to_dual /-- The category of Eilenberg-Moore coalgebras for a comonad. -/]
 instance eilenbergMoore : Category (Algebra T) where
 
@@ -137,28 +138,34 @@ To construct an isomorphism of algebras, it suffices to give an isomorphism of t
 commutes with the structure morphisms.
 -/
 @[simps]
-def isoMk {A B : Algebra T} (h : A.A ≅ B.A)
-    (w : (T : C ⥤ C).map h.hom ≫ B.a = A.a ≫ h.hom := by cat_disch) : A ≅ B where
+def isoMk
+    {A B : Algebra T} (h : A.A ≅ B.A)
+    (w : (T : C ⥤ C).map h.hom ≫ B.a = A.a ≫ h.hom := by cat_disch)
+    : A ≅ B where
   hom := { f := h.hom }
-  inv :=
-    { f := h.inv
-      h := by
-        rw [h.eq_comp_inv, Category.assoc, ← w, ← Functor.map_comp_assoc]
-        simp }
+  inv := {
+    f := h.inv
+    h := by
+      rw [h.eq_comp_inv, Category.assoc, ← w, ← Functor.map_comp_assoc]
+      simp
+  }
 
 /--
 To construct an isomorphism of coalgebras, it suffices to give an isomorphism of the carriers which
 commutes with the structure morphisms.
 -/
 @[simps]
-def _root_.CategoryTheory.Comonad.Coalgebra.isoMk {T : Comonad C} {A B : T.Coalgebra}
-    (h : A.A ≅ B.A) (w : A.a ≫ (T : C ⥤ C).map h.hom = h.hom ≫ B.a := by cat_disch) : A ≅ B where
+def _root_.CategoryTheory.Comonad.Coalgebra.isoMk
+    {T : Comonad C} {A B : T.Coalgebra} (h : A.A ≅ B.A)
+    (w : A.a ≫ (T : C ⥤ C).map h.hom = h.hom ≫ B.a := by cat_disch)
+    : A ≅ B where
   hom := { f := h.hom }
-  inv :=
-    { f := h.inv
-      h := by
-        rw [h.eq_inv_comp, ← reassoc_of% w, ← Functor.map_comp]
-        simp }
+  inv := {
+    f := h.inv
+    h := by
+      rw [h.eq_inv_comp, ← reassoc_of% w, ← Functor.map_comp]
+      simp
+  }
 
 to_dual_for isoMk := Comonad.Coalgebra.isoMk h (by simpa using congr(h.hom ≫ $w.symm ≫ T.map h.hom))
 to_dual_for Comonad.Coalgebra.isoMk := isoMk h (by simpa using congr(T.map h.hom ≫ $w.symm ≫ h.hom))
@@ -169,7 +176,7 @@ variable (T : Monad C)
 
 /-- The forgetful functor from the Eilenberg-Moore category, forgetting the algebraic structure. -/
 @[to_dual (attr := simps, implicit_reducible)
-/-- The forgetful functor from the Eilenberg-Moore category, forgetting the coalgebraic
+  /-- The forgetful functor from the Eilenberg-Moore category, forgetting the coalgebraic
 structure. -/]
 def forget : Algebra T ⥤ C where
   obj A := A.A
@@ -177,59 +184,56 @@ def forget : Algebra T ⥤ C where
 
 /-- The free functor from the Eilenberg-Moore category, constructing an algebra for any object. -/
 @[to_dual (attr := simps, implicit_reducible)
-/-- The cofree functor from the Eilenberg-Moore category, constructing a coalgebra for any
+  /-- The cofree functor from the Eilenberg-Moore category, constructing a coalgebra for any
 object. -/]
 def free : C ⥤ Algebra T where
-  obj X :=
-    { A := T.obj X
-      a := T.μ.app X
-      assoc := (T.assoc _).symm }
-  map f :=
-    { f := T.map f
-      h := T.μ.naturality _ }
+  obj X := { A := T.obj X, a := T.μ.app X, assoc := (T.assoc _).symm }
+  map f := { f := T.map f, h := T.μ.naturality _ }
 
-@[to_dual]
-instance [Inhabited C] : Inhabited (Algebra T) :=
-  ⟨(free T).obj default⟩
+@[to_dual] instance [Inhabited C] : Inhabited (Algebra T) := ⟨(free T).obj default⟩
 
 -- The other two `simps` projection lemmas can be derived from these two, so `simp_nf` complains if
 -- those are added too
-/-- The adjunction between the free and forgetful constructions for Eilenberg-Moore algebras for
-  a monad. cf Lemma 5.2.8 of [Riehl][riehl2017]. -/
+/--
+The adjunction between the free and forgetful constructions for Eilenberg-Moore algebras for
+a monad. cf Lemma 5.2.8 of [Riehl][riehl2017].
+-/
 @[simps! unit counit]
 def adj : T.free ⊣ T.forget :=
-  Adjunction.mkOfHomEquiv
-    { homEquiv X Y :=
-        { toFun f := T.η.app X ≫ f.f
-          invFun := fun f =>
-            { f := T.map f ≫ Y.a
-              h := by simp [← Y.assoc, ← T.μ.naturality_assoc] }
-          left_inv f := by cat_disch
-          right_inv f := by
-            dsimp only [forget_obj]
-            rw [← T.η.naturality_assoc, Y.unit]
-            apply Category.comp_id } }
+  Adjunction.mkOfHomEquiv {
+    homEquiv X Y := {
+      toFun f := T.η.app X ≫ f.f
+      invFun := fun f => { f := T.map f ≫ Y.a, h := by simp [← Y.assoc, ← T.μ.naturality_assoc] }
+      left_inv f := by cat_disch
+      right_inv f := by
+        dsimp only [forget_obj]
+        rw [← T.η.naturality_assoc, Y.unit]
+        apply Category.comp_id
+    }
+  }
 
 open Comonad in
-/-- The adjunction between the cofree and forgetful constructions for Eilenberg-Moore coalgebras
+/--
+The adjunction between the cofree and forgetful constructions for Eilenberg-Moore coalgebras
 for a comonad.
 -/
 @[simps! unit counit]
 def _root_.CategoryTheory.Comonad.adj (T : Comonad C) : T.forget ⊣ T.cofree :=
-  Adjunction.mkOfHomEquiv
-    { homEquiv X Y :=
-        { toFun f :=
-            { f := X.a ≫ T.map f
-              h := by simp [← Coalgebra.coassoc_assoc] }
-          invFun g := g.f ≫ T.ε.app Y
-          left_inv _ := by simp [X.counit_assoc]
-          right_inv g := by cat_disch } }
+  Adjunction.mkOfHomEquiv {
+    homEquiv X Y := {
+      toFun f := { f := X.a ≫ T.map f, h := by simp [← Coalgebra.coassoc_assoc] }
+      invFun g := g.f ≫ T.ε.app Y
+      left_inv _ := by simp [X.counit_assoc]
+      right_inv g := by cat_disch
+    }
+  }
 
-/-- Given an algebra morphism whose carrier part is an isomorphism, we get an algebra isomorphism.
+/--
+Given an algebra morphism whose carrier part is an isomorphism, we get an algebra isomorphism.
 -/
 @[to_dual
-/-- Given a coalgebra morphism whose carrier part is an isomorphism, we get a coalgebra isomorphism.
--/]
+  /-- Given a coalgebra morphism whose carrier part is an isomorphism, we get a coalgebra isomorphism.
+  -/]
 theorem algebra_iso_of_iso {A B : Algebra T} (f : A ⟶ B) [IsIso f.f] : IsIso f :=
   ⟨⟨{ f := inv f.f, h := by simp }, by cat_disch⟩⟩
 
@@ -237,28 +241,27 @@ theorem algebra_iso_of_iso {A B : Algebra T} (f : A ⟶ B) [IsIso f.f] : IsIso f
 instance forget_reflects_iso : T.forget.ReflectsIsomorphisms where
   reflects {_ _} f [IsIso f.f] := algebra_iso_of_iso T f
 
-@[to_dual]
-instance forget_faithful : T.forget.Faithful where
+@[to_dual] instance forget_faithful : T.forget.Faithful where
 
-/-- Given an algebra morphism whose carrier part is an epimorphism, we get an algebra epimorphism.
+/--
+Given an algebra morphism whose carrier part is an epimorphism, we get an algebra epimorphism.
 -/
 @[to_dual
-/-- Given a coalgebra morphism whose carrier part is a monomorphism, we get an algebra monomorphism.
--/]
+  /-- Given a coalgebra morphism whose carrier part is a monomorphism, we get an algebra monomorphism.
+  -/]
 theorem algebra_epi_of_epi {X Y : Algebra T} (f : X ⟶ Y) [h : Epi f.f] : Epi f :=
   (forget T).epi_of_epi_map h
 
-/-- Given an algebra morphism whose carrier part is a monomorphism, we get an algebra monomorphism.
+/--
+Given an algebra morphism whose carrier part is a monomorphism, we get an algebra monomorphism.
 -/
 @[to_dual
-/-- Given a coalgebra morphism whose carrier part is an epimorphism, we get an algebra epimorphism.
--/]
+  /-- Given a coalgebra morphism whose carrier part is an epimorphism, we get an algebra epimorphism.
+  -/]
 theorem algebra_mono_of_mono {X Y : Algebra T} (f : X ⟶ Y) [h : Mono f.f] : Mono f :=
   (forget T).mono_of_mono_map h
 
-@[to_dual]
-instance : T.forget.IsRightAdjoint :=
-  ⟨T.free, ⟨T.adj⟩⟩
+@[to_dual] instance : T.forget.IsRightAdjoint := ⟨T.free, ⟨T.adj⟩⟩
 
 /--
 Given a monad morphism from `T₂` to `T₁`, we get a functor from the algebras of `T₁` to algebras of
@@ -266,11 +269,7 @@ Given a monad morphism from `T₂` to `T₁`, we get a functor from the algebras
 -/
 @[simps]
 def algebraFunctorOfMonadHom {T₁ T₂ : Monad C} (h : T₂ ⟶ T₁) : Algebra T₁ ⥤ Algebra T₂ where
-  obj A :=
-    { A := A.A
-      a := h.app A.A ≫ A.a
-      unit := by simp [A.unit]
-      assoc := by simp [A.assoc] }
+  obj A := { A := A.A, a := h.app A.A ≫ A.a, unit := by simp [A.unit], assoc := by simp [A.assoc] }
   map f := { f := f.f }
 
 set_option backward.isDefEq.respectTransparency.types false in
@@ -284,26 +283,27 @@ def algebraFunctorOfMonadHomId {T₁ : Monad C} : algebraFunctorOfMonadHom (𝟙
 
 set_option backward.isDefEq.respectTransparency.types false in
 set_option backward.defeqAttrib.useBackward true in
-/-- A composition of monad morphisms gives the composition of corresponding functors.
--/
+/-- A composition of monad morphisms gives the composition of corresponding functors. -/
 @[simps (rhsMd := .default)]
-def algebraFunctorOfMonadHomComp {T₁ T₂ T₃ : Monad C} (f : T₁ ⟶ T₂) (g : T₂ ⟶ T₃) :
-    algebraFunctorOfMonadHom (f ≫ g) ≅ algebraFunctorOfMonadHom g ⋙ algebraFunctorOfMonadHom f :=
+def algebraFunctorOfMonadHomComp {T₁ T₂ T₃ : Monad C} (f : T₁ ⟶ T₂) (g : T₂ ⟶ T₃)
+    : algebraFunctorOfMonadHom (f ≫ g) ≅ algebraFunctorOfMonadHom g ⋙ algebraFunctorOfMonadHom f :=
   NatIso.ofComponents fun X => Algebra.isoMk (Iso.refl _)
 
 set_option backward.isDefEq.respectTransparency.types false in
-/-- If `f` and `g` are two equal morphisms of monads, then the functors of algebras induced by them
+/--
+If `f` and `g` are two equal morphisms of monads, then the functors of algebras induced by them
 are isomorphic.
 We define it like this as opposed to using `eqToIso` so that the components are nicer to prove
 lemmas about.
 -/
 @[simps (rhsMd := .default)]
-def algebraFunctorOfMonadHomEq {T₁ T₂ : Monad C} {f g : T₁ ⟶ T₂} (h : f = g) :
-    algebraFunctorOfMonadHom f ≅ algebraFunctorOfMonadHom g :=
+def algebraFunctorOfMonadHomEq {T₁ T₂ : Monad C} {f g : T₁ ⟶ T₂} (h : f = g)
+    : algebraFunctorOfMonadHom f ≅ algebraFunctorOfMonadHom g :=
   NatIso.ofComponents fun X => Algebra.isoMk (Iso.refl _)
 
 set_option backward.defeqAttrib.useBackward true in
-/-- Isomorphic monads give equivalent categories of algebras. Furthermore, they are equivalent as
+/--
+Isomorphic monads give equivalent categories of algebras. Furthermore, they are equivalent as
 categories over `C`, that is, we have `algebraEquivOfIsoMonads h ⋙ forget = forget`.
 -/
 @[simps]
@@ -311,15 +311,15 @@ def algebraEquivOfIsoMonads {T₁ T₂ : Monad C} (h : T₁ ≅ T₂) : Algebra 
   functor := algebraFunctorOfMonadHom h.inv
   inverse := algebraFunctorOfMonadHom h.hom
   unitIso :=
-    algebraFunctorOfMonadHomId.symm ≪≫
-      algebraFunctorOfMonadHomEq (by simp) ≪≫ algebraFunctorOfMonadHomComp _ _
+    algebraFunctorOfMonadHomId.symm ≪≫ algebraFunctorOfMonadHomEq (by simp)
+      ≪≫ algebraFunctorOfMonadHomComp _ _
   counitIso :=
-    (algebraFunctorOfMonadHomComp _ _).symm ≪≫
-      algebraFunctorOfMonadHomEq (by simp) ≪≫ algebraFunctorOfMonadHomId
+    (algebraFunctorOfMonadHomComp _ _).symm ≪≫ algebraFunctorOfMonadHomEq (by simp)
+      ≪≫ algebraFunctorOfMonadHomId
 
 @[simp]
-theorem algebra_equiv_of_iso_monads_comp_forget {T₁ T₂ : Monad C} (h : T₁ ⟶ T₂) :
-    algebraFunctorOfMonadHom h ⋙ forget _ = forget _ :=
+theorem algebra_equiv_of_iso_monads_comp_forget {T₁ T₂ : Monad C} (h : T₁ ⟶ T₂)
+    : algebraFunctorOfMonadHom h ⋙ forget _ = forget _ :=
   rfl
 
 end Monad

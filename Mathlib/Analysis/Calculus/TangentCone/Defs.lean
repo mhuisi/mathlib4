@@ -45,7 +45,8 @@ section TangentConeAt
 
 variable [AddCommGroup E] [SMul R E] [TopologicalSpace E] {s : Set E} {x y : E}
 
-/-- The set of all tangent directions to the set `s` at the point `x`.
+/--
+The set of all tangent directions to the set `s` at the point `x`.
 
 A point `y` belongs to the tangent cone of `s` at `x` iff
 there exist a family of scalars `c n`, a family of vectors `d n`,
@@ -63,14 +64,16 @@ In a space with first countable topology,
 one can assume that the index type is `ℕ` and the filter is `atTop`,
 but the definition we use is more useful without that assumption.
 -/
-@[no_expose] def tangentConeAt (s : Set E) (x : E) : Set E :=
+@[no_expose]
+def tangentConeAt (s : Set E) (x : E) : Set E :=
   {y : E | ClusterPt y ((⊤ : Filter R) • 𝓝[(x + ·) ⁻¹' s] 0)}
 
 alias tangentConeAt_def := tangentConeAt.eq_def
 
 variable {R}
 
-/-- Let `c n` be a family of scalars, `d n` be a family of vectors, and `l` be a filter such that
+/--
+Let `c n` be a family of scalars, `d n` be a family of vectors, and `l` be a filter such that
 
 - `d n → 0` along `l`;
 - `x + d n ∈ s` frequently along `l`;
@@ -82,9 +85,10 @@ See also
 - `mem_tangentConeAt_of_seq` for a version assuming that `x + d n ∈ s` eventually along `l`.
 - `exists_fun_of_mem_tangentConeAt` for the other implication.
 -/
-theorem mem_tangentConeAt_of_frequently {α : Type*} (l : Filter α) (c : α → R) (d : α → E)
-    (hd₀ : Tendsto d l (𝓝 0)) (hds : ∃ᶠ n in l, x + d n ∈ s)
-    (hcd : Tendsto (fun n ↦ c n • d n) l (𝓝 y)) : y ∈ tangentConeAt R s x := by
+theorem mem_tangentConeAt_of_frequently
+    {α : Type*} (l : Filter α) (c : α → R) (d : α → E) (hd₀ : Tendsto d l (𝓝 0))
+    (hds : ∃ᶠ n in l, x + d n ∈ s) (hcd : Tendsto (fun n ↦ c n • d n) l (𝓝 y))
+    : y ∈ tangentConeAt R s x := by
   suffices Tendsto (fun n ↦ c n • d n) (l ⊓ 𝓟 {y | x + d y ∈ s}) (⊤ • 𝓝[(x + ·) ⁻¹' s] 0) by
     rw [frequently_iff_neBot] at hds
     exact ClusterPt.mono (hcd.mono_left inf_le_left).mapClusterPt this
@@ -94,12 +98,15 @@ theorem mem_tangentConeAt_of_frequently {α : Type*} (l : Filter α) (c : α →
   · simp [eventually_inf_principal]
 
 /-- A special case of `mem_tangentConeAt_of_frequently`, which avoids `Filter.Frequently`. -/
-theorem mem_tangentConeAt_of_seq {α : Type*} (l : Filter α) [l.NeBot] (c : α → R) (d : α → E)
-    (hd₀ : Tendsto d l (𝓝 0)) (hds : ∀ᶠ n in l, x + d n ∈ s)
-    (hcd : Tendsto (fun n ↦ c n • d n) l (𝓝 y)) : y ∈ tangentConeAt R s x :=
+theorem mem_tangentConeAt_of_seq
+    {α : Type*} (l : Filter α) [l.NeBot]
+    (c : α → R) (d : α → E) (hd₀ : Tendsto d l (𝓝 0)) (hds : ∀ᶠ n in l, x + d n ∈ s)
+    (hcd : Tendsto (fun n ↦ c n • d n) l (𝓝 y))
+    : y ∈ tangentConeAt R s x :=
   mem_tangentConeAt_of_frequently l c d hd₀ hds.frequently hcd
 
-/-- If `y` belongs to the tangent cone of `s` at `x`, then there exist
+/--
+If `y` belongs to the tangent cone of `s` at `x`, then there exist
 
 - an index type `α` and a nontrivial filter `l` on `α`;
 - a family of scalars `c n`, `n : α`, and a family of vectors `d n`, `n : α` such that
@@ -110,12 +117,14 @@ theorem mem_tangentConeAt_of_seq {α : Type*} (l : Filter α) [l.NeBot] (c : α 
 In fact, one can take `α = R × E`, `c = Prod.fst`, and `d = Prod.snd`, but this is not important,
 so the lemma statement hides these details.
 
-This lemma provides a convenient way to unfold the definition of `tangentConeAt`. -/
-theorem exists_fun_of_mem_tangentConeAt (h : y ∈ tangentConeAt R s x) :
-    ∃ (α : Type (max u v)) (l : Filter α) (_hl : l.NeBot) (c : α → R) (d : α → E),
+This lemma provides a convenient way to unfold the definition of `tangentConeAt`.
+-/
+theorem exists_fun_of_mem_tangentConeAt (h : y ∈ tangentConeAt R s x)
+    : ∃ (α : Type (max u v)) (l : Filter α) (_hl : l.NeBot) (c : α → R) (d : α → E),
       Tendsto d l (𝓝 0) ∧ (∀ᶠ n in l, x + d n ∈ s) ∧ Tendsto (fun n ↦ c n • d n) l (𝓝 y) := by
   rw [tangentConeAt, mem_ofPred, ← map₂_smul, ← map_prod_eq_map₂, ClusterPt,
-    ← neBot_inf_comap_iff_map'] at h
+      ← neBot_inf_comap_iff_map']
+    at h
   refine ⟨R × E, _, h, Prod.fst, Prod.snd, ?_, ?_, ?_⟩
   · refine (tendsto_snd (f := ⊤)).mono_left <| inf_le_right.trans <| ?_
     gcongr
@@ -129,31 +138,34 @@ theorem exists_fun_of_mem_tangentConeAt (h : y ∈ tangentConeAt R s x) :
 end TangentConeAt
 
 /-- "Positive" tangent cone to `s` at `x`. -/
-abbrev posTangentConeAt [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] (s : Set E) (x : E) :
-    Set E :=
+abbrev posTangentConeAt [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] (s : Set E) (x : E)
+    : Set E :=
   tangentConeAt NNReal s x
 
 variable [Semiring R] [AddCommGroup E] [Module R E] [TopologicalSpace E]
 
-/-- A property ensuring that the tangent cone to `s` at `x` spans a dense subset of the whole space.
+/--
+A property ensuring that the tangent cone to `s` at `x` spans a dense subset of the whole space.
 The main role of this property is to ensure that the differential within `s` at `x` is unique,
 hence this name. The uniqueness it asserts is proved in `UniqueDiffWithinAt.eq` in
 `Mathlib/Analysis/Calculus/FDeriv/Basic.lean`.
 To avoid pathologies in dimension 0, we also require that `x` belongs to the closure of `s` (which
-is automatic when `E` is not `0`-dimensional). -/
+is automatic when `E` is not `0`-dimensional).
+-/
 @[mk_iff]
 structure UniqueDiffWithinAt (s : Set E) (x : E) : Prop where
   dense_tangentConeAt : Dense (Submodule.span R (tangentConeAt R s x) : Set E)
   mem_closure : x ∈ closure s
 
-/-- A property ensuring that the tangent cone to `s` at any of its points spans a dense subset of
+/--
+A property ensuring that the tangent cone to `s` at any of its points spans a dense subset of
 the whole space. The main role of this property is to ensure that the differential along `s` is
 unique, hence this name. The uniqueness it asserts is proved in `UniqueDiffOn.eq` in
-`Mathlib/Analysis/Calculus/FDeriv/Basic.lean`. -/
-def UniqueDiffOn (s : Set E) : Prop :=
-  ∀ x ∈ s, UniqueDiffWithinAt R s x
+`Mathlib/Analysis/Calculus/FDeriv/Basic.lean`.
+-/
+def UniqueDiffOn (s : Set E) : Prop := ∀ x ∈ s, UniqueDiffWithinAt R s x
 
 variable {R} in
-theorem UniqueDiffOn.uniqueDiffWithinAt {s : Set E} {x} (hs : UniqueDiffOn R s) (h : x ∈ s) :
-    UniqueDiffWithinAt R s x :=
+theorem UniqueDiffOn.uniqueDiffWithinAt {s : Set E} {x} (hs : UniqueDiffOn R s) (h : x ∈ s)
+    : UniqueDiffWithinAt R s x :=
   hs x h

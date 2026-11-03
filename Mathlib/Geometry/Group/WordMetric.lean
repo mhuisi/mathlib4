@@ -63,32 +63,36 @@ noncomputable def wordLength : ℕ := sInf {n | ∃ l, P.wordProd l = g ∧ l.le
 
 /-! ### Geodesic words -/
 
-/-- A word `l` is geodesic if its length is exactly the word length of the group element it
-represents. -/
+/--
+A word `l` is geodesic if its length is exactly the word length of the group element it
+represents.
+-/
 @[to_additive /-- A word `l` is geodesic if its length is exactly the word length of the group
 element it represents. -/]
 def IsGeodesic : Prop := P.wordLength (P.wordProd l) = l.length
 
 @[to_additive]
-lemma IsGeodesic.eq {l : List (ι × Bool)} (hl : P.IsGeodesic l) :
-    P.wordLength (P.wordProd l) = l.length := hl
+lemma IsGeodesic.eq {l : List (ι × Bool)} (hl : P.IsGeodesic l)
+    : P.wordLength (P.wordProd l) = l.length :=
+  hl
 
 /-- Every group element has a geodesic word representative. -/
 @[to_additive /-- Every additive group element has a geodesic word representative. -/]
 theorem exists_isGeodesic : ∃ l, P.IsGeodesic l ∧ P.wordProd l = g := by
-  obtain ⟨l, rfl, hlen⟩ :
-      sInf (List.length '' {l | P.wordProd l = g}) ∈ List.length '' {l | P.wordProd l = g} :=
+  obtain ⟨l, rfl, hlen⟩
+      : sInf (List.length '' {l | P.wordProd l = g}) ∈ List.length '' {l | P.wordProd l = g} :=
     Nat.sInf_mem <| .image List.length (P.wordProd_surjective g)
   exact ⟨l, hlen.symm, rfl⟩
 
 /-! ### Word length -/
 
 @[to_additive]
-lemma wordLength_wordProd_le : P.wordLength (P.wordProd l) ≤ l.length :=
-  Nat.sInf_le ⟨l, rfl, rfl⟩
+lemma wordLength_wordProd_le : P.wordLength (P.wordProd l) ≤ l.length := Nat.sInf_le ⟨l, rfl, rfl⟩
 
-/-- The characterisation of word length: the word length of a group element is less or equal to `n`
-if and only if there exists a word `l` of length at most `n` which evaluates to `g`. -/
+/--
+The characterisation of word length: the word length of a group element is less or equal to `n`
+if and only if there exists a word `l` of length at most `n` which evaluates to `g`.
+-/
 @[to_additive /-- The characterisation of word length: the word length of an additive group
 element is less or equal to `n` if and only if there exists a word `l` of length at most `n` which
 evaluates to `g`. -/]
@@ -107,8 +111,7 @@ lemma wordLength_eq_zero_iff : P.wordLength g = 0 ↔ g = 1 := by
   simp [eq_comm]
 
 @[to_additive (attr := simp)]
-lemma wordLength_one : P.wordLength (1 : G) = 0 := by
-  rw [wordLength_eq_zero_iff]
+lemma wordLength_one : P.wordLength (1 : G) = 0 := by rw [wordLength_eq_zero_iff]
 
 -- This is superseded by `wordLength_inv`.
 @[to_additive]
@@ -140,8 +143,10 @@ noncomputable def groupNorm : GroupNorm G where
 
 /-! ### Word metric -/
 
-/-- The `wordLength` with respect to a generating family `P` gives `G` the structure of a normed
-group. -/
+/--
+The `wordLength` with respect to a generating family `P` gives `G` the structure of a normed
+group.
+-/
 @[to_additive (attr := instance_reducible) /-- The `wordLength` with respect to a generating family
 `P` gives `G` the structure of a normed additive group. -/]
 noncomputable def normedGroup : NormedGroup G := P.groupNorm.toNormedGroup

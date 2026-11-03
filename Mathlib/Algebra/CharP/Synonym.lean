@@ -17,7 +17,6 @@ Transfer characteristic instances from `R` to `Rᵒᵈ` and `Lex R`.
 
 public section
 
-
 variable {R : Type*}
 
 /-! ### Order dual -/
@@ -26,14 +25,14 @@ namespace OrderDual
 
 instance [AddMonoidWithOne R] [CharZero R] : CharZero Rᵒᵈ := inferInstanceAs <| CharZero R
 
-instance {p : ℕ} [AddMonoidWithOne R] [CharP R p] : CharP Rᵒᵈ p := inferInstanceAs <| CharP R p
+instance {p : ℕ} [AddMonoidWithOne R] [CharP R p] : CharP (Rᵒᵈ) p := inferInstanceAs <| CharP R p
 
-instance {p : ℕ} [AddMonoidWithOne R] [ExpChar R p] : ExpChar Rᵒᵈ p :=
+instance {p : ℕ} [AddMonoidWithOne R] [ExpChar R p] : ExpChar (Rᵒᵈ) p :=
   inferInstanceAs <| ExpChar R p
 
 @[simp]
 theorem ringChar_eq [NonAssocSemiring R] : ringChar Rᵒᵈ = ringChar R :=
-  ringChar.eq Rᵒᵈ (ringChar R)
+  ringChar.eq (Rᵒᵈ) (ringChar R)
 
 end OrderDual
 

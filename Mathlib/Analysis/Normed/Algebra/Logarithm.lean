@@ -6,7 +6,6 @@ Authors: Kevin Buzzard
 module
 
 public import Mathlib.Analysis.Analytic.OfScalars
-
 import Mathlib.Algebra.Algebra.TransferInstance
 
 /-!
@@ -66,28 +65,32 @@ open FormalMultilinearSeries
 
 section TopologicalAlgebra
 
-/-- `logSeries 𝕂 𝔸` is the `FormalMultilinearSeries` whose `n`-th term is the map
+/--
+`logSeries 𝕂 𝔸` is the `FormalMultilinearSeries` whose `n`-th term is the map
 `(xᵢ) : 𝔸ⁿ ↦ ((-1) ^ (n + 1) / n : 𝕂) • ∏ xᵢ`; its `0`-th term is `0` since `1 / 0 = 0`.
-The corresponding sum evaluated at `x - 1` is the logarithm `NormedSpace.log x`. -/
-def logSeries (𝕂 𝔸 : Type*) [Field 𝕂] [Ring 𝔸] [Algebra 𝕂 𝔸] [TopologicalSpace 𝔸]
-    [IsTopologicalRing 𝔸] : FormalMultilinearSeries 𝕂 𝔸 𝔸 := fun n =>
+The corresponding sum evaluated at `x - 1` is the logarithm `NormedSpace.log x`.
+-/
+def logSeries
+    (𝕂 𝔸 : Type*) [Field 𝕂] [Ring 𝔸] [Algebra 𝕂 𝔸] [TopologicalSpace 𝔸] [IsTopologicalRing 𝔸]
+    : FormalMultilinearSeries 𝕂 𝔸 𝔸 := fun n =>
   ((-1) ^ (n + 1) / n : 𝕂) • ContinuousMultilinearMap.mkPiAlgebraFin 𝕂 n 𝔸
 
 variable (𝕂 𝔸 : Type*) [Field 𝕂] [Ring 𝔸] [Algebra 𝕂 𝔸] [TopologicalSpace 𝔸] [IsTopologicalRing 𝔸]
 
-theorem logSeries_eq_ofScalars : logSeries 𝕂 𝔸 = ofScalars 𝔸 fun n ↦ ((-1) ^ (n + 1) / n : 𝕂) :=
-  rfl
+theorem logSeries_eq_ofScalars : logSeries 𝕂 𝔸 = ofScalars 𝔸 fun n ↦ ((-1) ^ (n + 1) / n : 𝕂) := rfl
 
 variable {𝕂 𝔸}
 
 open scoped Classical in
-/-- `NormedSpace.log : 𝔸 → 𝔸` is the logarithm `log x = ∑ₙ ((-1) ^ (n + 1) / n) • (x - 1) ^ n`.
+/--
+`NormedSpace.log : 𝔸 → 𝔸` is the logarithm `log x = ∑ₙ ((-1) ^ (n + 1) / n) • (x - 1) ^ n`.
 It is defined as the sum of the `FormalMultilinearSeries` `logSeries ℚ 𝔸` at `x - 1`, in the same
 way as `NormedSpace.exp`, and takes the junk value `0` where the series does not converge.
 
 If `𝔸` can't be equipped with a `ℚ`-algebra structure, we use the junk value `0`.
 -/
-@[no_expose] noncomputable def log (x : 𝔸) : 𝔸 :=
+@[no_expose]
+noncomputable def log (x : 𝔸) : 𝔸 :=
   if h : Nonempty (Algebra ℚ 𝔸) then
     letI _ := h.some
     (NormedSpace.logSeries ℚ 𝔸).sum (x - 1)
@@ -99,30 +102,35 @@ If `𝔸` can't be equipped with a `ℚ`-algebra structure, we use the junk valu
 theorem log_of_isEmpty_algebra_rat [IsEmpty (Algebra ℚ 𝔸)] (x : 𝔸) : log x = 0 := by
   rw [log, dite_eq_right (not_nonempty_iff.mpr ‹_›)]
 
-theorem logSeries_apply_eq (x : 𝔸) (n : ℕ) :
-    (logSeries 𝕂 𝔸 n fun _ => x) = ((-1) ^ (n + 1) / n : 𝕂) • x ^ n := by simp [logSeries]
+theorem logSeries_apply_eq (x : 𝔸) (n : ℕ)
+    : (logSeries 𝕂 𝔸 n fun _ => x) = ((-1) ^ (n + 1) / n : 𝕂) • x ^ n := by
+  simp [logSeries]
 
-theorem logSeries_sum_eq (x : 𝔸) :
-    (logSeries 𝕂 𝔸).sum x = ∑' n : ℕ, ((-1) ^ (n + 1) / n : 𝕂) • x ^ n :=
+theorem logSeries_sum_eq (x : 𝔸)
+    : (logSeries 𝕂 𝔸).sum x = ∑' n : ℕ, ((-1) ^ (n + 1) / n : 𝕂) • x ^ n :=
   tsum_congr fun n => logSeries_apply_eq x n
 
-private lemma neg_one_pow_div_natCast_eq_inv_intCast (T : Type*) [DivisionRing T] (k n : ℕ) :
-    ((-1) ^ k / n : T) = (((-1) ^ k * n : ℤ) : T)⁻¹ := by
+private lemma neg_one_pow_div_natCast_eq_inv_intCast (T : Type*) [DivisionRing T] (k n : ℕ)
+    : ((-1) ^ k / n : T) = (((-1) ^ k * n : ℤ) : T)⁻¹ := by
   rcases Nat.even_or_odd k with hk | hk <;> simp [hk.neg_one_pow, div_eq_mul_inv, inv_neg]
 
-/-- If `E` is a module over two division rings `R` and `S`, then scalar multiplication by the
-coefficients `(-1) ^ k / n` of the logarithm series agree in `R` and `S`. -/
-private lemma neg_one_pow_div_natCast_smul_eq {E : Type*} (R S : Type*) [AddCommGroup E]
-    [DivisionRing R] [DivisionRing S] [Module R E] [Module S E] (k n : ℕ) (x : E) :
-    ((-1) ^ k / n : R) • x = ((-1) ^ k / n : S) • x := by
+/--
+If `E` is a module over two division rings `R` and `S`, then scalar multiplication by the
+coefficients `(-1) ^ k / n` of the logarithm series agree in `R` and `S`.
+-/
+private lemma neg_one_pow_div_natCast_smul_eq
+    {E : Type*} (R S : Type*)
+    [AddCommGroup E] [DivisionRing R] [DivisionRing S] [Module R E] [Module S E]
+    (k n : ℕ) (x : E)
+    : ((-1) ^ k / n : R) • x = ((-1) ^ k / n : S) • x := by
   rw [neg_one_pow_div_natCast_eq_inv_intCast R, neg_one_pow_div_natCast_eq_inv_intCast S,
     inv_intCast_smul_eq R S]
 
 theorem logSeries_sum_eq_rat [Algebra ℚ 𝔸] : (logSeries 𝕂 𝔸).sum = (logSeries ℚ 𝔸).sum := by
   ext; simp_rw [logSeries_sum_eq, neg_one_pow_div_natCast_smul_eq 𝕂 ℚ]
 
-theorem logSeries_eq_logSeries_rat [Algebra ℚ 𝔸] (n : ℕ) :
-    (⇑(logSeries 𝕂 𝔸 n) : (Fin n → 𝔸) → 𝔸) = logSeries ℚ 𝔸 n := by
+theorem logSeries_eq_logSeries_rat [Algebra ℚ 𝔸] (n : ℕ)
+    : (⇑(logSeries 𝕂 𝔸 n) : (Fin n → 𝔸) → 𝔸) = logSeries ℚ 𝔸 n := by
   ext c
   simp [logSeries, neg_one_pow_div_natCast_smul_eq 𝕂 ℚ]
 
@@ -132,8 +140,8 @@ theorem log_eq_logSeries_sum [CharZero 𝕂] : log = fun x : 𝔸 ↦ (logSeries
   rw [log, dite_eq_left ⟨RestrictScalars.algebra ℚ 𝕂 𝔸⟩, ← @logSeries_sum_eq_rat (𝕂 := 𝕂)]
 
 variable (𝕂) in
-theorem log_eq_tsum [CharZero 𝕂] :
-    log = fun x : 𝔸 ↦ ∑' n : ℕ, ((-1) ^ (n + 1) / n : 𝕂) • (x - 1) ^ n := by
+theorem log_eq_tsum [CharZero 𝕂]
+    : log = fun x : 𝔸 ↦ ∑' n : ℕ, ((-1) ^ (n + 1) / n : 𝕂) • (x - 1) ^ n := by
   simp_rw [log_eq_logSeries_sum 𝕂, logSeries_sum_eq]
 
 theorem logSeries_apply_zero (n : ℕ) : logSeries 𝕂 𝔸 n (fun _ ↦ (0 : 𝔸)) = 0 := by
@@ -155,8 +163,8 @@ theorem log_op [T2Space 𝔸] (x : 𝔸) : log (MulOpposite.op x) = MulOpposite.
     simp_rw [← MulOpposite.op_one, ← MulOpposite.op_sub, ← MulOpposite.op_pow,
       ← MulOpposite.op_smul, tsum_op]
 
-theorem star_log [T2Space 𝔸] [StarRing 𝔸] [ContinuousStar 𝔸] (x : 𝔸) :
-    star (log x) = log (star x) := by
+theorem star_log [T2Space 𝔸] [StarRing 𝔸] [ContinuousStar 𝔸] (x : 𝔸)
+    : star (log x) = log (star x) := by
   obtain _ | ⟨⟨_⟩⟩ := isEmpty_or_nonempty (Algebra ℚ 𝔸)
   · simp
   · simp [log_eq_tsum ℚ, tsum_star]
@@ -164,9 +172,10 @@ theorem star_log [T2Space 𝔸] [StarRing 𝔸] [ContinuousStar 𝔸] (x : 𝔸)
 /-- A subring of `𝔸` that is closed topologically and under `ℚ`-scaling is closed under `log`. -/
 theorem log_mem
     {R S : Type*} [Monoid R] [SMul ℚ R] [MulAction R 𝔸] [Algebra ℚ 𝔸] [IsScalarTower ℚ R 𝔸]
-    [SetLike S 𝔸] [SubringClass S 𝔸] [SMulMemClass S R 𝔸] {s : S}
-    (h_closed : IsClosed (s : Set 𝔸)) {x : 𝔸} (h : x ∈ s) :
-    log x ∈ s := by
+    [SetLike S 𝔸] [SubringClass S 𝔸] [SMulMemClass S R 𝔸]
+    {s : S} (h_closed : IsClosed (s : Set 𝔸))
+    {x : 𝔸} (h : x ∈ s)
+    : log x ∈ s := by
   have := SMulMemClass.ofIsScalarTower S ℚ R 𝔸
   rw [log_eq_tsum ℚ]
   exact tsum_mem h_closed fun i => SMulMemClass.smul_mem _ <| pow_mem (sub_mem h (one_mem s)) _
@@ -179,20 +188,17 @@ open NormedSpace
 
 variable {𝔸 : Type*} [Ring 𝔸] [TopologicalSpace 𝔸] [IsTopologicalRing 𝔸]
 
-theorem log_right [T2Space 𝔸] {x y : 𝔸} (h : Commute x y) :
-    Commute x (log y) := by
+theorem log_right [T2Space 𝔸] {x y : 𝔸} (h : Commute x y) : Commute x (log y) := by
   obtain _ | ⟨⟨_⟩⟩ := isEmpty_or_nonempty (Algebra ℚ 𝔸)
   · simp
   · rw [log_eq_tsum ℚ]
     exact Commute.tsum_right x fun n =>
       ((h.sub_right (Commute.one_right x)).pow_right n).smul_right _
 
-theorem log_left [T2Space 𝔸] {x y : 𝔸} (h : Commute x y) :
-    Commute (log x) y :=
+theorem log_left [T2Space 𝔸] {x y : 𝔸} (h : Commute x y) : Commute (log x) y :=
   h.symm.log_right.symm
 
-theorem log [T2Space 𝔸] {x y : 𝔸} (h : Commute x y) :
-    Commute (log x) (log y) :=
+theorem log [T2Space 𝔸] {x y : 𝔸} (h : Commute x y) : Commute (log x) (log y) :=
   h.log_left.log_right
 
 end Commute

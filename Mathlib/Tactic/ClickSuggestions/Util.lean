@@ -34,20 +34,22 @@ open Widget PrettyPrinter.Delaborator
 def exprToHtml (e : Expr) : MetaM ProofWidgets.Html :=
   return jsx%{<InteractiveCode fmt={← Widget.ppExprTagged e}/>}
 
-/-- Turn a constant into an HTML with hover info.
-This avoids the `@` that may appear when using `exprToHtml`. -/
+/--
+Turn a constant into an HTML with hover info.
+This avoids the `@` that may appear when using `exprToHtml`.
+-/
 def constToHtml (n : Name) : MetaM ProofWidgets.Html := do
   let delab := withOptionAtCurrPos `pp.tagAppFns true delabConst
   let ⟨fmt, infos⟩ ← PrettyPrinter.ppExprWithInfos (delab := delab) (← mkConstWithLevelParams n)
   let tt := TaggedText.prettyTagged fmt
   let ctx := {
-    env           := (← getEnv)
-    mctx          := (← getMCtx)
-    options       := (← getOptions)
+    env := (← getEnv)
+    mctx := (← getMCtx)
+    options := (← getOptions)
     currNamespace := (← getCurrNamespace)
-    openDecls     := (← getOpenDecls)
-    fileMap       := default
-    ngen          := (← getNGen)
+    openDecls := (← getOpenDecls)
+    fileMap := default
+    ngen := (← getNGen)
   }
   return jsx%{<InteractiveCode fmt={← tagCodeInfos ctx infos tt}/>}
 
@@ -56,25 +58,25 @@ def formatToHtmlWithDoc (fmt : Format) (n : Name) : MetaM ProofWidgets.Html := d
   let tag := 0
   -- Hack: use `.ofCommandInfo` instead of `.ofTacticInfo` to avoid printing `n` and its type.
   -- Unfortunately, there is still a loose dangling ` : `.
-  let infos := .insert ∅ tag <| .ofCommandInfo
-    { elaborator := `ClickSuggestions, stx := .node .none n #[] }
+  let infos :=
+    .insert ∅ tag <| .ofCommandInfo { elaborator := `ClickSuggestions, stx := .node .none n #[] }
   let tt := TaggedText.prettyTagged <| .tag tag fmt
   let ctx := {
-    env           := (← getEnv)
-    mctx          := (← getMCtx)
-    options       := (← getOptions)
+    env := (← getEnv)
+    mctx := (← getMCtx)
+    options := (← getOptions)
     currNamespace := (← getCurrNamespace)
-    openDecls     := (← getOpenDecls)
-    fileMap       := default
-    ngen          := (← getNGen)
+    openDecls := (← getOpenDecls)
+    fileMap := default
+    ngen := (← getNGen)
   }
   -- TODO: I would love to print this using the same keyword colour used by the editor,
   -- but I don't think this is possible. Additionally, `InteractiveCode` already overwrites the
   -- colour and style of the text (namely the expression style)
   return jsx%{<InteractiveCode fmt={← tagCodeInfos ctx infos tt} />}
 
-
-/-- Pretty print a tactic with its docstring as hover info.
+/--
+Pretty print a tactic with its docstring as hover info.
 
 I would love to print `tac` with another colour, e.g. the keyword highlighting used by the editor,
 but I have no idea how to do this.
@@ -96,7 +98,7 @@ inductive Premise where
   | const (declName : Name)
   /-- A free variable. -/
   | fvar (fvarId : FVarId)
-  deriving Inhabited
+deriving Inhabited
 
 namespace Premise
 
@@ -105,8 +107,7 @@ def toString : Premise → String
   | .const name | .fvar ⟨name⟩ => name.toString
 
 /-- The name length of a premise. -/
-def length (premise : Premise) : Nat :=
-  premise.toString.length
+def length (premise : Premise) : Nat := premise.toString.length
 
 /-- Get the type of a premise. -/
 def getType : Premise → MetaM Expr
@@ -146,8 +147,10 @@ end Premise
 structure State where
   /-- The ongoing computations. -/
   status : Std.HashMap String Nat := {}
-  /-- Whether any progress has been made at all. If all computations have been finished
-  and no progress has been made, then inform the user. -/
+  /--
+  Whether any progress has been made at all. If all computations have been finished
+  and no progress has been made, then inform the user.
+  -/
   progress : Bool := false
   /-- The suggestions that close the goal. -/
   solvedSuggestions : Array ProofWidgets.Html := #[]
@@ -156,19 +159,25 @@ structure State where
 structure Context where
   /-- The current document -/
   «meta» : DocumentMeta
-  /-- The range that should be replaced.
+  /--
+  The range that should be replaced.
   In tactic mode, this should be the range of the suggestion tactic.
-  In infoview mode, the start and end of the range should both be the cursor position. -/
+  In infoview mode, the start and end of the range should both be the cursor position.
+  -/
   cursorPos : Lsp.Position
   /-- Whether to use the `on_goal n =>` combinator. -/
   onGoal : Option Nat
   /-- Whether to use the `·` combinator. -/
   focus : Bool
-  /-- The preceding piece of syntax, if available. It is not available if the cursor is
-  at the start of the next tactic. This is used for merging consecutive `rw` tactics. -/
+  /--
+  The preceding piece of syntax, if available. It is not available if the cursor is
+  at the start of the next tactic. This is used for merging consecutive `rw` tactics.
+  -/
   stx : Option (TSyntax `tactic)
-  /-- The token for updating the main HTML body of suggestions.
-  This is used for displaying a message that no progress has happened. -/
+  /--
+  The token for updating the main HTML body of suggestions.
+  This is used for displaying a message that no progress has happened.
+  -/
   masterToken : RefreshToken
   /-- The token for the `⏳️` HTML that represents the state of the ongoing computations. -/
   statusToken : RefreshToken
@@ -202,30 +211,43 @@ private def checkProgress : ClickSuggestionsM Unit := do
 
 /-- Get the syntax of the variable whose type the user selected. -/
 def getHypIdent? : ClickSuggestionsM (Option Ident) := do
-  let some fvarId := (← read).hyp? | return none
+  let some fvarId := (← read).hyp?
+    | return none
   return mkIdent (← fvarId.getUserName)
 
 /-- Get the variable whose type the user selected. -/
 def getHypIdent! : ClickSuggestionsM Ident := do
-  let some fvarId := (← read).hyp? | throwError "no hypothesis was selected"
+  let some fvarId := (← read).hyp?
+    | throwError "no hypothesis was selected"
   return mkIdent (← fvarId.getUserName)
 
 /-- Run a computation in such a way that we can keep track of it. -/
 def trackingComputation {α} (name : String) (k : ClickSuggestionsM α) : ClickSuggestionsM α := do
-  modify (fun s ↦ { s with status := s.status.alter name fun
-    | none => some 0
-    | some n => some (n + 1) })
+  modify (fun s ↦ {
+    s with
+    status :=
+      s.status.alter name fun
+        | none => some 0
+        | some n => some (n + 1)
+  })
   renderStatus
-  try k
+  try
+    k
   finally
-    modify (fun s ↦ { s with status := s.status.alter name fun
-      | some (n + 1) => some n
-      | _ => none })
+    modify (fun s ↦ {
+      s with
+      status :=
+        s.status.alter name fun
+          | some (n + 1) => some n
+          | _ => none
+    })
     renderStatus
     checkProgress
 where
-  /-- If the set of computations is non-empty, display a `⏳️` symbol with hover information that
-  shows all of the ongoing computations. -/
+  /--
+  If the set of computations is non-empty, display a `⏳️` symbol with hover information that
+  shows all of the ongoing computations.
+  -/
   renderStatus : ClickSuggestionsM Unit := do
     let { status, .. } ← get
     let { statusToken, .. } ← read
@@ -234,16 +256,19 @@ where
         .text ""
       else
         -- TODO: use a fancier throbber instead of `⏳️`?
-        let title := "ongoing computations: " ++ String.intercalate ", " status.keys;
+        let title := "ongoing computations: " ++ String.intercalate ", " status.keys
         jsx%{<span title={title}>⏳️</span>}
 
 section Meta
 
-/-- Determine whether the explicit parts of two expressions are equal,
+/--
+Determine whether the explicit parts of two expressions are equal,
 and the implicit parts are definitionally equal, up to `reducible_and_instances` transparency.
-This says whether two expressions are 'morally equal', and is used for deduplicating suggestions. -/
+This says whether two expressions are 'morally equal', and is used for deduplicating suggestions.
+-/
 partial def isExplicitEq (t s : Expr) : MetaM Bool := do
-  let t := t.cleanupAnnotations; let s := s.cleanupAnnotations
+  let t := t.cleanupAnnotations
+  let s := s.cleanupAnnotations
   if t == s then
     return true
   unless t.getAppNumArgs == s.getAppNumArgs && t.getAppFn == s.getAppFn do
@@ -267,7 +292,8 @@ where
       unless fnType.isForall do
         fnType ← whnfD (fnType.instantiateRevRange j i args)
         j := i
-      let .forallE _ _ b bi := fnType | throwError m! "expected function type {indentExpr fnType}"
+      let .forallE _ _ b bi := fnType
+        | throwError m!"expected function type {indentExpr fnType}"
       fnType := b
       result := result.push bi
     return result
@@ -277,19 +303,25 @@ end Meta
 section Syntax
 open Syntax Parser.Tactic
 
-/-- Information about the rewrite position. This is used to determine whether to suggest
-`rw`, `rw!`, `nth_rw`, or `simp_rw`. -/
+/--
+Information about the rewrite position. This is used to determine whether to suggest
+`rw`, `rw!`, `nth_rw`, or `simp_rw`.
+-/
 inductive RwKind where
-  /-- `rw` cannot rewrite here, because the subexpression contains bound variables.
-  So, we suggest `simp_rw`. -/
+  /--
+  `rw` cannot rewrite here, because the subexpression contains bound variables.
+  So, we suggest `simp_rw`.
+  -/
   | hasBVars
-  /-- If `motiveTypeCorrect := true`, we suggest `rw!` instead of `rw`.
-  If `occ := some n`, we suggest `nth_rw n` instead of `rw`. -/
+  /--
+  If `motiveTypeCorrect := true`, we suggest `rw!` instead of `rw`.
+  If `occ := some n`, we suggest `nth_rw n` instead of `rw`.
+  -/
   | valid (motiveTypeCorrect : Bool) (occ : Option Nat)
 
 /-- Construct the syntax for a rewrite tactic. -/
-def mkRewrite (kind : RwKind) (symm : Bool) (e : Term) (loc : Option Ident)
-    (grw := false) : CoreM (TSyntax `tactic) := do
+def mkRewrite (kind : RwKind) (symm : Bool) (e : Term) (loc : Option Ident) (grw := false)
+    : CoreM (TSyntax `tactic) := do
   let rule ← if symm then `(Parser.Tactic.rwRule| ← $e) else `(Parser.Tactic.rwRule| $e:term)
   if grw then
     match kind with
@@ -306,41 +338,47 @@ def mkRewrite (kind : RwKind) (symm : Bool) (e : Term) (loc : Option Ident)
       `(tactic| rw! $occs [$rule] $[at $loc:term]?)
     | .hasBVars => `(tactic| simp_rw [$rule] $[at $loc:term]?)
 
-/-- Try to combine the suggested tactic with the preceding tactic in the tactic sequence.
-In particular, we merge sequences of `rw`, `simp_rw` and `grw`. -/
-partial def mergeTactics? {m} [Monad m] [MonadQuotation m] (stx₁ stx₂ : TSyntax `tactic) :
-    m (Option (TSyntax `tactic)) := do
+/--
+Try to combine the suggested tactic with the preceding tactic in the tactic sequence.
+In particular, we merge sequences of `rw`, `simp_rw` and `grw`.
+-/
+partial def mergeTactics? {m} [Monad m] [MonadQuotation m] (stx₁ stx₂ : TSyntax `tactic)
+    : m (Option (TSyntax `tactic)) := do
   match stx₁, stx₂ with
   | `(tactic| on_goal $n₁:num => $tac₁:tactic), `(tactic| on_goal $n₂:num => $tac₂:tactic) =>
     if n₁.getNat == n₂.getNat then
       if let some tac ← mergeTactics? tac₁ tac₂ then
         return ← `(tactic| on_goal $n₁:num => $tac:tactic)
-  | `(tactic| rw [$[$rules₁],*] $[at $h₁:ident]?),
-    `(tactic| rw [$[$rules₂],*] $[at $h₂:ident]?) =>
+  | `(tactic| rw [$[$rules₁],*] $[at $h₁:ident]?), `(tactic| rw [$[$rules₂],*] $[at $h₂:ident]?) =>
     if h₁.map (·.getId) == h₂.map (·.getId) then
       return ← `(tactic| rw [$[$(rules₁ ++ rules₂)],*] $[at $h₁:ident]?)
   | `(tactic| simp_rw [$[$rules₁],*] $[at $h₁:ident]?),
-    `(tactic| simp_rw [$[$rules₂],*] $[at $h₂:ident]?) =>
+      `(tactic| simp_rw [$[$rules₂],*] $[at $h₂:ident]?) =>
     if h₁.map (·.getId) == h₂.map (·.getId) then
       return ← `(tactic| simp_rw [$[$(rules₁ ++ rules₂)],*] $[at $h₁:ident]?)
   | `(tactic| grw [$[$rules₁],*] $[at $h₁:ident]?),
-    `(tactic| grw [$[$rules₂],*] $[at $h₂:ident]?) =>
+      `(tactic| grw [$[$rules₂],*] $[at $h₂:ident]?) =>
     if h₁.map (·.getId) == h₂.map (·.getId) then
       return ← `(tactic| grw [$[$(rules₁ ++ rules₂)],*] $[at $h₁:ident]?)
   | _, _ => pure ()
   return none
 
-/-- Given tactic syntax `tac` that we want to paste into the editor, return it as a string.
-This function respects the 100 character limit for long lines. -/
+/--
+Given tactic syntax `tac` that we want to paste into the editor, return it as a string.
+This function respects the 100 character limit for long lines.
+-/
 def tacticPasteString (tac : TSyntax `tactic) : ClickSuggestionsM String := do
   let column := (← read).cursorPos.character
   let indent := column
   return (← PrettyPrinter.ppTactic tac).pretty 100 indent column
 
-/-- Given tactic syntax `tac`, compute the text edit that will paste it into the editor.
-We return the range that should be replaced, and the new text that will replace it. -/
+/--
+Given tactic syntax `tac`, compute the text edit that will paste it into the editor.
+We return the range that should be replaced, and the new text that will replace it.
+-/
 def mkInsertion (tac : TSyntax `tactic) : ClickSuggestionsM (Lsp.Range × String) := do
-  let tac ← match (← read).onGoal with
+  let tac ←
+    match (← read).onGoal with
     | some n => `(tactic| on_goal $(Syntax.mkNatLit (n + 1)):num => $tac:tactic)
     | none => pure tac
   if let some stx := (← read).stx then
@@ -352,8 +390,11 @@ def mkInsertion (tac : TSyntax `tactic) : ClickSuggestionsM (Lsp.Range × String
         let tactic ← tacticPasteString tac
         return (text.utf8RangeToLspRange ⟨range.start, endPos⟩, tactic ++ extraWhitespace)
   let tac ← if (← read).focus then `(tactic| · $tac:tactic) else pure tac
-  return (⟨(← read).cursorPos, (← read).cursorPos⟩,
-    s!"{← tacticPasteString tac}\n{String.replicate (← read).cursorPos.character ' '}")
+  return (
+    ⟨(← read).cursorPos, (← read).cursorPos⟩,
+    s!"{← tacticPasteString tac}\
+      \n{String.replicate (← read).cursorPos.character ' '}"
+  )
 
 end Syntax
 
@@ -361,11 +402,14 @@ section Widget
 
 open Widget
 
-/-- Generate a suggestion for inserting `tac`, with message `html`.
+/--
+Generate a suggestion for inserting `tac`, with message `html`.
 `button` will be used as the text on the clickable button.
-If `solves := true`, then a `🎉️` emoji is added. -/
-def mkSuggestion (tac : TSyntax `tactic) (button : String) (html : ProofWidgets.Html)
-    (solves : Bool) : ClickSuggestionsM ProofWidgets.Html := do
+If `solves := true`, then a `🎉️` emoji is added.
+-/
+def mkSuggestion
+    (tac : TSyntax `tactic) (button : String) (html : ProofWidgets.Html) (solves : Bool)
+    : ClickSuggestionsM ProofWidgets.Html := do
   let (range, newText) ← mkInsertion tac (← read)
   let buttonText := s!"{if solves then "🎉️" else ""}[{button}] "
   let button :=
@@ -381,7 +425,8 @@ def mkSuggestion (tac : TSyntax `tactic) (button : String) (html : ProofWidgets.
 def addSolvingSuggestion (tac : TSyntax `tactic) : ClickSuggestionsM Unit := do
   let html ← mkSuggestion tac "done" (.text (← PrettyPrinter.ppTactic tac).pretty) (solves := true)
   modify fun s ↦ { s with solvedSuggestions := s.solvedSuggestions.push html }
-  (← read).solvedToken.update jsx%{<details open={true}>
+  (← read).solvedToken.update
+    jsx%{<details open={true}>
     <summary className="mv2 pointer">
     Tactics that solve the goal
     </summary>
@@ -399,14 +444,14 @@ def kabstractFindsPositions (e p : Expr) (targetPos : SubExpr.Pos) : MetaM Bool 
   let rec visit (e : Expr) (pos : SubExpr.Pos) : MetaM Unit := do
     let visitChildren : MetaM Unit := do
       match e with
-      | .app f a         => visit f pos.pushAppFn; visit a pos.pushAppArg
-      | .mdata _ e       => visit e pos
-      | .proj _ _ e      => visit e pos.pushProj
-      | .letE _ t v b _  =>
+      | .app f a => visit f pos.pushAppFn; visit a pos.pushAppArg
+      | .mdata _ e => visit e pos
+      | .proj _ _ e => visit e pos.pushProj
+      | .letE _ t v b _ =>
         visit t pos.pushLetVarType; visit v pos.pushLetValue; visit b pos.pushLetBody
-      | .lam _ d b _     => visit d pos.pushBindingDomain; visit b pos.pushBindingBody
+      | .lam _ d b _ => visit d pos.pushBindingDomain; visit b pos.pushBindingBody
       | .forallE _ d b _ => visit d pos.pushBindingDomain; visit b pos.pushBindingBody
-      | _                => pure ()
+      | _ => pure ()
     if e.hasLooseBVars then
       visitChildren
     else if e.toHeadIndex != pHeadIdx || e.headNumArgs != pNumArgs then
@@ -428,17 +473,18 @@ def kabstractFindsPositions (e p : Expr) (targetPos : SubExpr.Pos) : MetaM Bool 
   catch _ =>
     return false
 
-/-- Determine which metavariables count as "unhelpful", given the old and new metavariables.
+/--
+Determine which metavariables count as "unhelpful", given the old and new metavariables.
 This is used in suggestions of e.g. `apply`, to filter out suggestions with unhelpful metavariables.
 
 A metavariable is unhelpful if it was freshly introduced, and is not used in the assignment
 of a previously appearing metavariable.
 -/
-def hasUnhelpfulMVars (newMVars : Array MVarId) (oldMVars newExpressions : Array Expr) :
-    MetaM Bool := do
+def hasUnhelpfulMVars (newMVars : Array MVarId) (oldMVars newExpressions : Array Expr)
+    : MetaM Bool := do
   let used ← oldMVars.foldlM (init := {}) (Expr.collectMVars · <$> instantiateMVars ·)
   let used := used.result
-  let unhelpful := newMVars.filter (!used.contains ·)
+  let unhelpful := newMVars.filter (! used.contains ·)
   return newExpressions.any (·.findMVar? unhelpful.contains |>.isSome)
 
 end Mathlib.Tactic.ClickSuggestions

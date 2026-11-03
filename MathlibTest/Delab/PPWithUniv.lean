@@ -11,8 +11,7 @@ Setting `pp.mdata` to `true` used to break delaboration of
 constants tagged with `@[pp_with_univ]`, so we test for it.
 -/
 
-@[pp_with_univ]
-def Foo := Sort u
+@[pp_with_univ] def Foo := Sort u
 
 /-- info: Foo.{u} : Type u -/
 #guard_msgs in
@@ -27,8 +26,7 @@ set_option pp.mdata true in
 #guard_msgs in
 #check Foo.{3}
 
-@[pp_with_univ]
-def Bar (n : Nat) := Fin n → Sort u
+@[pp_with_univ] def Bar (n : Nat) := Fin n → Sort u
 
 /-- info: Bar.{u} : Nat → Type u -/
 #guard_msgs in

@@ -31,8 +31,10 @@ def evalInt (e : Expr) : MetaM Int := do
       return v.num
   throwError "the following entry cannot be simplified to an integer numeral{indentExpr e}"
 
-/-- Evaluate a `ℤ√d` entry to its value. The entry is a `⟨re, im⟩` literal, `√d` itself, or
-an entry without `√d` content, which `norm_num` evaluates. -/
+/--
+Evaluate a `ℤ√d` entry to its value. The entry is a `⟨re, im⟩` literal, `√d` itself, or
+an entry without `√d` content, which `norm_num` evaluates.
+-/
 def evalZsqrtdEntry (d : ℤ) (e : Expr) : MetaM (ℤ√d) := do
   match_expr e with
   | Zsqrtd.mk _ re im => return ⟨← evalInt re, ← evalInt im⟩
@@ -51,30 +53,36 @@ def zsqrtdOps (d : ℤ) : RingOps (ℤ√d) where
     ⟨z.re / n, z.im / n⟩
   isZero := (· == 0)
 
-/-- The `ℤ√d` model of the ring `α`, which reduces to `Zsqrtd dQ`.
-The elimination runs on `ℤ√d` values. `d` is the value of the integer literal `dQ`. -/
-def zsqrtdModel {u : Level} (α : Q(Type u)) (dQ : Q(ℤ)) (d : ℤ) : Model α := .mk (ℤ√d) {
-  ops := zsqrtdOps d
-  evalEntry e := return (← evalZsqrtdEntry d e, none)
-  -- The entries are rebuilt in the numeral form instead of returned as the carrier's shape
-  -- since the raw literals display as `Int.ofNat 3`, and `simp` does not normalise them.
-  mkEntry v := do
-    -- An integer value is emitted as an integer numeral.
-    if v.im = 0 then
-      let n : Q(Zsqrtd $dQ) ← mkNumeral q(Zsqrtd $dQ) v.re.natAbs
-      let entry : Q(Zsqrtd $dQ) := if v.re < 0 then q(-$n) else n
+/--
+The `ℤ√d` model of the ring `α`, which reduces to `Zsqrtd dQ`.
+The elimination runs on `ℤ√d` values. `d` is the value of the integer literal `dQ`.
+-/
+def zsqrtdModel {u : Level} (α : Q(Type u)) (dQ : Q(ℤ)) (d : ℤ) : Model α :=
+  .mk (ℤ√d) {
+    ops := zsqrtdOps d
+    evalEntry e := return (← evalZsqrtdEntry d e, none)
+    -- The entries are rebuilt in the numeral form instead of returned as the carrier's shape
+    -- since the raw literals display as `Int.ofNat 3`, and `simp` does not normalise them.
+    mkEntry v := do
+      -- An integer value is emitted as an integer numeral.
+      if v.im = 0 then
+        let n : Q(Zsqrtd $dQ) ← mkNumeral (q(Zsqrtd $dQ)) v.re.natAbs
+        let entry : Q(Zsqrtd $dQ) := if v.re < 0 then q(-$n) else n
+        return entry
+      let entry : Q(Zsqrtd $dQ) := q(⟨$(mkIntLitQ v.re), $(mkIntLitQ v.im)⟩)
       return entry
-    let entry : Q(Zsqrtd $dQ) := q(⟨$(mkIntLitQ v.re), $(mkIntLitQ v.im)⟩)
-    return entry
-}
+  }
 
 /-- The `ℤ√d` model registration: handles `Zsqrtd d` for an integer literal `d`. -/
-@[bareiss_ext] def zsqrtdExt : BareissExt where
+@[bareiss_ext]
+def zsqrtdExt : BareissExt where
   model? α := do
     -- unfold reducible aliases such as `GaussianInt` before matching
     let R ← whnfR α
-    let_expr Zsqrtd dE := R | return none
-    let some d ← getIntValue? dE | return none
+    let_expr Zsqrtd dE := R
+      | return none
+    let some d ← getIntValue? dE
+      | return none
     have dQ : Q(ℤ) := dE
     return zsqrtdModel α dQ d
 

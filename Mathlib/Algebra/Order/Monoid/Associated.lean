@@ -31,8 +31,7 @@ instance instPreorder : Preorder (Associates M) where
 
 lemma dvd_eq_le : ((· ∣ ·) : Associates M → Associates M → Prop) = (· ≤ ·) := rfl
 
-lemma isUnit_iff_eq_bot : IsUnit a ↔ a = ⊥ := by
-  rw [Associates.isUnit_iff_eq_one, bot_eq_one]
+lemma isUnit_iff_eq_bot : IsUnit a ↔ a = ⊥ := by rw [Associates.isUnit_iff_eq_one, bot_eq_one]
 
 lemma mul_mono (h₁ : a ≤ b) (h₂ : c ≤ d) : a * c ≤ b * d :=
   let ⟨x, hx⟩ := h₁
@@ -46,8 +45,7 @@ instance instOrderBot : OrderBot (Associates M) where
   bot_le _ := one_le
 
 @[deprecated _root_.one_le +typeChanged (since := "2026-05-07")]
-protected lemma one_le : 1 ≤ a :=
-  one_le
+protected lemma one_le : 1 ≤ a := one_le
 
 lemma le_mul_right : a ≤ a * b := ⟨b, rfl⟩
 lemma le_mul_left : a ≤ b * a := by rw [mul_comm]; exact le_mul_right

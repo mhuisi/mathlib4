@@ -6,7 +6,6 @@ Authors: Markus Himmel
 module
 
 public import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Basic
-
 import Mathlib.CategoryTheory.Limits.FilteredColimitCommutesFiniteLimit
 
 set_option doc.verso true

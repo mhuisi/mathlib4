@@ -26,22 +26,26 @@ public meta section
 namespace Mathlib.Meta.NormNum
 open Lean Lean.Meta Qq Ordinal
 
-/- The `guard_msgs` in this file are for checking whether the current default extensions have been
-updated and the extensions in this file are no longer needed. -/
+/-
+The `guard_msgs` in this file are for checking whether the current default extensions have been
+updated and the extensions in this file are no longer needed.
+-/
 
 /-- info: 12 * 5 -/
 #guard_msgs in
 #norm_num (12 : Ordinal.{0}) * (5 : Ordinal.{0})
 
-lemma isNat_ordinalMul.{u} : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
-    IsNat a an → IsNat b bn → an * bn = rn → IsNat (a * b) rn
+lemma isNat_ordinalMul.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
+      IsNat a an → IsNat b bn → an * bn = rn → IsNat (a * b) rn
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨Eq.symm <| natCast_mul ..⟩
 
 /-- The `norm_num` extension for multiplication on ordinals. -/
 @[norm_num (_ : Ordinal) * (_ : Ordinal)]
 def evalOrdinalMul : NormNumExt where
   eval {u α} e := do
-    let some u' := u.dec | throwError "level is not succ"
+    let some u' := u.dec
+      | throwError "level is not succ"
     haveI' : u =QL u' + 1 := ⟨⟩
     match α, e with
     | ~q(Ordinal.{u'}), ~q(($a : Ordinal) * ($b : Ordinal)) =>
@@ -61,20 +65,22 @@ def evalOrdinalMul : NormNumExt where
 #guard_msgs in
 #norm_num (5 : Ordinal.{0}) < 12
 
-lemma isNat_ordinalLE_true.{u} : ∀ {a b : Ordinal.{u}} {an bn : ℕ},
-    IsNat a an → IsNat b bn → decide (an ≤ bn) = true → a ≤ b
+lemma isNat_ordinalLE_true.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn : ℕ}, IsNat a an → IsNat b bn → decide (an ≤ bn) = true → a ≤ b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => Nat.cast_le.mpr <| of_decide_eq_true h
 
-lemma isNat_ordinalLE_false.{u} : ∀ {a b : Ordinal.{u}} {an bn : ℕ},
-    IsNat a an → IsNat b bn → decide (an ≤ bn) = false → ¬a ≤ b
+lemma isNat_ordinalLE_false.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn : ℕ},
+      IsNat a an → IsNat b bn → decide (an ≤ bn) = false → ¬ a ≤ b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => not_iff_not.mpr Nat.cast_le |>.mpr <| of_decide_eq_false h
 
-lemma isNat_ordinalLT_true.{u} : ∀ {a b : Ordinal.{u}} {an bn : ℕ},
-    IsNat a an → IsNat b bn → decide (an < bn) = true → a < b
+lemma isNat_ordinalLT_true.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn : ℕ}, IsNat a an → IsNat b bn → decide (an < bn) = true → a < b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => Nat.cast_lt.mpr <| of_decide_eq_true h
 
-lemma isNat_ordinalLT_false.{u} : ∀ {a b : Ordinal.{u}} {an bn : ℕ},
-    IsNat a an → IsNat b bn → decide (an < bn) = false → ¬a < b
+lemma isNat_ordinalLT_false.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn : ℕ},
+      IsNat a an → IsNat b bn → decide (an < bn) = false → ¬ a < b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => not_iff_not.mpr Nat.cast_lt |>.mpr <| of_decide_eq_false h
 
 /-- The `norm_num` extension for inequality on ordinals. -/
@@ -117,15 +123,17 @@ def evalOrdinalLT : NormNumExt where
 #guard_msgs in
 #norm_num (12 : Ordinal.{0}) - 5
 
-lemma isNat_ordinalSub.{u} : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
-    IsNat a an → IsNat b bn → an - bn = rn → IsNat (a - b) rn
+lemma isNat_ordinalSub.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
+      IsNat a an → IsNat b bn → an - bn = rn → IsNat (a - b) rn
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨Eq.symm <| natCast_sub ..⟩
 
 /-- The `norm_num` extension for subtraction on ordinals. -/
 @[norm_num (_ : Ordinal) - (_ : Ordinal)]
 def evalOrdinalSub : NormNumExt where
   eval {u α} e := do
-    let some u' := u.dec | throwError "level is not succ"
+    let some u' := u.dec
+      | throwError "level is not succ"
     haveI' : u =QL u' + 1 := ⟨⟩
     match α, e with
     | ~q(Ordinal.{u'}), ~q(($a : Ordinal) - ($b : Ordinal)) =>
@@ -141,15 +149,17 @@ def evalOrdinalSub : NormNumExt where
 #guard_msgs in
 #norm_num (12 : Ordinal.{0}) / 5
 
-lemma isNat_ordinalDiv.{u} : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
-    IsNat a an → IsNat b bn → an / bn = rn → IsNat (a / b) rn
+lemma isNat_ordinalDiv.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
+      IsNat a an → IsNat b bn → an / bn = rn → IsNat (a / b) rn
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨Eq.symm <| natCast_div ..⟩
 
 /-- The `norm_num` extension for division on ordinals. -/
 @[norm_num (_ : Ordinal) / (_ : Ordinal)]
 def evalOrdinalDiv : NormNumExt where
   eval {u α} e := do
-    let some u' := u.dec | throwError "level is not succ"
+    let some u' := u.dec
+      | throwError "level is not succ"
     haveI' : u =QL u' + 1 := ⟨⟩
     match α, e with
     | ~q(Ordinal.{u'}), ~q(($a : Ordinal) / ($b : Ordinal)) =>
@@ -165,15 +175,17 @@ def evalOrdinalDiv : NormNumExt where
 #guard_msgs in
 #norm_num (12 : Ordinal.{0}) % 5
 
-lemma isNat_ordinalMod.{u} : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
-    IsNat a an → IsNat b bn → an % bn = rn → IsNat (a % b) rn
+lemma isNat_ordinalMod.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
+      IsNat a an → IsNat b bn → an % bn = rn → IsNat (a % b) rn
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨Eq.symm <| natCast_mod ..⟩
 
 /-- The `norm_num` extension for modulo on ordinals. -/
 @[norm_num (_ : Ordinal) % (_ : Ordinal)]
 def evalOrdinalMod : NormNumExt where
   eval {u α} e := do
-    let some u' := u.dec | throwError "level is not succ"
+    let some u' := u.dec
+      | throwError "level is not succ"
     haveI' : u =QL u' + 1 := ⟨⟩
     match α, e with
     | ~q(Ordinal.{u'}), ~q(($a : Ordinal) % ($b : Ordinal)) =>
@@ -185,15 +197,17 @@ def evalOrdinalMod : NormNumExt where
       pure (.isNat i rn q(isNat_ordinalMod $pa $pb (.refl $rn)))
     | _, _ => throwError "not modulo on ordinals"
 
-lemma isNat_ordinalOPow.{u} : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
-    IsNat a an → IsNat b bn → an ^ bn = rn → IsNat (a ^ b) rn
+lemma isNat_ordinalOPow.{u}
+    : ∀ {a b : Ordinal.{u}} {an bn rn : ℕ},
+      IsNat a an → IsNat b bn → an ^ bn = rn → IsNat (a ^ b) rn
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨(opow_natCast ..).trans (natCast_pow ..).symm⟩
 
 /-- The `norm_num` extension for homogeneous power on ordinals. -/
 @[norm_num (_ : Ordinal) ^ (_ : Ordinal)]
 def evalOrdinalOPow : NormNumExt where
   eval {u α} e := do
-    let some u' := u.dec | throwError "level is not succ"
+    let some u' := u.dec
+      | throwError "level is not succ"
     haveI' : u =QL u' + 1 := ⟨⟩
     match α, e with
     | ~q(Ordinal.{u'}), ~q(($a : Ordinal) ^ ($b : Ordinal)) =>
@@ -209,15 +223,17 @@ def evalOrdinalOPow : NormNumExt where
 #guard_msgs in
 #norm_num (12 : Ordinal.{0}) ^ (2 : ℕ)
 
-lemma isNat_ordinalNPow.{u} : ∀ {a : Ordinal.{u}} {b an bn rn : ℕ},
-    IsNat a an → IsNat b bn → an ^ bn = rn → IsNat (a ^ b) rn
+lemma isNat_ordinalNPow.{u}
+    : ∀ {a : Ordinal.{u}} {b an bn rn : ℕ},
+      IsNat a an → IsNat b bn → an ^ bn = rn → IsNat (a ^ b) rn
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨Eq.symm <| natCast_pow ..⟩
 
 /-- The `norm_num` extension for natural power on ordinals. -/
 @[norm_num (_ : Ordinal) ^ (_ : ℕ)]
 def evalOrdinalNPow : NormNumExt where
   eval {u α} e := do
-    let some u' := u.dec | throwError "level is not succ"
+    let some u' := u.dec
+      | throwError "level is not succ"
     haveI' : u =QL u' + 1 := ⟨⟩
     match α, e with
     | ~q(Ordinal.{u'}), ~q(($a : Ordinal) ^ ($b : ℕ)) =>

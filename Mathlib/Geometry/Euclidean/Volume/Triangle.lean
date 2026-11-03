@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Geometry.Euclidean.Angle.Unoriented.Affine
 public import Mathlib.Geometry.Euclidean.Volume.Def
-
 import Mathlib.Geometry.Euclidean.Triangle
 import Mathlib.Geometry.Euclidean.Volume.Basic
 
@@ -40,9 +39,10 @@ theorem volume_eq_height_mul : t.volume = 2⁻¹ * t.height i₁ * dist (t.point
   simp [s.volume_eq 0, volume_eq_dist, faceOpposite_point_eq_point_succAbove]
 
 include h₁₂ h₁₃ h₂₃ in
-theorem volume_eq_mul_sin :
-    t.volume = 2⁻¹ * dist (t.points i₁) (t.points i₂) * dist (t.points i₂) (t.points i₃) *
-      Real.sin (∠ (t.points i₁) (t.points i₂) (t.points i₃)) := by
+theorem volume_eq_mul_sin
+    : t.volume
+      = 2⁻¹ * dist (t.points i₁) (t.points i₂) * dist (t.points i₂) (t.points i₃)
+        * Real.sin (∠ (t.points i₁) (t.points i₂) (t.points i₃)) := by
   rw [t.volume_eq_height_mul h₁₂ h₁₃ h₂₃, t.height_eq_sin_mul_dist h₁₂ h₁₃ h₂₃]
   ring
 

@@ -77,6 +77,6 @@ theorem noZeroDivisors_polynomial : NoZeroDivisors NatMaxAdd[X] := inferInstance
 
 end NatMaxAdd
 
-theorem not_isDomain_commSemiring_imp_isDomain_polynomial :
-    ¬ ∀ (R : Type) [CommSemiring R] [IsDomain R], IsDomain R[X] :=
-  fun h ↦ NatMaxAdd.not_isDomain_polynomial (h _)
+theorem not_isDomain_commSemiring_imp_isDomain_polynomial
+    : ¬ ∀ (R : Type) [CommSemiring R] [IsDomain R], IsDomain R[X] := fun h ↦
+  NatMaxAdd.not_isDomain_polynomial (h _)

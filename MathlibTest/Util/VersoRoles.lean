@@ -27,9 +27,11 @@ def urlBracketsTest : Nat := 0
 -- Also newlines are allowed.
 #guard_msgs in
 set_option doc.verso true in
-/-- See {url}[
+/--
+See {url}[
 `https://leanprover.org`
-   ]. -/
+   ].
+-/
 def urlNewlineTest : Nat := 0
 
 -- The `{library_note}` role accepts a known label without emitting diagnostics.

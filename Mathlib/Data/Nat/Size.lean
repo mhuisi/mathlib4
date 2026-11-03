@@ -32,20 +32,17 @@ theorem shiftLeft'_true_ne_zero (m) : ∀ {n}, (n ≠ 0) → shiftLeft' true m n
 
 /-! ### `size` -/
 
-
-@[simp]
-theorem size_zero : size 0 = 0 := rfl
+@[simp] theorem size_zero : size 0 = 0 := rfl
 
 @[simp]
 theorem size_bit {b n} (h : bit b n ≠ 0) : size (bit b n) = succ (size n) :=
   Nat.binaryRec_eq _ _ (.inr <| Nat.bit_ne_zero_iff.mp h)
 
-@[simp]
-theorem size_one : size 1 = 1 := rfl
+@[simp] theorem size_one : size 1 = 1 := rfl
 
 @[simp]
-theorem size_shiftLeft' {b m n} (h : shiftLeft' b m n ≠ 0) :
-    size (shiftLeft' b m n) = size m + n := by
+theorem size_shiftLeft' {b m n} (h : shiftLeft' b m n ≠ 0)
+    : size (shiftLeft' b m n) = size m + n := by
   induction n with
   | zero => simp [shiftLeft']
   | succ n IH =>
@@ -54,7 +51,8 @@ theorem size_shiftLeft' {b m n} (h : shiftLeft' b m n ≠ 0) :
     by_cases s0 : shiftLeft' b m n = 0
     case neg => rw [IH s0]
     rw [s0] at h ⊢
-    cases b; · exact absurd rfl h
+    cases b
+    · exact absurd rfl h
     have : shiftLeft' true m n + 1 = 1 := congr_arg (· + 1) s0
     rw [shiftLeft'_true_eq_mul_pow] at this
     obtain rfl := succ.inj (eq_one_of_dvd_one ⟨_, this.symm⟩)
@@ -72,8 +70,9 @@ theorem lt_size_self (n : ℕ) : n < 2 ^ size n := by
     rw [← Nat.bit_ne_zero_iff] at h
     rwa [size_bit h, bit_lt_two_pow_succ_iff]
 
-theorem size_le {m n : ℕ} : size m ≤ n ↔ m < 2 ^ n :=
-  ⟨fun h => Nat.lt_of_lt_of_le (lt_size_self _) (Nat.pow_le_pow_right (by decide) h), fun h ↦ by
+theorem size_le {m n : ℕ} : size m ≤ n ↔ m < 2 ^ n := ⟨
+  fun h => Nat.lt_of_lt_of_le (lt_size_self _) (Nat.pow_le_pow_right (by decide) h),
+  fun h ↦ by
     induction m using binaryRec' generalizing n with
     | zero => simp
     | bit b m e IH =>
@@ -81,7 +80,8 @@ theorem size_le {m n : ℕ} : size m ≤ n ↔ m < 2 ^ n :=
       rw [size_bit e]
       cases n with
       | zero => exact (e (Nat.lt_one_iff.mp h)).elim
-      | succ n => exact succ_le_succ (IH (bit_lt_two_pow_succ_iff.mp h))⟩
+      | succ n => exact succ_le_succ (IH (bit_lt_two_pow_succ_iff.mp h))
+⟩
 
 theorem lt_size {m n : ℕ} : m < size n ↔ 2 ^ m ≤ n := by
   rw [← Nat.not_lt, Decidable.iff_not_comm, Nat.not_lt, size_le]

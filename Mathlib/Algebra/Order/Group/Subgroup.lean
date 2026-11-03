@@ -22,7 +22,7 @@ public section
 
 /-- The order preserving isomorphism from the top subgroup to the group. -/
 @[expose]
-noncomputable def Subgroup.topOrderMonoidIso (G : Type*) [Group G] [Preorder G] :
-    (⊤ : Subgroup G) ≃*o G where
+noncomputable def Subgroup.topOrderMonoidIso (G : Type*) [Group G] [Preorder G]
+    : (⊤ : Subgroup G) ≃*o G where
   __ := (Subgroup.topEquiv (G := G))
   map_le_map_iff' := by simp
