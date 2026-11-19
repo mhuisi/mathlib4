@@ -9,5 +9,5 @@ public import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Init
 
 deprecated_module
   "The material in this module is internal to the `Inclusion` tactic, \
-  it has been moved to namespace `Inclusion.IntervalDyadicReal.Dyadic`."
+    it has been moved to namespace `Inclusion.IntervalDyadicReal.Dyadic`."
   (since := "2026-10-22")

@@ -30,11 +30,13 @@ variable {ι M : Type*} [Zero M]
 section LE
 variable [LE M] {f g : ι →₀ M}
 
-instance instLE : LE (ι →₀ M) where le f g := ∀ i, f i ≤ g i
+instance instLE : LE (ι →₀ M) where
+  le f g := ∀ i, f i ≤ g i
 
 lemma le_def : f ≤ g ↔ ∀ i, f i ≤ g i := .rfl
 
-@[simp, norm_cast] lemma coe_le_coe : ⇑f ≤ g ↔ f ≤ g := .rfl
+@[simp, norm_cast]
+lemma coe_le_coe : ⇑f ≤ g ↔ f ≤ g := .rfl
 
 /-- The order on `Finsupp`s over a partial order embeds into the order on functions -/
 @[simps]
@@ -58,7 +60,8 @@ instance preorder : Preorder (ι →₀ M) where
   le_trans _ _ _ hfg hgh i := (hfg i).trans (hgh i)
 
 lemma lt_def : f < g ↔ f ≤ g ∧ ∃ i, f i < g i := Pi.lt_def
-@[simp, norm_cast] lemma coe_lt_coe : ⇑f < g ↔ f < g := .rfl
+@[simp, norm_cast]
+lemma coe_lt_coe : ⇑f < g ↔ f < g := .rfl
 
 lemma coe_mono : Monotone (Finsupp.toFun : (ι →₀ M) → ι → M) := fun _ _ ↦ id
 
@@ -78,7 +81,8 @@ instance semilatticeInf : SemilatticeInf (ι →₀ M) where
   inf_le_right _f _g _i := inf_le_right
   le_inf _f _g _i h1 h2 s := le_inf (h1 s) (h2 s)
 
-@[simp] lemma inf_apply (f g : ι →₀ M) (i : ι) : (f ⊓ g) i = f i ⊓ g i := rfl
+@[simp]
+lemma inf_apply (f g : ι →₀ M) (i : ι) : (f ⊓ g) i = f i ⊓ g i := rfl
 
 end SemilatticeInf
 

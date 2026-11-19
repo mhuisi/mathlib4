@@ -40,43 +40,40 @@ instance smul [Group G] [MulAction G β] : SMul G (α ↪ β) :=
 instance [Group G] [MulAction G β] : IsSMulApply G (α ↪ β) where
 
 @[to_additive]
-theorem smul_def [Group G] [MulAction G β] (g : G) (f : α ↪ β) :
-    g • f = f.trans (MulAction.toPerm g).toEmbedding :=
+theorem smul_def [Group G] [MulAction G β] (g : G) (f : α ↪ β)
+    : g • f = f.trans (MulAction.toPerm g).toEmbedding :=
   rfl
 
 @[deprecated vadd_apply +typeChanged (since := "2026-11-10")]
-protected theorem vadd_apply [AddGroup G] [AddAction G β] (g : G) (f : α ↪ β) (a : α) :
-    (g +ᵥ f) a = g +ᵥ f a :=
+protected theorem vadd_apply [AddGroup G] [AddAction G β] (g : G) (f : α ↪ β) (a : α)
+    : (g +ᵥ f) a = g +ᵥ f a :=
   rfl
 
 @[to_additive existing, deprecated smul_apply +typeChanged (since := "2026-11-10")]
-protected theorem smul_apply [Group G] [MulAction G β] (g : G) (f : α ↪ β) (a : α) :
-    (g • f) a = g • f a :=
+protected theorem smul_apply [Group G] [MulAction G β] (g : G) (f : α ↪ β) (a : α)
+    : (g • f) a = g • f a :=
   rfl
 
 @[deprecated FunLike.coe_vadd +typeChanged (since := "2026-11-10")]
-theorem coe_vadd [AddGroup G] [AddAction G β] (g : G) (f : α ↪ β) : ⇑(g +ᵥ f) = g +ᵥ ⇑f :=
-  rfl
+theorem coe_vadd [AddGroup G] [AddAction G β] (g : G) (f : α ↪ β) : ⇑(g +ᵥ f) = g +ᵥ ⇑f := rfl
 
 @[to_additive existing, deprecated FunLike.coe_smul +typeChanged (since := "2026-11-10")]
-theorem coe_smul [Group G] [MulAction G β] (g : G) (f : α ↪ β) : ⇑(g • f) = g • ⇑f :=
-  rfl
+theorem coe_smul [Group G] [MulAction G β] (g : G) (f : α ↪ β) : ⇑(g • f) = g • ⇑f := rfl
 
-instance [Group G] [Group G'] [SMul G G'] [MulAction G β] [MulAction G' β]
-    [IsScalarTower G G' β] : IsScalarTower G G' (α ↪ β) :=
+instance [Group G] [Group G'] [SMul G G'] [MulAction G β] [MulAction G' β] [IsScalarTower G G' β]
+    : IsScalarTower G G' (α ↪ β) :=
   FunLike.isScalarTower
 
 @[to_additive]
-instance [Group G] [Group G'] [MulAction G β] [MulAction G' β] [SMulCommClass G G' β] :
-    SMulCommClass G G' (α ↪ β) :=
+instance [Group G] [Group G'] [MulAction G β] [MulAction G' β] [SMulCommClass G G' β]
+    : SMulCommClass G G' (α ↪ β) :=
   FunLike.smulCommClass
 
-instance [Group G] [MulAction G β] [MulAction Gᵐᵒᵖ β] [IsCentralScalar G β] :
-    IsCentralScalar G (α ↪ β) :=
+instance [Group G] [MulAction G β] [MulAction Gᵐᵒᵖ β] [IsCentralScalar G β]
+    : IsCentralScalar G (α ↪ β) :=
   FunLike.isCentralScalar
 
 @[to_additive]
-instance [Group G] [MulAction G β] : MulAction G (α ↪ β) :=
-  fast_instance% FunLike.mulAction
+instance [Group G] [MulAction G β] : MulAction G (α ↪ β) := fast_instance% FunLike.mulAction
 
 end Function.Embedding

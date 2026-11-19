@@ -29,7 +29,6 @@ Everything about split equalizers is dualized to split coequalizers.
 
 @[expose] public section
 
-
 namespace CategoryTheory
 
 universe v v₂ u u₂
@@ -39,7 +38,8 @@ variable {D : Type u₂} [Category.{v₂} D]
 variable (G : C ⥤ D)
 variable {X Y : C} (f g : X ⟶ Y)
 
-/-- A split equalizer diagram consists of morphisms
+/--
+A split equalizer diagram consists of morphisms
 
 ```
       ι   f
@@ -74,7 +74,8 @@ structure IsSplitEqualizer {W : C} (ι : W ⟶ X) where
   /-- `f` composed with `rightRetraction` is `leftRetraction` composed with `ι` -/
   top_rightRetraction : f ≫ rightRetraction = leftRetraction ≫ ι := by cat_disch
 
-/-- A split coequalizer diagram consists of morphisms
+/--
+A split coequalizer diagram consists of morphisms
 
       f   π
     X ⇉ Y → Z
@@ -123,9 +124,9 @@ variable {f g}
 
 /-- Split equalizers are absolute: they are preserved by any functor. -/
 @[to_dual (attr := simps)
-/-- Split coequalizers are absolute: they are preserved by any functor. -/]
-def IsSplitEqualizer.map {W : C} {ι : W ⟶ X} (q : IsSplitEqualizer f g ι) (F : C ⥤ D) :
-    IsSplitEqualizer (F.map f) (F.map g) (F.map ι) where
+  /-- Split coequalizers are absolute: they are preserved by any functor. -/]
+def IsSplitEqualizer.map {W : C} {ι : W ⟶ X} (q : IsSplitEqualizer f g ι) (F : C ⥤ D)
+    : IsSplitEqualizer (F.map f) (F.map g) (F.map ι) where
   leftRetraction := F.map q.leftRetraction
   rightRetraction := F.map q.rightRetraction
   condition := by rw [← F.map_comp, q.condition, F.map_comp]
@@ -139,12 +140,13 @@ open Limits
 
 /-- A split equalizer clearly induces a fork. -/
 @[to_dual (attr := simps! pt) /-- A split coequalizer clearly induces a cofork. -/]
-def IsSplitEqualizer.asFork {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) :
-    Fork f g := Fork.ofι h t.condition
+def IsSplitEqualizer.asFork {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) : Fork f g :=
+  Fork.ofι h t.condition
 
 @[to_dual (attr := simp)]
-theorem IsSplitEqualizer.asFork_ι {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) :
-    t.asFork.ι = h := rfl
+theorem IsSplitEqualizer.asFork_ι {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h)
+    : t.asFork.ι = h :=
+  rfl
 
 set_option backward.isDefEq.respectTransparency.types false in
 set_option backward.defeqAttrib.useBackward true in
@@ -153,16 +155,17 @@ The fork induced by a split equalizer is an equalizer, justifying the name. In s
 is more convenient to show a given fork is an equalizer by showing it is split.
 -/
 @[to_dual
-/--
-The cofork induced by a split coequalizer is a coequalizer, justifying the name. In some cases it
+  /--
+  The cofork induced by a split coequalizer is a coequalizer, justifying the name. In some cases it
 is more convenient to show a given cofork is a coequalizer by showing it is split.
--/]
-def IsSplitEqualizer.isEqualizer {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) :
-    IsLimit t.asFork :=
-  Fork.IsLimit.mk' _ fun s =>
-    ⟨ s.ι ≫ t.leftRetraction,
-      by simp [-top_rightRetraction, ← t.top_rightRetraction, s.condition_assoc],
-      fun hm => by simp [← hm] ⟩
+  -/]
+def IsSplitEqualizer.isEqualizer {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h)
+    : IsLimit t.asFork :=
+  Fork.IsLimit.mk' _ fun s => ⟨
+    s.ι ≫ t.leftRetraction,
+    by simp [-top_rightRetraction, ← t.top_rightRetraction, s.condition_assoc],
+    fun hm => by simp [← hm]
+  ⟩
 
 end
 variable (f g)
@@ -189,12 +192,11 @@ The pair `f,g` is a `G`-cosplit pair if there is an `h : W ⟶ G X` so that `G f
 split equalizer in `D`.
 -/
 @[to_dual (rename := X ↔ Y) IsSplitPair
-/--
-The pair `f,g` is a `G`-split pair if there is an `h : G Y ⟶ Z` so that `G f, G g, h` forms a split
+  /--
+  The pair `f,g` is a `G`-split pair if there is an `h : G Y ⟶ Z` so that `G f, G g, h` forms a split
 coequalizer in `D`.
--/]
-abbrev Functor.IsCosplitPair : Prop :=
-  HasSplitEqualizer (G.map f) (G.map g)
+  -/]
+abbrev Functor.IsCosplitPair : Prop := HasSplitEqualizer (G.map f) (G.map g)
 
 /-- Get the equalizer object from the typeclass `IsCosplitPair`. -/
 @[to_dual /-- Get the coequalizer object from the typeclass `IsSplitPair`. -/]
@@ -203,28 +205,27 @@ noncomputable def HasSplitEqualizer.equalizerOfSplit [HasSplitEqualizer f g] : C
 
 /-- Get the equalizer morphism from the typeclass `IsCosplitPair`. -/
 @[to_dual /-- Get the coequalizer morphism from the typeclass `IsSplitPair`. -/]
-noncomputable def HasSplitEqualizer.equalizerι [HasSplitEqualizer f g] :
-    HasSplitEqualizer.equalizerOfSplit f g ⟶ X :=
+noncomputable def HasSplitEqualizer.equalizerι [HasSplitEqualizer f g]
+    : HasSplitEqualizer.equalizerOfSplit f g ⟶ X :=
   (splittable (f := f) (g := g)).choose_spec.choose
 
 /-- The equalizer morphism `equalizerι` gives a split equalizer on `f,g`. -/
 @[to_dual /-- The coequalizer morphism `coequalizerπ` gives a split coequalizer on `f,g`. -/]
-noncomputable def HasSplitEqualizer.isSplitEqualizer [HasSplitEqualizer f g] :
-    IsSplitEqualizer f g (HasSplitEqualizer.equalizerι f g) :=
+noncomputable def HasSplitEqualizer.isSplitEqualizer [HasSplitEqualizer f g]
+    : IsSplitEqualizer f g (HasSplitEqualizer.equalizerι f g) :=
   Classical.choice (splittable (f := f) (g := g)).choose_spec.choose_spec
 
 /-- If `f, g` is cosplit, then `G f, G g` is cosplit. -/
 @[to_dual map_is_split_pair /-- If `f, g` is split, then `G f, G g` is split. -/]
 instance map_is_cosplit_pair [HasSplitEqualizer f g] : HasSplitEqualizer (G.map f) (G.map g) where
-  splittable :=
-    ⟨_, _, ⟨IsSplitEqualizer.map (HasSplitEqualizer.isSplitEqualizer f g) _⟩⟩
+  splittable := ⟨_, _, ⟨IsSplitEqualizer.map (HasSplitEqualizer.isSplitEqualizer f g) _⟩⟩
 
 namespace Limits
 
 /-- If a pair has a split equalizer, it has an equalizer. -/
 @[to_dual /-- If a pair has a split coequalizer, it has a coequalizer. -/]
-instance (priority := 1) hasEqualizer_of_hasSplitEqualizer [HasSplitEqualizer f g] :
-    HasEqualizer f g :=
+instance (priority := 1) hasEqualizer_of_hasSplitEqualizer [HasSplitEqualizer f g]
+    : HasEqualizer f g :=
   HasLimit.mk ⟨_, (HasSplitEqualizer.isSplitEqualizer f g).isEqualizer⟩
 
 end Limits

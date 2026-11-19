@@ -40,10 +40,8 @@ end OrderDual
 
 namespace Lex
 
-instance instModule [Semiring α] [AddCommMonoid β] [Module α β] : Module (Lex α) β :=
-  ‹Module α β›
+instance instModule [Semiring α] [AddCommMonoid β] [Module α β] : Module (Lex α) β := ‹Module α β›
 
-instance instModule' [Semiring α] [AddCommMonoid β] [Module α β] : Module α (Lex β) :=
-  ‹Module α β›
+instance instModule' [Semiring α] [AddCommMonoid β] [Module α β] : Module α (Lex β) := ‹Module α β›
 
 end Lex

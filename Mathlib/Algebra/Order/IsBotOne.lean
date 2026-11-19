@@ -17,13 +17,17 @@ set_option doc.verso.suggestions false
 
 public section
 
-/-- A typeclass expressing that the `0` of a type is a bottom element. In a partial `OrderBot`, this
-is equivalent to `⊥ = 0`. -/
+/--
+A typeclass expressing that the `0` of a type is a bottom element. In a partial `OrderBot`, this
+is equivalent to `⊥ = 0`.
+-/
 class IsBotZeroClass (α : Type*) [LE α] [Zero α] : Prop where
   isBot_zero : IsBot (0 : α)
 
-/-- A typeclass expressing that the `1` of a type is a bottom element. In a partial `OrderBot`, this
-is equivalent to `⊥ = 1`. -/
+/--
+A typeclass expressing that the `1` of a type is a bottom element. In a partial `OrderBot`, this
+is equivalent to `⊥ = 1`.
+-/
 @[to_additive existing]
 class IsBotOneClass (α : Type*) [LE α] [One α] : Prop where
   isBot_one : IsBot (1 : α)
@@ -34,32 +38,32 @@ section LE
 variable [LE α] [One α] [IsBotOneClass α]
 
 @[to_additive]
-theorem isBot_one : IsBot (1 : α) :=
-  IsBotOneClass.isBot_one
+theorem isBot_one : IsBot (1 : α) := IsBotOneClass.isBot_one
 
 @[to_additive (attr := simp) zero_le]
-theorem one_le {a : α} : 1 ≤ a :=
-  isBot_one a
+theorem one_le {a : α} : 1 ≤ a := isBot_one a
 
 @[deprecated (since := "2026-05-27")]
 alias zero_le' := zero_le
 
 variable (α) in
 /-- Create an `OrderBot` instance, setting `1` as the bottom element. -/
-@[expose, to_additive (attr := instance_reducible)
-/-- Create an `OrderBot` instance, setting `0` as the bottom element. -/]
+@[expose,
+  to_additive (attr := instance_reducible)
+    /-- Create an `OrderBot` instance, setting `0` as the bottom element. -/]
 def IsBotOneClass.toOrderBot : OrderBot α where
   bot := 1
   bot_le _ := one_le
 
 @[to_additive]
-instance {β : Type*} [LE β] [One β] [IsBotOneClass β] :
-    IsBotOneClass (α × β) where
+instance {β : Type*} [LE β] [One β] [IsBotOneClass β] : IsBotOneClass (α × β) where
   isBot_one _ := by simp [Prod.le_def]
 
 @[to_additive]
-instance {ι : Type*} {M : ι → Type*} [(i : ι) → LE (M i)] [(i : ι) → One (M i)]
-    [(i : ι) → IsBotOneClass (M i)] : IsBotOneClass ((i : ι) → M i) where
+instance
+    {ι : Type*} {M : ι → Type*}
+    [(i : ι) → LE (M i)] [(i : ι) → One (M i)] [(i : ι) → IsBotOneClass (M i)]
+    : IsBotOneClass ((i : ι) → M i) where
   isBot_one _ _ := one_le
 
 end LE
@@ -83,14 +87,12 @@ theorem not_lt_one : ¬ a < 1 := one_le.not_gt
 alias not_lt_zero' := not_lt_zero
 
 @[to_additive] -- `(attr := simp)` cannot be used here because `a` cannot be inferred by `simp`.
-theorem one_lt_of_gt (h : a < b) : 1 < b :=
-  one_le.trans_lt h
+theorem one_lt_of_gt (h : a < b) : 1 < b := one_le.trans_lt h
 
 @[to_additive] alias LT.lt.one_lt := one_lt_of_gt
 
 @[to_additive]
-theorem ne_one_of_lt (h : a < b) : b ≠ 1 :=
-  h.one_lt.ne'
+theorem ne_one_of_lt (h : a < b) : b ≠ 1 := h.one_lt.ne'
 
 @[to_additive] alias LT.lt.ne_one := ne_one_of_lt
 
@@ -107,8 +109,7 @@ theorem bot_eq_one [OrderBot α] : (⊥ : α) = 1 := isBot_one.eq_bot.symm
 alias bot_eq_zero'' := bot_eq_zero
 
 @[to_additive (attr := simp)]
-theorem le_one_iff_eq_one : a ≤ 1 ↔ a = 1 :=
-  one_le.ge_iff_eq'
+theorem le_one_iff_eq_one : a ≤ 1 ↔ a = 1 := one_le.ge_iff_eq'
 
 @[deprecated (since := "2026-11-13")]
 alias le_zero_iff := nonpos_iff_eq_zero
@@ -117,8 +118,7 @@ alias le_zero_iff := nonpos_iff_eq_zero
 @[to_additive] alias LE.le.eq_one := eq_one_of_le_one
 
 @[to_additive]
-theorem one_lt_iff_ne_one : 1 < a ↔ a ≠ 1 :=
-  one_le.lt_iff_ne.trans ne_comm
+theorem one_lt_iff_ne_one : 1 < a ↔ a ≠ 1 := one_le.lt_iff_ne.trans ne_comm
 
 @[deprecated (since := "2026-11-13")]
 alias zero_lt_iff := pos_iff_ne_zero
@@ -169,8 +169,7 @@ theorem one_sup (a : α) : 1 ⊔ a = a := by simp
 theorem sup_one (a : α) : a ⊔ 1 = a := by simp
 
 @[to_additive (attr := simp)]
-theorem sup_eq_one {a b : α} : a ⊔ b = 1 ↔ a = 1 ∧ b = 1 := by
-  simp [← le_one_iff_eq_one]
+theorem sup_eq_one {a b : α} : a ⊔ b = 1 ↔ a = 1 ∧ b = 1 := by simp [← le_one_iff_eq_one]
 
 end SemilatticeSup
 
@@ -202,17 +201,16 @@ end LinearOrder
 namespace NeZero
 variable [Zero α]
 
-theorem of_gt [Preorder α] [IsBotZeroClass α] (h : a < b) : NeZero b :=
-  ⟨h.ne_zero⟩
+theorem of_gt [Preorder α] [IsBotZeroClass α] (h : a < b) : NeZero b := ⟨h.ne_zero⟩
 
-theorem pos [PartialOrder α] [IsBotZeroClass α] (a : α) [NeZero a] : 0 < a :=
-  NeZero.out.pos
+theorem pos [PartialOrder α] [IsBotZeroClass α] (a : α) [NeZero a] : 0 < a := NeZero.out.pos
 
 -- 1 < p is still an often-used `Fact`, due to `Nat.Prime` implying it, and it implying `Nontrivial`
 -- on `ZMod`'s ring structure. We cannot just set this to be any `x < y`, else that becomes a
 -- metavariable and it will hugely slow down typeclass inference.
-instance (priority := 10) of_gt' [Preorder α] [IsBotZeroClass α] [One α]
-    [Fact (1 < a)] : NeZero a := of_gt <| @Fact.out (1 < a) _
+instance (priority := 10) of_gt' [Preorder α] [IsBotZeroClass α] [One α] [Fact (1 < a)]
+    : NeZero a :=
+  of_gt <| @Fact.out (1 < a) _
 
 theorem of_ge [PartialOrder α] [IsBotZeroClass α] [NeZero a] (h : a ≤ b) : NeZero b :=
   ⟨((pos a).trans_le h).ne_zero⟩

@@ -23,11 +23,17 @@ divisibility, divides
 
 public section
 
-variable {E F M N : Type*} [Semigroup M] [Semigroup N] [FunLike F M N] [MulHomClass F M N]
-  [EquivLike E M N] [MulEquivClass E M N] {a b : M}
+variable
+  {E F M N : Type*} [Semigroup M] [Semigroup N] [FunLike F M N] [MulHomClass F M N]
+  [EquivLike E M N] [MulEquivClass E M N]
+  {a b : M}
 
-@[gcongr] lemma map_dvd (f : F) : a ∣ b → f a ∣ f b | ⟨c, h⟩ => ⟨f c, h.symm ▸ map_mul f a c⟩
-@[gcongr] lemma map_rightDvd (f : F) : a ∣ᵣ b → f a ∣ᵣ f b | ⟨c, h⟩ => ⟨f c, h.symm ▸ map_mul f c a⟩
+@[gcongr]
+lemma map_dvd (f : F) : a ∣ b → f a ∣ f b
+  | ⟨c, h⟩ => ⟨f c, h.symm ▸ map_mul f a c⟩
+@[gcongr]
+lemma map_rightDvd (f : F) : a ∣ᵣ b → f a ∣ᵣ f b
+  | ⟨c, h⟩ => ⟨f c, h.symm ▸ map_mul f c a⟩
 
 @[simp]
 lemma map_dvd_iff (e : E) : e a ∣ e b ↔ a ∣ b :=
@@ -49,5 +55,6 @@ lemma map_dvd_iff_dvd_symm (e : E) {b : N} : e a ∣ b ↔ a ∣ (MulEquivClass.
 
 protected lemma MulHom.map_dvd (f : M →ₙ* N) : a ∣ b → f a ∣ f b := map_dvd f
 
-protected lemma MonoidHom.map_dvd {M N : Type*} [Monoid M] [Monoid N] (f : M →* N) {a b : M} :
-    a ∣ b → f a ∣ f b := map_dvd f
+protected lemma MonoidHom.map_dvd {M N : Type*} [Monoid M] [Monoid N] (f : M →* N) {a b : M}
+    : a ∣ b → f a ∣ f b :=
+  map_dvd f

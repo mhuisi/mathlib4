@@ -57,17 +57,14 @@ section GradedCoe
 variable (Γ) in
 /-- The map sending `F : ⨁ k, ModularForm Γ k` to the function `∑ k, F k : ℍ → ℂ`. -/
 def gradedCoe : (⨁ k, ModularForm Γ k) →+ (ℍ → ℂ) :=
-  toAddMonoid fun _ ↦
-    { toFun := fun f ↦ f
-      map_zero' := rfl
-      map_add' := fun _ _ ↦ rfl }
+  toAddMonoid fun _ ↦ { toFun := fun f ↦ f, map_zero' := rfl, map_add' := fun _ _ ↦ rfl }
 
 @[simp]
 theorem gradedCoe_of (k : ℤ) (f : ModularForm Γ k) : gradedCoe Γ (of _ k f) = f := by
   simp [gradedCoe]
 
-theorem gradedCoe_periodic (hΓ : h ∈ Γ.strictPeriods) (F : ⨁ k, ModularForm Γ k) :
-    Periodic (gradedCoe Γ F ∘ ofComplex) h := by
+theorem gradedCoe_periodic (hΓ : h ∈ Γ.strictPeriods) (F : ⨁ k, ModularForm Γ k)
+    : Periodic (gradedCoe Γ F ∘ ofComplex) h := by
   induction F using DirectSum.induction_on with
   | zero => simp [gradedCoe, Periodic]
   | of k f => simpa using SlashInvariantFormClass.periodic_comp_ofComplex f hΓ
@@ -79,22 +76,23 @@ theorem gradedCoe_holo (F : ⨁ k, ModularForm Γ k) : MDiff (gradedCoe Γ F) :=
   | of k f => simpa using holo f
   | add F G hF hG => simpa using hF.add hG
 
-theorem gradedCoe_bdd [Fact (IsCusp ∞ Γ)] (F : ⨁ k, ModularForm Γ k) :
-    IsBoundedAtImInfty (gradedCoe Γ F) := by
+theorem gradedCoe_bdd [Fact (IsCusp ∞ Γ)] (F : ⨁ k, ModularForm Γ k)
+    : IsBoundedAtImInfty (gradedCoe Γ F) := by
   induction F using DirectSum.induction_on with
   | zero => exact Asymptotics.isBigO_zero _ atImInfty
   | of k f => simpa using bdd_at_infty f
   | add F G hF hG => exact map_add (gradedCoe Γ) F G ▸ hF.add hG
 
-private theorem gradedCoe_analyticAt (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods)
-    (F : ⨁ k, ModularForm Γ k) : AnalyticAt ℂ (cuspFunction h (gradedCoe Γ F)) 0 :=
+private theorem gradedCoe_analyticAt
+    (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods) (F : ⨁ k, ModularForm Γ k)
+    : AnalyticAt ℂ (cuspFunction h (gradedCoe Γ F)) 0 :=
   have : Fact (IsCusp ∞ Γ) := ⟨Γ.isCusp_of_mem_strictPeriods hh hΓ⟩
   analyticAt_cuspFunction_zero hh (gradedCoe_periodic hΓ F) (gradedCoe_holo F) (gradedCoe_bdd F)
 
 /-- The `q`-expansion of `∑ k, F k` is the image of `F` under `ModularForm.qExpansionAlgHom`. -/
 @[simp]
-theorem qExpansion_gradedCoe (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods) (F : ⨁ k, ModularForm Γ k) :
-    qExpansion h (gradedCoe Γ F) = qExpansionAlgHom h hh hΓ F := by
+theorem qExpansion_gradedCoe (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods) (F : ⨁ k, ModularForm Γ k)
+    : qExpansion h (gradedCoe Γ F) = qExpansionAlgHom h hh hΓ F := by
   induction F using DirectSum.induction_on with
   | zero => exact qExpansion_zero h
   | of k f => simp
@@ -111,62 +109,71 @@ private def denomUnit (γ : GL (Fin 2) ℝ) (z : ℍ) : ℂˣ := Units.mk0 _ (de
 private theorem val_denomUnit (γ : GL (Fin 2) ℝ) (z : ℍ) : (denomUnit γ z : ℂ) = denom γ z := rfl
 
 variable (Γ) in
-/-- The Laurent polynomial `∑ k, (F k z) T ^ k` attached to `F : ⨁ k, ModularForm Γ k` and to a
-point `(z : ℍ)`. -/
+/--
+The Laurent polynomial `∑ k, (F k z) T ^ k` attached to `F : ⨁ k, ModularForm Γ k` and to a
+point `(z : ℍ)`.
+-/
 private def weightLaurent (z : ℍ) : (⨁ k, ModularForm Γ k) →+ ℂ[T;T⁻¹] :=
-  toAddMonoid fun k ↦
-    { toFun := fun f ↦ LaurentPolynomial.C (f z) * LaurentPolynomial.T k
-      map_zero' := by simp
-      map_add' := fun _ _ ↦ by simp [add_mul] }
+  toAddMonoid fun k ↦ {
+    toFun := fun f ↦ LaurentPolynomial.C (f z) * LaurentPolynomial.T k
+    map_zero' := by simp
+    map_add' := fun _ _ ↦ by simp [add_mul]
+  }
 
-/-- Evaluating the weight Laurent polynomial of `F` at `denom γ z` gives the value at `γ • z` of
-the function attached to `F`. -/
-private theorem weightLaurent_eval (z : ℍ) {γ : GL (Fin 2) ℝ} (hγ : γ ∈ Γ)
-    (F : ⨁ k, ModularForm Γ k) :
-    LaurentPolynomial.eval₂ (RingHom.id ℂ) (denomUnit γ z) (weightLaurent Γ z F) =
-      gradedCoe Γ F (γ • z) := by
+/--
+Evaluating the weight Laurent polynomial of `F` at `denom γ z` gives the value at `γ • z` of
+the function attached to `F`.
+-/
+private theorem weightLaurent_eval
+    (z : ℍ) {γ : GL (Fin 2) ℝ} (hγ : γ ∈ Γ) (F : ⨁ k, ModularForm Γ k)
+    : LaurentPolynomial.eval₂ (RingHom.id ℂ) (denomUnit γ z) (weightLaurent Γ z F)
+      = gradedCoe Γ F (γ • z) := by
   induction F using DirectSum.induction_on with
   | zero => simp
   | of k f =>
-      simpa [weightLaurent, mul_comm (f z)] using
-        (SlashInvariantForm.slash_action_eqn'' f hγ z).symm
+    simpa [weightLaurent, mul_comm (f z)] using (SlashInvariantForm.slash_action_eqn'' f hγ z).symm
   | add F G hF hG => simpa using congrArg₂ (· + ·) hF hG
 
-private theorem weightLaurent_coeff (z : ℍ) (F : ⨁ k, ModularForm Γ k) (k : ℤ) :
-    (weightLaurent Γ z F).coeff k = F k z := by
+private theorem weightLaurent_coeff (z : ℍ) (F : ⨁ k, ModularForm Γ k) (k : ℤ)
+    : (weightLaurent Γ z F).coeff k = F k z := by
   induction F using DirectSum.induction_on with
   | zero => simp
   | of j f =>
-      rcases eq_or_ne j k with rfl | hjk <;>
-        simp_all [weightLaurent, ← LaurentPolynomial.single_eq_C_mul_T, of_apply]
+    rcases eq_or_ne j k with rfl | hjk
+      <;> simp_all [weightLaurent, ← LaurentPolynomial.single_eq_C_mul_T, of_apply]
   | add F G hF hG => simpa using congr($hF + $hG)
 
 end WeightLaurent
 
 section Injective
 
-/-- Multiplying on the right by the translation `[1, t; 0, 1]` shifts the denominator by
-`t` times the lower-left entry. -/
-private theorem denom_mul_upperRightHom (γ : GL (Fin 2) ℝ) (t : ℝ) (z : ℍ) :
-    denom (γ * upperRightHom t) z = denom γ z + γ 1 0 * t := by
+/--
+Multiplying on the right by the translation `[1, t; 0, 1]` shifts the denominator by
+`t` times the lower-left entry.
+-/
+private theorem denom_mul_upperRightHom (γ : GL (Fin 2) ℝ) (t : ℝ) (z : ℍ)
+    : denom (γ * upperRightHom t) z = denom γ z + γ 1 0 * t := by
   simp [denom, Matrix.mul_apply]
   ring
 
-/-- **Modular forms of distinct weights are linearly independent**: if `∞` is a cusp of `Γ` and
+/--
+**Modular forms of distinct weights are linearly independent**: if `∞` is a cusp of `Γ` and
 `Γ` does not fix `∞`, then `F ↦ ∑ k, F k` is injective on the graded ring of modular forms of
-level `Γ`. See `ModularForm.gradedCoe_injective` for the case of an arithmetic subgroup. -/
-theorem gradedCoe_injective_of_exists_smul_infty_ne_infty [Fact (IsCusp ∞ Γ)]
-    (hΓinf : ∃ γ ∈ Γ, γ • (∞ : OnePoint ℝ) ≠ ∞) : Injective (gradedCoe Γ) := by
+level `Γ`. See `ModularForm.gradedCoe_injective` for the case of an arithmetic subgroup.
+-/
+theorem gradedCoe_injective_of_exists_smul_infty_ne_infty
+    [Fact (IsCusp ∞ Γ)] (hΓinf : ∃ γ ∈ Γ, γ • (∞ : OnePoint ℝ) ≠ ∞)
+    : Injective (gradedCoe Γ) := by
   obtain ⟨h, hh, hΓ⟩ := Γ.exists_ne_zero_mem_strictPeriods_of_isCusp Fact.out
   obtain ⟨γ₀, hγ₀, hγ₀inf⟩ := hΓinf
   rw [Ne, smul_infty_eq_self_iff] at hγ₀inf
   refine (injective_iff_map_eq_zero _).mpr fun F hF ↦ DirectSum.ext fun k ↦ ext fun z ↦ ?_
-  suffices weightLaurent Γ z F = 0 by
-    simpa [this] using (weightLaurent_coeff z F k).symm
+  suffices weightLaurent Γ z F = 0 by simpa [this] using (weightLaurent_coeff z F k).symm
   refine LaurentPolynomial.eq_zero_of_infinite_smeval_eq_zero _ <|
     Set.infinite_of_injective_forall_mem
       (f := fun (n : ℕ) ↦ denomUnit (γ₀ * upperRightHom (n * h)) z)
-      (fun n m hnm ↦ ?_) fun n ↦ ?_
+      (fun n m hnm ↦ ?_)
+      fun n ↦ ?_
   · grind [val_denomUnit, denom_mul_upperRightHom, Complex.ofReal_eq_zero, Complex.ofReal_inj,
       Nat.cast_inj]
   · have hmem (n : ℕ) : γ₀ * upperRightHom (n * h) ∈ Γ :=
@@ -174,12 +181,14 @@ theorem gradedCoe_injective_of_exists_smul_infty_ne_infty [Fact (IsCusp ∞ Γ)]
     rw [Set.mem_ofPred_eq, ← LaurentPolynomial.eval₂_eq_smeval, Algebra.algebraMap_self,
       weightLaurent_eval z (hmem n) F, hF, Pi.zero_apply]
 
-/-- **The `q`-expansion homomorphism on the graded ring of modular forms is injective**, provided
+/--
+**The `q`-expansion homomorphism on the graded ring of modular forms is injective**, provided
 `Γ` has a positive strict period `h` and does not fix the cusp `∞`. See
-`ModularForm.qExpansionAlgHom_injective` for the case of an arithmetic subgroup. -/
-theorem qExpansionAlgHom_injective_of_exists_smul_infty_ne_infty (hh : 0 < h)
-    (hΓ : h ∈ Γ.strictPeriods) (hΓinf : ∃ γ ∈ Γ, γ • (∞ : OnePoint ℝ) ≠ ∞) :
-    Injective (qExpansionAlgHom h hh hΓ) := by
+`ModularForm.qExpansionAlgHom_injective` for the case of an arithmetic subgroup.
+-/
+theorem qExpansionAlgHom_injective_of_exists_smul_infty_ne_infty
+    (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods) (hΓinf : ∃ γ ∈ Γ, γ • (∞ : OnePoint ℝ) ≠ ∞)
+    : Injective (qExpansionAlgHom h hh hΓ) := by
   have : Fact (IsCusp ∞ Γ) := ⟨Γ.isCusp_of_mem_strictPeriods hh hΓ⟩
   refine (injective_iff_map_eq_zero _).mpr (fun F hF ↦ ?_)
   refine gradedCoe_injective_of_exists_smul_infty_ne_infty hΓinf ?_
@@ -192,16 +201,20 @@ section IsArithmetic
 
 variable [Γ.IsArithmetic]
 
-/-- **Modular forms of distinct weights are linearly independent**: for an arithmetic subgroup
-`Γ`, the map `F ↦ ∑ k, F k` is injective on the graded ring of modular forms of level `Γ`. -/
+/--
+**Modular forms of distinct weights are linearly independent**: for an arithmetic subgroup
+`Γ`, the map `F ↦ ∑ k, F k` is injective on the graded ring of modular forms of level `Γ`.
+-/
 theorem gradedCoe_injective : Injective (gradedCoe Γ) :=
   gradedCoe_injective_of_exists_smul_infty_ne_infty
     (Subgroup.IsArithmetic.exists_smul_infty_ne_infty Γ)
 
-/-- **The `q`-expansion homomorphism on the graded ring of modular forms of an arithmetic subgroup
-is injective**. -/
-theorem qExpansionAlgHom_injective (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods) :
-    Injective (qExpansionAlgHom h hh hΓ) :=
+/--
+**The `q`-expansion homomorphism on the graded ring of modular forms of an arithmetic subgroup
+is injective**.
+-/
+theorem qExpansionAlgHom_injective (hh : 0 < h) (hΓ : h ∈ Γ.strictPeriods)
+    : Injective (qExpansionAlgHom h hh hΓ) :=
   qExpansionAlgHom_injective_of_exists_smul_infty_ne_infty hh hΓ
     (Subgroup.IsArithmetic.exists_smul_infty_ne_infty Γ)
 

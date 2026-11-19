@@ -29,32 +29,36 @@ namespace Cache.Requests
 
 open System (FilePath)
 
-/-- The storage backend an upload targets, selected with `--backend=NAME`.
-`runPut` dispatches on this type. -/
+/--
+The storage backend an upload targets, selected with `--backend=NAME`.
+`runPut` dispatches on this type.
+-/
 inductive UploadBackend where
   /-- Azure Blob Storage (`Cache/Upload/Azure.lean`). -/
   | azure
   /-- An S3-compatible bucket (`Cache/Upload/S3.lean`); the default. -/
   | s3
-  deriving DecidableEq, Repr, BEq, Inhabited
+deriving DecidableEq, Repr, BEq, Inhabited
 
 namespace UploadBackend
 
 /-- Canonical short name for a backend, used in the `--backend` flag. -/
 def name : UploadBackend → String
   | .azure => "azure"
-  | .s3    => "s3"
+  | .s3 => "s3"
 
 /-- All known backends, listed in their canonical declaration order. -/
 def all : List UploadBackend := [.azure, .s3]
 
-/-- Parse a short name back into an `UploadBackend`. Matching is
-case-insensitive. -/
+/--
+Parse a short name back into an `UploadBackend`. Matching is
+case-insensitive.
+-/
 def parse? (s : String) : Option UploadBackend :=
   match s.toLower with
   | "azure" => some .azure
-  | "s3"    => some .s3
-  | _       => none
+  | "s3" => some .s3
+  | _ => none
 
 end UploadBackend
 
@@ -73,17 +77,20 @@ Without it, the function returns the container layout under the bucket in
 `MATHLIB_CACHE_PUT_BASE_URL` (`putBase?`, where an empty value means unset)
 for the s3 backend, and an error for the azure backend.
 -/
-def uploadLocationFrom (backend : UploadBackend) (putUrl? putBase? : Option String)
-    (container? : Option Container) (repo : String) (scope? : Option String) :
-    Except String Location := do
+def uploadLocationFrom
+    (backend : UploadBackend) (putUrl? putBase? : Option String) (container? : Option Container)
+    (repo : String) (scope? : Option String)
+    : Except String Location := do
   if backend == .azure && container?.isSome then
     throw "the azure backend uses MATHLIB_CACHE_PUT_URL without a container: \
       remove --container"
-  let dest ← if let some url := putUrl? then
+  let dest ←
+    if let some url := putUrl? then
       pure (.ofEndpoint url "MATHLIB_CACHE_PUT_URL" repo scope?)
     else
       match backend with
-      | .azure => .error "the azure backend needs an endpoint: \
+      | .azure =>
+        .error "the azure backend needs an endpoint: \
           set MATHLIB_CACHE_PUT_URL"
       | .s3 => s3UploadLocationFrom (normalizeBaseURL putBase?) container? repo scope?
   -- An s3 root must have the form `https://endpoint/bucket[/prefix]`.
@@ -97,8 +104,10 @@ def uploadLocationFrom (backend : UploadBackend) (putUrl? putBase? : Option Stri
 The location derives both the file directory and its optional marker, so
 every transfer tool uses one resolution.
 -/
-def uploadLocation (backend : UploadBackend) (container? : Option Container)
-    (repo : String) (scope? : Option String) : IO Location := do
+def uploadLocation
+    (backend : UploadBackend) (container? : Option Container) (repo : String)
+    (scope? : Option String)
+    : IO Location := do
   let putUrl? ← IO.getEnv "MATHLIB_CACHE_PUT_URL"
   let putBase? ← IO.getEnv "MATHLIB_CACHE_PUT_BASE_URL"
   IO.ofExcept <| uploadLocationFrom backend putUrl? putBase? container? repo scope?

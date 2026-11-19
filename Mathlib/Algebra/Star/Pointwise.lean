@@ -32,9 +32,11 @@ local postfix:max "⋆" => star
 
 variable {α : Type*} {s t : Set α} {a : α}
 
-/-- The set `(star s : Set α)` is defined as `{x | star x ∈ s}` in the scope `Pointwise`.
+/--
+The set `(star s : Set α)` is defined as `{x | star x ∈ s}` in the scope `Pointwise`.
 In the usual case where `star` is involutive, it is equal to `{star s | x ∈ s}`, see
-`Set.image_star`. -/
+`Set.image_star`.
+-/
 @[instance_reducible]
 protected def star [Star α] : Star (Set α) := ⟨preimage Star.star⟩
 
@@ -131,8 +133,9 @@ end Set
 
 open scoped Pointwise in
 @[simp]
-lemma StarMemClass.star_coe_eq {S α : Type*} [InvolutiveStar α] [SetLike S α]
-    [StarMemClass S α] (s : S) : star (s : Set α) = s := by
+lemma StarMemClass.star_coe_eq
+    {S α : Type*} [InvolutiveStar α] [SetLike S α] [StarMemClass S α] (s : S)
+    : star (s : Set α) = s := by
   ext
   simpa using star_mem_iff
 
@@ -141,8 +144,8 @@ namespace Set.Pairwise
 open scoped Pointwise
 
 @[simp]
-lemma commute_star_iff {α : Type*} [Mul α] [StarMul α] {s : Set α} :
-    (star s).Pairwise Commute ↔ s.Pairwise Commute := by
+lemma commute_star_iff {α : Type*} [Mul α] [StarMul α] {s : Set α}
+    : (star s).Pairwise Commute ↔ s.Pairwise Commute := by
   simp only [Set.Pairwise]
   conv_rhs => simp +singlePass only [star_involutive.surjective.forall]
   simp

@@ -34,13 +34,15 @@ section
 
 variable {N : ι₁ ⊕ ι₂ → Type*} [∀ i, AddCommMonoid (N i)] [∀ i, Module R (N i)]
 
-/-- Given a family of modules `N` indexed by a type `ι₁ ⊕ ι₂`,
+/--
+Given a family of modules `N` indexed by a type `ι₁ ⊕ ι₂`,
 a multilinear map from the modules `N (.inl i₁)` to `N₁` and
 a multilinear map from the modules `N (.inr i₁)` to `N₂`, this
-is the induced multilinear map from all the modules `N i` to `N₁ ⊗ N₂`. -/
+is the induced multilinear map from all the modules `N i` to `N₁ ⊗ N₂`.
+-/
 @[simps apply]
-def domCoprodDep (a : (Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) (b : (Π i₂, N (.inr i₂)) →ₘₛₗ[σ] N₂) :
-    (Π i, N i) →ₘₛₗ[σ] N₁ ⊗[S] N₂ where
+def domCoprodDep (a : (Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) (b : (Π i₂, N (.inr i₂)) →ₘₛₗ[σ] N₂)
+    : (Π i, N i) →ₘₛₗ[σ] N₁ ⊗[S] N₂ where
   toFun v := a (fun i₁ ↦ v (.inl i₁)) ⊗ₜ b (fun i₂ ↦ v (.inr i₂))
   map_update_add' := by
     rintro _ _ (_ | _) _ _
@@ -51,25 +53,27 @@ def domCoprodDep (a : (Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) (b : (Π i
     · let := Classical.decEq ι₁; simp
     · let := Classical.decEq ι₂; simp
 
-/-- A more bundled version of `MultilinearMap.domCoprodDep`, as a linear map
-from the tensor product of spaces of multilinear maps. -/
-def domCoprodDep' :
-    ((Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) ⊗[S] ((Π i₂, N (.inr i₂)) →ₘₛₗ[σ] N₂) →ₗ[S]
-        (Π i, N i) →ₘₛₗ[σ] N₁ ⊗[S] N₂ :=
-  TensorProduct.lift (LinearMap.mk₂ S domCoprodDep
-    (by aesop) (by aesop) (by aesop) (by aesop))
+/--
+A more bundled version of `MultilinearMap.domCoprodDep`, as a linear map
+from the tensor product of spaces of multilinear maps.
+-/
+def domCoprodDep'
+    : ((Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) ⊗[S] ((Π i₂, N (.inr i₂)) →ₘₛₗ[σ] N₂) →ₗ[S]
+          (Π i, N i) →ₘₛₗ[σ] N₁ ⊗[S] N₂ :=
+  TensorProduct.lift (LinearMap.mk₂ S domCoprodDep (by aesop) (by aesop) (by aesop) (by aesop))
 
 @[simp]
 theorem domCoprodDep'_apply
-    (a : (Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) (b : (Π i₂, N (.inr i₂)) →ₘₛₗ[σ] N₂) :
-    domCoprodDep' (a ⊗ₜ b) = domCoprodDep a b := by
+    (a : (Π i₁, N (.inl i₁)) →ₘₛₗ[σ] N₁) (b : (Π i₂, N (.inr i₂)) →ₘₛₗ[σ] N₂)
+    : domCoprodDep' (a ⊗ₜ b) = domCoprodDep a b := by
   rfl
 
 end
 
 variable {N : Type*} [AddCommMonoid N] [Module R N]
 
-/-- Given two multilinear maps `(ι₁ → N) → N₁` and `(ι₂ → N) → N₂`, this produces the map
+/--
+Given two multilinear maps `(ι₁ → N) → N₁` and `(ι₂ → N) → N₂`, this produces the map
 `(ι₁ ⊕ ι₂ → N) → N₁ ⊗ N₂` by taking the coproduct of the domain and the tensor product
 of the codomain.
 
@@ -83,27 +87,31 @@ to the simple case defined here. See
 [this zulip thread](https://leanprover.zulipchat.com/#narrow/stream/217875-Is-there.20code.20for.20X.3F/topic/Instances.20on.20.60sum.2Eelim.20A.20B.20i.60/near/218484619).
 -/
 @[simps! apply]
-def domCoprod (a : (ι₁ → N) →ₘₛₗ[σ] N₁) (b : (ι₂ → N) →ₘₛₗ[σ] N₂) :
-    (ι₁ ⊕ ι₂ → N) →ₘₛₗ[σ] N₁ ⊗[S] N₂ :=
+def domCoprod (a : (ι₁ → N) →ₘₛₗ[σ] N₁) (b : (ι₂ → N) →ₘₛₗ[σ] N₂)
+    : (ι₁ ⊕ ι₂ → N) →ₘₛₗ[σ] N₁ ⊗[S] N₂ :=
   domCoprodDep a b
 
-/-- A more bundled version of `MultilinearMap.domCoprod` that maps
-`((ι₁ → N) → N₁) ⊗ ((ι₂ → N) → N₂)` to `(ι₁ ⊕ ι₂ → N) → N₁ ⊗ N₂`. -/
-def domCoprod' :
-    ((ι₁ → N) →ₘₛₗ[σ] N₁) ⊗[S] ((ι₂ → N) →ₘₛₗ[σ] N₂) →ₗ[S] (ι₁ ⊕ ι₂ → N) →ₘₛₗ[σ] N₁ ⊗[S] N₂ :=
+/--
+A more bundled version of `MultilinearMap.domCoprod` that maps
+`((ι₁ → N) → N₁) ⊗ ((ι₂ → N) → N₂)` to `(ι₁ ⊕ ι₂ → N) → N₁ ⊗ N₂`.
+-/
+def domCoprod'
+    : ((ι₁ → N) →ₘₛₗ[σ] N₁) ⊗[S] ((ι₂ → N) →ₘₛₗ[σ] N₂) →ₗ[S] (ι₁ ⊕ ι₂ → N) →ₘₛₗ[σ] N₁ ⊗[S] N₂ :=
   domCoprodDep' (σ := σ) (N := fun (_ : ι₁ ⊕ ι₂) ↦ N)
 
 @[simp]
-theorem domCoprod'_apply (a : (ι₁ → N) →ₘₛₗ[σ] N₁) (b : (ι₂ → N) →ₘₛₗ[σ] N₂) :
-    domCoprod' (a ⊗ₜ[S] b) = domCoprod a b :=
+theorem domCoprod'_apply (a : (ι₁ → N) →ₘₛₗ[σ] N₁) (b : (ι₂ → N) →ₘₛₗ[σ] N₂)
+    : domCoprod' (a ⊗ₜ[S] b) = domCoprod a b :=
   rfl
 
-/-- When passed an `Equiv.sumCongr`, `MultilinearMap.domDomCongr` distributes over
-`MultilinearMap.domCoprod`. -/
-theorem domCoprod_domDomCongr_sumCongr (a : (ι₁ → N) →ₘₛₗ[σ] N₁) (b : (ι₂ → N) →ₘₛₗ[σ] N₂)
-    (σa : ι₁ ≃ ι₃) (σb : ι₂ ≃ ι₄) :
-    (a.domCoprod b).domDomCongr (σa.sumCongr σb) =
-      (a.domDomCongr σa).domCoprod (b.domDomCongr σb) :=
+/--
+When passed an `Equiv.sumCongr`, `MultilinearMap.domDomCongr` distributes over
+`MultilinearMap.domCoprod`.
+-/
+theorem domCoprod_domDomCongr_sumCongr
+    (a : (ι₁ → N) →ₘₛₗ[σ] N₁) (b : (ι₂ → N) →ₘₛₗ[σ] N₂) (σa : ι₁ ≃ ι₃) (σb : ι₂ ≃ ι₄)
+    : (a.domCoprod b).domDomCongr (σa.sumCongr σb)
+      = (a.domDomCongr σa).domCoprod (b.domDomCongr σb) :=
   rfl
 
 end DomCoprod

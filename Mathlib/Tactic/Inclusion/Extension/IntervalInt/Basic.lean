@@ -22,13 +22,11 @@ namespace Inclusion.IntervalInt
 /-- Construct an inclusion variable for an integer expression using an integer interval. -/
 @[inclusion_ext(_ : ℤ)]
 meta def mkIntIVar : InclusionExt :=
-  mkNDIVarExt `interval_int
-    ⟨q(ℤ), q(Interval ℤ), q(instToSetIntervalOfPreorder (α := ℤ))⟩
+  mkNDIVarExt `interval_int ⟨q(ℤ), q(Interval ℤ), q(instToSetIntervalOfPreorder (α := ℤ))⟩
     (Interval.mkBinarySplitCover q(binarySplit))
 
 @[inclusion_op interval_int]
-theorem ofNat_mem (n : ℕ) : (OfNat.ofNat n : ℤ) ∈ Interval.singleton (n : ℤ) :=
-  ⟨le_rfl, le_rfl⟩
+theorem ofNat_mem (n : ℕ) : (OfNat.ofNat n : ℤ) ∈ Interval.singleton (n : ℤ) := ⟨le_rfl, le_rfl⟩
 
 section Arithmetic
 
@@ -61,54 +59,51 @@ end Arithmetic
 section Props
 
 @[inclusion_op interval_int]
-theorem le_mem {x y : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hy : y ∈ J) :
-    (x ≤ y) ∈ I.le J :=
+theorem le_mem {x y : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hy : y ∈ J) : (x ≤ y) ∈ I.le J :=
   Interval.le_mem (OrderEmbedding.id ℤ) (by simp [hx]) (by simp [hy])
 
 @[inclusion_op interval_int]
-theorem lt_mem {x y : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hy : y ∈ J) :
-    (x < y) ∈ I.lt J :=
+theorem lt_mem {x y : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hy : y ∈ J) : (x < y) ∈ I.lt J :=
   Interval.lt_mem (OrderEmbedding.id ℤ) (by simp [hx]) (by simp [hy])
 
 @[inclusion_op interval_int]
-theorem eq_mem {x y : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hy : y ∈ J) :
-    (x = y) ∈ I.eq J :=
+theorem eq_mem {x y : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hy : y ∈ J) : (x = y) ∈ I.eq J :=
   Interval.eq_mem (OrderEmbedding.id ℤ) (by simp [hx]) (by simp [hy])
 
 @[inclusion_op interval_int]
-theorem mem_Ici {a x : ℤ} {I J : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) :
-    (x ∈ Set.Ici a) ∈ I.le J := le_mem ha hx
+theorem mem_Ici {a x : ℤ} {I J : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) : (x ∈ Set.Ici a) ∈ I.le J :=
+  le_mem ha hx
 
 @[inclusion_op interval_int]
-theorem mem_Ioi {a x : ℤ} {I J : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) :
-    (x ∈ Set.Ioi a) ∈ I.lt J := lt_mem ha hx
+theorem mem_Ioi {a x : ℤ} {I J : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) : (x ∈ Set.Ioi a) ∈ I.lt J :=
+  lt_mem ha hx
 
 @[inclusion_op interval_int]
-theorem mem_Iic {b x : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hb : b ∈ J) :
-    (x ∈ Set.Iic b) ∈ I.le J := le_mem hx hb
+theorem mem_Iic {b x : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hb : b ∈ J) : (x ∈ Set.Iic b) ∈ I.le J :=
+  le_mem hx hb
 
 @[inclusion_op interval_int]
-theorem mem_Iio {b x : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hb : b ∈ J) :
-    (x ∈ Set.Iio b) ∈ I.lt J := lt_mem hx hb
+theorem mem_Iio {b x : ℤ} {I J : Interval ℤ} (hx : x ∈ I) (hb : b ∈ J) : (x ∈ Set.Iio b) ∈ I.lt J :=
+  lt_mem hx hb
 
 @[inclusion_op interval_int]
-theorem mem_Icc {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K) :
-    (x ∈ Set.Icc a b) ∈ (I.le J).and (J.le K) :=
+theorem mem_Icc {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K)
+    : (x ∈ Set.Icc a b) ∈ (I.le J).and (J.le K) :=
   IntervalBool.and_mem (le_mem ha hx) (le_mem hx hb)
 
 @[inclusion_op interval_int]
-theorem mem_Ico {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K) :
-    (x ∈ Set.Ico a b) ∈ (I.le J).and (J.lt K) :=
+theorem mem_Ico {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K)
+    : (x ∈ Set.Ico a b) ∈ (I.le J).and (J.lt K) :=
   IntervalBool.and_mem (le_mem ha hx) (lt_mem hx hb)
 
 @[inclusion_op interval_int]
-theorem mem_Ioc {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K) :
-    (x ∈ Set.Ioc a b) ∈ (I.lt J).and (J.le K) :=
+theorem mem_Ioc {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K)
+    : (x ∈ Set.Ioc a b) ∈ (I.lt J).and (J.le K) :=
   IntervalBool.and_mem (lt_mem ha hx) (le_mem hx hb)
 
 @[inclusion_op interval_int]
-theorem mem_Ioo {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K) :
-    (x ∈ Set.Ioo a b) ∈ (I.lt J).and (J.lt K) :=
+theorem mem_Ioo {a b x : ℤ} {I J K : Interval ℤ} (ha : a ∈ I) (hx : x ∈ J) (hb : b ∈ K)
+    : (x ∈ Set.Ioo a b) ∈ (I.lt J).and (J.lt K) :=
   IntervalBool.and_mem (lt_mem ha hx) (lt_mem hx hb)
 
 end Props

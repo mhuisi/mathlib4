@@ -82,10 +82,12 @@ section Ring
 
 variable [Ring R] (S : Sequence R)
 
-/-- The first `m` polynomials of a polynomial sequence span all polynomials of degree `< m` if their
-    leading coefficients are units. -/
-lemma span_degreeLT {m : ℕ} (hCoeff : ∀ i < m, IsUnit (S i).leadingCoeff) :
-    span R (S '' Set.Iio m) = degreeLT R m := by
+/--
+The first `m` polynomials of a polynomial sequence span all polynomials of degree `< m` if their
+leading coefficients are units.
+-/
+lemma span_degreeLT {m : ℕ} (hCoeff : ∀ i < m, IsUnit (S i).leadingCoeff)
+    : span R (S '' Set.Iio m) = degreeLT R m := by
   apply span_eq_of_le
   · intro P hP
     obtain ⟨i, hi, rfl⟩ := (Set.mem_image _ _ _).mp hP
@@ -129,17 +131,19 @@ lemma span_degreeLT {m : ℕ} (hCoeff : ∀ i < m, IsUnit (S i).leadingCoeff) :
       rwa [Polynomial.mem_degreeLT]
     -- first we want that `P` and `head` have the same degree
     have isRightRegular_smul_leadingCoeff : IsRightRegular (u • S n).leadingCoeff := by
-      simpa [leadingCoeff_smul_of_smul_regular, IsSMulRegular.of_mul_eq_one leftinv, rightinv]
-        using isRegular_one.right
-    have u_degree_same := degree_smul_of_isRightRegular_leadingCoeff
-      (left_ne_zero_of_mul_eq_one rightinv) (hCoeff n hn).isRegular.right
-    have head_degree_eq := degree_smul_of_isRightRegular_leadingCoeff
-      (leadingCoeff_ne_zero.mpr p_ne_zero) isRightRegular_smul_leadingCoeff
-    rw [u_degree_same, S.degree_eq n, ← hp, eq_comm,
-      ← degree_eq_natDegree p_ne_zero, hp] at head_degree_eq
+      simpa [leadingCoeff_smul_of_smul_regular, IsSMulRegular.of_mul_eq_one leftinv, rightinv] using
+        isRegular_one.right
+    have u_degree_same :=
+      degree_smul_of_isRightRegular_leadingCoeff (left_ne_zero_of_mul_eq_one rightinv)
+        (hCoeff n hn).isRegular.right
+    have head_degree_eq :=
+      degree_smul_of_isRightRegular_leadingCoeff (leadingCoeff_ne_zero.mpr p_ne_zero)
+        isRightRegular_smul_leadingCoeff
+    rw [u_degree_same, S.degree_eq n, ← hp, eq_comm, ← degree_eq_natDegree p_ne_zero, hp]
+      at head_degree_eq
     -- and that this degree is also their `natDegree`
-    have head_degree_eq_natDegree : head.degree = head.natDegree := degree_eq_natDegree <| by
-      grind [degree_eq_bot]
+    have head_degree_eq_natDegree : head.degree = head.natDegree :=
+      degree_eq_natDegree <| by grind [degree_eq_bot]
     -- and that they have matching leading coefficients
     have hPhead : P.leadingCoeff = head.leadingCoeff := by
       rw [degree_eq_natDegree p_ne_zero, head_degree_eq_natDegree] at head_degree_eq
@@ -153,10 +157,12 @@ lemma span_degreeLT {m : ℕ} (hCoeff : ∀ i < m, IsUnit (S i).leadingCoeff) :
     have tail_degree_lt := P.degree_sub_lt_left head_degree_eq p_ne_zero hPhead
     rwa [degree_eq_natDegree p_ne_zero, hp] at tail_degree_lt
 
-/-- The first `m + 1` polynomials of a polynomial sequence span all polynomials of degree `≤ m` if
-    their leading coefficients are units. -/
-lemma span_degreeLE {m : ℕ} (hCoeff : ∀ i ≤ m, IsUnit (S i).leadingCoeff) :
-    span R (S '' Set.Iic m) = degreeLE R m := by
+/--
+The first `m + 1` polynomials of a polynomial sequence span all polynomials of degree `≤ m` if
+their leading coefficients are units.
+-/
+lemma span_degreeLE {m : ℕ} (hCoeff : ∀ i ≤ m, IsUnit (S i).leadingCoeff)
+    : span R (S '' Set.Iic m) = degreeLE R m := by
   rw [← Set.Iio_succ_eq_Iic, span_degreeLT _ (fun i hi => hCoeff i (Order.lt_succ_iff.mp hi))]
   simp [← Polynomial.degreeLT_succ_eq_degreeLE]
 
@@ -175,22 +181,23 @@ section IsDomain
 variable [IsDomain R]
 
 /-- Polynomials in a polynomial sequence are linearly independent. -/
-lemma linearIndependent :
-    LinearIndependent R S := linearIndependent_iff'.mpr <| fun s g eqzero i hi ↦ by
-  by_cases hsupzero : s.sup (fun i ↦ (g i • S i).degree) = ⊥
-  · have le_sup := Finset.le_sup hi (f := fun i ↦ (g i • S i).degree)
-    exact (smul_eq_zero_iff_left (S.ne_zero i)).mp <| degree_eq_bot.mp (eq_bot_mono le_sup hsupzero)
-  have hpairwise : {i | i ∈ s ∧ g i • S i ≠ 0}.Pairwise (Ne on fun i ↦ (g i • S i).degree) := by
-    intro x ⟨_, hx⟩ y ⟨_, hy⟩ xney
-    have zgx : g x ≠ 0 := (smul_ne_zero_iff.mp hx).1
-    have zgy : g y ≠ 0 := (smul_ne_zero_iff.mp hy).1
-    have rx : IsRightRegular (S x).leadingCoeff := IsRegular.of_ne_zero (by simp) |>.right
-    have ry : IsRightRegular (S y).leadingCoeff := IsRegular.of_ne_zero (by simp) |>.right
-    simp [degree_smul_of_isRightRegular_leadingCoeff, rx, ry, zgx, zgy, xney]
-  obtain ⟨n, hn⟩ : ∃ n, (s.sup fun i ↦ (g i • S i).degree) = n := exists_eq'
-  refine degree_ne_bot.mp ?_ eqzero |>.elim
-  have hsum := degree_sum_eq_of_disjoint _ s hpairwise
-  exact hsum.trans hn |>.trans_ne <| (ne_of_ne_of_eq (hsupzero ·.symm) hn).symm
+lemma linearIndependent : LinearIndependent R S :=
+  linearIndependent_iff'.mpr <| fun s g eqzero i hi ↦ by
+    by_cases hsupzero : s.sup (fun i ↦ (g i • S i).degree) = ⊥
+    · have le_sup := Finset.le_sup hi (f := fun i ↦ (g i • S i).degree)
+      exact (smul_eq_zero_iff_left (S.ne_zero i)).mp <|
+        degree_eq_bot.mp (eq_bot_mono le_sup hsupzero)
+    have hpairwise : {i | i ∈ s ∧ g i • S i ≠ 0}.Pairwise (Ne on fun i ↦ (g i • S i).degree) := by
+      intro x ⟨_, hx⟩ y ⟨_, hy⟩ xney
+      have zgx : g x ≠ 0 := (smul_ne_zero_iff.mp hx).1
+      have zgy : g y ≠ 0 := (smul_ne_zero_iff.mp hy).1
+      have rx : IsRightRegular (S x).leadingCoeff := IsRegular.of_ne_zero (by simp) |>.right
+      have ry : IsRightRegular (S y).leadingCoeff := IsRegular.of_ne_zero (by simp) |>.right
+      simp [degree_smul_of_isRightRegular_leadingCoeff, rx, ry, zgx, zgy, xney]
+    obtain ⟨n, hn⟩ : ∃ n, (s.sup fun i ↦ (g i • S i).degree) = n := exists_eq'
+    refine degree_ne_bot.mp ?_ eqzero |>.elim
+    have hsum := degree_sum_eq_of_disjoint _ s hpairwise
+    exact hsum.trans hn |>.trans_ne <| (ne_of_ne_of_eq (hsupzero ·.symm) hn).symm
 
 variable (hCoeff : ∀ i, IsUnit (S i).leadingCoeff)
 

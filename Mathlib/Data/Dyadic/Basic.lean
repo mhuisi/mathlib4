@@ -18,18 +18,23 @@ namespace Dyadic
 
 section Lemmas
 
-@[simp] theorem toRat_one : toRat 1 = 1 := rfl
+@[simp]
+theorem toRat_one : toRat 1 = 1 := rfl
 
-@[simp] protected theorem natCast_zero : (Nat.cast 0 : Dyadic) = 0 := rfl
-@[simp] protected theorem natCast_one : (Nat.cast 1 : Dyadic) = 1 := rfl
+@[simp]
+protected theorem natCast_zero : (Nat.cast 0 : Dyadic) = 0 := rfl
+@[simp]
+protected theorem natCast_one : (Nat.cast 1 : Dyadic) = 1 := rfl
 
 @[norm_cast]
 protected theorem natCast_add (a b : ℕ) : (Nat.cast (a + b) : Dyadic) = a + b := by
   simp [← Dyadic.toRat_inj]
 
-@[simp] protected theorem intCast_zero : (Int.cast 0 : Dyadic) = 0 := rfl
+@[simp]
+protected theorem intCast_zero : (Int.cast 0 : Dyadic) = 0 := rfl
 
-@[simp] protected theorem intCast_one : (Int.cast 1 : Dyadic) = 1 := rfl
+@[simp]
+protected theorem intCast_one : (Int.cast 1 : Dyadic) = 1 := rfl
 
 @[norm_cast]
 protected theorem intCast_add (a b : ℤ) : (Int.cast (a + b) : Dyadic) = a + b := by
@@ -89,7 +94,7 @@ instance : CommRing Dyadic where
   intCast_ofNat := Dyadic.intCast_natCast
   intCast_negSucc := by
     intro n
-    change Int.cast (Int.negSucc n) = -Nat.cast (n + 1)
+    change Int.cast (Int.negSucc n) = - Nat.cast (n + 1)
     rw [Int.negSucc_eq, ← toRat_inj, toRat_intCast, toRat_neg, toRat_natCast, Rat.intCast_neg,
       Rat.intCast_add, Rat.intCast_natCast, Rat.natCast_add, ← Rat.intCast_natCast 1,
       Int.natCast_one]

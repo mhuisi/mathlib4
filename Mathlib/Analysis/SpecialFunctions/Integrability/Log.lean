@@ -37,22 +37,20 @@ open scoped Interval
 
 section IntervalIntegrable
 
-variable
-  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-  {f : ℝ → E} {a b : ℝ}
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {f : ℝ → E} {a b : ℝ}
 
 /--
 If `f` is real-meromorphic on a compact interval, then `log ‖f ·‖` is interval integrable on this
 interval.
 -/
-theorem MeromorphicOn.intervalIntegrable_log_norm (hf : MeromorphicOn f [[a, b]]) :
-    IntervalIntegrable (log ‖f ·‖) volume a b := by
+theorem MeromorphicOn.intervalIntegrable_log_norm (hf : MeromorphicOn f [[a, b]])
+    : IntervalIntegrable (log ‖f ·‖) volume a b := by
   by_cases t₀ : ∀ u : [[a, b]], meromorphicOrderAt f u ≠ ⊤
-  · obtain ⟨g, h₁g, h₂g, h₃g⟩ := hf.extract_zeros_poles t₀
-      ((MeromorphicOn.divisor f [[a, b]]).finiteSupport isCompact_uIcc)
+  · obtain ⟨g, h₁g, h₂g, h₃g⟩ :=
+      hf.extract_zeros_poles t₀ ((MeromorphicOn.divisor f [[a, b]]).finiteSupport isCompact_uIcc)
     have h₄g := MeromorphicOn.extract_zeros_poles_log h₂g h₃g
-    rw [intervalIntegrable_congr_codiscreteWithin
-      (h₄g.filter_mono (Filter.codiscreteWithin_mono Set.uIoc_subset_uIcc))]
+    rw [intervalIntegrable_congr_codiscreteWithin (h₄g.filter_mono (Filter.codiscreteWithin_mono
+      Set.uIoc_subset_uIcc))]
     apply IntervalIntegrable.add
     · apply IntervalIntegrable.finsum
       intro i
@@ -81,8 +79,8 @@ theorem MeromorphicOn.intervalIntegrable_log_norm (hf : MeromorphicOn f [[a, b]]
 If `f` is real-meromorphic on a compact interval, then `log ∘ f` is interval integrable on this
 interval.
 -/
-theorem _root_.MeromorphicOn.intervalIntegrable_log {f : ℝ → ℝ} (hf : MeromorphicOn f [[a, b]]) :
-    IntervalIntegrable (log ∘ f) volume a b := by
+theorem _root_.MeromorphicOn.intervalIntegrable_log {f : ℝ → ℝ} (hf : MeromorphicOn f [[a, b]])
+    : IntervalIntegrable (log ∘ f) volume a b := by
   rw [(by aesop : log ∘ f = (log ‖f ·‖))]
   exact hf.intervalIntegrable_log_norm
 
@@ -108,9 +106,7 @@ end IntervalIntegrable
 
 section CircleIntegrable
 
-variable
-  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-  {c : ℂ} {R : ℝ} {f : ℂ → E}
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {c : ℂ} {R : ℝ} {f : ℂ → E}
 
 /--
 If `f` is complex meromorphic on a circle in the complex plane, then `log ‖f ·‖` is circle
@@ -120,11 +116,11 @@ This theorem is tagged `fun_prop`. Circle integrability of concrete functions su
 `(log ‖· - a‖)` or `∑ᶠ u, (D u * log ‖· - u‖)` can therefore be established by `fun_prop`.
 -/
 @[fun_prop]
-theorem MeromorphicOn.circleIntegrable_log_norm (hf : MeromorphicOn f (sphere c |R|)) :
-    CircleIntegrable (log ‖f ·‖) c R := by
+theorem MeromorphicOn.circleIntegrable_log_norm (hf : MeromorphicOn f (sphere c |R|))
+    : CircleIntegrable (log ‖f ·‖) c R := by
   by_cases t₀ : ∀ u : (sphere c |R|), meromorphicOrderAt f u ≠ ⊤
-  · obtain ⟨g, h₁g, h₂g, h₃g⟩ := hf.extract_zeros_poles t₀
-      ((divisor f (sphere c |R|)).finiteSupport (isCompact_sphere c |R|))
+  · obtain ⟨g, h₁g, h₂g, h₃g⟩ :=
+      hf.extract_zeros_poles t₀ ((divisor f (sphere c |R|)).finiteSupport (isCompact_sphere c |R|))
     have h₄g := MeromorphicOn.extract_zeros_poles_log h₂g h₃g
     apply CircleIntegrable.congr_codiscreteWithin h₄g.symm
     apply CircleIntegrable.add
@@ -143,7 +139,8 @@ theorem MeromorphicOn.circleIntegrable_log_norm (hf : MeromorphicOn f (sphere c 
         rw [ne_eq, norm_eq_zero]
         apply h₂g ⟨circleMap c R x, circleMap_mem_sphere' c R x⟩
   · rw [← hf.exists_meromorphicOrderAt_ne_top_iff_forall (isConnected_sphere (by simp) c
-      (abs_nonneg R))] at t₀
+        (abs_nonneg R))]
+      at t₀
     push Not at t₀
     have : (log ‖f ·‖) =ᶠ[codiscreteWithin (sphere c |R|)] 0 := by
       filter_upwards [hf.meromorphicNFAt_mem_codiscreteWithin,
@@ -154,12 +151,10 @@ theorem MeromorphicOn.circleIntegrable_log_norm (hf : MeromorphicOn f (sphere c 
       simp_all [← h₁x.meromorphicOrderAt_eq_zero_iff, t₀ ⟨x, h₂x⟩]
     apply CircleIntegrable.congr_codiscreteWithin this.symm (circleIntegrable_const 0 c R)
 
-/--
-Variant of `MeromorphicOn.circleIntegrable_log_norm` for non-negative radii.
--/
-theorem MeromorphicOn.circleIntegrable_log_norm_of_nonneg (hf : MeromorphicOn f (sphere c R))
-    (hR : 0 ≤ R) :
-    CircleIntegrable (log ‖f ·‖) c R := by
+/-- Variant of `MeromorphicOn.circleIntegrable_log_norm` for non-negative radii. -/
+theorem MeromorphicOn.circleIntegrable_log_norm_of_nonneg
+    (hf : MeromorphicOn f (sphere c R)) (hR : 0 ≤ R)
+    : CircleIntegrable (log ‖f ·‖) c R := by
   rw [← abs_of_nonneg hR] at hf
   exact hf.circleIntegrable_log_norm
 
@@ -168,17 +163,15 @@ If `f` is complex meromorphic, then `log ‖f ·‖` is circle integrable over e
 complex plane.
 -/
 @[fun_prop]
-theorem Meromorphic.circleIntegrable_log_norm (hf : Meromorphic f) :
-    CircleIntegrable (log ‖f ·‖) c R :=
+theorem Meromorphic.circleIntegrable_log_norm (hf : Meromorphic f)
+    : CircleIntegrable (log ‖f ·‖) c R :=
   hf.meromorphicOn.circleIntegrable_log_norm
 
-/--
-Variant of `MeromorphicOn.circleIntegrable_log_norm` for factorized rational functions.
--/
+/-- Variant of `MeromorphicOn.circleIntegrable_log_norm` for factorized rational functions. -/
 @[deprecated MeromorphicOn.circleIntegrable_log_norm "use `fun_prop`" +typeChanged
   (since := "2026-11-17")]
-theorem circleIntegrable_log_norm_factorizedRational {R : ℝ} {c : ℂ} (D : ℂ → ℤ) :
-    CircleIntegrable (∑ᶠ u, ((D u) * log ‖· - u‖)) c R := by
+theorem circleIntegrable_log_norm_factorizedRational {R : ℝ} {c : ℂ} (D : ℂ → ℤ)
+    : CircleIntegrable (∑ᶠ u, ((D u) * log ‖· - u‖)) c R := by
   fun_prop
 
 /--
@@ -186,8 +179,7 @@ If `a` is any complex number, the function `(log ‖· - a‖)` is circle integr
 -/
 @[deprecated MeromorphicOn.circleIntegrable_log_norm "use `fun_prop`" +typeChanged
   (since := "2026-11-17")]
-lemma circleIntegrable_log_norm_sub_const {a : ℂ} (r : ℝ) :
-    CircleIntegrable (log ‖· - a‖) c r := by
+lemma circleIntegrable_log_norm_sub_const {a : ℂ} (r : ℝ) : CircleIntegrable (log ‖· - a‖) c r := by
   fun_prop
 
 end CircleIntegrable

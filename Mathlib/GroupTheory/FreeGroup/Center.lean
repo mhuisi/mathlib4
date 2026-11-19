@@ -41,8 +41,8 @@ open Subgroup
 variable {α : Type*}
 
 @[to_additive]
-theorem mem_zpowers_of_iff [DecidableEq α] {a : α} {x : FreeGroup α} :
-    x ∈ Subgroup.zpowers (of a) ↔ ∀ p ∈ x.toWord, p.1 = a := by
+theorem mem_zpowers_of_iff [DecidableEq α] {a : α} {x : FreeGroup α}
+    : x ∈ Subgroup.zpowers (of a) ↔ ∀ p ∈ x.toWord, p.1 = a := by
   refine ⟨by rintro ⟨_, rfl⟩; simp, fun h ↦ mk_toWord (x := x) ▸ ?_⟩
   generalize x.toWord = L at h
   induction L with
@@ -52,8 +52,8 @@ theorem mem_zpowers_of_iff [DecidableEq α] {a : α} {x : FreeGroup α} :
     refine mul_mem ?_ (ih (by grind))
     obtain ⟨b, _ | _⟩ := p
     all_goals
-    · simp at h
-      simp [h.1, mk_eq_of, mk_eq_inv_of]
+      · simp at h
+        simp [h.1, mk_eq_of, mk_eq_inv_of]
 
 @[to_additive]
 theorem centralizer_of (a : α) : centralizer {of a} = zpowers (of a) := by
@@ -66,13 +66,11 @@ theorem centralizer_of (a : α) : centralizer {of a} = zpowers (of a) := by
     List.idxOf_eq_zero_iff_eq_nil_or_head_eq]
 
 @[to_additive]
-theorem commute_of_iff {a : α} {x : FreeGroup α} :
-    Commute (of a) x ↔ x ∈ zpowers (of a) := by
+theorem commute_of_iff {a : α} {x : FreeGroup α} : Commute (of a) x ↔ x ∈ zpowers (of a) := by
   rw [← centralizer_of, mem_centralizer_singleton_iff, Commute.symm_iff]
 
 @[to_additive]
-theorem center_eq_top_of_subsingleton [Subsingleton α] : center (FreeGroup α) = ⊤ :=
-  center_eq_top
+theorem center_eq_top_of_subsingleton [Subsingleton α] : center (FreeGroup α) = ⊤ := center_eq_top
 
 @[to_additive]
 theorem center_eq_bot_of_nontrivial [Nontrivial α] : center (FreeGroup α) = ⊥ := by
@@ -116,8 +114,8 @@ theorem isCyclic_centralizer {g : G} (ha : g ≠ 1) : IsCyclic (centralizer {g})
 
 /-- Free groups are commutative-transitive. -/
 @[to_additive /-- Free additive groups are commutative-transitive. -/]
-theorem commute_trans {a b c : G} (h₁ : Commute a b) (h₂ : Commute b c) (hb : b ≠ 1) :
-    Commute a c := by
+theorem commute_trans {a b c : G} (h₁ : Commute a b) (h₂ : Commute b c) (hb : b ≠ 1)
+    : Commute a c := by
   obtain ⟨g, hg⟩ := isCyclic_centralizer hb
   obtain ⟨n, hn⟩ := hg ⟨a, mem_centralizer_singleton_iff.mpr h₁.eq⟩
   obtain ⟨m, hm⟩ := hg ⟨c, mem_centralizer_singleton_iff.mpr h₂.symm.eq⟩
@@ -125,8 +123,8 @@ theorem commute_trans {a b c : G} (h₁ : Commute a b) (h₂ : Commute b c) (hb 
   simp [← hn, ← hm]
 
 @[to_additive]
-theorem commute_iff_exists_zpow {a b : G} :
-    Commute a b ↔ ∃ c, ∃ n m : ℤ, a = c ^ n ∧ b = c ^ m := by
+theorem commute_iff_exists_zpow {a b : G}
+    : Commute a b ↔ ∃ c, ∃ n m : ℤ, a = c ^ n ∧ b = c ^ m := by
   refine ⟨fun h ↦ ?_, by simp +contextual⟩
   by_cases hb : b = 1
   · exact ⟨a, 1, 0, by simp [hb]⟩

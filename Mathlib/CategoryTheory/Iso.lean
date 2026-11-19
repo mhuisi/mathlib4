@@ -45,11 +45,13 @@ namespace CategoryTheory
 
 open Category
 
-/-- An isomorphism (a.k.a. an invertible morphism) between two objects of a category.
+/--
+An isomorphism (a.k.a. an invertible morphism) between two objects of a category.
 The inverse morphism is bundled.
 
 See also `CategoryTheory.Core` for the category with the same objects and isomorphisms playing
-the role of morphisms. -/
+the role of morphisms.
+-/
 @[stacks 0017, wikidata Q189112]
 structure Iso {C : Type u} [Category.{v} C] (X Y : C) where
   /-- The forward direction of an isomorphism. -/
@@ -58,8 +60,10 @@ structure Iso {C : Type u} [Category.{v} C] (X Y : C) where
   inv : Y ⟶ X
   /-- Composition of the two directions of an isomorphism is the identity on the source. -/
   hom_inv_id : hom ≫ inv = 𝟙 X := by cat_disch
-  /-- Composition of the two directions of an isomorphism in reverse order
-  is the identity on the target. -/
+  /--
+  Composition of the two directions of an isomorphism in reverse order
+  is the identity on the target.
+  -/
   inv_hom_id : inv ≫ hom = 𝟙 Y := by cat_disch
 
 attribute [to_dual existing inv] Iso.hom
@@ -80,8 +84,9 @@ set_option linter.existingAttributeWarning false in
 theorem ext ⦃α β : X ≅ Y⦄ (w : α.hom = β.hom) : α = β :=
   suffices α.inv = β.inv by grind [Iso]
   calc
-    α.inv = α.inv ≫ β.hom ≫ β.inv := by grind
-    _     = β.inv                 := by grind
+    α.inv
+      = α.inv ≫ β.hom ≫ β.inv := by grind
+    _ = β.inv := by grind
 
 /-- Inverse isomorphism. -/
 @[symm, implicit_reducible]
@@ -90,13 +95,12 @@ def symm (I : X ≅ Y) : Y ≅ X where
   inv := I.hom
 
 @[to_dual (attr := simp, grind =) symm_inv]
-theorem symm_hom (α : X ≅ Y) : α.symm.hom = α.inv :=
-  rfl
+theorem symm_hom (α : X ≅ Y) : α.symm.hom = α.inv := rfl
 
 @[simp, grind =, to_dual self]
-theorem symm_mk {X Y : C} (hom : X ⟶ Y) (inv : Y ⟶ X) (hom_inv_id) (inv_hom_id) :
-    Iso.symm { hom, inv, hom_inv_id := hom_inv_id, inv_hom_id := inv_hom_id } =
-      { hom := inv, inv := hom, hom_inv_id := inv_hom_id, inv_hom_id := hom_inv_id } :=
+theorem symm_mk {X Y : C} (hom : X ⟶ Y) (inv : Y ⟶ X) (hom_inv_id) (inv_hom_id)
+    : Iso.symm { hom, inv, hom_inv_id := hom_inv_id, inv_hom_id := inv_hom_id }
+      = { hom := inv, inv := hom, hom_inv_id := inv_hom_id, inv_hom_id := hom_inv_id } :=
   rfl
 
 @[simp, grind =]
@@ -146,19 +150,20 @@ infixr:80 " ≪≫ " => Iso.trans -- type as `\ll \gg`.
 -- Hopefully this can be restored when `grind` has support for associative/commutative operations,
 -- or direct support for category theory.
 @[simp, to_dual self]
-theorem trans_mk {X Y Z : C} (hom : X ⟶ Y) (inv : Y ⟶ X) (hom_inv_id) (inv_hom_id)
-    (hom' : Y ⟶ Z) (inv' : Z ⟶ Y) (hom_inv_id') (inv_hom_id') (hom_inv_id'') (inv_hom_id'') :
-    Iso.trans ⟨hom, inv, hom_inv_id, inv_hom_id⟩ ⟨hom', inv', hom_inv_id', inv_hom_id'⟩ =
-     ⟨hom ≫ hom', inv' ≫ inv, hom_inv_id'', inv_hom_id''⟩ :=
+theorem trans_mk
+    {X Y Z : C} (hom : X ⟶ Y) (inv : Y ⟶ X)
+    (hom_inv_id) (inv_hom_id) (hom' : Y ⟶ Z) (inv' : Z ⟶ Y) (hom_inv_id') (inv_hom_id')
+    (hom_inv_id'') (inv_hom_id'')
+    : Iso.trans ⟨hom, inv, hom_inv_id, inv_hom_id⟩ ⟨hom', inv', hom_inv_id', inv_hom_id'⟩
+      = ⟨hom ≫ hom', inv' ≫ inv, hom_inv_id'', inv_hom_id''⟩ :=
   rfl
 
 @[simp, grind _=_]
-theorem trans_symm (α : X ≅ Y) (β : Y ≅ Z) : (α ≪≫ β).symm = β.symm ≪≫ α.symm :=
-  rfl
+theorem trans_symm (α : X ≅ Y) (β : Y ≅ Z) : (α ≪≫ β).symm = β.symm ≪≫ α.symm := rfl
 
 @[simp, grind _=_]
-theorem trans_assoc {Z' : C} (α : X ≅ Y) (β : Y ≅ Z) (γ : Z ≅ Z') :
-    (α ≪≫ β) ≪≫ γ = α ≪≫ β ≪≫ γ := by
+theorem trans_assoc {Z' : C} (α : X ≅ Y) (β : Y ≅ Z) (γ : Z ≅ Z')
+    : (α ≪≫ β) ≪≫ γ = α ≪≫ β ≪≫ γ := by
   ext; simp only [trans_hom, Category.assoc]
 
 @[simp]
@@ -168,12 +173,10 @@ theorem refl_trans (α : X ≅ Y) : Iso.refl X ≪≫ α = α := by ext; apply C
 theorem trans_refl (α : X ≅ Y) : α ≪≫ Iso.refl Y = α := by ext; apply Category.comp_id
 
 @[simp]
-theorem symm_self_id (α : X ≅ Y) : α.symm ≪≫ α = Iso.refl Y :=
-  ext α.inv_hom_id
+theorem symm_self_id (α : X ≅ Y) : α.symm ≪≫ α = Iso.refl Y := ext α.inv_hom_id
 
 @[simp]
-theorem self_symm_id (α : X ≅ Y) : α ≪≫ α.symm = Iso.refl X :=
-  ext α.hom_inv_id
+theorem self_symm_id (α : X ≅ Y) : α ≪≫ α.symm = Iso.refl X := ext α.hom_inv_id
 
 @[simp]
 theorem symm_self_id_assoc (α : X ≅ Y) (β : Y ≅ Z) : α.symm ≪≫ α ≪≫ β = β := by
@@ -220,8 +223,9 @@ theorem hom_eq_inv (α : X ≅ Y) (β : Y ≅ X) : α.hom = β.inv ↔ β.hom = 
 attribute [local grind] Function.LeftInverse Function.RightInverse
 
 /-- The bijection `(Z ⟶ X) ≃ (Z ⟶ Y)` induced by `α : X ≅ Y`. -/
-@[implicit_reducible, to_dual (attr := simps) homFromEquiv
-/-- The bijection `(X ⟶ Z) ≃ (Y ⟶ Z)` induced by `α : X ≅ Y`. -/]
+@[implicit_reducible,
+  to_dual (attr := simps) homFromEquiv
+    /-- The bijection `(X ⟶ Z) ≃ (Y ⟶ Z)` induced by `α : X ≅ Y`. -/]
 def homToEquiv (α : X ≅ Y) {Z : C} : (Z ⟶ X) ≃ (Z ⟶ Y) where
   toFun f := f ≫ α.hom
   invFun g := g ≫ α.inv
@@ -231,10 +235,12 @@ def homToEquiv (α : X ≅ Y) {Z : C} : (Z ⟶ X) ≃ (Z ⟶ Y) where
 end Iso
 
 set_option linter.translate.warnInvalid false in
-/-- The `IsIso` typeclass expresses that a morphism is invertible.
+/--
+The `IsIso` typeclass expresses that a morphism is invertible.
 
 Given a morphism `f` with `IsIso f`, one can view `f` as an isomorphism via `asIso f` and get
-the inverse using `inv f`. -/
+the inverse using `inv f`.
+-/
 @[to_dual self]
 class IsIso (f : X ⟶ Y) : Prop where
   /-- The existence of an inverse morphism. -/
@@ -244,15 +250,13 @@ to_dual_for IsIso.mk := ⟨by simpa only [and_comm] using out⟩
 
 /-- The inverse of a morphism `f` when we have `[IsIso f]`. -/
 @[to_dual self, no_expose]
-noncomputable def inv (f : X ⟶ Y) [I : IsIso f] : Y ⟶ X :=
-  Classical.choose I.out
+noncomputable def inv (f : X ⟶ Y) [I : IsIso f] : Y ⟶ X := Classical.choose I.out
 
 attribute [to_dual self] inv.congr_simp
 
 namespace IsIso
 
-theorem hom_inv_id (f : X ⟶ Y) [I : IsIso f] : f ≫ inv f = 𝟙 X :=
-  (Classical.choose_spec I.out).left
+theorem hom_inv_id (f : X ⟶ Y) [I : IsIso f] : f ≫ inv f = 𝟙 X := (Classical.choose_spec I.out).left
 
 @[to_dual existing (attr := reassoc (attr := simp), map, grind =) hom_inv_id]
 theorem inv_hom_id (f : X ⟶ Y) [I : IsIso f] : inv f ≫ f = 𝟙 Y :=
@@ -263,42 +267,37 @@ attribute [reassoc] hom_inv_id_map inv_hom_id_map
 end IsIso
 
 @[to_dual isIso_inv]
-instance Iso.isIso_hom (e : X ≅ Y) : IsIso e.hom :=
-  ⟨e.inv, by simp only [hom_inv_id], by simp⟩
+instance Iso.isIso_hom (e : X ≅ Y) : IsIso e.hom := ⟨e.inv, by simp only [hom_inv_id], by simp⟩
 
 open IsIso
 
 /-- Reinterpret a morphism `f : X ⟶ Y` with an `IsIso f` instance as `X ≅ Y`. -/
 @[to_dual (attr := implicit_reducible) asIso'
-/-- Reinterpret a morphism `f : X ⟶ Y` with an `IsIso f` instance as `Y ≅ X`. -/]
-noncomputable def asIso (f : X ⟶ Y) [IsIso f] : X ≅ Y :=
-  ⟨f, inv f, hom_inv_id f, inv_hom_id f⟩
+  /-- Reinterpret a morphism `f : X ⟶ Y` with an `IsIso f` instance as `Y ≅ X`. -/]
+noncomputable def asIso (f : X ⟶ Y) [IsIso f] : X ≅ Y := ⟨f, inv f, hom_inv_id f, inv_hom_id f⟩
 
 @[to_dual (attr := simp) asIso'_hom]
-theorem asIso_hom (f : X ⟶ Y) [IsIso f] : (asIso f).hom = f :=
-  rfl
+theorem asIso_hom (f : X ⟶ Y) [IsIso f] : (asIso f).hom = f := rfl
 
 @[to_dual (attr := simp) asIso'_inv]
-theorem asIso_inv (f : X ⟶ Y) [IsIso f] : (asIso f).inv = inv f :=
-  rfl
+theorem asIso_inv (f : X ⟶ Y) [IsIso f] : (asIso f).inv = inv f := rfl
 
 namespace IsIso
 
 -- see Note [lower instance priority]
 @[to_dual]
 instance (priority := 100) epi_of_iso (f : X ⟶ Y) [IsIso f] : Epi f where
-  left_cancellation g h w := by
-    rw [← IsIso.inv_hom_id_assoc f g, w, IsIso.inv_hom_id_assoc f h]
+  left_cancellation g h w := by rw [← IsIso.inv_hom_id_assoc f g, w, IsIso.inv_hom_id_assoc f h]
 
 @[aesop apply safe (rule_sets := [CategoryTheory]), grind ←=, to_dual inv_eq_of_inv_hom_id]
-theorem inv_eq_of_hom_inv_id {f : X ⟶ Y} [IsIso f] {g : Y ⟶ X} (hom_inv_id : f ≫ g = 𝟙 X) :
-    inv f = g := by
+theorem inv_eq_of_hom_inv_id {f : X ⟶ Y} [IsIso f] {g : Y ⟶ X} (hom_inv_id : f ≫ g = 𝟙 X)
+    : inv f = g := by
   have := congrArg (inv f ≫ ·) hom_inv_id
   grind
 
 @[aesop apply safe (rule_sets := [CategoryTheory]), to_dual eq_inv_of_inv_hom_id]
-theorem eq_inv_of_hom_inv_id {f : X ⟶ Y} [IsIso f] {g : Y ⟶ X} (hom_inv_id : f ≫ g = 𝟙 X) :
-    g = inv f :=
+theorem eq_inv_of_hom_inv_id {f : X ⟶ Y} [IsIso f] {g : Y ⟶ X} (hom_inv_id : f ≫ g = 𝟙 X)
+    : g = inv f :=
   (inv_eq_of_hom_inv_id hom_inv_id).symm
 
 instance id (X : C) : IsIso (𝟙 X) := ⟨⟨𝟙 X, by simp⟩⟩
@@ -306,12 +305,10 @@ instance id (X : C) : IsIso (𝟙 X) := ⟨⟨𝟙 X, by simp⟩⟩
 variable {f : X ⟶ Y} {h : Y ⟶ Z}
 
 @[to_dual self]
-instance inv_isIso [IsIso f] : IsIso (inv f) :=
-  (asIso f).isIso_inv
+instance inv_isIso [IsIso f] : IsIso (inv f) := (asIso f).isIso_inv
 
 @[to_dual self (reorder := X Z, f h, 8 9)]
-instance comp_isIso [IsIso f] [IsIso h] : IsIso (f ≫ h) :=
-  (asIso f ≪≫ asIso h).isIso_hom
+instance comp_isIso [IsIso f] [IsIso h] : IsIso (f ≫ h) := (asIso f ≪≫ asIso h).isIso_hom
 
 /--
 The composition of isomorphisms is an isomorphism. Here the arguments of type `IsIso` are
@@ -349,22 +346,23 @@ theorem eq_inv_comp (α : X ⟶ Y) [IsIso α] {f : X ⟶ Z} {g : Y ⟶ Z} : g = 
   (asIso α).eq_inv_comp
 
 @[to_dual (reorder := f g) of_isIso_comp_right]
-theorem of_isIso_comp_left {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) [IsIso f] [IsIso (f ≫ g)] :
-    IsIso g := by
+theorem of_isIso_comp_left {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) [IsIso f] [IsIso (f ≫ g)]
+    : IsIso g := by
   rw [← id_comp g, ← inv_hom_id f, assoc]
   infer_instance
 
 @[to_dual of_isIso_fac_right]
-theorem of_isIso_fac_left {X Y Z : C} {f : X ⟶ Y} {g : Y ⟶ Z} {h : X ⟶ Z} [IsIso f]
-    [hh : IsIso h] (w : f ≫ g = h) : IsIso g := by
+theorem of_isIso_fac_left
+    {X Y Z : C} {f : X ⟶ Y} {g : Y ⟶ Z} {h : X ⟶ Z} [IsIso f] [hh : IsIso h] (w : f ≫ g = h)
+    : IsIso g := by
   rw [← w] at hh
   exact of_isIso_comp_left f g
 
 end IsIso
 
 @[to_dual (attr := simp) (reorder := f g) isIso_comp_right_iff]
-theorem isIso_comp_left_iff {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) [IsIso f] :
-    IsIso (f ≫ g) ↔ IsIso g :=
+theorem isIso_comp_left_iff {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) [IsIso f]
+    : IsIso (f ≫ g) ↔ IsIso g :=
   ⟨fun _ ↦ IsIso.of_isIso_comp_left f g, fun _ ↦ inferInstance⟩
 
 open IsIso
@@ -417,15 +415,14 @@ rather than typeclasses, with coercions back to `X ⟶ Y`.
 Presumably we could write `X ↪ Y` and `X ↠ Y`.
 -/
 
-
 @[to_dual (attr := simp) (reorder := f g' g) cancel_iso_inv_right]
-theorem cancel_iso_hom_left {X Y Z : C} (f : X ≅ Y) (g g' : Y ⟶ Z) :
-    f.hom ≫ g = f.hom ≫ g' ↔ g = g' := by
+theorem cancel_iso_hom_left {X Y Z : C} (f : X ≅ Y) (g g' : Y ⟶ Z)
+    : f.hom ≫ g = f.hom ≫ g' ↔ g = g' := by
   simp only [cancel_epi]
 
 @[to_dual (attr := simp) (reorder := f f' g) cancel_iso_inv_left]
-theorem cancel_iso_hom_right {X Y Z : C} (f f' : X ⟶ Y) (g : Y ≅ Z) :
-    f ≫ g.hom = f' ≫ g.hom ↔ f = f' := by
+theorem cancel_iso_hom_right {X Y Z : C} (f f' : X ⟶ Y) (g : Y ≅ Z)
+    : f ≫ g.hom = f' ≫ g.hom ↔ f = f' := by
   simp only [cancel_mono]
 
 /-
@@ -436,13 +433,15 @@ We provide two more lemmas, for case of three morphisms, because this actually c
 but then stop.
 -/
 @[simp, to_dual none]
-theorem cancel_iso_hom_right_assoc {W X X' Y Z : C} (f : W ⟶ X) (g : X ⟶ Y) (f' : W ⟶ X')
-    (g' : X' ⟶ Y) (h : Y ≅ Z) : f ≫ g ≫ h.hom = f' ≫ g' ≫ h.hom ↔ f ≫ g = f' ≫ g' := by
+theorem cancel_iso_hom_right_assoc
+    {W X X' Y Z : C} (f : W ⟶ X) (g : X ⟶ Y) (f' : W ⟶ X') (g' : X' ⟶ Y) (h : Y ≅ Z)
+    : f ≫ g ≫ h.hom = f' ≫ g' ≫ h.hom ↔ f ≫ g = f' ≫ g' := by
   simp only [← Category.assoc, cancel_mono]
 
 @[simp, to_dual none]
-theorem cancel_iso_inv_right_assoc {W X X' Y Z : C} (f : W ⟶ X) (g : X ⟶ Y) (f' : W ⟶ X')
-    (g' : X' ⟶ Y) (h : Z ≅ Y) : f ≫ g ≫ h.inv = f' ≫ g' ≫ h.inv ↔ f ≫ g = f' ≫ g' := by
+theorem cancel_iso_inv_right_assoc
+    {W X X' Y Z : C} (f : W ⟶ X) (g : X ⟶ Y) (f' : W ⟶ X') (g' : X' ⟶ Y) (h : Z ≅ Y)
+    : f ≫ g ≫ h.inv = f' ≫ g' ≫ h.inv ↔ f ≫ g = f' ≫ g' := by
   simp only [← Category.assoc, cancel_mono]
 
 section
@@ -453,12 +452,10 @@ attribute [map] hom_inv_id inv_hom_id
 attribute [reassoc +to_dual (attr := simp), grind =] hom_inv_id_map inv_hom_id_map
 
 @[reassoc +to_dual, deprecated hom_inv_id_map +typeChanged (since := "2026-09-16")]
-lemma map_hom_inv_id (F : C ⥤ D) :
-    F.map e.hom ≫ F.map e.inv = 𝟙 _ := by simp
+lemma map_hom_inv_id (F : C ⥤ D) : F.map e.hom ≫ F.map e.inv = 𝟙 _ := by simp
 
 @[reassoc +to_dual, deprecated inv_hom_id_map +typeChanged (since := "2026-09-16")]
-lemma map_inv_hom_id (F : C ⥤ D) :
-    F.map e.inv ≫ F.map e.hom = 𝟙 _ := by grind
+lemma map_inv_hom_id (F : C ⥤ D) : F.map e.inv ≫ F.map e.hom = 𝟙 _ := by grind
 
 attribute [deprecated hom_inv_id_map_assoc +typeChanged (since := "2026-09-16")]
   map_hom_inv_id_assoc
@@ -485,12 +482,11 @@ def mapIso (F : C ⥤ D) {X Y : C} (i : X ≅ Y) : F.obj X ≅ F.obj Y where
 attribute [to_dual existing mapIso_inv] mapIso_hom
 
 @[simp]
-theorem mapIso_symm (F : C ⥤ D) {X Y : C} (i : X ≅ Y) : F.mapIso i.symm = (F.mapIso i).symm :=
-  rfl
+theorem mapIso_symm (F : C ⥤ D) {X Y : C} (i : X ≅ Y) : F.mapIso i.symm = (F.mapIso i).symm := rfl
 
 @[simp]
-theorem mapIso_trans (F : C ⥤ D) {X Y Z : C} (i : X ≅ Y) (j : Y ≅ Z) :
-    F.mapIso (i ≪≫ j) = F.mapIso i ≪≫ F.mapIso j := by
+theorem mapIso_trans (F : C ⥤ D) {X Y Z : C} (i : X ≅ Y) (j : Y ≅ Z)
+    : F.mapIso (i ≪≫ j) = F.mapIso i ≪≫ F.mapIso j := by
   ext; apply Functor.map_comp
 
 @[simp]
@@ -507,8 +503,9 @@ theorem map_inv (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) [IsIso f] : F.map (inv f) 
   exact IsIso.hom_inv_id_map f F
 
 @[to_dual (attr := reassoc) map_inv_hom]
-theorem map_hom_inv (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) [IsIso f] :
-    F.map f ≫ F.map (inv f) = 𝟙 (F.obj X) := by simp
+theorem map_hom_inv (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) [IsIso f]
+    : F.map f ≫ F.map (inv f) = 𝟙 (F.obj X) := by
+  simp
 
 attribute [deprecated IsIso.hom_inv_id_map +typeChanged (since := "2026-09-16")] map_hom_inv
 attribute [deprecated IsIso.inv_hom_id_map +typeChanged (since := "2026-09-16")] map_inv_hom
@@ -519,12 +516,14 @@ attribute [deprecated IsIso.inv_hom_id_map_assoc +typeChanged (since := "2026-09
 
 -- The following two lemmas are needed to generate good elementwise lemmas
 @[reassoc]
-theorem map_hom_inv' (F : C ⥤ D) {X Y : C} (f : X ≅ Y) :
-    F.map f.hom ≫ F.map f.inv = 𝟙 (F.obj X) := by simp
+theorem map_hom_inv' (F : C ⥤ D) {X Y : C} (f : X ≅ Y)
+    : F.map f.hom ≫ F.map f.inv = 𝟙 (F.obj X) := by
+  simp
 
 @[reassoc]
-theorem map_inv_hom' (F : C ⥤ D) {X Y : C} (f : X ≅ Y) :
-    F.map f.inv ≫ F.map f.hom = 𝟙 (F.obj Y) := by simp
+theorem map_inv_hom' (F : C ⥤ D) {X Y : C} (f : X ≅ Y)
+    : F.map f.inv ≫ F.map f.hom = 𝟙 (F.obj Y) := by
+  simp
 
 end Functor
 

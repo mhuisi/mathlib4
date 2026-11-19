@@ -23,7 +23,8 @@ even though it has no zero-divisors other than 0.
 public section
 
 /-- A type synonym for ℕ equipped with maximum as addition. -/
-@[expose] def NatMaxAdd := ℕ
+@[expose]
+def NatMaxAdd := ℕ
 
 open scoped Polynomial
 
@@ -68,8 +69,7 @@ theorem natCast_eq_one (n : ℕ) : ∀ [NeZero n], (n : NatMaxAdd) = 1 := by
     · intro; rfl
     · rw [Nat.cast_succ, ih]; intro; rfl
 
-theorem not_isCancelAdd : ¬ IsCancelAdd NatMaxAdd := fun h ↦ by
-  cases @h.add_left_cancel 1 0 1 rfl
+theorem not_isCancelAdd : ¬ IsCancelAdd NatMaxAdd := fun h ↦ by cases @h.add_left_cancel 1 0 1 rfl
 
 theorem not_isDomain_polynomial : ¬ IsDomain NatMaxAdd[X] :=
   Polynomial.isDomain_iff.not.mpr fun h ↦ not_isCancelAdd h.2
@@ -78,6 +78,6 @@ theorem noZeroDivisors_polynomial : NoZeroDivisors NatMaxAdd[X] := inferInstance
 
 end NatMaxAdd
 
-theorem not_isDomain_commSemiring_imp_isDomain_polynomial :
-    ¬ ∀ (R : Type) [CommSemiring R] [IsDomain R], IsDomain R[X] :=
-  fun h ↦ NatMaxAdd.not_isDomain_polynomial (h _)
+theorem not_isDomain_commSemiring_imp_isDomain_polynomial
+    : ¬ ∀ (R : Type) [CommSemiring R] [IsDomain R], IsDomain R[X] := fun h ↦
+  NatMaxAdd.not_isDomain_polynomial (h _)

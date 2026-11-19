@@ -27,8 +27,10 @@ wrap the result in an `Option` type instead:
 
 namespace Nat
 
-/-- Partial predecessor operation. Returns `ppred n = some m`
-  if `n = m + 1`, otherwise `none`. -/
+/--
+Partial predecessor operation. Returns `ppred n = some m`
+if `n = m + 1`, otherwise `none`.
+-/
 def ppred : ℕ → Option ℕ
   | 0 => none
   | n + 1 => some n
@@ -39,8 +41,10 @@ theorem ppred_zero : ppred 0 = none := rfl
 @[simp]
 theorem ppred_succ {n : ℕ} : ppred (succ n) = some n := rfl
 
-/-- Partial subtraction operation. Returns `psub m n = some k`
-  if `m = n + k`, otherwise `none`. -/
+/--
+Partial subtraction operation. Returns `psub m n = some k`
+if `m = n + k`, otherwise `none`.
+-/
 def psub (m : ℕ) : ℕ → Option ℕ
   | 0 => some m
   | n + 1 => psub m n >>= ppred
@@ -88,16 +92,14 @@ theorem ppred_eq_pred {n} (h : 0 < n) : ppred n = some (pred n) :=
 theorem psub_eq_sub {m n} (h : n ≤ m) : psub m n = some (m - n) :=
   psub_eq_some.2 <| Nat.sub_add_cancel h
 
-theorem psub_add (m n k) :
-    psub m (n + k) = (do psub (← psub m n) k) := by
-    induction k with
-    | zero => simp
-    | succ n ih => simp only [ih, add_succ, psub_succ, bind_assoc]
+theorem psub_add (m n k) : psub m (n + k) = (do psub (← psub m n) k) := by
+  induction k with
+  | zero => simp
+  | succ n ih => simp only [ih, add_succ, psub_succ, bind_assoc]
 
 /-- Same as `psub`, but with a more efficient implementation. -/
 @[inline]
-def psub' (m n : ℕ) : Option ℕ :=
-  if n ≤ m then some (m - n) else none
+def psub' (m n : ℕ) : Option ℕ := if n ≤ m then some (m - n) else none
 
 theorem psub'_eq_psub (m n) : psub' m n = psub m n := by
   rw [psub']

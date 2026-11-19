@@ -22,29 +22,37 @@ universe w v u
 
 namespace CategoryTheory.Limits.Types.FilteredColimit
 
-variable {J : Type*} [Category* J] (κ : Cardinal.{w}) [Fact κ.IsRegular] [IsCardinalFiltered J κ]
+variable
+  {J : Type*} [Category* J]
+  (κ : Cardinal.{w}) [Fact κ.IsRegular] [IsCardinalFiltered J κ]
   (F : J ⥤ Type u)
 
 open IsFiltered in
 variable {F} in
-/-- In a κ-filtered diagram of types, any κ-small family of elements in the colimit lifts to
-a common stage in the diagram. -/
+/--
+In a κ-filtered diagram of types, any κ-small family of elements in the colimit lifts to
+a common stage in the diagram.
+-/
 lemma jointly_surjective_of_isColimit_of_hasCardinalLT
-    {t : Cocone F} (ht : IsColimit t) {ι : Type*} (hι : HasCardinalLT ι κ) (x : ι → t.pt) :
-    ∃ (j : J) (x' : ι → F.obj j), ∀ (i : ι), t.ι.app j (x' i) = x i := by
+    {t : Cocone F} (ht : IsColimit t) {ι : Type*} (hι : HasCardinalLT ι κ) (x : ι → t.pt)
+    : ∃ (j : J) (x' : ι → F.obj j), ∀ (i : ι), t.ι.app j (x' i) = x i := by
   choose j₀ x₀ h₀ using fun i ↦ Types.jointly_surjective_of_isColimit ht (x i)
-  exact ⟨IsCardinalFiltered.max j₀ hι, fun i ↦ F.map (IsCardinalFiltered.toMax j₀ hι i) (x₀ i),
-    by simpa⟩
+  exact ⟨
+    IsCardinalFiltered.max j₀ hι,
+    fun i ↦ F.map (IsCardinalFiltered.toMax j₀ hι i) (x₀ i),
+    by simpa
+  ⟩
 
 variable {F} in
-/-- In a κ-filtered diagram of types, a family of size < κ in the `i`-th stage of the diagram
+/--
+In a κ-filtered diagram of types, a family of size < κ in the `i`-th stage of the diagram
 collapses to the same element in the colimit if and only if it already does at some
-stage of the colimit. -/
+stage of the colimit.
+-/
 theorem isColimit_eq_iff'_of_hasCardinalLT
-    {t : Cocone F} (ht : IsColimit t) {ι : Type*} (hι : HasCardinalLT ι κ)
-    {i : J} (x : ι → F.obj i) :
-    (∀ (k k' : ι), t.ι.app i (x k) = t.ι.app i (x k')) ↔
-      ∃ (j : _) (f : i ⟶ j), ∀ (k k' : ι), F.map f (x k) = F.map f (x k') := by
+    {t : Cocone F} (ht : IsColimit t) {ι : Type*} (hι : HasCardinalLT ι κ) {i : J} (x : ι → F.obj i)
+    : (∀ (k k' : ι), t.ι.app i (x k) = t.ι.app i (x k'))
+      ↔ ∃ (j : _) (f : i ⟶ j), ∀ (k k' : ι), F.map f (x k) = F.map f (x k') := by
   have := isFiltered_of_isCardinalFiltered J κ
   refine ⟨fun h ↦ ?_, fun ⟨j, f, h⟩ k k' ↦ ?_⟩
   · -- every individual equality is explained at some stage in the diagram by ℵ₀-filteredness
@@ -67,20 +75,22 @@ theorem isColimit_eq_iff'_of_hasCardinalLT
   · simp [← dsimp% t.ι.naturality_apply f (x k), h k k']
 
 variable {F} in
-/-- In a κ-filtered diagram of types, a family of size < κ of elements in the diagram collapses
-to the same element in the colimit if and only if it already does at some stage of the colimit. -/
+/--
+In a κ-filtered diagram of types, a family of size < κ of elements in the diagram collapses
+to the same element in the colimit if and only if it already does at some stage of the colimit.
+-/
 theorem isColimit_eq_iff''_of_hasCardinalLT
-    {t : Cocone F} (ht : IsColimit t) {ι : Type*} (hι : HasCardinalLT ι κ)
-    {φ : ι → J} (x : (i : ι) → F.obj (φ i)) :
-    (∀ (k k' : ι), t.ι.app _ (x k) = t.ι.app _ (x k')) ↔
-      ∃ (j : _) (f : (i : ι) → (φ i) ⟶ j), ∀ (k k' : ι),
+    {t : Cocone F} (ht : IsColimit t)
+    {ι : Type*} (hι : HasCardinalLT ι κ)
+    {φ : ι → J} (x : (i : ι) → F.obj (φ i))
+    : (∀ (k k' : ι), t.ι.app _ (x k) = t.ι.app _ (x k'))
+      ↔ ∃ (j : _) (f : (i : ι) → (φ i) ⟶ j), ∀ (k k' : ι),
         F.map (f k) (x k) = F.map (f k') (x k') := by
   refine ⟨fun h ↦ ?_, fun ⟨j, f, h⟩ k k' ↦ ?_⟩
   · -- We reduce to the case of isColimit_eq_iff'_of_hasCardinalLT
     let i₀ := IsCardinalFiltered.max φ hι
     let x₀ (i : ι) : F.obj i₀ := F.map (IsCardinalFiltered.toMax φ hι i) (x i)
-    have (k k' : ι) : (t.ι.app i₀) (x₀ k) = (t.ι.app i₀) (x₀ k') := by
-      simp [i₀, x₀, h k k']
+    have (k k' : ι) : (t.ι.app i₀) (x₀ k) = (t.ι.app i₀) (x₀ k') := by simp [i₀, x₀, h k k']
     obtain ⟨j, f₀, hj⟩ := (isColimit_eq_iff'_of_hasCardinalLT κ ht hι x₀).mp this
     use j, (IsCardinalFiltered.toMax φ hι · ≫ f₀)
     intro k k'

@@ -34,34 +34,30 @@ namespace CategoryTheory.ShortComplex
 
 section
 
-variable {J : Type*} [Category* J]
-  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+variable {J : Type*} [Category* J] [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
 
 open ObjectProperty
 
 instance : PreservesColimitsOfShape J (ShortComplex.cyclesFunctor C) :=
-  (preservesColimitsOfShape J).prop_of_isLimit
-    (ShortComplex.isLimitCyclesFunctorFork C) (by
-      rintro (_ | _)
-      all_goals
-        dsimp
-        infer_instance)
+  (preservesColimitsOfShape J).prop_of_isLimit (ShortComplex.isLimitCyclesFunctorFork C) (by
+    rintro (_ | _)
+    all_goals
+      dsimp
+      infer_instance)
 
 instance : PreservesColimitsOfShape J (ShortComplex.opcyclesFunctor C) :=
-  (preservesColimitsOfShape J).prop_of_isColimit
-    (ShortComplex.isColimitOpcyclesFunctorCofork C) (by
-      rintro (_ | _)
-      all_goals
-        dsimp
-        infer_instance)
+  (preservesColimitsOfShape J).prop_of_isColimit (ShortComplex.isColimitOpcyclesFunctorCofork C) (by
+    rintro (_ | _)
+    all_goals
+      dsimp
+      infer_instance)
 
 instance : PreservesColimitsOfShape J (ShortComplex.homologyFunctor C) :=
-  (preservesColimitsOfShape J).prop_of_isColimit
-    (ShortComplex.isColimitHomologyFunctorCofork C) (by
-      rintro (_ | _)
-      all_goals
-        dsimp
-        infer_instance)
+  (preservesColimitsOfShape J).prop_of_isColimit (ShortComplex.isColimitHomologyFunctorCofork C) (by
+    rintro (_ | _)
+    all_goals
+      dsimp
+      infer_instance)
 
 end
 
@@ -102,16 +98,16 @@ namespace HomologicalComplex
 variable [IsGrothendieckAbelian.{w} C] {ι : Type*} {c : ComplexShape ι} (i : ι)
 
 instance : Functor.IsCardinalAccessible.{w} (cyclesFunctor C c i) .aleph0 :=
-  inferInstanceAs (Functor.IsCardinalAccessible (shortComplexFunctor C c i ⋙
-    ShortComplex.cyclesFunctor C) _)
+  inferInstanceAs
+    (Functor.IsCardinalAccessible (shortComplexFunctor C c i ⋙ ShortComplex.cyclesFunctor C) _)
 
 instance : Functor.IsCardinalAccessible.{w} (opcyclesFunctor C c i) .aleph0 :=
-  inferInstanceAs (Functor.IsCardinalAccessible (shortComplexFunctor C c i ⋙
-    ShortComplex.opcyclesFunctor C) _)
+  inferInstanceAs
+    (Functor.IsCardinalAccessible (shortComplexFunctor C c i ⋙ ShortComplex.opcyclesFunctor C) _)
 
 instance : Functor.IsCardinalAccessible.{w} (homologyFunctor C c i) .aleph0 :=
-  inferInstanceAs (Functor.IsCardinalAccessible (shortComplexFunctor C c i ⋙
-    ShortComplex.homologyFunctor C) _)
+  inferInstanceAs
+    (Functor.IsCardinalAccessible (shortComplexFunctor C c i ⋙ ShortComplex.homologyFunctor C) _)
 
 instance : Functor.IsAccessible.{w} (cyclesFunctor C c i) :=
   Functor.isAccessible_of_isCardinalAccessible _ .aleph0

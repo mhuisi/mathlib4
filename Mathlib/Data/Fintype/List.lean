@@ -22,7 +22,6 @@ This function is applied to the `Finset.powerset` of `Finset.univ`.
 
 @[expose] public section
 
-
 variable {α : Type*}
 open List
 
@@ -30,13 +29,14 @@ namespace Multiset
 
 /-- Given a `m : Multiset α`, we form the `Multiset` of `l : List α` with the property `⟦l⟧ = m`. -/
 def lists : Multiset α → Multiset (List α) := fun s =>
-  Quotient.liftOn s (fun l => l.permutations) fun l l' (h : l ~ l') => by
-    refine coe_eq_coe.mpr ?_
-    exact Perm.permutations h
+  Quotient.liftOn s
+    (fun l => l.permutations)
+    fun l l' (h : l ~ l') => by
+      refine coe_eq_coe.mpr ?_
+      exact Perm.permutations h
 
 @[simp]
-theorem lists_coe (l : List α) : lists (l : Multiset α) = l.permutations :=
-  rfl
+theorem lists_coe (l : List α) : lists (l : Multiset α) = l.permutations := rfl
 
 @[simp]
 theorem lists_nodup_finset (l : Finset α) : (lists (l.val)).Nodup := by
@@ -52,7 +52,7 @@ theorem mem_lists_iff (s : Multiset α) (l : List α) : l ∈ lists s ↔ s = �
 
 end Multiset
 
-instance fintypeNodupList [Fintype α] : Fintype { l : List α // l.Nodup } := by
+instance fintypeNodupList [Fintype α] : Fintype {l : List α // l.Nodup} := by
   refine Fintype.subtype ?_ ?_
   · let univSubsets := ((Finset.univ : Finset α).powerset.val : (Multiset (Finset α)))
     let allPerms := Multiset.bind univSubsets (fun s => (Multiset.lists s.val))

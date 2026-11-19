@@ -40,7 +40,6 @@ is the kernel of the homomorphism `Complex.normSq` from `ℂ` to `ℝ`.
 
 @[expose] public section
 
-
 noncomputable section
 
 open Complex Function Metric
@@ -62,38 +61,52 @@ instance : HasDistribNeg Circle := inferInstanceAs <| HasDistribNeg (sphere _ _)
 instance : ContinuousNeg Circle := inferInstanceAs <| ContinuousNeg (sphere _ _)
 instance instMetricSpace : MetricSpace Circle := inferInstanceAs <| MetricSpace (sphere _ _)
 
-@[ext] lemma ext : (x : ℂ) = y → x = y := Subtype.ext
+@[ext]
+lemma ext : (x : ℂ) = y → x = y := Subtype.ext
 
 lemma coe_injective : Injective ((↑) : Circle → ℂ) := fun _ _ ↦ ext
 
 -- Not simp because `SetLike.coe_eq_coe` already proves it
 lemma coe_inj : (x : ℂ) = y ↔ x = y := coe_injective.eq_iff
 
-@[simp] lemma norm_coe (z : Circle) : ‖(z : ℂ)‖ = 1 := mem_sphere_zero_iff_norm.1 z.property
-@[simp] lemma nnNorm_coe (z : Circle) : ‖(z : ℂ)‖₊ = 1 := NNReal.coe_injective z.norm_coe
-@[simp] lemma eNorm_coe (z : Circle) : ‖(z : ℂ)‖ₑ = 1 := by simp [eNorm_eq_nnNorm]
+@[simp]
+lemma norm_coe (z : Circle) : ‖(z : ℂ)‖ = 1 := mem_sphere_zero_iff_norm.1 z.property
+@[simp]
+lemma nnNorm_coe (z : Circle) : ‖(z : ℂ)‖₊ = 1 := NNReal.coe_injective z.norm_coe
+@[simp]
+lemma eNorm_coe (z : Circle) : ‖(z : ℂ)‖ₑ = 1 := by simp [eNorm_eq_nnNorm]
 
 @[deprecated (since := "2026-11-06")] alias enorm_coe := eNorm_coe
 
 @[deprecated (since := "2026-10-31")] alias nnnorm_coe := nnNorm_coe
 
-@[simp] lemma normSq_coe (z : Circle) : normSq z = 1 := by simp [normSq_eq_norm_sq]
-@[simp] lemma coe_ne_zero (z : Circle) : (z : ℂ) ≠ 0 := ne_zero_of_mem_unit_sphere z
-@[simp, norm_cast] lemma coe_one : ↑(1 : Circle) = (1 : ℂ) := rfl
+@[simp]
+lemma normSq_coe (z : Circle) : normSq z = 1 := by simp [normSq_eq_norm_sq]
+@[simp]
+lemma coe_ne_zero (z : Circle) : (z : ℂ) ≠ 0 := ne_zero_of_mem_unit_sphere z
+@[simp, norm_cast]
+lemma coe_one : ↑(1 : Circle) = (1 : ℂ) := rfl
 -- Not simp because `OneMemClass.coe_eq_one` already proves it
-@[norm_cast] lemma coe_eq_one : (x : ℂ) = 1 ↔ x = 1 := by rw [← coe_inj, coe_one]
-@[simp, norm_cast] lemma coe_mul (z w : Circle) : ↑(z * w) = (z : ℂ) * w := rfl
-@[simp, norm_cast] lemma coe_inv (z : Circle) : ↑z⁻¹ = (z : ℂ)⁻¹ := rfl
+@[norm_cast]
+lemma coe_eq_one : (x : ℂ) = 1 ↔ x = 1 := by rw [← coe_inj, coe_one]
+@[simp, norm_cast]
+lemma coe_mul (z w : Circle) : ↑(z * w) = (z : ℂ) * w := rfl
+@[simp, norm_cast]
+lemma coe_inv (z : Circle) : ↑z⁻¹ = (z : ℂ)⁻¹ := rfl
 lemma coe_inv_eq_conj (z : Circle) : ↑z⁻¹ = conj (z : ℂ) := by
   rw [coe_inv, inv_def, normSq_coe, inv_one, ofReal_one, mul_one]
 
-@[simp, norm_cast] lemma coe_div (z w : Circle) : ↑(z / w) = (z : ℂ) / w := rfl
-@[simp, norm_cast] lemma coe_pow (z : Circle) (n : ℕ) : ↑(z ^ n) = (z : ℂ) ^ n := rfl
-@[simp, norm_cast] lemma coe_zpow (z : Circle) (n : ℤ) : ↑(z ^ n) = (z : ℂ) ^ n := rfl
-@[simp, norm_cast] lemma coe_neg (x : Circle) : ↑(-x) = -(x : ℂ) := rfl
+@[simp, norm_cast]
+lemma coe_div (z w : Circle) : ↑(z / w) = (z : ℂ) / w := rfl
+@[simp, norm_cast]
+lemma coe_pow (z : Circle) (n : ℕ) : ↑(z ^ n) = (z : ℂ) ^ n := rfl
+@[simp, norm_cast]
+lemma coe_zpow (z : Circle) (n : ℤ) : ↑(z ^ n) = (z : ℂ) ^ n := rfl
+@[simp, norm_cast]
+lemma coe_neg (x : Circle) : ↑(-x) = -(x : ℂ) := rfl
 
-lemma neg_ne_self (x : Circle) : -x ≠ x :=
-  fun h ↦ coe_ne_zero x <| neg_eq_self.mp <| coe_neg x ▸ congrArg Subtype.val h
+lemma neg_ne_self (x : Circle) : -x ≠ x := fun h ↦
+  coe_ne_zero x <| neg_eq_self.mp <| coe_neg x ▸ congrArg Subtype.val h
 
 /-- The coercion `Circle → ℂ` as a monoid homomorphism. -/
 @[simps]
@@ -106,7 +119,8 @@ def coeHom : Circle →* ℂ where
 def toUnits : Circle →* Units ℂ := unitSphereToUnits ℂ
 
 -- written manually because `@[simps]` generated the wrong lemma
-@[simp] lemma toUnits_apply (z : Circle) : toUnits z = Units.mk0 ↑z z.coe_ne_zero := rfl
+@[simp]
+lemma toUnits_apply (z : Circle) : toUnits z = Units.mk0 ↑z z.coe_ne_zero := rfl
 
 instance : CompactSpace Circle := inferInstanceAs <| CompactSpace (sphere _ _)
 instance : IsTopologicalGroup Circle := inferInstanceAs <| IsTopologicalGroup (sphere _ _)
@@ -116,14 +130,16 @@ instance instUniformSpace : UniformSpace Circle := inferInstanceAs <| UniformSpa
 @[simps]
 def ofConjDivSelf (z : ℂ) (hz : z ≠ 0) : Circle where
   val := conj z / z
-  property := mem_sphere_zero_iff_norm.2 <| by
-    rw [norm_div, RCLike.norm_conj, div_self]; exact norm_ne_zero_iff.mpr hz
+  property :=
+    mem_sphere_zero_iff_norm.2 <| by
+      rw [norm_div, RCLike.norm_conj, div_self]; exact norm_ne_zero_iff.mpr hz
 
 /-- The map `fun t => exp (t * I)` from `ℝ` to the unit circle in `ℂ`. -/
 def exp : C(ℝ, Circle) where
   toFun t := ⟨(t * I).exp, by simp [Submonoid.unitSphere, exp_mul_I, norm_cos_add_sin_mul_I]⟩
-  continuous_toFun := Continuous.subtype_mk (by fun_prop)
-    (by simp [Submonoid.unitSphere, exp_mul_I, norm_cos_add_sin_mul_I])
+  continuous_toFun :=
+    Continuous.subtype_mk (by fun_prop)
+      (by simp [Submonoid.unitSphere, exp_mul_I, norm_cos_add_sin_mul_I])
 
 @[simp, norm_cast]
 theorem coe_exp (t : ℝ) : exp t = Complex.exp (t * Complex.I) := rfl
@@ -134,25 +150,28 @@ theorem exp_zero : exp 0 = 1 :=
 
 @[simp]
 theorem exp_add (x y : ℝ) : exp (x + y) = exp x * exp y :=
-  Subtype.ext <| by
-    simp only [coe_exp, ofReal_add, add_mul, Complex.exp_add, coe_mul]
+  Subtype.ext <| by simp only [coe_exp, ofReal_add, add_mul, Complex.exp_add, coe_mul]
 
-/-- The map `fun t => exp (t * I)` from `ℝ` to the unit circle in `ℂ`,
-considered as a homomorphism of groups. -/
+/--
+The map `fun t => exp (t * I)` from `ℝ` to the unit circle in `ℂ`,
+considered as a homomorphism of groups.
+-/
 @[simps]
 def expHom : ℝ →+ Additive Circle where
   toFun := Additive.ofMul ∘ exp
   map_zero' := exp_zero
   map_add' := exp_add
 
-@[simp] lemma exp_sub (x y : ℝ) : exp (x - y) = exp x / exp y := expHom.map_sub x y
-@[simp] lemma exp_neg (x : ℝ) : exp (-x) = (exp x)⁻¹ := expHom.map_neg x
+@[simp]
+lemma exp_sub (x y : ℝ) : exp (x - y) = exp x / exp y := expHom.map_sub x y
+@[simp]
+lemma exp_neg (x : ℝ) : exp (-x) = (exp x)⁻¹ := expHom.map_neg x
 lemma exp_nsmul (x : ℝ) (n : ℕ) : exp (n • x) = exp x ^ n := expHom.map_nsmul n x
 lemma exp_zsmul (x : ℝ) (z : ℤ) : exp (z • x) = exp x ^ z := expHom.map_zsmul z x
-@[simp] lemma exp_natCast_mul (x : ℝ) (n : ℕ) : exp (n * x) = exp x ^ n := by
-  rw [← nsmul_eq_mul, exp_nsmul]
-@[simp] lemma exp_intCast_mul (x : ℝ) (z : ℤ) : exp (z * x) = exp x ^ z := by
-  rw [← zsmul_eq_mul, exp_zsmul]
+@[simp]
+lemma exp_natCast_mul (x : ℝ) (n : ℕ) : exp (n * x) = exp x ^ n := by rw [← nsmul_eq_mul, exp_nsmul]
+@[simp]
+lemma exp_intCast_mul (x : ℝ) (z : ℤ) : exp (z * x) = exp x ^ z := by rw [← zsmul_eq_mul, exp_zsmul]
 
 lemma exp_pi_ne_one : Circle.exp Real.pi ≠ 1 := by
   intro h
@@ -176,38 +195,40 @@ variable {α β M : Type*}
 
 instance instSMul [SMul ℂ α] : SMul Circle α := inferInstanceAs <| SMul (Submonoid.unitSphere _) α
 
-instance instSMulCommClass_left [SMul ℂ β] [SMul α β] [SMulCommClass ℂ α β] :
-    SMulCommClass Circle α β :=
+instance instSMulCommClass_left [SMul ℂ β] [SMul α β] [SMulCommClass ℂ α β]
+    : SMulCommClass Circle α β :=
   inferInstanceAs <| SMulCommClass (Submonoid.unitSphere _) α β
 
-instance instSMulCommClass_right [SMul ℂ β] [SMul α β] [SMulCommClass α ℂ β] :
-    SMulCommClass α Circle β :=
+instance instSMulCommClass_right [SMul ℂ β] [SMul α β] [SMulCommClass α ℂ β]
+    : SMulCommClass α Circle β :=
   inferInstanceAs <| SMulCommClass α (Submonoid.unitSphere _) β
 
-instance instIsScalarTower [SMul ℂ α] [SMul ℂ β] [SMul α β] [IsScalarTower ℂ α β] :
-    IsScalarTower Circle α β :=
+instance instIsScalarTower [SMul ℂ α] [SMul ℂ β] [SMul α β] [IsScalarTower ℂ α β]
+    : IsScalarTower Circle α β :=
   inferInstanceAs <| IsScalarTower (Submonoid.unitSphere _) α β
 
 instance instMulAction [MulAction ℂ α] : MulAction Circle α :=
   inferInstanceAs <| MulAction (Submonoid.unitSphere _) α
 
-instance instDistribMulAction [AddMonoid M] [DistribMulAction ℂ M] :
-    DistribMulAction Circle M :=
+instance instDistribMulAction [AddMonoid M] [DistribMulAction ℂ M] : DistribMulAction Circle M :=
   inferInstanceAs <| DistribMulAction (Submonoid.unitSphere _) M
 
 lemma smul_def [SMul ℂ α] (z : Circle) (a : α) : z • a = (z : ℂ) • a := rfl
 
-instance instContinuousSMul [TopologicalSpace α] [MulAction ℂ α] [ContinuousSMul ℂ α] :
-    ContinuousSMul Circle α :=
+instance instContinuousSMul [TopologicalSpace α] [MulAction ℂ α] [ContinuousSMul ℂ α]
+    : ContinuousSMul Circle α :=
   inferInstanceAs <| ContinuousSMul (Submonoid.unitSphere _) α
 
 section Norm
 
 variable {E : Type*} [SeminormedAddCommGroup E] [NormedSpace ℂ E] (u : Circle) (v : E)
 
-@[simp] protected lemma norm_smul : ‖u • v‖ = ‖v‖ := by simp [smul_def, norm_smul]
-@[simp] protected lemma nnNorm_smul : ‖u • v‖₊ = ‖v‖₊ := NNReal.coe_injective (u.norm_smul v)
-@[simp] protected lemma eNorm_smul : ‖u • v‖ₑ = ‖v‖ₑ := by simp [eNorm_eq_nnNorm]
+@[simp]
+protected lemma norm_smul : ‖u • v‖ = ‖v‖ := by simp [smul_def, norm_smul]
+@[simp]
+protected lemma nnNorm_smul : ‖u • v‖₊ = ‖v‖₊ := NNReal.coe_injective (u.norm_smul v)
+@[simp]
+protected lemma eNorm_smul : ‖u • v‖ₑ = ‖v‖ₑ := by simp [eNorm_eq_nnNorm]
 
 @[deprecated (since := "2026-10-31")] protected alias nnnorm_smul := Circle.nnNorm_smul
 @[deprecated (since := "2026-11-06")] protected alias enorm_smul := Circle.eNorm_smul
@@ -221,9 +242,11 @@ end Circle
 
 namespace Real
 
-/-- The additive character from `ℝ` onto the circle, given by `fun x ↦ exp (2 * π * x * I)`.
+/--
+The additive character from `ℝ` onto the circle, given by `fun x ↦ exp (2 * π * x * I)`.
 Denoted as `𝐞` within the `Real.FourierTransform` namespace. This uses the analyst convention that
-there is a `2 * π` in the exponent. -/
+there is a `2 * π` in the exponent.
+-/
 def fourierChar : AddChar ℝ Circle where
   toFun z := .exp (2 * π * z)
   map_zero_eq_one' := by rw [mul_zero, Circle.exp_zero]
@@ -247,8 +270,10 @@ theorem fourierChar_ne_one : fourierChar ≠ 1 := by
   rw [mul_comm, ← mul_assoc, inv_mul_cancel₀ (by positivity), one_mul]
   exact Circle.exp_pi_ne_one
 
-/-- The additive character from `ℝ` onto the circle, given by `fun x ↦ exp (x * I)`. This uses the
-probabilist convention that there is no `2 * π` in the exponent. -/
+/--
+The additive character from `ℝ` onto the circle, given by `fun x ↦ exp (x * I)`. This uses the
+probabilist convention that there is no `2 * π` in the exponent.
+-/
 def probChar : AddChar ℝ Circle where
   toFun := Circle.exp
   map_zero_eq_one' := Circle.exp_zero

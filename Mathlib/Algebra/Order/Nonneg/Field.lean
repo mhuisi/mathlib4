@@ -44,12 +44,16 @@ namespace Nonneg
 
 /-- In an ordered field, the units of the nonnegative elements are the positive elements. -/
 @[simps]
-def unitsEquivPos (R : Type*) [DivisionSemiring R] [PartialOrder R]
-    [IsStrictOrderedRing R] [PosMulReflectLT R] :
-    (Nonneg R)ˣ ≃* { r : R // 0 < r } where
+def unitsEquivPos
+    (R : Type*) [DivisionSemiring R] [PartialOrder R] [IsStrictOrderedRing R] [PosMulReflectLT R]
+    : (Nonneg R)ˣ ≃* {r : R // 0 < r} where
   toFun r := ⟨r, lt_of_le_of_ne r.val.property (Subtype.val_injective.ne r.ne_zero.symm)⟩
-  invFun r := ⟨⟨r.val, r.property.le⟩, ⟨r.val⁻¹, inv_nonneg.mpr r.property.le⟩,
-    by ext; simp [r.property.ne'], by ext; simp [r.property.ne']⟩
+  invFun r := ⟨
+    ⟨r.val, r.property.le⟩,
+    ⟨r.val⁻¹, inv_nonneg.mpr r.property.le⟩,
+    by ext; simp [r.property.ne'],
+    by ext; simp [r.property.ne']
+  ⟩
   left_inv r := by ext; rfl
   right_inv r := by ext; rfl
   map_mul' _ _ := rfl
@@ -58,60 +62,53 @@ section LinearOrderedDivisionSemiring
 
 variable [DivisionSemiring α] [LinearOrder α] [IsStrictOrderedRing α] {x y : α}
 
-instance inv : Inv (Nonneg α) :=
-  ⟨fun x => ⟨x⁻¹, inv_nonneg.2 x.property⟩⟩
+instance inv : Inv (Nonneg α) := ⟨fun x => ⟨x⁻¹, inv_nonneg.2 x.property⟩⟩
 
 @[simp, norm_cast]
-protected theorem coe_inv (a : Nonneg α) : ((a⁻¹ : Nonneg α) : α) = (a : α)⁻¹ :=
-  rfl
+protected theorem coe_inv (a : Nonneg α) : ((a⁻¹ : Nonneg α) : α) = (a : α)⁻¹ := rfl
 
 @[simp]
-theorem inv_mk (hx : 0 ≤ x) :
-    (⟨x, hx⟩ : Nonneg α)⁻¹ = ⟨x⁻¹, inv_nonneg.2 hx⟩ :=
-  rfl
+theorem inv_mk (hx : 0 ≤ x) : (⟨x, hx⟩ : Nonneg α)⁻¹ = ⟨x⁻¹, inv_nonneg.2 hx⟩ := rfl
 
-instance div : Div (Nonneg α) :=
-  ⟨fun x y => ⟨x / y, div_nonneg x.property y.property⟩⟩
+instance div : Div (Nonneg α) := ⟨fun x y => ⟨x / y, div_nonneg x.property y.property⟩⟩
 
 @[simp, norm_cast]
-protected theorem coe_div (a b : Nonneg α) : ((a / b : Nonneg α) : α) = a / b :=
-  rfl
+protected theorem coe_div (a b : Nonneg α) : ((a / b : Nonneg α) : α) = a / b := rfl
 
 @[simp]
-theorem mk_div_mk (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    (⟨x, hx⟩ : Nonneg α) / ⟨y, hy⟩ = ⟨x / y, div_nonneg hx hy⟩ :=
+theorem mk_div_mk (hx : 0 ≤ x) (hy : 0 ≤ y)
+    : (⟨x, hx⟩ : Nonneg α) / ⟨y, hy⟩ = ⟨x / y, div_nonneg hx hy⟩ :=
   rfl
 
-instance zpow : Pow (Nonneg α) ℤ :=
-  ⟨fun a n => ⟨(a : α) ^ n, zpow_nonneg a.property _⟩⟩
+instance zpow : Pow (Nonneg α) ℤ := ⟨fun a n => ⟨(a : α) ^ n, zpow_nonneg a.property _⟩⟩
 
 @[simp, norm_cast]
-protected theorem coe_zpow (a : Nonneg α) (n : ℤ) :
-    ((a ^ n : Nonneg α) : α) = (a : α) ^ n :=
-  rfl
+protected theorem coe_zpow (a : Nonneg α) (n : ℤ) : ((a ^ n : Nonneg α) : α) = (a : α) ^ n := rfl
 
 @[simp]
-theorem mk_zpow (hx : 0 ≤ x) (n : ℤ) :
-    (⟨x, hx⟩ : Nonneg α) ^ n = ⟨x ^ n, zpow_nonneg hx n⟩ :=
-  rfl
+theorem mk_zpow (hx : 0 ≤ x) (n : ℤ) : (⟨x, hx⟩ : Nonneg α) ^ n = ⟨x ^ n, zpow_nonneg hx n⟩ := rfl
 
 instance instNNRatCast : NNRatCast (Nonneg α) := ⟨fun q ↦ ⟨q, q.cast_nonneg⟩⟩
 instance instNNRatSMul : SMul ℚ≥0 (Nonneg α) where
   smul q a := ⟨q • a, by rw [NNRat.smul_def]; exact mul_nonneg q.cast_nonneg a.property⟩
 
-@[simp, norm_cast] lemma coe_nnratCast (q : ℚ≥0) : (q : Nonneg α) = (q : α) := rfl
-@[simp] lemma mk_nnratCast (q : ℚ≥0) : (⟨q, q.cast_nonneg⟩ : Nonneg α) = q := rfl
+@[simp, norm_cast]
+lemma coe_nnratCast (q : ℚ≥0) : (q : Nonneg α) = (q : α) := rfl
+@[simp]
+lemma mk_nnratCast (q : ℚ≥0) : (⟨q, q.cast_nonneg⟩ : Nonneg α) = q := rfl
 
-@[simp, norm_cast] lemma coe_nnqsmul (q : ℚ≥0) (a : Nonneg α) :
-    ↑(q • a) = (q • a : α) := rfl
-@[simp] lemma mk_nnqsmul (q : ℚ≥0) (a : α) (ha : 0 ≤ a) :
-    (⟨q • a, by rw [NNRat.smul_def]; exact mul_nonneg q.cast_nonneg ha⟩ : Nonneg α) =
-      q • a := rfl
+@[simp, norm_cast]
+lemma coe_nnqsmul (q : ℚ≥0) (a : Nonneg α) : ↑(q • a) = (q • a : α) := rfl
+@[simp]
+lemma mk_nnqsmul (q : ℚ≥0) (a : α) (ha : 0 ≤ a)
+    : (⟨q • a, by rw [NNRat.smul_def]; exact mul_nonneg q.cast_nonneg ha⟩ : Nonneg α) = q • a :=
+  rfl
 
 instance divisionSemiring : DivisionSemiring (Nonneg α) :=
   Subtype.coe_injective.divisionSemiring _ Nonneg.coe_zero Nonneg.coe_one Nonneg.coe_add
-    Nonneg.coe_mul Nonneg.coe_inv Nonneg.coe_div (fun _ _ => rfl) coe_nnqsmul Nonneg.coe_pow
-    Nonneg.coe_zpow Nonneg.coe_natCast coe_nnratCast
+    Nonneg.coe_mul Nonneg.coe_inv Nonneg.coe_div
+    (fun _ _ => rfl)
+    coe_nnqsmul Nonneg.coe_pow Nonneg.coe_zpow Nonneg.coe_natCast coe_nnratCast
 
 end LinearOrderedDivisionSemiring
 
@@ -119,15 +116,16 @@ section LinearOrderedSemifield
 
 variable [Semifield α] [LinearOrder α] [IsStrictOrderedRing α] {x y : α}
 
-instance semifield : Semifield { x : α // 0 ≤ x } := fast_instance% {
-  __ := divisionSemiring
-  mul_comm := mul_comm
-}
+instance semifield : Semifield {x : α // 0 ≤ x} :=
+  fast_instance% {
+      __ := divisionSemiring
+      mul_comm := mul_comm
+    }
 
 end LinearOrderedSemifield
 
-instance linearOrderedCommGroupWithZero [Field α] [LinearOrder α] [IsStrictOrderedRing α] :
-    LinearOrderedCommGroupWithZero (Nonneg α) :=
+instance linearOrderedCommGroupWithZero [Field α] [LinearOrder α] [IsStrictOrderedRing α]
+    : LinearOrderedCommGroupWithZero (Nonneg α) :=
   fast_instance% CanonicallyOrderedAdd.toLinearOrderedCommGroupWithZero
 
 end Nonneg

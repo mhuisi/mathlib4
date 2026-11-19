@@ -65,7 +65,6 @@ Gelfand transform, character space, C⋆-algebra
 
 @[expose] public section
 
-
 open WeakDual
 
 open scoped NNReal CStarAlgebra StarRing
@@ -74,39 +73,45 @@ section ComplexBanachAlgebra
 
 open Ideal
 
-variable {A : Type*} [NormedCommRing A] [NormedAlgebra ℂ A] [CompleteSpace A] (I : Ideal A)
-  [Ideal.IsMaximal I]
+variable
+  {A : Type*} [NormedCommRing A] [NormedAlgebra ℂ A] [CompleteSpace A]
+  (I : Ideal A) [Ideal.IsMaximal I]
 
-/-- Every maximal ideal in a commutative complex Banach algebra gives rise to a character on that
+/--
+Every maximal ideal in a commutative complex Banach algebra gives rise to a character on that
 algebra. In particular, the character, which may be identified as an algebra homomorphism due to
 `WeakDual.CharacterSpace.equivAlgHom`, is given by the composition of the quotient map and
-the Gelfand-Mazur isomorphism `NormedRing.algEquivComplexOfComplete`. -/
+the Gelfand-Mazur isomorphism `NormedRing.algEquivComplexOfComplete`.
+-/
 noncomputable def Ideal.toCharacterSpace : characterSpace ℂ A :=
   CharacterSpace.equivAlgHom.symm <|
     ((NormedRing.algEquivComplexOfComplete
-      (letI := Quotient.field I; isUnit_iff_ne_zero (G₀ := A ⧸ I))).symm : A ⧸ I →ₐ[ℂ] ℂ).comp <|
-    Quotient.mkₐ ℂ I
+          (letI := Quotient.field I; isUnit_iff_ne_zero (G₀ := A ⧸ I))).symm
+        : A ⧸ I →ₐ[ℂ] ℂ).comp <|
+      Quotient.mkₐ ℂ I
 
-theorem Ideal.toCharacterSpace_apply_eq_zero_of_mem {a : A} (ha : a ∈ I) :
-    I.toCharacterSpace a = 0 := by
+theorem Ideal.toCharacterSpace_apply_eq_zero_of_mem {a : A} (ha : a ∈ I)
+    : I.toCharacterSpace a = 0 := by
   unfold Ideal.toCharacterSpace
   simp only [CharacterSpace.equivAlgHom_symm_coe, AlgHom.coe_comp, AlgEquiv.coe_toAlgHom,
     Quotient.mkₐ_eq_mk, Function.comp_apply, NormedRing.algEquivComplexOfComplete_symm_apply]
   simp_rw [Quotient.eq_zero_iff_mem.mpr ha, spectrum.zero_eq]
   exact Set.eq_of_mem_singleton (Set.singleton_nonempty (0 : ℂ)).some_mem
 
-/-- If `a : A` is not a unit, then some character takes the value zero at `a`. This is equivalent
-to `gelfandTransform ℂ A a` takes the value zero at some character. -/
-theorem WeakDual.CharacterSpace.exists_apply_eq_zero {a : A} (ha : ¬IsUnit a) :
-    ∃ f : characterSpace ℂ A, f a = 0 := by
+/--
+If `a : A` is not a unit, then some character takes the value zero at `a`. This is equivalent
+to `gelfandTransform ℂ A a` takes the value zero at some character.
+-/
+theorem WeakDual.CharacterSpace.exists_apply_eq_zero {a : A} (ha : ¬ IsUnit a)
+    : ∃ f : characterSpace ℂ A, f a = 0 := by
   obtain ⟨M, hM, haM⟩ := (span {a}).exists_le_maximal (span_singleton_ne_top ha)
-  exact
-    ⟨M.toCharacterSpace,
-      M.toCharacterSpace_apply_eq_zero_of_mem
-        (haM (mem_span_singleton.mpr ⟨1, (mul_one a).symm⟩))⟩
+  exact ⟨
+    M.toCharacterSpace,
+    M.toCharacterSpace_apply_eq_zero_of_mem (haM (mem_span_singleton.mpr ⟨1, (mul_one a).symm⟩))
+  ⟩
 
-theorem WeakDual.CharacterSpace.mem_spectrum_iff_exists {a : A} {z : ℂ} :
-    z ∈ spectrum ℂ a ↔ ∃ f : characterSpace ℂ A, f a = z := by
+theorem WeakDual.CharacterSpace.mem_spectrum_iff_exists {a : A} {z : ℂ}
+    : z ∈ spectrum ℂ a ↔ ∃ f : characterSpace ℂ A, f a = z := by
   refine ⟨fun hz => ?_, ?_⟩
   · obtain ⟨f, hf⟩ := WeakDual.CharacterSpace.exists_apply_eq_zero hz
     simp only [map_sub, sub_eq_zero, AlgHomClass.commutes] at hf
@@ -115,15 +120,15 @@ theorem WeakDual.CharacterSpace.mem_spectrum_iff_exists {a : A} {z : ℂ} :
     exact AlgHom.apply_mem_spectrum f a
 
 /-- The Gelfand transform is spectrum-preserving. -/
-theorem spectrum.gelfandTransform_eq (a : A) :
-    spectrum ℂ (gelfandTransform ℂ A a) = spectrum ℂ a := by
+theorem spectrum.gelfandTransform_eq (a : A)
+    : spectrum ℂ (gelfandTransform ℂ A a) = spectrum ℂ a := by
   ext z
   rw [ContinuousMap.spectrum_eq_range, WeakDual.CharacterSpace.mem_spectrum_iff_exists]
   exact Iff.rfl
 
 instance [Nontrivial A] : Nonempty (characterSpace ℂ A) :=
-  ⟨Classical.choose <|
-      WeakDual.CharacterSpace.exists_apply_eq_zero <| zero_mem_nonunits.2 zero_ne_one⟩
+  ⟨Classical.choose <| WeakDual.CharacterSpace.exists_apply_eq_zero <|
+    zero_mem_nonunits.2 zero_ne_one⟩
 
 end ComplexBanachAlgebra
 
@@ -133,8 +138,8 @@ section Commutative
 
 variable {A : Type*} [CommCStarAlgebra A]
 
-theorem gelfandTransform_map_star (a : A) :
-    gelfandTransform ℂ A (star a) = star (gelfandTransform ℂ A a) :=
+theorem gelfandTransform_map_star (a : A)
+    : gelfandTransform ℂ A (star a) = star (gelfandTransform ℂ A a) :=
   ContinuousMap.ext fun φ => map_star φ a
 
 variable (A)
@@ -142,14 +147,17 @@ variable (A)
 /-- The Gelfand transform is an isometry when the algebra is a C⋆-algebra over `ℂ`. -/
 theorem gelfandTransform_isometry : Isometry (gelfandTransform ℂ A) := by
   refine AddMonoidHomClass.isometry_of_norm (gelfandTransform ℂ A) fun a => ?_
-  /- By `spectrum.gelfandTransform_eq`, the spectra of `star a * a` and its
-    `gelfandTransform` coincide. Therefore, so do their spectral radii, and since they are
-    self-adjoint, so also do their norms. Applying the C⋆-property of the norm and taking square
-    roots shows that the norm is preserved. -/
+  /-
+  By `spectrum.gelfandTransform_eq`, the spectra of `star a * a` and its
+  `gelfandTransform` coincide. Therefore, so do their spectral radii, and since they are
+  self-adjoint, so also do their norms. Applying the C⋆-property of the norm and taking square
+  roots shows that the norm is preserved.
+  -/
   have : spectralRadius ℂ (gelfandTransform ℂ A (star a * a)) = spectralRadius ℂ (star a * a) := by
     simp only [spectralRadius_eq_of_unital, spectrum.gelfandTransform_eq]
   rw [map_mul, (IsSelfAdjoint.star_mul_self a).spectralRadius_eq_nnNorm, gelfandTransform_map_star,
-    (IsSelfAdjoint.star_mul_self (gelfandTransform ℂ A a)).spectralRadius_eq_nnNorm] at this
+      (IsSelfAdjoint.star_mul_self (gelfandTransform ℂ A a)).spectralRadius_eq_nnNorm]
+    at this
   simp only [ENNReal.coe_inj, CStarRing.nnNorm_star_mul_self, ← sq] at this
   simpa only [NNReal.sqrt_sq] using! congr((NNReal.sqrt $this : ℝ))
 
@@ -157,48 +165,61 @@ set_option backward.defeqAttrib.useBackward true in
 /-- The Gelfand transform is bijective when the algebra is a C⋆-algebra over `ℂ`. -/
 theorem gelfandTransform_bijective : Function.Bijective (gelfandTransform ℂ A) := by
   refine ⟨(gelfandTransform_isometry A).injective, ?_⟩
-  /- The range of `gelfandTransform ℂ A` is actually a `StarSubalgebra`. The key lemma below may be
-    hard to spot; it's `map_star` coming from `WeakDual.Complex.instStarHomClass`, which is a
-    nontrivial result. -/
-  let rng : StarSubalgebra ℂ C(characterSpace ℂ A, ℂ) :=
-    { toSubalgebra := (gelfandTransform ℂ A).range
-      star_mem' := by
-        rintro - ⟨a, rfl⟩
-        use star a
-        ext1 φ
-        dsimp
-        simp only [map_star, RCLike.star_def] }
-  suffices rng = ⊤ from
-    fun x => show x ∈ rng from this.symm ▸ StarSubalgebra.mem_top
-  /- Because the `gelfandTransform ℂ A` is an isometry, it has closed range, and so by the
-    Stone-Weierstrass theorem, it suffices to show that the image of the Gelfand transform separates
-    points in `C(characterSpace ℂ A, ℂ)` and is closed under `star`. -/
-  have h : rng.topologicalClosure = rng := le_antisymm
-    (StarSubalgebra.topologicalClosure_minimal le_rfl
-      (gelfandTransform_isometry A).isClosedEmbedding.isClosed_range)
-    (StarSubalgebra.le_topologicalClosure _)
-  refine h ▸ ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints
-    _ (fun _ _ => ?_)
-  /- Separating points just means that elements of the `characterSpace` which agree at all points
-    of `A` are the same functional, which is just extensionality. -/
+  /-
+  The range of `gelfandTransform ℂ A` is actually a `StarSubalgebra`. The key lemma below may be
+  hard to spot; it's `map_star` coming from `WeakDual.Complex.instStarHomClass`, which is a
+  nontrivial result.
+  -/
+  let rng : StarSubalgebra ℂ C(characterSpace ℂ A, ℂ) := {
+    toSubalgebra := (gelfandTransform ℂ A).range
+    star_mem' := by
+      rintro - ⟨a, rfl⟩
+      use star a
+      ext1 φ
+      dsimp
+      simp only [map_star, RCLike.star_def]
+  }
+  suffices rng = ⊤ from fun x => show x ∈ rng from this.symm ▸ StarSubalgebra.mem_top
+  /-
+  Because the `gelfandTransform ℂ A` is an isometry, it has closed range, and so by the
+  Stone-Weierstrass theorem, it suffices to show that the image of the Gelfand transform separates
+  points in `C(characterSpace ℂ A, ℂ)` and is closed under `star`.
+  -/
+  have h : rng.topologicalClosure = rng :=
+    le_antisymm
+      (StarSubalgebra.topologicalClosure_minimal le_rfl
+        (gelfandTransform_isometry A).isClosedEmbedding.isClosed_range)
+      (StarSubalgebra.le_topologicalClosure _)
+  refine h
+    ▸ ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints _ (fun _ _ => ?_)
+  /-
+  Separating points just means that elements of the `characterSpace` which agree at all points
+  of `A` are the same functional, which is just extensionality.
+  -/
   contrapose!
-  exact fun h => Subtype.ext (ContinuousLinearMap.ext fun a =>
-    h (gelfandTransform ℂ A a) ⟨gelfandTransform ℂ A a, ⟨a, rfl⟩, rfl⟩)
+  exact fun h =>
+    Subtype.ext (ContinuousLinearMap.ext fun a =>
+      h (gelfandTransform ℂ A a) ⟨gelfandTransform ℂ A a, ⟨a, rfl⟩, rfl⟩)
 
-/-- The Gelfand transform as a `StarAlgEquiv` between a commutative unital C⋆-algebra over `ℂ`
-and the continuous functions on its `characterSpace`. -/
+/--
+The Gelfand transform as a `StarAlgEquiv` between a commutative unital C⋆-algebra over `ℂ`
+and the continuous functions on its `characterSpace`.
+-/
 @[simps!]
 noncomputable def gelfandStarTransform : A ≃⋆ₐ[ℂ] C(characterSpace ℂ A, ℂ) :=
   StarAlgEquiv.ofBijective
-    (show A →⋆ₐ[ℂ] C(characterSpace ℂ A, ℂ) from
-      { gelfandTransform ℂ A with map_star' := fun x => gelfandTransform_map_star x })
+    (show A →⋆ₐ[ℂ] C(characterSpace ℂ A, ℂ) from {
+      gelfandTransform ℂ A with
+      map_star' := fun x => gelfandTransform_map_star x
+    })
     (gelfandTransform_bijective A)
 
 end Commutative
 
 open Unitization in
-private lemma norm_add_eq_max_aux {A : Type*} [NonUnitalCommCStarAlgebra A] {a b : A}
-    (h : a * b = 0) : ‖a + b‖ = max ‖a‖ ‖b‖ := by
+private lemma norm_add_eq_max_aux
+    {A : Type*} [NonUnitalCommCStarAlgebra A] {a b : A} (h : a * b = 0)
+    : ‖a + b‖ = max ‖a‖ ‖b‖ := by
   let f := gelfandStarTransform A⁺¹ ∘ inrNonUnitalAlgHom ℂ A
   have hf : Isometry f := gelfandTransform_isometry _ |>.comp isometry_inr
   simp_rw [← hf.norm_map_of_map_zero (by simp [f]), show f (a + b) = f a + f b by simp [f]]
@@ -210,17 +231,18 @@ variable {A : Type*} [NonUnitalCStarAlgebra A] {a b : A}
 
 open scoped IsMulCommutative in
 open NonUnitalStarAlgebra NonUnitalStarSubalgebra in
-private protected lemma IsStarNormal.norm_add_eq_max_aux (ha : IsStarNormal a) (hb : IsStarNormal b)
-    (hcomm : Commute a b) (hab : a * b = 0) :
-    ‖a + b‖ = max ‖a‖ ‖b‖ := by
-  /- Since `a` and `b` are normal and commute, the C⋆-subalgebra generated by `a` and `b` is
+private protected lemma IsStarNormal.norm_add_eq_max_aux
+    (ha : IsStarNormal a) (hb : IsStarNormal b) (hcomm : Commute a b) (hab : a * b = 0)
+    : ‖a + b‖ = max ‖a‖ ‖b‖ := by
+  /-
+  Since `a` and `b` are normal and commute, the C⋆-subalgebra generated by `a` and `b` is
   commutative, and the conclusion follows from the corresponding result for
-  commutative C⋆-algebras. -/
+  commutative C⋆-algebras.
+  -/
   let S : NonUnitalStarSubalgebra ℂ A := (adjoin ℂ {a, b}).topologicalClosure
   have := (adjoin ℂ {a, b}).isClosed_topologicalClosure
   have := CStarAlgebra.isMulCommutative_nonUnital_adjoin_pair hcomm ha hb
-  refine norm_add_eq_max_aux (A := S) (a := ⟨a, ?_⟩) (b := ⟨b, ?_⟩)
-    (by ext; simpa)
+  refine norm_add_eq_max_aux (A := S) (a := ⟨a, ?_⟩) (b := ⟨b, ?_⟩) (by ext; simpa)
   all_goals apply le_topologicalClosure; aesop
 
 namespace IsStarOrtho
@@ -235,26 +257,22 @@ lemma norm_add (h : a ⋆⟂ b) : ‖a + b‖ = max ‖a‖ ‖b‖ := by
   · simpa using h'.commute_star
   · simpa using h'.mul_star_eq_zero
 
-lemma nnNorm_add (h : a ⋆⟂ b) : ‖a + b‖₊ = max ‖a‖₊ ‖b‖₊ :=
-  Subtype.ext <| h.norm_add
+lemma nnNorm_add (h : a ⋆⟂ b) : ‖a + b‖₊ = max ‖a‖₊ ‖b‖₊ := Subtype.ext <| h.norm_add
 
 lemma norm_sub (h : a ⋆⟂ b) : ‖a - b‖ = max ‖a‖ ‖b‖ := by
   simpa [sub_eq_add_neg] using h.neg_right.norm_add
 
-lemma nnNorm_sub (h : a ⋆⟂ b) : ‖a - b‖₊ = max ‖a‖₊ ‖b‖₊ :=
-  Subtype.ext <| h.norm_sub
+lemma nnNorm_sub (h : a ⋆⟂ b) : ‖a - b‖₊ = max ‖a‖₊ ‖b‖₊ := Subtype.ext <| h.norm_sub
 
 open scoped Function in
-lemma nnNorm_sum {ι : Type*} {s : Finset ι} {f : ι → A}
-    (h : (s : Set ι).Pairwise ((· ⋆⟂ ·) on f)) :
-    ‖∑ i ∈ s, f i‖₊ = s.sup (‖f ·‖₊) := by
+lemma nnNorm_sum {ι : Type*} {s : Finset ι} {f : ι → A} (h : (s : Set ι).Pairwise ((· ⋆⟂ ·) on f))
+    : ‖∑ i ∈ s, f i‖₊ = s.sup (‖f ·‖₊) := by
   classical
   induction s using Finset.induction with
   | empty => simp
   | insert j s hj ih =>
     simp only [Finset.coe_insert, Set.pairwise_insert_of_symm, SetLike.mem_coe, ne_eq] at h
-    suffices f j ⋆⟂ ∑ i ∈ s, f i by
-      simp_all [this.nnNorm_add, ih h.1]
+    suffices f j ⋆⟂ ∑ i ∈ s, f i by simp_all [this.nnNorm_add, ih h.1]
     exact .sum_right fun i hi ↦ h.2 i hi (by grind)
 
 end IsStarOrtho
@@ -262,30 +280,30 @@ end IsStarOrtho
 namespace IsStarNormal
 
 @[deprecated IsStarOrtho.norm_add +typeChanged (since := "2026-10-29")]
-lemma norm_add_eq_max (ha : IsStarNormal a) (_hb : IsStarNormal b)
-    (hcomm : Commute a b) (hab : a * b = 0) :
-    ‖a + b‖ = max ‖a‖ ‖b‖ :=
+lemma norm_add_eq_max
+    (ha : IsStarNormal a) (_hb : IsStarNormal b) (hcomm : Commute a b) (hab : a * b = 0)
+    : ‖a + b‖ = max ‖a‖ ‖b‖ :=
   (ha.isStarOrtho_iff_mul_eq_zero hcomm |>.mpr hab).norm_add
 
 @[deprecated IsStarOrtho.nnNorm_add +typeChanged (since := "2026-10-29")]
-lemma nnNorm_add_eq_max (ha : IsStarNormal a) (_hb : IsStarNormal b)
-    (hcomm : Commute a b) (hab : a * b = 0) :
-    ‖a + b‖₊ = max ‖a‖₊ ‖b‖₊ :=
+lemma nnNorm_add_eq_max
+    (ha : IsStarNormal a) (_hb : IsStarNormal b) (hcomm : Commute a b) (hab : a * b = 0)
+    : ‖a + b‖₊ = max ‖a‖₊ ‖b‖₊ :=
   (ha.isStarOrtho_iff_mul_eq_zero hcomm |>.mpr hab).nnNorm_add
 
 @[deprecated IsStarOrtho.nnNorm_add +typeChanged (since := "2026-10-31")]
 alias nnnorm_add_eq_max := nnNorm_add_eq_max
 
 @[deprecated IsStarOrtho.norm_sub +typeChanged (since := "2026-10-29")]
-lemma norm_sub_eq_max (ha : IsStarNormal a) (_hb : IsStarNormal b)
-    (hcomm : Commute a b) (hab : a * b = 0) :
-    ‖a - b‖ = max ‖a‖ ‖b‖ :=
+lemma norm_sub_eq_max
+    (ha : IsStarNormal a) (_hb : IsStarNormal b) (hcomm : Commute a b) (hab : a * b = 0)
+    : ‖a - b‖ = max ‖a‖ ‖b‖ :=
   (ha.isStarOrtho_iff_mul_eq_zero hcomm |>.mpr hab).norm_sub
 
 @[deprecated IsStarOrtho.nnNorm_sub +typeChanged (since := "2026-10-29")]
-lemma nnNorm_sub_eq_max (ha : IsStarNormal a) (_hb : IsStarNormal b)
-    (hcomm : Commute a b) (hab : a * b = 0) :
-    ‖a - b‖₊ = max ‖a‖₊ ‖b‖₊ :=
+lemma nnNorm_sub_eq_max
+    (ha : IsStarNormal a) (_hb : IsStarNormal b) (hcomm : Commute a b) (hab : a * b = 0)
+    : ‖a - b‖₊ = max ‖a‖₊ ‖b‖₊ :=
   (ha.isStarOrtho_iff_mul_eq_zero hcomm |>.mpr hab).nnNorm_sub
 
 @[deprecated IsStarOrtho.nnNorm_sub +typeChanged (since := "2026-10-31")]
@@ -296,26 +314,26 @@ end IsStarNormal
 namespace IsSelfAdjoint
 
 @[deprecated IsStarOrtho.norm_add +typeChanged (since := "2026-10-29")]
-lemma norm_add_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0) :
-    ‖a + b‖ = max ‖a‖ ‖b‖ :=
+lemma norm_add_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0)
+    : ‖a + b‖ = max ‖a‖ ‖b‖ :=
   (isStarOrtho_iff_mul_eq_zero ha hb |>.mpr hab).norm_add
 
 @[deprecated IsStarOrtho.nnNorm_add +typeChanged (since := "2026-10-29")]
-lemma nnNorm_add_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0) :
-    ‖a + b‖₊ = max ‖a‖₊ ‖b‖₊ :=
+lemma nnNorm_add_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0)
+    : ‖a + b‖₊ = max ‖a‖₊ ‖b‖₊ :=
   (isStarOrtho_iff_mul_eq_zero ha hb |>.mpr hab).nnNorm_add
 
 @[deprecated IsStarOrtho.nnNorm_add +typeChanged (since := "2026-10-31")]
 alias nnnorm_add_eq_max := nnNorm_add_eq_max
 
 @[deprecated IsStarOrtho.norm_sub +typeChanged (since := "2026-10-29")]
-lemma norm_sub_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0) :
-    ‖a - b‖ = max ‖a‖ ‖b‖ :=
+lemma norm_sub_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0)
+    : ‖a - b‖ = max ‖a‖ ‖b‖ :=
   (isStarOrtho_iff_mul_eq_zero ha hb |>.mpr hab).norm_sub
 
 @[deprecated IsStarOrtho.nnNorm_sub +typeChanged (since := "2026-10-29")]
-lemma nnNorm_sub_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0) :
-    ‖a - b‖₊ = max ‖a‖₊ ‖b‖₊ :=
+lemma nnNorm_sub_eq_max (ha : IsSelfAdjoint a) (hb : IsSelfAdjoint b) (hab : a * b = 0)
+    : ‖a - b‖₊ = max ‖a‖₊ ‖b‖₊ :=
   (isStarOrtho_iff_mul_eq_zero ha hb |>.mpr hab).nnNorm_sub
 
 @[deprecated IsStarOrtho.nnNorm_sub +typeChanged (since := "2026-10-31")]
@@ -323,9 +341,10 @@ alias nnnorm_sub_eq_max := nnNorm_sub_eq_max
 
 open scoped Function in
 @[deprecated IsStarOrtho.nnNorm_sum +typeChanged (since := "2026-10-29")]
-lemma nnNorm_sum_eq_sup {ι : Type*} {f : ι → A} (s : Finset ι)
-    (h : ∀ i ∈ s, IsSelfAdjoint (f i)) (h0 : Pairwise ((· * · = 0) on f)) :
-    ‖∑ i ∈ s, f i‖₊ = s.sup (‖f ·‖₊) :=
+lemma nnNorm_sum_eq_sup
+    {ι : Type*} {f : ι → A}
+    (s : Finset ι) (h : ∀ i ∈ s, IsSelfAdjoint (f i)) (h0 : Pairwise ((· * · = 0) on f))
+    : ‖∑ i ∈ s, f i‖₊ = s.sup (‖f ·‖₊) :=
   IsStarOrtho.nnNorm_sum fun i hi j hj hij ↦
     isStarOrtho_iff_mul_eq_zero (h i hi) (h j hj) |>.mpr (h0 hij)
 
@@ -364,8 +383,8 @@ alias nnnorm_sub_eq_max := nnNorm_sub_eq_max
 
 open scoped Function in
 @[deprecated IsStarOrtho.nnNorm_sum +typeChanged (since := "2026-10-29")]
-lemma nnNorm_sum_eq_sup {ι : Type*} {f : ι → A} (s : Finset ι) (h0 : Pairwise ((· * · = 0) on f)) :
-    ‖∑ i ∈ s, f i‖₊ = s.sup (‖f ·‖₊) :=
+lemma nnNorm_sum_eq_sup {ι : Type*} {f : ι → A} (s : Finset ι) (h0 : Pairwise ((· * · = 0) on f))
+    : ‖∑ i ∈ s, f i‖₊ = s.sup (‖f ·‖₊) :=
   IsStarOrtho.nnNorm_sum fun _ _ _ _ hij ↦ .of_mul_eq_zero (h0 hij)
 
 @[deprecated IsStarOrtho.nnNorm_sum +typeChanged (since := "2026-10-31")]
@@ -386,11 +405,13 @@ variable [NormedRing A] [NormedAlgebra 𝕜 A] [CompleteSpace A] [StarRing A]
 variable [NormedRing B] [NormedAlgebra 𝕜 B] [CompleteSpace B] [StarRing B]
 variable [NormedRing C] [NormedAlgebra 𝕜 C] [CompleteSpace C] [StarRing C]
 
-/-- The functorial map taking `ψ : A →⋆ₐ[ℂ] B` to a continuous function
-`characterSpace ℂ B → characterSpace ℂ A` obtained by pre-composition with `ψ`. -/
+/--
+The functorial map taking `ψ : A →⋆ₐ[ℂ] B` to a continuous function
+`characterSpace ℂ B → characterSpace ℂ A` obtained by pre-composition with `ψ`.
+-/
 @[simps]
-noncomputable def compContinuousMap (ψ : A →⋆ₐ[𝕜] B) :
-    C(characterSpace 𝕜 B, characterSpace 𝕜 A) where
+noncomputable def compContinuousMap (ψ : A →⋆ₐ[𝕜] B)
+    : C(characterSpace 𝕜 B, characterSpace 𝕜 A) where
   toFun φ := equivAlgHom.symm ((equivAlgHom φ).comp ψ.toAlgHom)
   continuous_toFun :=
     Continuous.subtype_mk
@@ -399,14 +420,14 @@ noncomputable def compContinuousMap (ψ : A →⋆ₐ[𝕜] B) :
 variable (A) in
 /-- `WeakDual.CharacterSpace.compContinuousMap` sends the identity to the identity. -/
 @[simp]
-theorem compContinuousMap_id :
-    compContinuousMap (StarAlgHom.id 𝕜 A) = ContinuousMap.id (characterSpace 𝕜 A) :=
+theorem compContinuousMap_id
+    : compContinuousMap (StarAlgHom.id 𝕜 A) = ContinuousMap.id (characterSpace 𝕜 A) :=
   ContinuousMap.ext fun _a => ext fun _x => rfl
 
 /-- `WeakDual.CharacterSpace.compContinuousMap` is functorial. -/
 @[simp]
-theorem compContinuousMap_comp (ψ₂ : B →⋆ₐ[𝕜] C) (ψ₁ : A →⋆ₐ[𝕜] B) :
-    compContinuousMap (ψ₂.comp ψ₁) = (compContinuousMap ψ₁).comp (compContinuousMap ψ₂) :=
+theorem compContinuousMap_comp (ψ₂ : B →⋆ₐ[𝕜] C) (ψ₁ : A →⋆ₐ[𝕜] B)
+    : compContinuousMap (ψ₂.comp ψ₁) = (compContinuousMap ψ₁).comp (compContinuousMap ψ₂) :=
   ContinuousMap.ext fun _a => ext fun _x => rfl
 
 end CharacterSpace
@@ -439,10 +460,11 @@ V                     V
 B  --- η B ---> C(characterSpace ℂ B, ℂ)
 ```
 -/
-theorem gelfandStarTransform_naturality {A B : Type*} [CommCStarAlgebra A] [CommCStarAlgebra B]
-    (φ : A →⋆ₐ[ℂ] B) :
-    (gelfandStarTransform B).toStarAlgHom.comp φ =
-      (compContinuousMap φ |>.compStarAlgHom' ℂ ℂ).comp (gelfandStarTransform A).toStarAlgHom := by
+theorem gelfandStarTransform_naturality
+    {A B : Type*} [CommCStarAlgebra A] [CommCStarAlgebra B] (φ : A →⋆ₐ[ℂ] B)
+    : (gelfandStarTransform B).toStarAlgHom.comp φ
+      = (compContinuousMap φ |>.compStarAlgHom' ℂ ℂ).comp
+        (gelfandStarTransform A).toStarAlgHom := by
   rfl
 
 /--
@@ -468,8 +490,10 @@ V                     V
 Y  --- η Y ---> characterSpace ℂ C(Y, ℂ)
 ```
 -/
-lemma WeakDual.CharacterSpace.homeoEval_naturality {X Y 𝕜 : Type*} [RCLike 𝕜] [TopologicalSpace X]
-    [CompactSpace X] [T2Space X] [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] (f : C(X, Y)) :
-    (homeoEval Y 𝕜 : C(_, _)).comp f =
-      (f.compStarAlgHom' 𝕜 𝕜 |> compContinuousMap).comp (homeoEval X 𝕜 : C(_, _)) :=
+lemma WeakDual.CharacterSpace.homeoEval_naturality
+    {X Y 𝕜 : Type*} [RCLike 𝕜] [TopologicalSpace X] [CompactSpace X] [T2Space X]
+    [TopologicalSpace Y] [CompactSpace Y] [T2Space Y]
+    (f : C(X, Y))
+    : (homeoEval Y 𝕜 : C(_, _)).comp f
+      = (f.compStarAlgHom' 𝕜 𝕜 |> compContinuousMap).comp (homeoEval X 𝕜 : C(_, _)) :=
   rfl

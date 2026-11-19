@@ -39,53 +39,60 @@ variable {T : ∀ ⦃i j : ι⦄, i ≤ j → Sort w} (f : ∀ i j (h : i ≤ j)
 variable [∀ ⦃i j⦄ (h : i ≤ j), FunLike (T h) (F i) (F j)]
 variable [DirectedSystem F (f · · ·)] [IsDirectedOrder ι]
 
-/-- The cardinality of a direct limit is at most the sum of the cardinalities of its
-components. -/
+/--
+The cardinality of a direct limit is at most the sum of the cardinalities of its
+components.
+-/
 theorem mk_le_sum : #(DirectLimit F (f · · ·)) ≤ Cardinal.sum fun i ↦ #(F i) :=
   mk_quotient_le.trans_eq (mk_sigma F)
 
-/-- An infinite cardinal that bounds the cardinality of the index type and all components also
-bounds the cardinality of the direct limit. -/
-theorem mk_le_of_aleph0_le (c : Cardinal.{max u v}) (hc : ℵ₀ ≤ c)
-    (hι : Cardinal.lift.{v} #ι ≤ c) (hF : ∀ i, Cardinal.lift.{u} #(F i) ≤ c) :
-    #(DirectLimit F (f · · ·)) ≤ c :=
+/--
+An infinite cardinal that bounds the cardinality of the index type and all components also
+bounds the cardinality of the direct limit.
+-/
+theorem mk_le_of_aleph0_le
+    (c : Cardinal.{max u v})
+    (hc : ℵ₀ ≤ c) (hι : Cardinal.lift.{v} #ι ≤ c) (hF : ∀ i, Cardinal.lift.{u} #(F i) ≤ c)
+    : #(DirectLimit F (f · · ·)) ≤ c :=
   (mk_le_sum f).trans <| (sum_le_lift_mk_mul_iSup_lift _).trans <|
     Cardinal.mul_le_of_le hc hι (ciSup_le' hF)
 
-/-- If all canonical maps into a direct limit are injective and the supremum of the component
+/--
+If all canonical maps into a direct limit are injective and the supremum of the component
 cardinalities is greater than the cardinality of the index type, then it equals the cardinality
-of the direct limit. -/
+of the direct limit.
+-/
 theorem mk_eq_iSup_lift_mk
     (hι : Cardinal.lift.{v} #ι ≤ ⨆ i, Cardinal.lift.{u} #(F i))
-    (h : ∀ i, Injective fun x ↦ (⟦⟨i, x⟩⟧ : DirectLimit F (f · · ·))) :
-    #(DirectLimit F (f · · ·)) = ⨆ i, Cardinal.lift.{u} #(F i) := by
+    (h : ∀ i, Injective fun x ↦ (⟦⟨i, x⟩⟧ : DirectLimit F (f · · ·)))
+    : #(DirectLimit F (f · · ·)) = ⨆ i, Cardinal.lift.{u} #(F i) := by
   apply le_antisymm
   · by_cases! hc : ℵ₀ ≤ ⨆ i, lift.{u, v} #(F i)
-    · exact mk_le_of_aleph0_le f _ hc hι fun i ↦
-        le_ciSup Cardinal.bddAbove_of_small i
-    · have : Finite ι :=
-        mk_lt_aleph0_iff.mp (lift_lt_aleph0.mp (hι.trans_lt hc))
+    · exact mk_le_of_aleph0_le f _ hc hι fun i ↦ le_ciSup Cardinal.bddAbove_of_small i
+    · have : Finite ι := mk_lt_aleph0_iff.mp (lift_lt_aleph0.mp (hι.trans_lt hc))
       cases isEmpty_or_nonempty ι with
-      | inl hle =>
-        simp
+      | inl hle => simp
       | inr hlne =>
         obtain ⟨m, hm⟩ := Finite.exists_le (id : ι → ι)
         have he := (equivOfIsTop f m hm).lift_cardinal_eq
-        rw [Cardinal.lift_id'.{v,u}, Cardinal.lift_umax.{v,u}] at he
+        rw [Cardinal.lift_id'.{v, u}, Cardinal.lift_umax.{v, u}] at he
         rw [he]
         exact le_ciSup Cardinal.bddAbove_of_small m
   · refine ciSup_le' fun i ↦ ?_
     have := lift_mk_le_lift_mk_of_injective (h i)
     simp only [DirectLimit, ge_iff_le]
-    rwa [Cardinal.lift_umax, Cardinal.lift_id'.{v,u}] at this
+    rwa [Cardinal.lift_umax, Cardinal.lift_id'.{v, u}] at this
 
-/-- If all components have the same cardinality `c`, the cardinality of the index type is at most
-`c`, and all canonical maps are injective, then the direct limit also has cardinality `c`. -/
-theorem mk_eq_of_forall_lift_mk_eq [Nonempty ι] (c : Cardinal.{max u v})
+/--
+If all components have the same cardinality `c`, the cardinality of the index type is at most
+`c`, and all canonical maps are injective, then the direct limit also has cardinality `c`.
+-/
+theorem mk_eq_of_forall_lift_mk_eq
+    [Nonempty ι]
+    (c : Cardinal.{max u v})
     (hι : Cardinal.lift.{v} #ι ≤ c) (hF : ∀ i, Cardinal.lift.{u} #(F i) = c)
-    (h : ∀ i, Injective fun x ↦ (⟦⟨i, x⟩⟧ : DirectLimit F (f · · ·))) :
-    #(DirectLimit F (f · · ·)) = c := by
-  simpa only [hF, ciSup_const] using
-    mk_eq_iSup_lift_mk f (by simpa only [hF, ciSup_const]) h
+    (h : ∀ i, Injective fun x ↦ (⟦⟨i, x⟩⟧ : DirectLimit F (f · · ·)))
+    : #(DirectLimit F (f · · ·)) = c := by
+  simpa only [hF, ciSup_const] using mk_eq_iSup_lift_mk f (by simpa only [hF, ciSup_const]) h
 
 end DirectLimit

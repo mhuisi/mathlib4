@@ -19,8 +19,7 @@ public section
 
 namespace ZMod
 
-lemma rootsOfUnity_eq_top {p : ℕ} [Fact p.Prime] :
-    (rootsOfUnity (p - 1) (ZMod p)) = ⊤ := by
+lemma rootsOfUnity_eq_top {p : ℕ} [Fact p.Prime] : (rootsOfUnity (p - 1) (ZMod p)) = ⊤ := by
   ext
   simpa [Units.ext_iff] using pow_card_sub_one_eq_one (Units.ne_zero _)
 

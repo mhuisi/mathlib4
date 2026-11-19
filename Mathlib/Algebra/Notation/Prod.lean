@@ -30,20 +30,16 @@ section One
 variable [One M] [One N]
 
 @[to_additive]
-instance instOne : One (M × N) :=
-  ⟨(1, 1)⟩
+instance instOne : One (M × N) := ⟨(1, 1)⟩
 
 @[to_additive (attr := simp)]
-theorem fst_one : (1 : M × N).1 = 1 :=
-  rfl
+theorem fst_one : (1 : M × N).1 = 1 := rfl
 
 @[to_additive (attr := simp)]
-theorem snd_one : (1 : M × N).2 = 1 :=
-  rfl
+theorem snd_one : (1 : M × N).2 = 1 := rfl
 
 @[to_additive]
-theorem one_eq_mk : (1 : M × N) = (1, 1) :=
-  rfl
+theorem one_eq_mk : (1 : M × N) = (1, 1) := rfl
 
 @[to_additive]
 theorem mk_one_one : ((1 : M), (1 : N)) = 1 := rfl
@@ -52,8 +48,7 @@ theorem mk_one_one : ((1 : M), (1 : N)) = 1 := rfl
 theorem mk_eq_one {x : M} {y : N} : (x, y) = 1 ↔ x = 1 ∧ y = 1 := mk_inj
 
 @[to_additive (attr := simp)]
-theorem swap_one : (1 : M × N).swap = 1 :=
-  rfl
+theorem swap_one : (1 : M × N).swap = 1 := rfl
 
 end One
 
@@ -62,8 +57,7 @@ section Mul
 variable {M N : Type*} [Mul M] [Mul N]
 
 @[to_additive]
-instance instMul : Mul (M × N) :=
-  ⟨fun p q => ⟨p.1 * q.1, p.2 * q.2⟩⟩
+instance instMul : Mul (M × N) := ⟨fun p q => ⟨p.1 * q.1, p.2 * q.2⟩⟩
 
 @[to_additive (attr := simp)]
 theorem fst_mul (p q : M × N) : (p * q).1 = p.1 * q.1 := rfl
@@ -87,8 +81,7 @@ section Inv
 variable {G H : Type*} [Inv G] [Inv H]
 
 @[to_additive]
-instance instInv : Inv (G × H) :=
-  ⟨fun p => (p.1⁻¹, p.2⁻¹)⟩
+instance instInv : Inv (G × H) := ⟨fun p => (p.1⁻¹, p.2⁻¹)⟩
 
 @[to_additive (attr := simp)]
 theorem fst_inv (p : G × H) : p⁻¹.1 = p.1⁻¹ := rfl
@@ -109,8 +102,7 @@ section Div
 variable {G H : Type*} [Div G] [Div H]
 
 @[to_additive]
-instance instDiv : Div (G × H) :=
-  ⟨fun p q => ⟨p.1 / q.1, p.2 / q.2⟩⟩
+instance instDiv : Div (G × H) := ⟨fun p q => ⟨p.1 / q.1, p.2 / q.2⟩⟩
 
 @[to_additive (attr := simp)]
 theorem fst_div (a b : G × H) : (a / b).1 = a.1 / b.1 := rfl
@@ -124,7 +116,8 @@ theorem mk_div_mk (x₁ x₂ : G) (y₁ y₂ : H) : (x₁, y₁) / (x₂, y₂) 
 @[to_additive (attr := simp)]
 theorem swap_div (a b : G × H) : (a / b).swap = a.swap / b.swap := rfl
 
-@[to_additive] lemma div_def (a b : G × H) : a / b = (a.1 / b.1, a.2 / b.2) := rfl
+@[to_additive]
+lemma div_def (a b : G × H) : a / b = (a.1 / b.1, a.2 / b.2) := rfl
 
 end Div
 
@@ -133,7 +126,8 @@ section Pow
 variable {E α β : Type*} [Pow α E] [Pow β E]
 
 @[to_additive (attr := to_additive) instSMul]
-instance instPow : Pow (α × β) E where pow p c := (p.1 ^ c, p.2 ^ c)
+instance instPow : Pow (α × β) E where
+  pow p c := (p.1 ^ c, p.2 ^ c)
 
 @[to_additive (attr := to_additive, simp) (reorder := p c) smul_fst]
 lemma pow_fst (p : α × β) (c : E) : (p ^ c).fst = p.fst ^ c := rfl
@@ -156,7 +150,8 @@ section Star
 
 variable [Star R] [Star S]
 
-instance : Star (R × S) where star x := (star x.1, star x.2)
+instance : Star (R × S) where
+  star x := (star x.1, star x.2)
 
 @[simp]
 theorem fst_star (x : R × S) : (star x).1 = star x.1 := rfl
@@ -167,6 +162,5 @@ theorem snd_star (x : R × S) : (star x).2 = star x.2 := rfl
 theorem star_def (x : R × S) : star x = (star x.1, star x.2) := rfl
 
 end Star
-
 
 end Prod

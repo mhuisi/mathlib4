@@ -14,23 +14,18 @@ public section
 
 variable {α : Type*}
 
-instance [LE α] : LE (Multiplicative α) :=
-  inferInstanceAs <| LE α
+instance [LE α] : LE (Multiplicative α) := inferInstanceAs <| LE α
 
-instance [LE α] : LE (Additive α) :=
-  inferInstanceAs <| LE α
+instance [LE α] : LE (Additive α) := inferInstanceAs <| LE α
 
-instance [LT α] : LT (Multiplicative α) :=
-  inferInstanceAs <| LT α
+instance [LT α] : LT (Multiplicative α) := inferInstanceAs <| LT α
 
-instance [LT α] : LT (Additive α) :=
-  inferInstanceAs <| LT α
+instance [LT α] : LT (Additive α) := inferInstanceAs <| LT α
 
 instance Multiplicative.preorder [Preorder α] : Preorder (Multiplicative α) :=
   inferInstanceAs <| Preorder α
 
-instance Additive.preorder [Preorder α] : Preorder (Additive α) :=
-  inferInstanceAs <| Preorder α
+instance Additive.preorder [Preorder α] : Preorder (Additive α) := inferInstanceAs <| Preorder α
 
 instance Multiplicative.partialOrder [PartialOrder α] : PartialOrder (Multiplicative α) :=
   inferInstanceAs <| PartialOrder α
@@ -62,8 +57,8 @@ instance Multiplicative.boundedOrder [LE α] [BoundedOrder α] : BoundedOrder (M
 instance Additive.boundedOrder [LE α] [BoundedOrder α] : BoundedOrder (Additive α) :=
   inferInstanceAs <| BoundedOrder α
 
-instance Multiplicative.existsMulOfLe [Add α] [LE α] [ExistsAddOfLE α] :
-    ExistsMulOfLE (Multiplicative α) :=
+instance Multiplicative.existsMulOfLe [Add α] [LE α] [ExistsAddOfLE α]
+    : ExistsMulOfLE (Multiplicative α) :=
   ⟨@exists_add_of_le α _ _ _⟩
 
 instance Additive.existsAddOfLe [Mul α] [LE α] [ExistsMulOfLE α] : ExistsAddOfLE (Additive α) :=
@@ -74,20 +69,16 @@ section Preorder
 variable [Preorder α]
 
 @[simp]
-theorem ofMul_le {a b : α} : ofMul a ≤ ofMul b ↔ a ≤ b :=
-  Iff.rfl
+theorem ofMul_le {a b : α} : ofMul a ≤ ofMul b ↔ a ≤ b := Iff.rfl
 
 @[simp]
-theorem ofMul_lt {a b : α} : ofMul a < ofMul b ↔ a < b :=
-  Iff.rfl
+theorem ofMul_lt {a b : α} : ofMul a < ofMul b ↔ a < b := Iff.rfl
 
 @[simp]
-theorem toMul_le {a b : Additive α} : a.toMul ≤ b.toMul ↔ a ≤ b :=
-  Iff.rfl
+theorem toMul_le {a b : Additive α} : a.toMul ≤ b.toMul ↔ a ≤ b := Iff.rfl
 
 @[simp]
-theorem toMul_lt {a b : Additive α} : a.toMul < b.toMul ↔ a < b :=
-  Iff.rfl
+theorem toMul_lt {a b : Additive α} : a.toMul < b.toMul ↔ a < b := Iff.rfl
 
 @[gcongr] alias ⟨_, toMul_mono⟩ := toMul_le
 @[gcongr] alias ⟨_, ofMul_mono⟩ := ofMul_le
@@ -99,22 +90,30 @@ end Preorder
 section OrderTop
 variable [LE α] [OrderTop α]
 
-@[simp] lemma ofMul_top : ofMul (⊤ : α) = ⊤ := rfl
-@[simp] lemma toMul_top : toMul ⊤ = (⊤ : α) := rfl
+@[simp]
+lemma ofMul_top : ofMul (⊤ : α) = ⊤ := rfl
+@[simp]
+lemma toMul_top : toMul ⊤ = (⊤ : α) := rfl
 
-@[simp] lemma ofMul_eq_top {a : α} : ofMul a = ⊤ ↔ a = ⊤ := .rfl
-@[simp] lemma toMul_eq_top {a : Additive α} : toMul a = ⊤ ↔ a = ⊤ := .rfl
+@[simp]
+lemma ofMul_eq_top {a : α} : ofMul a = ⊤ ↔ a = ⊤ := .rfl
+@[simp]
+lemma toMul_eq_top {a : Additive α} : toMul a = ⊤ ↔ a = ⊤ := .rfl
 
 end OrderTop
 
 section OrderBot
 variable [LE α] [OrderBot α]
 
-@[simp] lemma ofMul_bot : ofMul (⊥ : α) = ⊥ := rfl
-@[simp] lemma toMul_bot : toMul ⊥ = (⊥ : α) := rfl
+@[simp]
+lemma ofMul_bot : ofMul (⊥ : α) = ⊥ := rfl
+@[simp]
+lemma toMul_bot : toMul ⊥ = (⊥ : α) := rfl
 
-@[simp] lemma ofMul_eq_bot {a : α} : ofMul a = ⊥ ↔ a = ⊥ := .rfl
-@[simp] lemma toMul_eq_bot {a : Additive α} : toMul a = ⊥ ↔ a = ⊥ := .rfl
+@[simp]
+lemma ofMul_eq_bot {a : α} : ofMul a = ⊥ ↔ a = ⊥ := .rfl
+@[simp]
+lemma toMul_eq_bot {a : Additive α} : toMul a = ⊥ ↔ a = ⊥ := .rfl
 
 end OrderBot
 end Additive
@@ -124,20 +123,16 @@ section Preorder
 variable [Preorder α]
 
 @[simp]
-theorem ofAdd_le {a b : α} : ofAdd a ≤ ofAdd b ↔ a ≤ b :=
-  Iff.rfl
+theorem ofAdd_le {a b : α} : ofAdd a ≤ ofAdd b ↔ a ≤ b := Iff.rfl
 
 @[simp]
-theorem ofAdd_lt {a b : α} : ofAdd a < ofAdd b ↔ a < b :=
-  Iff.rfl
+theorem ofAdd_lt {a b : α} : ofAdd a < ofAdd b ↔ a < b := Iff.rfl
 
 @[simp]
-theorem toAdd_le {a b : Multiplicative α} : a.toAdd ≤ b.toAdd ↔ a ≤ b :=
-  Iff.rfl
+theorem toAdd_le {a b : Multiplicative α} : a.toAdd ≤ b.toAdd ↔ a ≤ b := Iff.rfl
 
 @[simp]
-theorem toAdd_lt {a b : Multiplicative α} : a.toAdd < b.toAdd ↔ a < b :=
-  Iff.rfl
+theorem toAdd_lt {a b : Multiplicative α} : a.toAdd < b.toAdd ↔ a < b := Iff.rfl
 
 @[gcongr] alias ⟨_, toAdd_mono⟩ := toAdd_le
 @[gcongr] alias ⟨_, ofAdd_mono⟩ := ofAdd_le
@@ -149,22 +144,30 @@ end Preorder
 section OrderTop
 variable [LE α] [OrderTop α]
 
-@[simp] lemma ofAdd_top : ofAdd (⊤ : α) = ⊤ := rfl
-@[simp] lemma toAdd_top : toAdd ⊤ = (⊤ : α) := rfl
+@[simp]
+lemma ofAdd_top : ofAdd (⊤ : α) = ⊤ := rfl
+@[simp]
+lemma toAdd_top : toAdd ⊤ = (⊤ : α) := rfl
 
-@[simp] lemma ofAdd_eq_top {a : α} : ofAdd a = ⊤ ↔ a = ⊤ := .rfl
-@[simp] lemma toAdd_eq_top {a : Multiplicative α} : toAdd a = ⊤ ↔ a = ⊤ := .rfl
+@[simp]
+lemma ofAdd_eq_top {a : α} : ofAdd a = ⊤ ↔ a = ⊤ := .rfl
+@[simp]
+lemma toAdd_eq_top {a : Multiplicative α} : toAdd a = ⊤ ↔ a = ⊤ := .rfl
 
 end OrderTop
 
 section OrderBot
 variable [LE α] [OrderBot α]
 
-@[simp] lemma ofAdd_bot : ofAdd (⊥ : α) = ⊥ := rfl
-@[simp] lemma toAdd_bot : toAdd ⊥ = (⊥ : α) := rfl
+@[simp]
+lemma ofAdd_bot : ofAdd (⊥ : α) = ⊥ := rfl
+@[simp]
+lemma toAdd_bot : toAdd ⊥ = (⊥ : α) := rfl
 
-@[simp] lemma ofAdd_eq_bot {a : α} : ofAdd a = ⊥ ↔ a = ⊥ := .rfl
-@[simp] lemma toAdd_eq_bot {a : Multiplicative α} : toAdd a = ⊥ ↔ a = ⊥ := .rfl
+@[simp]
+lemma ofAdd_eq_bot {a : α} : ofAdd a = ⊥ ↔ a = ⊥ := .rfl
+@[simp]
+lemma toAdd_eq_bot {a : Multiplicative α} : toAdd a = ⊥ ↔ a = ⊥ := .rfl
 
 end OrderBot
 

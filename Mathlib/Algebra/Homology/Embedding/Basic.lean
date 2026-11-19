@@ -60,9 +60,11 @@ variable {ι ι' : Type*} (c : ComplexShape ι) (c' : ComplexShape ι')
 
 namespace ComplexShape
 
-/-- An embedding of a complex shape `c : ComplexShape ι` into a complex shape
+/--
+An embedding of a complex shape `c : ComplexShape ι` into a complex shape
 `c' : ComplexShape ι'` consists of an injective map `f : ι → ι'` which satisfies
-a compatibility with respect to the relations `c.Rel` and `c'.Rel`. -/
+a compatibility with respect to the relations `c.Rel` and `c'.Rel`.
+-/
 structure Embedding where
   /-- the map between the underlying types of indices -/
   f : ι → ι'
@@ -81,8 +83,10 @@ def op : Embedding c.symm c'.symm where
   injective_f := e.injective_f
   rel h := e.rel h
 
-/-- An embedding of complex shapes `e` satisfies `e.IsRelIff` if the implication
-`e.rel` is an equivalence. -/
+/--
+An embedding of complex shapes `e` satisfies `e.IsRelIff` if the implication
+`e.rel` is an equivalence.
+-/
 class IsRelIff : Prop where
   rel' (i₁ i₂ : ι) (h : c'.Rel (e.f i₁) (e.f i₂)) : c.Rel i₁ i₂
 
@@ -97,11 +101,13 @@ instance [e.IsRelIff] : e.op.IsRelIff where
 section
 
 variable (c c')
-variable (f : ι → ι') (hf : Function.Injective f)
-    (iff : ∀ (i₁ i₂ : ι), c.Rel i₁ i₂ ↔ c'.Rel (f i₁) (f i₂))
+variable
+  (f : ι → ι') (hf : Function.Injective f) (iff : ∀ (i₁ i₂ : ι), c.Rel i₁ i₂ ↔ c'.Rel (f i₁) (f i₂))
 
-/-- Constructor for embeddings between complex shapes when we have an equivalence
-`∀ (i₁ i₂ : ι), c.Rel i₁ i₂ ↔ c'.Rel (f i₁) (f i₂)`. -/
+/--
+Constructor for embeddings between complex shapes when we have an equivalence
+`∀ (i₁ i₂ : ι), c.Rel i₁ i₂ ↔ c'.Rel (f i₁) (f i₂)`.
+-/
 @[simps, implicit_reducible]
 def mk' : Embedding c c' where
   f := f
@@ -113,20 +119,22 @@ instance IsRelIff.mk' : (mk' c c' f hf iff).IsRelIff where
 
 end
 
-/-- The condition that the image of the map `e.f` of an embedding of
-complex shapes `e : Embedding c c'` is stable by `c'.next`. -/
+/--
+The condition that the image of the map `e.f` of an embedding of
+complex shapes `e : Embedding c c'` is stable by `c'.next`.
+-/
 class IsTruncGE : Prop extends e.IsRelIff where
-  mem_next {j : ι} {k' : ι'} (h : c'.Rel (e.f j) k') :
-    ∃ k, e.f k = k'
+  mem_next {j : ι} {k' : ι'} (h : c'.Rel (e.f j) k') : ∃ k, e.f k = k'
 
 lemma mem_next [e.IsTruncGE] {j : ι} {k' : ι'} (h : c'.Rel (e.f j) k') : ∃ k, e.f k = k' :=
   IsTruncGE.mem_next h
 
-/-- The condition that the image of the map `e.f` of an embedding of
-complex shapes `e : Embedding c c'` is stable by `c'.prev`. -/
+/--
+The condition that the image of the map `e.f` of an embedding of
+complex shapes `e : Embedding c c'` is stable by `c'.prev`.
+-/
 class IsTruncLE : Prop extends e.IsRelIff where
-  mem_prev {i' : ι'} {j : ι} (h : c'.Rel i' (e.f j)) :
-    ∃ i, e.f i = i'
+  mem_prev {i' : ι'} {j : ι} (h : c'.Rel i' (e.f j)) : ∃ i, e.f i = i'
 
 lemma mem_prev [e.IsTruncLE] {i' : ι'} {j : ι} (h : c'.Rel i' (e.f j)) : ∃ i, e.f i = i' :=
   IsTruncLE.mem_prev h
@@ -140,27 +148,26 @@ instance [e.IsTruncLE] : e.op.IsTruncGE where
 open scoped Classical in
 /-- The map `ι' → Option ι` which sends `e.f i` to `some i` and the other elements to `none`. -/
 noncomputable def r (i' : ι') : Option ι :=
-  if h : ∃ (i : ι), e.f i = i'
-  then some h.choose
-  else none
+  if h : ∃ (i : ι), e.f i = i' then
+    some h.choose
+  else
+    none
 
-lemma r_eq_some {i : ι} {i' : ι'} (hi : e.f i = i') :
-    e.r i' = some i := by
+lemma r_eq_some {i : ι} {i' : ι'} (hi : e.f i = i') : e.r i' = some i := by
   have h : ∃ (i : ι), e.f i = i' := ⟨i, hi⟩
   have : h.choose = i := e.injective_f (h.choose_spec.trans (hi.symm))
   dsimp [r]
   rw [dite_eq_left ⟨i, hi⟩, this]
 
-lemma r_eq_none (i' : ι') (hi : ∀ i, e.f i ≠ i') :
-    e.r i' = none :=
+lemma r_eq_none (i' : ι') (hi : ∀ i, e.f i ≠ i') : e.r i' = none :=
   dite_eq_right (by
     rintro ⟨i, hi'⟩
     exact hi i hi')
 
-@[simp] lemma r_f (i : ι) : e.r (e.f i) = some i := r_eq_some _ rfl
+@[simp]
+lemma r_f (i : ι) : e.r (e.f i) = some i := r_eq_some _ rfl
 
-lemma f_eq_of_r_eq_some {i : ι} {i' : ι'} (hi : e.r i' = some i) :
-    e.f i = i' := by
+lemma f_eq_of_r_eq_some {i : ι} {i' : ι'} (hi : e.r i' = some i) : e.f i = i' := by
   by_cases h : ∃ (k : ι), e.f k = i'
   · obtain ⟨k, rfl⟩ := h
     rw [r_f] at hi
@@ -177,9 +184,8 @@ variable {A : Type*} [AddCommSemigroup A] [IsRightCancelAdd A] [One A]
 /-- The embedding from `up' a` to itself via (· + b). -/
 @[simps!, implicit_reducible]
 def embeddingUp'Add (a b : A) : Embedding (up' a) (up' a) :=
-  Embedding.mk' _ _ (· + b)
-    (fun _ _ h => by simpa using h)
-    (by dsimp; simp_rw [add_right_comm _ b a, add_right_cancel_iff, implies_true])
+  Embedding.mk' _ _ (· + b) (fun _ _ h => by simpa using h) (by
+    dsimp; simp_rw [add_right_comm _ b a, add_right_cancel_iff, implies_true])
 
 instance (a b : A) : (embeddingUp'Add a b).IsRelIff := .mk' ..
 
@@ -189,9 +195,8 @@ instance (a b : A) : (embeddingUp'Add a b).IsTruncGE where
 /-- The embedding from `down' a` to itself via (· + b). -/
 @[simps!, implicit_reducible]
 def embeddingDown'Add (a b : A) : Embedding (down' a) (down' a) :=
-  Embedding.mk' _ _ (· + b)
-    (fun _ _ h => by simpa using h)
-    (by dsimp; simp_rw [add_right_comm _ b a, add_right_cancel_iff, implies_true])
+  Embedding.mk' _ _ (· + b) (fun _ _ h => by simpa using h) (by
+    dsimp; simp_rw [add_right_comm _ b a, add_right_cancel_iff, implies_true])
 
 instance (a b : A) : (embeddingDown'Add a b).IsRelIff := .mk' ..
 
@@ -203,9 +208,7 @@ end
 /-- The obvious embedding from `up ℕ` to `up ℤ`. -/
 @[simps!, implicit_reducible]
 def embeddingUpNat : Embedding (up ℕ) (up ℤ) :=
-  Embedding.mk' _ _ (fun n => n)
-    (fun _ _ h => by simpa using h)
-    (by dsimp; lia)
+  Embedding.mk' _ _ (fun n => n) (fun _ _ h => by simpa using h) (by dsimp; lia)
 
 instance : embeddingUpNat.IsRelIff := .mk' ..
 
@@ -215,9 +218,7 @@ instance : embeddingUpNat.IsTruncGE where
 /-- The embedding from `down ℕ` to `up ℤ` with sends `n` to `-n`. -/
 @[simps!, implicit_reducible]
 def embeddingDownNat : Embedding (down ℕ) (up ℤ) :=
-  Embedding.mk' _ _ (fun n => -n)
-    (fun _ _ h => by simpa using h)
-    (by dsimp; lia)
+  Embedding.mk' _ _ (fun n => -n) (fun _ _ h => by simpa using h) (by dsimp; lia)
 
 instance : embeddingDownNat.IsRelIff := .mk' ..
 
@@ -229,9 +230,7 @@ variable (p : ℤ)
 /-- The embedding from `up ℕ` to `up ℤ` which sends `n : ℕ` to `p + n`. -/
 @[simps!, implicit_reducible]
 def embeddingUpIntGE : Embedding (up ℕ) (up ℤ) :=
-  Embedding.mk' _ _ (fun n => p + n)
-    (fun _ _ h => by dsimp at h; lia)
-    (by dsimp; lia)
+  Embedding.mk' _ _ (fun n => p + n) (fun _ _ h => by dsimp at h; lia) (by dsimp; lia)
 
 instance : (embeddingUpIntGE p).IsRelIff := .mk' ..
 
@@ -241,17 +240,15 @@ instance : (embeddingUpIntGE p).IsTruncGE where
 /-- The embedding from `down ℕ` to `up ℤ` which sends `n : ℕ` to `p - n`. -/
 @[simps!, implicit_reducible]
 def embeddingUpIntLE : Embedding (down ℕ) (up ℤ) :=
-  Embedding.mk' _ _ (fun n => p - n)
-    (fun _ _ h => by dsimp at h; lia)
-    (by dsimp; lia)
+  Embedding.mk' _ _ (fun n => p - n) (fun _ _ h => by dsimp at h; lia) (by dsimp; lia)
 
 instance : (embeddingUpIntLE p).IsRelIff := .mk' ..
 
 instance : (embeddingUpIntLE p).IsTruncLE where
   mem_prev {_ k} h := ⟨k + 1, by dsimp at h ⊢; lia⟩
 
-lemma notMem_range_embeddingUpIntLE_iff (n : ℤ) :
-    (∀ (i : ℕ), (embeddingUpIntLE p).f i ≠ n) ↔ p < n := by
+lemma notMem_range_embeddingUpIntLE_iff (n : ℤ)
+    : (∀ (i : ℕ), (embeddingUpIntLE p).f i ≠ n) ↔ p < n := by
   constructor
   · intro h
     by_contra
@@ -260,8 +257,8 @@ lemma notMem_range_embeddingUpIntLE_iff (n : ℤ) :
     dsimp
     lia
 
-lemma notMem_range_embeddingUpIntGE_iff (n : ℤ) :
-    (∀ (i : ℕ), (embeddingUpIntGE p).f i ≠ n) ↔ n < p := by
+lemma notMem_range_embeddingUpIntGE_iff (n : ℤ)
+    : (∀ (i : ℕ), (embeddingUpIntGE p).f i ≠ n) ↔ n < p := by
   constructor
   · intro h
     by_contra

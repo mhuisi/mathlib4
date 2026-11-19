@@ -27,7 +27,8 @@ universe u v
 
 namespace ModelWithCorners
 
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+variable
+  {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
   {H : Type*} [TopologicalSpace H]
 
@@ -45,20 +46,22 @@ attribute [instance] MfldCat.topologicalSpace MfldCat.chartedSpace MfldCat.isMan
 initialize_simps_projections MfldCat (-topologicalSpace, -chartedSpace, -isManifold)
 
 namespace MfldCat
-variable {I : ModelWithCorners 𝕜 E H} {n : ℕ∞ω} {M N P : MfldCat I n} {X Y Z : Type u}
-  [TopologicalSpace X] [ChartedSpace H X] [IsManifold I n X]
-  [TopologicalSpace Y] [ChartedSpace H Y] [IsManifold I n Y]
-  [TopologicalSpace Z] [ChartedSpace H Z] [IsManifold I n Z]
+variable
+  {I : ModelWithCorners 𝕜 E H} {n : ℕ∞ω} {M N P : MfldCat I n} {X Y Z : Type u}
+  [TopologicalSpace X] [ChartedSpace H X] [IsManifold I n X] [TopologicalSpace Y] [ChartedSpace H Y]
+  [IsManifold I n Y] [TopologicalSpace Z] [ChartedSpace H Z] [IsManifold I n Z]
 
 instance : CoeSort (MfldCat I n) (Type u) := ⟨MfldCat.carrier⟩
 
 attribute [coe] MfldCat.carrier
 
-/-- The object of `ModelWithCorners.MfldCat I n` associated to a `C^n` manifold `X` modeled on `I`.
+/--
+The object of `ModelWithCorners.MfldCat I n` associated to a `C^n` manifold `X` modeled on `I`.
 
-This is the preferred way to construct a term of `ModelWithCorners.MfldCat I n`. -/
-abbrev of (X : Type u) [TopologicalSpace X] [ChartedSpace H X] [IsManifold I n X] :
-    MfldCat I n := ⟨X⟩
+This is the preferred way to construct a term of `ModelWithCorners.MfldCat I n`.
+-/
+abbrev of (X : Type u) [TopologicalSpace X] [ChartedSpace H X] [IsManifold I n X] : MfldCat I n :=
+  ⟨X⟩
 
 open Lean.PrettyPrinter.Delaborator in
 /-- This prints `ModelWithCorners.MfldCat.of X` as `↧X`. -/
@@ -100,22 +103,29 @@ initialize_simps_projections Hom (hom' → hom)
 The results below duplicate the `ConcreteCategory` simp lemmas, but we can keep them for `dsimp`.
 -/
 
-@[simp] lemma hom_id : (𝟙 M : M ⟶ M).hom = ContMDiffMap.id := rfl
-@[simp] lemma hom_comp (f : M ⟶ N) (g : N ⟶ P) : (f ≫ g).hom = g.hom.comp f.hom := rfl
+@[simp]
+lemma hom_id : (𝟙 M : M ⟶ M).hom = ContMDiffMap.id := rfl
+@[simp]
+lemma hom_comp (f : M ⟶ N) (g : N ⟶ P) : (f ≫ g).hom = g.hom.comp f.hom := rfl
 
 lemma id_apply (M : MfldCat I n) (m : M) : (𝟙 M : M ⟶ M) m = m := rfl
 lemma comp_apply (f : M ⟶ N) (g : N ⟶ P) (m : M) : (f ≫ g) m = g (f m) := rfl
 
-@[ext] lemma hom_ext {f g : M ⟶ N} (hf : f.hom = g.hom) : f = g := Hom.ext hf
-
-@[simp] lemma hom_ofHom (f : ContMDiffMap I I X Y n) : (ofHom f).hom = f := rfl
-@[simp] lemma ofHom_hom (f : M ⟶ N) : ofHom f.hom = f := rfl
-
-@[simp] lemma ofHom_id : ofHom (.id (I := I) (n := n)) = 𝟙 (of X) := rfl
+@[ext]
+lemma hom_ext {f g : M ⟶ N} (hf : f.hom = g.hom) : f = g := Hom.ext hf
 
 @[simp]
-lemma ofHom_comp (f : ContMDiffMap I I X Y n) (g : ContMDiffMap I I Y Z n) :
-    ofHom (g.comp f) = ofHom f ≫ ofHom g := rfl
+lemma hom_ofHom (f : ContMDiffMap I I X Y n) : (ofHom f).hom = f := rfl
+@[simp]
+lemma ofHom_hom (f : M ⟶ N) : ofHom f.hom = f := rfl
+
+@[simp]
+lemma ofHom_id : ofHom (.id (I := I) (n := n)) = 𝟙 (of X) := rfl
+
+@[simp]
+lemma ofHom_comp (f : ContMDiffMap I I X Y n) (g : ContMDiffMap I I Y Z n)
+    : ofHom (g.comp f) = ofHom f ≫ ofHom g :=
+  rfl
 
 lemma ofHom_apply (f : ContMDiffMap I I X Y n) (x : X) : ofHom f x = f x := rfl
 
@@ -128,11 +138,13 @@ instance hasForgetToTopCat : HasForget₂ (MfldCat I n) TopCat.{u} where
   forget₂.obj M := ↧M
   forget₂.map f := TopCat.ofHom ⟨f.hom, f.hom.contMDiff.continuous⟩
 
-@[simp] lemma forget₂_topCat_obj (M : MfldCat I n) :
-    (forget₂ (MfldCat I n) TopCat).obj M = ↧M := rfl
+@[simp]
+lemma forget₂_topCat_obj (M : MfldCat I n) : (forget₂ (MfldCat I n) TopCat).obj M = ↧M := rfl
 
-@[simp] lemma forget₂_topCat_map (f : M ⟶ N) :
-    (forget₂ (MfldCat I n) TopCat).map f = TopCat.ofHom ⟨f.hom, f.hom.contMDiff.continuous⟩ := rfl
+@[simp]
+lemma forget₂_topCat_map (f : M ⟶ N)
+    : (forget₂ (MfldCat I n) TopCat).map f = TopCat.ofHom ⟨f.hom, f.hom.contMDiff.continuous⟩ :=
+  rfl
 
 /-- Build an isomorphism in `ModelWithCorners.MfldCat I n` from a diffeomorphism. -/
 @[expose, simps]
@@ -150,8 +162,10 @@ def diffeomorphOfIso (i : M ≅ N) : M ≃ₘ^n⟮I, I⟯ N where
   contMDiff_toFun := i.hom.hom.contMDiff
   contMDiff_invFun := i.inv.hom.contMDiff
 
-/-- Diffeomorphisms between manifolds modeled on `I` are the same as isomorphisms in
-`ModelWithCorners.MfldCat I n`. -/
+/--
+Diffeomorphisms between manifolds modeled on `I` are the same as isomorphisms in
+`ModelWithCorners.MfldCat I n`.
+-/
 @[expose, simps]
 def isoEquivDiffeomorph : (M ≅ N) ≃ (M ≃ₘ^n⟮I, I⟯ N) where
   toFun := diffeomorphOfIso

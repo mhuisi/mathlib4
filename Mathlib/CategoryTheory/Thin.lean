@@ -23,7 +23,6 @@ in each direction.
 
 @[expose] public section
 
-
 universe v₁ v₂ u₁ u₂
 
 namespace CategoryTheory
@@ -34,8 +33,10 @@ section
 
 variable [CategoryStruct.{v₁} C] [Quiver.IsThin C]
 
-/-- Construct a category instance from a `CategoryStruct`, using the fact that
-    hom spaces are subsingletons to prove the axioms. -/
+/--
+Construct a category instance from a `CategoryStruct`, using the fact that
+hom spaces are subsingletons to prove the axioms.
+-/
 @[instance_reducible]
 def thin_category : Category C where
 
@@ -52,8 +53,7 @@ instance functor_thin : Quiver.IsThin (D ⥤ C) := fun _ _ =>
   ⟨fun α β => NatTrans.ext (by subsingleton)⟩
 
 /-- To show `X ≅ Y` in a thin category, it suffices to just give any morphism in each direction. -/
-def iso_of_both_ways {X Y : C} (f : X ⟶ Y) (g : Y ⟶ X) :
-    X ≅ Y where
+def iso_of_both_ways {X Y : C} (f : X ⟶ Y) (g : Y ⟶ X) : X ≅ Y where
   hom := f
   inv := g
 

@@ -56,12 +56,10 @@ section Lattice
 variable [DecidableEq α] {s s₁ s₂ t t₁ t₂ u v : Finset α} {a : α}
 
 /-- `s ∪ t` is the set such that `a ∈ s ∪ t` iff `a ∈ s` or `a ∈ t`. -/
-instance : Max (Finset α) :=
-  ⟨fun s t => ⟨_, t.nodup.ndunion s.val⟩⟩
+instance : Max (Finset α) := ⟨fun s t => ⟨_, t.nodup.ndunion s.val⟩⟩
 
 /-- `s ∩ t` is the set such that `a ∈ s ∩ t` iff `a ∈ s` and `a ∈ t`. -/
-instance : Min (Finset α) :=
-  ⟨fun s t => ⟨_, s.nodup.ndinter t.val⟩⟩
+instance : Min (Finset α) := ⟨fun s t => ⟨_, s.nodup.ndinter t.val⟩⟩
 
 instance : Lattice (Finset α) where
   sup := (· ∪ ·)
@@ -74,39 +72,30 @@ instance : Lattice (Finset α) where
   inf_le_right := fun _ _ _ h => (mem_ndinter.1 h).2
 
 @[deprecated "This is now a syntactic equality" (since := "2026-10-23")]
-theorem sup_eq_union' : (Max.max : Finset α → Finset α → Finset α) = Max.max :=
-  rfl
+theorem sup_eq_union' : (Max.max : Finset α → Finset α → Finset α) = Max.max := rfl
 
 @[deprecated "This is now a syntactic equality" (since := "2026-10-23")]
-theorem sup_eq_union {s t : Finset α} : s ⊔ t = s ∪ t :=
-  rfl
+theorem sup_eq_union {s t : Finset α} : s ⊔ t = s ∪ t := rfl
 
 @[deprecated "This is now a syntactic equality" (since := "2026-10-23")]
-theorem inf_eq_inter' : (Min.min : Finset α → Finset α → Finset α) = Min.min :=
-  rfl
+theorem inf_eq_inter' : (Min.min : Finset α → Finset α → Finset α) = Min.min := rfl
 
 @[deprecated "This is now a syntactic equality" (since := "2026-10-23")]
-theorem inf_eq_inter {s t : Finset α} : s ⊓ t = s ∩ t :=
-  rfl
+theorem inf_eq_inter {s t : Finset α} : s ⊓ t = s ∩ t := rfl
 
 /-! #### union -/
 
-theorem union_val_nd (s t : Finset α) : (s ∪ t).val = ndunion s.val t.val :=
-  rfl
+theorem union_val_nd (s t : Finset α) : (s ∪ t).val = ndunion s.val t.val := rfl
 
 @[simp]
-theorem union_val (s t : Finset α) : (s ∪ t).val = s.val ∪ t.val :=
-  ndunion_eq_union s.nodup
+theorem union_val (s t : Finset α) : (s ∪ t).val = s.val ∪ t.val := ndunion_eq_union s.nodup
 
 @[simp, grind =]
-theorem mem_union : a ∈ s ∪ t ↔ a ∈ s ∨ a ∈ t :=
-  mem_ndunion
+theorem mem_union : a ∈ s ∪ t ↔ a ∈ s ∨ a ∈ t := mem_ndunion
 
-theorem mem_union_left (t : Finset α) (h : a ∈ s) : a ∈ s ∪ t :=
-  mem_union.2 <| Or.inl h
+theorem mem_union_left (t : Finset α) (h : a ∈ s) : a ∈ s ∪ t := mem_union.2 <| Or.inl h
 
-theorem mem_union_right (s : Finset α) (h : a ∈ t) : a ∈ s ∪ t :=
-  mem_union.2 <| Or.inr h
+theorem mem_union_right (s : Finset α) (h : a ∈ t) : a ∈ s ∪ t := mem_union.2 <| Or.inr h
 
 theorem forall_mem_union {p : α → Prop} : (∀ a ∈ s ∪ t, p a) ↔ (∀ a ∈ s, p a) ∧ ∀ a ∈ t, p a := by
   grind
@@ -114,11 +103,9 @@ theorem forall_mem_union {p : α → Prop} : (∀ a ∈ s ∪ t, p a) ↔ (∀ a
 theorem notMem_union : a ∉ s ∪ t ↔ a ∉ s ∧ a ∉ t := by rw [mem_union, not_or]
 
 @[simp, norm_cast]
-theorem coe_union (s₁ s₂ : Finset α) : ↑(s₁ ∪ s₂) = (s₁ ∪ s₂ : Set α) :=
-  Set.ext fun _ => mem_union
+theorem coe_union (s₁ s₂ : Finset α) : ↑(s₁ ∪ s₂) = (s₁ ∪ s₂ : Set α) := Set.ext fun _ => mem_union
 
-theorem union_subset (hs : s ⊆ u) : t ⊆ u → s ∪ t ⊆ u :=
-  sup_le hs
+theorem union_subset (hs : s ⊆ u) : t ⊆ u → s ∪ t ⊆ u := sup_le hs
 
 lemma subset_union_left : s₁ ⊆ s₁ ∪ s₂ := le_sup_left
 lemma subset_union_right : s₂ ⊆ s₁ ∪ s₂ := le_sup_right
@@ -134,8 +121,7 @@ theorem union_comm (s₁ s₂ : Finset α) : s₁ ∪ s₂ = s₂ ∪ s₁ := su
 @[simp]
 theorem union_assoc (s₁ s₂ s₃ : Finset α) : s₁ ∪ s₂ ∪ s₃ = s₁ ∪ (s₂ ∪ s₃) := sup_assoc _ _ _
 
-theorem union_subset_left (h : s ∪ t ⊆ u) : s ⊆ u :=
-  subset_union_left.trans h
+theorem union_subset_left (h : s ∪ t ⊆ u) : s ⊆ u := subset_union_left.trans h
 
 theorem union_subset_right {s t u : Finset α} (h : s ∪ t ⊆ u) : t ⊆ u :=
   Subset.trans subset_union_right h
@@ -156,28 +142,21 @@ lemma union_eq_right : s ∪ t = t ↔ s ⊆ t := sup_eq_right
 
 lemma right_eq_union : s = t ∪ s ↔ t ⊆ s := right_eq_sup
 
-theorem union_congr_left (ht : t ⊆ s ∪ u) (hu : u ⊆ s ∪ t) : s ∪ t = s ∪ u :=
-  sup_congr_left ht hu
+theorem union_congr_left (ht : t ⊆ s ∪ u) (hu : u ⊆ s ∪ t) : s ∪ t = s ∪ u := sup_congr_left ht hu
 
-theorem union_congr_right (hs : s ⊆ t ∪ u) (ht : t ⊆ s ∪ u) : s ∪ u = t ∪ u :=
-  sup_congr_right hs ht
+theorem union_congr_right (hs : s ⊆ t ∪ u) (ht : t ⊆ s ∪ u) : s ∪ u = t ∪ u := sup_congr_right hs ht
 
-theorem union_eq_union_iff_left : s ∪ t = s ∪ u ↔ t ⊆ s ∪ u ∧ u ⊆ s ∪ t :=
-  sup_eq_sup_iff_left
+theorem union_eq_union_iff_left : s ∪ t = s ∪ u ↔ t ⊆ s ∪ u ∧ u ⊆ s ∪ t := sup_eq_sup_iff_left
 
-theorem union_eq_union_iff_right : s ∪ u = t ∪ u ↔ s ⊆ t ∪ u ∧ t ⊆ s ∪ u :=
-  sup_eq_sup_iff_right
+theorem union_eq_union_iff_right : s ∪ u = t ∪ u ↔ s ⊆ t ∪ u ∧ t ⊆ s ∪ u := sup_eq_sup_iff_right
 
-theorem inter_val_nd (s₁ s₂ : Finset α) : (s₁ ∩ s₂).val = ndinter s₁.val s₂.val :=
-  rfl
+theorem inter_val_nd (s₁ s₂ : Finset α) : (s₁ ∩ s₂).val = ndinter s₁.val s₂.val := rfl
 
 @[simp]
-theorem inter_val (s₁ s₂ : Finset α) : (s₁ ∩ s₂).val = s₁.val ∩ s₂.val :=
-  ndinter_eq_inter s₁.nodup
+theorem inter_val (s₁ s₂ : Finset α) : (s₁ ∩ s₂).val = s₁.val ∩ s₂.val := ndinter_eq_inter s₁.nodup
 
 @[simp, grind =]
-theorem mem_inter {a : α} {s₁ s₂ : Finset α} : a ∈ s₁ ∩ s₂ ↔ a ∈ s₁ ∧ a ∈ s₂ :=
-  mem_ndinter
+theorem mem_inter {a : α} {s₁ s₂ : Finset α} : a ∈ s₁ ∩ s₂ ↔ a ∈ s₁ ∧ a ∈ s₂ := mem_ndinter
 
 theorem mem_of_mem_inter_left {a : α} {s₁ s₂ : Finset α} (h : a ∈ s₁ ∩ s₂) : a ∈ s₁ :=
   (mem_inter.1 h).1
@@ -194,8 +173,7 @@ lemma inter_subset_right : s₁ ∩ s₂ ⊆ s₂ := inf_le_right
 theorem subset_inter {s₁ s₂ u : Finset α} : s₁ ⊆ s₂ → s₁ ⊆ u → s₁ ⊆ s₂ ∩ u := le_inf
 
 @[simp, norm_cast]
-theorem coe_inter (s₁ s₂ : Finset α) : ↑(s₁ ∩ s₂) = (s₁ ∩ s₂ : Set α) :=
-  Set.ext fun _ => mem_inter
+theorem coe_inter (s₁ s₂ : Finset α) : ↑(s₁ ∩ s₂) = (s₁ ∩ s₂ : Set α) := Set.ext fun _ => mem_inter
 
 theorem union_inter_cancel_left {s t : Finset α} : (s ∪ t) ∩ s = s := by simp
 
@@ -220,13 +198,13 @@ theorem inter_subset_inter_left (h : t ⊆ u) : s ∩ t ⊆ s ∩ u := by gcongr
 
 theorem inter_subset_inter_right (h : s ⊆ t) : s ∩ u ⊆ t ∩ u := by gcongr
 
-theorem inter_subset_union : s ∩ t ⊆ s ∪ t :=
-  inf_le_sup
+theorem inter_subset_union : s ∩ t ⊆ s ∪ t := inf_le_sup
 
-instance : DistribLattice (Finset α) :=
-  { le_sup_inf := fun a b c => by
-      simp +contextual only [subset_iff, mem_inter, mem_union, and_imp,
-        or_imp, true_or, imp_true_iff, true_and, or_true] }
+instance : DistribLattice (Finset α) := {
+  le_sup_inf := fun a b c => by
+    simp +contextual only [subset_iff, mem_inter, mem_union, and_imp, or_imp, true_or, imp_true_iff,
+      true_and, or_true]
+}
 
 theorem union_left_idem (s t : Finset α) : s ∪ (s ∪ t) = s ∪ t := sup_left_idem _ _
 
@@ -266,27 +244,21 @@ theorem union_union_union_comm (s t u v : Finset α) : s ∪ t ∪ (u ∪ v) = s
 theorem inter_inter_inter_comm (s t u v : Finset α) : s ∩ t ∩ (u ∩ v) = s ∩ u ∩ (t ∩ v) :=
   inf_inf_inf_comm _ _ _ _
 
-theorem union_subset_iff : s ∪ t ⊆ u ↔ s ⊆ u ∧ t ⊆ u :=
-  (sup_le_iff : s ⊔ t ≤ u ↔ s ≤ u ∧ t ≤ u)
+theorem union_subset_iff : s ∪ t ⊆ u ↔ s ⊆ u ∧ t ⊆ u := (sup_le_iff : s ⊔ t ≤ u ↔ s ≤ u ∧ t ≤ u)
 
-theorem subset_inter_iff : s ⊆ t ∩ u ↔ s ⊆ t ∧ s ⊆ u :=
-  (le_inf_iff : s ≤ t ⊓ u ↔ s ≤ t ∧ s ≤ u)
+theorem subset_inter_iff : s ⊆ t ∩ u ↔ s ⊆ t ∧ s ⊆ u := (le_inf_iff : s ≤ t ⊓ u ↔ s ≤ t ∧ s ≤ u)
 
 lemma inter_eq_left : s ∩ t = s ↔ s ⊆ t := inf_eq_left
 
 lemma inter_eq_right : t ∩ s = s ↔ s ⊆ t := inf_eq_right
 
-theorem inter_congr_left (ht : s ∩ u ⊆ t) (hu : s ∩ t ⊆ u) : s ∩ t = s ∩ u :=
-  inf_congr_left ht hu
+theorem inter_congr_left (ht : s ∩ u ⊆ t) (hu : s ∩ t ⊆ u) : s ∩ t = s ∩ u := inf_congr_left ht hu
 
-theorem inter_congr_right (hs : t ∩ u ⊆ s) (ht : s ∩ u ⊆ t) : s ∩ u = t ∩ u :=
-  inf_congr_right hs ht
+theorem inter_congr_right (hs : t ∩ u ⊆ s) (ht : s ∩ u ⊆ t) : s ∩ u = t ∩ u := inf_congr_right hs ht
 
-theorem inter_eq_inter_iff_left : s ∩ t = s ∩ u ↔ s ∩ u ⊆ t ∧ s ∩ t ⊆ u :=
-  inf_eq_inf_iff_left
+theorem inter_eq_inter_iff_left : s ∩ t = s ∩ u ↔ s ∩ u ⊆ t ∧ s ∩ t ⊆ u := inf_eq_inf_iff_left
 
-theorem inter_eq_inter_iff_right : s ∩ u = t ∩ u ↔ t ∩ u ⊆ s ∧ s ∩ u ⊆ t :=
-  inf_eq_inf_iff_right
+theorem inter_eq_inter_iff_right : s ∩ u = t ∩ u ↔ t ∩ u ⊆ s ∧ s ∩ u ⊆ t := inf_eq_inf_iff_right
 
 theorem ite_subset_union (s s' : Finset α) (P : Prop) [Decidable P] : ite P s s' ⊆ s ∪ s' :=
   ite_le_sup s s' P

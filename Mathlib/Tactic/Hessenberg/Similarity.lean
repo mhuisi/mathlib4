@@ -8,9 +8,9 @@ module
 public meta import Mathlib.Tactic.Hessenberg.Reduce
 public meta import Mathlib.Tactic.Matrix.Cert
 public meta import Mathlib.Tactic.Matrix.MulExpand
-public import Mathlib.Data.Matrix.Reflection  -- shake: keep (Qq dependency)
-public import Mathlib.LinearAlgebra.Matrix.Array  -- shake: keep (Qq dependency)
-public import Mathlib.LinearAlgebra.Matrix.Hessenberg.Similarity  -- shake: keep (Qq dependency)
+public import Mathlib.Data.Matrix.Reflection -- shake: keep (Qq dependency)
+public import Mathlib.LinearAlgebra.Matrix.Array -- shake: keep (Qq dependency)
+public import Mathlib.LinearAlgebra.Matrix.Hessenberg.Similarity -- shake: keep (Qq dependency)
 public import Mathlib.Tactic.Hessenberg.Reduce
 public import Mathlib.Tactic.Matrix.Cert
 public import Mathlib.Tactic.Matrix.MulExpand
@@ -60,12 +60,16 @@ structure SimilarityResult {n : ℕ} (A : Q(Matrix (Fin $n) (Fin $n) ℚ)) where
   /-- The reduction data underlying the certificate. -/
   red : Reduction
 
-/-- Produce the `Matrix.Hessenberg.Similarity` certificate and corresponding reduction of `A.map f`
+/--
+Produce the `Matrix.Hessenberg.Similarity` certificate and corresponding reduction of `A.map f`
 for the `n × n` matrix literal `A` over `S` and the map `f : S → ℚ`, from the parsed entries
-`entries` of `A`, where `evalEntry` evaluates the image under `f` of an entry. -/
-def mkHessenbergSimilarity {u : Level} {S : Q(Type u)} (f : Q($S → ℚ)) (n : ℕ)
-    (A : Q(Matrix (Fin $n) (Fin $n) $S)) (entries : Array (Array Q($S)))
-    (evalEntry : Q($S) → MetaM ℚ) : MetaM (SimilarityResult q(($A).map $f)) := do
+`entries` of `A`, where `evalEntry` evaluates the image under `f` of an entry.
+-/
+def mkHessenbergSimilarity
+    {u : Level} {S : Q(Type u)} (f : Q($S → ℚ))
+    (n : ℕ) (A : Q(Matrix (Fin $n) (Fin $n) $S))
+    (entries : Array (Array Q($S))) (evalEntry : Q($S) → MetaM ℚ)
+    : MetaM (SimilarityResult q(($A).map $f)) := do
   -- Evaluate the entries and reduce the matrix `M := A.map f` to Hessenberg form.
   let M : Q(Matrix (Fin $n) (Fin $n) ℚ) := q(($A).map $f)
   let vals ← entries.mapM (·.mapM evalEntry)
@@ -83,15 +87,17 @@ def mkHessenbergSimilarity {u : Level} {S : Q(Type u)} (f : Q($S → ℚ)) (n : 
   let P := ListMatrixLit.ofRows q(inferInstance) n n pRows
   have Pm := P.matrix
 
-  let mulLH := proveMul (q(inferInstance) : Q(Zero ℚ)) (q(inferInstance) : Q(Add ℚ))
-    (q(inferInstance) : Q(Mul ℚ)) n n n lRows hRows
+  let mulLH :=
+    proveMul (q(inferInstance) : Q(Zero ℚ)) (q(inferInstance) : Q(Add ℚ))
+      (q(inferInstance) : Q(Mul ℚ)) n n n lRows hRows
   have Lm : Q(Matrix (Fin $n) (Fin $n) ℚ) := q(ofLists $n $n $(mulLH.A))
   have Hm : Q(Matrix (Fin $n) (Fin $n) ℚ) := q(ofLists $n $n $(mulLH.B))
 
   let H : ListMatrixLit q(ℚ) n n := { matrix := Hm, lit := mulLH.B, rows := hRows }
 
-  let mulAσL := proveMul (q(inferInstance) : Q(Zero ℚ)) (q(inferInstance) : Q(Add ℚ))
-    (q(inferInstance) : Q(Mul ℚ)) n n n aσRows lRows
+  let mulAσL :=
+    proveMul (q(inferInstance) : Q(Zero ℚ)) (q(inferInstance) : Q(Add ℚ))
+      (q(inferInstance) : Q(Mul ℚ)) n n n aσRows lRows
   have Aσm : Q(Matrix (Fin $n) (Fin $n) ℚ) := q(ofLists $n $n $(mulAσL.A))
 
   -- `M.reindex σ σ` unfolds to the literal `Aσ`

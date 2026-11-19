@@ -1,4 +1,5 @@
 module
+
 import Batteries.Tactic.PermuteGoals
 import Mathlib.Tactic.Linter.UnusedTactic
 import Mathlib.Tactic.AdaptationNote
@@ -29,8 +30,7 @@ example : True := by
   exact .intro
 
 -- `;` is unseen by the linter
-example : True ∧ True := by
-  constructor; all_goals trivial;
+example : True ∧ True := by constructor; all_goals trivial
 
 set_option linter.unusedTactic true
 /--
@@ -101,8 +101,7 @@ warning: Unused tactic linter: `rfl` does not change the goal.
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
 -/
 #guard_msgs in
-example : True := by
-  first | rfl | simp
+example : True := by first | rfl | simp
 
 -- The linter works correctly with `try`
 /--
@@ -185,8 +184,7 @@ warning: Unused tactic linter: `all_goals` can be removed.
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
 -/
 #guard_msgs (positions := true) in
-example : True := by
-  all_goals simp
+example : True := by all_goals simp
 
 /--
 @ +2:2...5
@@ -195,8 +193,7 @@ warning: Unused tactic linter: `try` can be removed.
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
 -/
 #guard_msgs (positions := true) in
-example : True := by
-  try simp
+example : True := by try simp
 
 /--
 @ +2:2...11
@@ -205,8 +202,7 @@ warning: Unused tactic linter: `any_goals` can be removed.
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
 -/
 #guard_msgs (positions := true) in
-example : True := by
-  any_goals simp
+example : True := by any_goals simp
 
 example : True ∧ True := by
   constructor
@@ -235,8 +231,7 @@ example : True ∧ True ∧ True := by
     try exact trivial
     all_goals simp
 
-example : True ∧ True ∧ True := by
-  constructor <;> ((try apply And.intro); all_goals simp)
+example : True ∧ True ∧ True := by constructor <;> ((try apply And.intro); all_goals simp)
 
 /--
 warning: Unused tactic linter: `try` can be removed.
@@ -278,8 +273,7 @@ Note: This linter can be disabled with `set_option linter.unusedTactic false`
 #guard_msgs in
 example : True ∧ True := by
   constructor
-  try
-    any_goals rfl
+  try any_goals rfl
   all_goals trivial
 
 section allowing_more_unused_tactics
@@ -328,8 +322,10 @@ warning: Unused tactic linter: `congr` does not change the goal.
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
 -/
-#guard_msgs in doEmitWarning congr
+#guard_msgs in
+doEmitWarning congr
 
-#guard_msgs in doNotEmitWarning congr
+#guard_msgs in
+doNotEmitWarning congr
 
 end ignore_tactic_kind

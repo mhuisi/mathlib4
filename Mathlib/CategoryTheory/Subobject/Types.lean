@@ -23,7 +23,6 @@ but it remains to be seen whether this just pushes lumps around in the carpet.
 
 @[expose] public section
 
-
 universe u
 
 open CategoryTheory ConcreteCategory
@@ -37,21 +36,23 @@ theorem subtypeVal_mono {α : Type u} (s : Set α) : Mono (↾(Subtype.val : s �
 
 attribute [local instance] subtypeVal_mono
 
-/-- The category of `MonoOver α`, for `α : Type u`, is equivalent to the partial order `Set α`.
--/
+/-- The category of `MonoOver α`, for `α : Type u`, is equivalent to the partial order `Set α`. -/
 @[simps]
 noncomputable def Types.monoOverEquivalenceSet (α : Type u) : MonoOver α ≌ Set α where
-  functor :=
-    { obj := fun f => Set.range f.obj.hom
-      map := fun {f g} t =>
-        homOfLE
-          (by
-            rintro a ⟨x, rfl⟩
-            exact ⟨t.hom.left x, congr_hom t.hom.w x⟩) }
-  inverse :=
-    { obj := fun s => MonoOver.mk <| ↾(Subtype.val : s → α)
-      map := fun {s t} b => MonoOver.homMk (↾
-        fun w => ⟨w.val, Set.mem_of_mem_of_subset w.property b.le⟩) }
+  functor := {
+    obj := fun f => Set.range f.obj.hom
+    map := fun {f g} t =>
+      homOfLE (by
+        rintro a ⟨x, rfl⟩
+        exact ⟨t.hom.left x, congr_hom t.hom.w x⟩)
+  }
+  inverse := {
+    obj := fun s => MonoOver.mk <| ↾(Subtype.val : s → α)
+    map := fun {s t} b =>
+      MonoOver.homMk
+        (↾
+          fun w => ⟨w.val, Set.mem_of_mem_of_subset w.property b.le⟩)
+  }
   unitIso :=
     NatIso.ofComponents fun f =>
       MonoOver.isoMk (Equiv.ofInjective f.obj.hom ((mono_iff_injective _).mp f.property)).toIso
@@ -61,7 +62,6 @@ instance : WellPowered.{u} (Type u) :=
   wellPowered_of_essentiallySmall_monoOver fun α =>
     EssentiallySmall.mk' (Types.monoOverEquivalenceSet α)
 
-/-- For `α : Type u`, `Subobject α` is order isomorphic to `Set α`.
--/
+/-- For `α : Type u`, `Subobject α` is order isomorphic to `Set α`. -/
 noncomputable def Types.subobjectEquivSet (α : Type u) : Subobject α ≃o Set α :=
   (Types.monoOverEquivalenceSet α).thinSkeletonOrderIso

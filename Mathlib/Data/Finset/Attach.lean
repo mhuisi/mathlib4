@@ -40,18 +40,17 @@ attribute [local trans] Subset.trans Superset.trans
 
 /-! ### attach -/
 
-/-- `attach s` takes the elements of `s` and forms a new set of elements of the subtype
-`{x // x ∈ s}`. -/
-def attach (s : Finset α) : Finset { x // x ∈ s } :=
-  ⟨Multiset.attach s.val, nodup_attach.2 s.nodup⟩
+/--
+`attach s` takes the elements of `s` and forms a new set of elements of the subtype
+`{x // x ∈ s}`.
+-/
+def attach (s : Finset α) : Finset {x // x ∈ s} := ⟨Multiset.attach s.val, nodup_attach.2 s.nodup⟩
 
 @[simp]
-theorem attach_val (s : Finset α) : s.attach.val = s.val.attach :=
-  rfl
+theorem attach_val (s : Finset α) : s.attach.val = s.val.attach := rfl
 
 @[simp, grind ←]
-theorem mem_attach (s : Finset α) : ∀ x, x ∈ s.attach :=
-  Multiset.mem_attach _
+theorem mem_attach (s : Finset α) : ∀ x, x ∈ s.attach := Multiset.mem_attach _
 
 @[simp, norm_cast]
 theorem coe_attach (s : Finset α) : (s.attach : Set s) = Set.univ := by ext; simp

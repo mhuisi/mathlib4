@@ -99,17 +99,21 @@ macro (name := convInConv) "conv" " in " occs?:(occs)? p:term " => " code:convSe
 syntax (name := dischargeConv) "discharge" (" => " tacticSeq)? : conv
 
 /-- Elaborator for the `discharge` tactic. -/
-@[tactic dischargeConv] def elabDischargeConv : Tactic := fun
+@[tactic dischargeConv]
+def elabDischargeConv : Tactic := fun
   | `(conv| discharge $[=> $tac]?) => do
-    let g :: gs ← getGoals | throwNoGoalsToBeSolved
+    let g :: gs ← getGoals
+      | throwNoGoalsToBeSolved
     let (theLhs, theRhs) ← Conv.getLhsRhsCore g
-    let .true ← isProp theLhs | throwError "target is not a proposition"
+    let .true ← isProp theLhs
+      | throwError "target is not a proposition"
     theRhs.mvarId!.assign (mkConst ``True)
     let m ← mkFreshExprMVar theLhs
     g.assign (← mkEqTrue m)
     if let some tac := tac then
       setGoals [m.mvarId!]
-      evalTactic tac; done
+      evalTactic tac
+      done
       setGoals gs
     else
       setGoals (m.mvarId! :: gs)
@@ -134,13 +138,14 @@ elab (name := convCmd) tk:"#conv " conv:conv " => " e:term : command =>
   Command.runTermElabM fun _ ↦ do
     let e ← Elab.Term.elabTermAndSynthesize e none
     let (rhs, g) ← Conv.mkConvGoalFor e
-    _ ← Tactic.run g.mvarId! do
-      evalTactic conv
-      for mvarId in (← getGoals) do
-        liftM <| mvarId.refl <|> mvarId.inferInstance <|> pure ()
-      pruneSolvedGoals
-      let e' ← instantiateMVars rhs
-      logInfoAt tk e'
+    _ ←
+      Tactic.run g.mvarId! do
+        evalTactic conv
+        for mvarId in (← getGoals) do
+          liftM <| mvarId.refl <|> mvarId.inferInstance <|> pure ()
+        pruneSolvedGoals
+        let e' ← instantiateMVars rhs
+        logInfoAt tk e'
 
 @[inherit_doc Parser.Tactic.withReducible]
 macro (name := withReducible) tk:"with_reducible " s:convSeq : conv =>

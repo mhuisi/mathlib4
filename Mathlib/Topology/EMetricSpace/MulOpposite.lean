@@ -23,17 +23,19 @@ namespace MulOpposite
 
 variable {α : Type*} [TopologicalSpace α] [WeakPseudoEMetricSpace α]
 
-/-- weak pseudoemetric space instance on the multiplicative opposite of a
-weak pseudoemetric space. -/
+/--
+weak pseudoemetric space instance on the multiplicative opposite of a
+weak pseudoemetric space.
+-/
 @[to_additive
-/-- Weak pseudoemetric space instance on the additive opposite of a weak pseudoemetric space. -/]
-instance {α : Type*} [TopologicalSpace α] [WeakPseudoEMetricSpace α] :
-    WeakPseudoEMetricSpace αᵐᵒᵖ :=
+  /-- Weak pseudoemetric space instance on the additive opposite of a weak pseudoemetric space. -/]
+instance {α : Type*} [TopologicalSpace α] [WeakPseudoEMetricSpace α]
+    : WeakPseudoEMetricSpace αᵐᵒᵖ :=
   WeakPseudoEMetricSpace.IsInducing (f := unop) MulOpposite.opHomeomorph.symm.isInducing ‹_›
 
 /-- Pseudoemetric space instance on the multiplicative opposite of a pseudoemetric space. -/
 @[to_additive
-/-- Pseudoemetric space instance on the additive opposite of a pseudoemetric space. -/]
+  /-- Pseudoemetric space instance on the additive opposite of a pseudoemetric space. -/]
 instance {α : Type*} [PseudoEMetricSpace α] : PseudoEMetricSpace αᵐᵒᵖ :=
   PseudoEMetricSpace.induced unop ‹_›
 

@@ -5,8 +5,10 @@ public import Mathlib.Data.Fintype.Basic
 public import Mathlib.Order.Interval.Finset.Nat
 
 section
-variable {ι M : Type*} [CommMonoid M] [AddCommMonoid M] [Fintype ι] {s : Finset ι} {p : ι → Prop}
-  [DecidablePred p] {f : ι → M}
+variable
+  {ι M : Type*} [CommMonoid M] [AddCommMonoid M] [Fintype ι]
+  {s : Finset ι} {p : ι → Prop} [DecidablePred p]
+  {f : ι → M}
 
 /-! ### Big operators over a finset -/
 

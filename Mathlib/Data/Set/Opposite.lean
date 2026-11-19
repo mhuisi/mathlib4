@@ -26,23 +26,19 @@ open Opposite
 namespace Set
 
 /-- The opposite of a set `s` is the set obtained by taking the opposite of each member of `s`. -/
-protected def op (s : Set α) : Set αᵒᵖ :=
-  unop ⁻¹' s
+protected def op (s : Set α) : Set αᵒᵖ := unop ⁻¹' s
 
 /-- The unop of a set `s` is the set obtained by taking the unop of each member of `s`. -/
-protected def unop (s : Set αᵒᵖ) : Set α :=
-  op ⁻¹' s
+protected def unop (s : Set αᵒᵖ) : Set α := op ⁻¹' s
 
 @[simp]
-theorem mem_op {s : Set α} {a : αᵒᵖ} : a ∈ s.op ↔ unop a ∈ s :=
-  Iff.rfl
+theorem mem_op {s : Set α} {a : αᵒᵖ} : a ∈ s.op ↔ unop a ∈ s := Iff.rfl
 
 @[simp 1100]
 theorem op_mem_op {s : Set α} {a : α} : op a ∈ s.op ↔ a ∈ s := by rfl
 
 @[simp]
-theorem mem_unop {s : Set αᵒᵖ} {a : α} : a ∈ s.unop ↔ op a ∈ s :=
-  Iff.rfl
+theorem mem_unop {s : Set αᵒᵖ} {a : α} : a ∈ s.unop ↔ op a ∈ s := Iff.rfl
 
 @[simp 1100]
 theorem unop_mem_unop {s : Set αᵒᵖ} {a : αᵒᵖ} : unop a ∈ s.unop ↔ a ∈ s := by rfl
@@ -60,8 +56,7 @@ def opEquiv_self (s : Set α) : s.op ≃ s :=
 
 /-- Taking opposites as an equivalence of powersets. -/
 @[simps]
-def opEquiv : Set α ≃ Set αᵒᵖ :=
-  ⟨Set.op, Set.unop, op_unop, unop_op⟩
+def opEquiv : Set α ≃ Set αᵒᵖ := ⟨Set.op, Set.unop, op_unop, unop_op⟩
 
 @[simp]
 theorem singleton_op (x : α) : ({x} : Set α).op = {op x} := by

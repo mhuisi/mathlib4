@@ -30,24 +30,19 @@ namespace Sum
 
 section SMul
 
-variable [SMul M α] [SMul M β] [SMul N α] [SMul N β] (a : M) (b : α) (c : β)
-  (x : α ⊕ β)
+variable [SMul M α] [SMul M β] [SMul N α] [SMul N β] (a : M) (b : α) (c : β) (x : α ⊕ β)
 
 @[to_additive]
-instance instSMul : SMul M (α ⊕ β) :=
-  ⟨fun a => Sum.map (a • ·) (a • ·)⟩
+instance instSMul : SMul M (α ⊕ β) := ⟨fun a => Sum.map (a • ·) (a • ·)⟩
 
 @[to_additive]
-theorem smul_def : a • x = x.map (a • ·) (a • ·) :=
-  rfl
+theorem smul_def : a • x = x.map (a • ·) (a • ·) := rfl
 
 @[to_additive (attr := simp)]
-theorem smul_inl : a • (inl b : α ⊕ β) = inl (a • b) :=
-  rfl
+theorem smul_inl : a • (inl b : α ⊕ β) = inl (a • b) := rfl
 
 @[to_additive (attr := simp)]
-theorem smul_inr : a • (inr c : α ⊕ β) = inr (a • c) :=
-  rfl
+theorem smul_inr : a • (inr c : α ⊕ β) = inr (a • c) := rfl
 
 @[to_additive (attr := simp)]
 theorem smul_swap : (a • x).swap = a • x.swap := by cases x <;> rfl
@@ -64,8 +59,8 @@ instance [SMulCommClass M N α] [SMulCommClass M N β] : SMulCommClass M N (α �
     exacts [congr_arg inl (smul_comm _ _ _), congr_arg inr (smul_comm _ _ _)]⟩
 
 @[to_additive]
-instance [SMul Mᵐᵒᵖ α] [SMul Mᵐᵒᵖ β] [IsCentralScalar M α] [IsCentralScalar M β] :
-    IsCentralScalar M (α ⊕ β) :=
+instance [SMul Mᵐᵒᵖ α] [SMul Mᵐᵒᵖ β] [IsCentralScalar M α] [IsCentralScalar M β]
+    : IsCentralScalar M (α ⊕ β) :=
   ⟨fun a x => by
     cases x
     exacts [congr_arg inl (op_smul_eq_smul _ _), congr_arg inr (op_smul_eq_smul _ _)]⟩
@@ -81,8 +76,7 @@ instance FaithfulSMulRight [FaithfulSMul M β] : FaithfulSMul M (α ⊕ β) :=
 end SMul
 
 @[to_additive]
-instance {m : Monoid M} [MulAction M α] [MulAction M β] :
-    MulAction M (α ⊕ β) where
+instance {m : Monoid M} [MulAction M α] [MulAction M β] : MulAction M (α ⊕ β) where
   mul_smul a b x := by
     cases x
     exacts [congr_arg inl (mul_smul _ _ _), congr_arg inr (mul_smul _ _ _)]

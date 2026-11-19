@@ -24,7 +24,7 @@ open Metric
 
 namespace PNat
 
-instance : MetricSpace ℕ+ := inferInstanceAs (MetricSpace { n : ℕ // 0 < n })
+instance : MetricSpace ℕ+ := inferInstanceAs (MetricSpace {n : ℕ // 0 < n})
 
 theorem dist_eq (x y : ℕ+) : dist x y = |(↑x : ℝ) - ↑y| := rfl
 
@@ -33,7 +33,7 @@ theorem dist_coe (x y : ℕ+) : dist (↑x : ℕ) (↑y : ℕ) = dist x y := rfl
 
 theorem isUniformEmbedding_coe : IsUniformEmbedding ((↑) : ℕ+ → ℕ) := isUniformEmbedding_subtypeVal
 
-instance : DiscreteTopology ℕ+ := inferInstanceAs (DiscreteTopology { n : ℕ // 0 < n })
+instance : DiscreteTopology ℕ+ := inferInstanceAs (DiscreteTopology {n : ℕ // 0 < n})
 
 instance : ProperSpace ℕ+ where
   isCompact_closedBall n r := by

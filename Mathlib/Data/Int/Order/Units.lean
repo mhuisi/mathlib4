@@ -16,7 +16,6 @@ set_option doc.verso.suggestions false
 
 public section
 
-
 namespace Int
 
 theorem isUnit_iff_abs_eq {x : ℤ} : IsUnit x ↔ abs x = 1 := by
@@ -47,10 +46,9 @@ theorem units_coe_mul_self (u : ℤˣ) : (u * u : ℤ) = 1 := by
 theorem neg_one_pow_ne_zero {n : ℕ} : (-1 : ℤ) ^ n ≠ 0 := by simp
 
 theorem sq_eq_one_of_sq_lt_four {x : ℤ} (h1 : x ^ 2 < 4) (h2 : x ≠ 0) : x ^ 2 = 1 :=
-  sq_eq_one_iff.mpr
-    ((abs_eq (zero_le_one' ℤ)).mp
-      (le_antisymm (lt_add_one_iff.mp (abs_lt_of_sq_lt_sq h1 zero_le_two))
-        (sub_one_lt_iff.mp (abs_pos.mpr h2))))
+  sq_eq_one_iff.mpr ((abs_eq (zero_le_one' ℤ)).mp
+    (le_antisymm (lt_add_one_iff.mp (abs_lt_of_sq_lt_sq h1 zero_le_two))
+      (sub_one_lt_iff.mp (abs_pos.mpr h2))))
 
 theorem sq_eq_one_of_sq_le_three {x : ℤ} (h1 : x ^ 2 ≤ 3) (h2 : x ≠ 0) : x ^ 2 = 1 :=
   sq_eq_one_of_sq_lt_four (lt_of_le_of_lt h1 (lt_add_one (3 : ℤ))) h2

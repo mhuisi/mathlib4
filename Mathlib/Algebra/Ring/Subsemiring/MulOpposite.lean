@@ -77,7 +77,8 @@ def opEquiv : Subsemiring R ≃o Subsemiring Rᵐᵒᵖ where
 theorem op_injective : (@Subsemiring.op R _).Injective := opEquiv.injective
 theorem unop_injective : (@Subsemiring.unop R _).Injective := opEquiv.symm.injective
 
-@[simp] theorem op_inj {S T : Subsemiring R} : S.op = T.op ↔ S = T := opEquiv.eq_iff_eq
+@[simp]
+theorem op_inj {S T : Subsemiring R} : S.op = T.op ↔ S = T := opEquiv.eq_iff_eq
 
 @[simp]
 theorem unop_inj {S T : Subsemiring Rᵐᵒᵖ} : S.unop = T.unop ↔ S = T := opEquiv.symm.eq_iff_eq
@@ -106,8 +107,7 @@ theorem unop_top : (⊤ : Subsemiring Rᵐᵒᵖ).unop = ⊤ := rfl
 @[simp]
 theorem unop_eq_top {S : Subsemiring Rᵐᵒᵖ} : S.unop = ⊤ ↔ S = ⊤ := unop_injective.eq_iff' unop_top
 
-theorem op_sup (S₁ S₂ : Subsemiring R) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op :=
-  opEquiv.map_sup _ _
+theorem op_sup (S₁ S₂ : Subsemiring R) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op := opEquiv.map_sup _ _
 
 theorem unop_sup (S₁ S₂ : Subsemiring Rᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
   opEquiv.symm.map_sup _ _

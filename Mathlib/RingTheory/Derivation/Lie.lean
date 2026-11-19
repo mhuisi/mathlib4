@@ -19,7 +19,6 @@ public import Mathlib.RingTheory.Derivation.Basic
 
 @[expose] public section
 
-
 namespace Derivation
 
 variable {R : Type*} [CommRing R]
@@ -30,21 +29,19 @@ section LieStructures
 
 /-! ### Lie structures -/
 
-
 /-- The commutator of derivations is again a derivation. -/
 instance : Bracket (Derivation R A A) (Derivation R A A) :=
   ⟨fun D1 D2 =>
     mk' ⁅(D1 : Module.End R A), (D2 : Module.End R A)⁆ fun a b => by
-      simp only [Ring.lie_def, map_add, smul_eq_mul, mul_apply_eq_comp, leibniz,
-        coeFn_coe, LinearMap.sub_apply]
+      simp only [Ring.lie_def, map_add, smul_eq_mul, mul_apply_eq_comp, leibniz, coeFn_coe,
+        LinearMap.sub_apply]
       ring⟩
 
 @[simp]
-theorem commutator_coe_linear_map : ↑⁅D1, D2⁆ = ⁅(D1 : Module.End R A), (D2 : Module.End R A)⁆ :=
+theorem commutator_coe_linear_map : ↑ ⁅D1, D2⁆ = ⁅(D1 : Module.End R A), (D2 : Module.End R A)⁆ :=
   rfl
 
-theorem commutator_apply : ⁅D1, D2⁆ a = D1 (D2 a) - D2 (D1 a) :=
-  rfl
+theorem commutator_apply : ⁅D1, D2⁆ a = D1 (D2 a) - D2 (D1 a) := rfl
 
 instance : LieRing (Derivation R A A) where
   add_lie d e f := by ext a; simp only [commutator_apply, add_apply, map_add]; ring
@@ -52,10 +49,10 @@ instance : LieRing (Derivation R A A) where
   lie_self d := by ext a; simp only [commutator_apply]; ring_nf; simp
   leibniz_lie d e f := by ext a; simp only [commutator_apply, add_apply, map_sub]; ring
 
-instance instLieAlgebra : LieAlgebra R (Derivation R A A) :=
-  { Derivation.instModule with
-    lie_smul := fun r d e => by
-      ext a; simp only [commutator_apply, map_smul, smul_sub, smul_apply] }
+instance instLieAlgebra : LieAlgebra R (Derivation R A A) := {
+  Derivation.instModule with
+  lie_smul := fun r d e => by ext a; simp only [commutator_apply, map_smul, smul_sub, smul_apply]
+}
 
 instance : LieRingModule (Derivation R A A) A where
   bracket X a := X a
@@ -75,9 +72,11 @@ variable {A' : Type*} [CommRing A'] [Algebra R A'] [Algebra A A'] [IsScalarTower
 attribute [local instance 100] LieRing.ofAssociativeRing
 
 variable (R A A') in
-/-- Let `σ : A → A'` be a an homomorphism. A derivation `d : A → A` and a derivation
+/--
+Let `σ : A → A'` be a an homomorphism. A derivation `d : A → A` and a derivation
 `d' : A' → A'` are called compatible if `d' ∘ σ = σ ∘ d`. Couples of derivations
-with this property form a Lie subalgebra of all couples of derivations. -/
+with this property form a Lie subalgebra of all couples of derivations.
+-/
 def couple : LieSubalgebra R (Derivation R A' A' × Derivation R A A) where
   carrier := { x | x.fst.compAlgebraMapL R A A' A' = (Algebra.ofId A A').toLinearMap.compDer x.snd }
   add_mem' := by simp_all
@@ -91,25 +90,33 @@ def couple : LieSubalgebra R (Derivation R A' A' × Derivation R A A) where
     simp [Derivation.commutator_apply, hxx, hyy]
 
 namespace Compatible
-lemma mem (x : (Derivation R A' A') × (Derivation R A A)) :
-    x ∈ couple R A A' ↔ x.1 ∘ Algebra.ofId A A' = Algebra.ofId A A' ∘ x.2 := by
+lemma mem (x : (Derivation R A' A') × (Derivation R A A))
+    : x ∈ couple R A A' ↔ x.1 ∘ Algebra.ofId A A' = Algebra.ofId A A' ∘ x.2 := by
   constructor
   · intro hx; ext a; exact congrArg (· a) hx
   · intro hx; ext a; exact congrArg (· a) hx
 
 /-- Generate an element of `couple` from `x y` satisfying the compatibility equation. -/
-def mk (x : Derivation R A' A') (y : Derivation R A A)
-  (h : x ∘ (Algebra.ofId A A') = (Algebra.ofId A A') ∘ y) : couple R A A' :=
-⟨(x, y), (Compatible.mem _).mpr h⟩
+def mk
+    (x : Derivation R A' A') (y : Derivation R A A)
+    (h : x ∘ (Algebra.ofId A A') = (Algebra.ofId A A') ∘ y)
+    : couple R A A' :=
+  ⟨(x, y), (Compatible.mem _).mpr h⟩
 
-lemma mk_left (x : Derivation R A' A') (y : Derivation R A A)
-    (h : x ∘ (Algebra.ofId A A') = (Algebra.ofId A A') ∘ y) : (mk x y h).val.1 = x := rfl
+lemma mk_left
+    (x : Derivation R A' A') (y : Derivation R A A)
+    (h : x ∘ (Algebra.ofId A A') = (Algebra.ofId A A') ∘ y)
+    : (mk x y h).val.1 = x :=
+  rfl
 
-lemma mk_right (x : Derivation R A' A') (y : Derivation R A A)
-    (h : x ∘ (Algebra.ofId A A') = (Algebra.ofId A A') ∘ y) : (mk x y h).val.2 = y := rfl
+lemma mk_right
+    (x : Derivation R A' A') (y : Derivation R A A)
+    (h : x ∘ (Algebra.ofId A A') = (Algebra.ofId A A') ∘ y)
+    : (mk x y h).val.2 = y :=
+  rfl
 
-lemma apply (x : couple R A A') (a : A) :
-    x.val.1 (Algebra.ofId A A' a) = (Algebra.ofId A A') (x.val.2 a) :=
+lemma apply (x : couple R A A') (a : A)
+    : x.val.1 (Algebra.ofId A A' a) = (Algebra.ofId A A') (x.val.2 a) :=
   congrArg (· a) x.property
 
 end Compatible

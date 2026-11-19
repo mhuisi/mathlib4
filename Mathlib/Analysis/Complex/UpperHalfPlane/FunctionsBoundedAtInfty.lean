@@ -29,8 +29,7 @@ namespace UpperHalfPlane
 variable {α : Type*}
 
 /-- Filter for approaching `i∞`. -/
-def atImInfty :=
-  Filter.atTop.comap UpperHalfPlane.im
+def atImInfty := Filter.atTop.comap UpperHalfPlane.im
 
 instance : atImInfty.NeBot := by
   refine comap_neBot_iff_frequently.mpr (Eventually.frequently ?_)
@@ -44,15 +43,12 @@ theorem atImInfty_mem (S : Set ℍ) : S ∈ atImInfty ↔ ∃ A : ℝ, ∀ z : �
   simp only [atImInfty_basis.mem_iff, true_and]; rfl
 
 /-- A function `f : ℍ → α` is bounded at infinity if it is bounded along `atImInfty`. -/
-def IsBoundedAtImInfty [Norm α] (f : ℍ → α) : Prop :=
-  BoundedAtFilter atImInfty f
+def IsBoundedAtImInfty [Norm α] (f : ℍ → α) : Prop := BoundedAtFilter atImInfty f
 
 /-- A function `f : ℍ → α` is zero at infinity it is zero along `atImInfty`. -/
-def IsZeroAtImInfty [Zero α] [TopologicalSpace α] (f : ℍ → α) : Prop :=
-  ZeroAtFilter atImInfty f
+def IsZeroAtImInfty [Zero α] [TopologicalSpace α] (f : ℍ → α) : Prop := ZeroAtFilter atImInfty f
 
-theorem zero_form_isBoundedAtImInfty [NormedField α] :
-    IsBoundedAtImInfty (0 : ℍ → α) :=
+theorem zero_form_isBoundedAtImInfty [NormedField α] : IsBoundedAtImInfty (0 : ℍ → α) :=
   const_boundedAtFilter atImInfty (0 : α)
 
 /-- Module of functions that are zero at infinity. -/
@@ -63,45 +59,47 @@ def zeroAtImInftySubmodule (α : Type*) [NormedField α] : Submodule α (ℍ →
 def boundedAtImInftySubalgebra (α : Type*) [NormedField α] : Subalgebra α (ℍ → α) :=
   boundedFilterSubalgebra _ atImInfty
 
-theorem isBoundedAtImInfty_iff [Norm α] {f : ℍ → α} :
-    IsBoundedAtImInfty f ↔ ∃ M A : ℝ, ∀ z : ℍ, A ≤ im z → ‖f z‖ ≤ M := by
+theorem isBoundedAtImInfty_iff [Norm α] {f : ℍ → α}
+    : IsBoundedAtImInfty f ↔ ∃ M A : ℝ, ∀ z : ℍ, A ≤ im z → ‖f z‖ ≤ M := by
   simp [IsBoundedAtImInfty, BoundedAtFilter, Asymptotics.isBigO_iff, Filter.Eventually,
     atImInfty_mem]
 
-theorem isZeroAtImInfty_iff [SeminormedAddGroup α] {f : ℍ → α} :
-    IsZeroAtImInfty f ↔ ∀ ε : ℝ, 0 < ε → ∃ A : ℝ, ∀ z : ℍ, A ≤ im z → ‖f z‖ ≤ ε :=
+theorem isZeroAtImInfty_iff [SeminormedAddGroup α] {f : ℍ → α}
+    : IsZeroAtImInfty f ↔ ∀ ε : ℝ, 0 < ε → ∃ A : ℝ, ∀ z : ℍ, A ≤ im z → ‖f z‖ ≤ ε :=
   (atImInfty_basis.tendsto_iff Metric.nhds_basis_closedBall).trans <| by simp
 
-theorem IsZeroAtImInfty.isBoundedAtImInfty [SeminormedAddGroup α] {f : ℍ → α}
-    (hf : IsZeroAtImInfty f) : IsBoundedAtImInfty f :=
+theorem IsZeroAtImInfty.isBoundedAtImInfty
+    [SeminormedAddGroup α] {f : ℍ → α} (hf : IsZeroAtImInfty f)
+    : IsBoundedAtImInfty f :=
   hf.boundedAtFilter
 
-@[simp] theorem isBoundedAtImInfty_neg_iff [SeminormedAddGroup α] {f : ℍ → α} :
-    IsBoundedAtImInfty (-f) ↔ IsBoundedAtImInfty f := by
+@[simp]
+theorem isBoundedAtImInfty_neg_iff [SeminormedAddGroup α] {f : ℍ → α}
+    : IsBoundedAtImInfty (-f) ↔ IsBoundedAtImInfty f := by
   simp [isBoundedAtImInfty_iff]
 
 alias ⟨_, IsBoundedAtImInfty.neg⟩ := isBoundedAtImInfty_neg_iff
 
-@[simp] theorem isZeroAtImInfty_neg_iff [TopologicalSpace α] [SubtractionMonoid α]
-    [ContinuousNeg α] {f : ℍ → α} : IsZeroAtImInfty (-f) ↔ IsZeroAtImInfty f :=
+@[simp]
+theorem isZeroAtImInfty_neg_iff
+    [TopologicalSpace α] [SubtractionMonoid α] [ContinuousNeg α] {f : ℍ → α}
+    : IsZeroAtImInfty (-f) ↔ IsZeroAtImInfty f :=
   zeroAtFilter_neg_iff
 
 alias ⟨_, IsZeroAtImInfty.neg⟩ := isZeroAtImInfty_neg_iff
 
-lemma tendsto_comap_im_ofComplex :
-    Tendsto ofComplex (comap Complex.im atTop) atImInfty := by
+lemma tendsto_comap_im_ofComplex : Tendsto ofComplex (comap Complex.im atTop) atImInfty := by
   simp only [atImInfty, tendsto_comap_iff, Function.comp_def]
   refine tendsto_comap.congr' ?_
   filter_upwards [preimage_mem_comap (Ioi_mem_atTop 0)] with z hz
   simp [ofComplex_apply_of_im_pos hz]
 
-lemma tendsto_coe_atImInfty :
-    Tendsto UpperHalfPlane.coe atImInfty (comap Complex.im atTop) := by
-  simpa only [atImInfty, tendsto_comap_iff, Function.comp_def,
-    funext UpperHalfPlane.coe_im] using tendsto_comap
+lemma tendsto_coe_atImInfty : Tendsto UpperHalfPlane.coe atImInfty (comap Complex.im atTop) := by
+  simpa only [atImInfty, tendsto_comap_iff, Function.comp_def, funext UpperHalfPlane.coe_im] using
+    tendsto_comap
 
-lemma tendsto_smul_atImInfty {g : GL (Fin 2) ℝ} (hg : g 1 0 = 0) :
-    Tendsto (fun τ ↦ g • τ) atImInfty atImInfty := by
+lemma tendsto_smul_atImInfty {g : GL (Fin 2) ℝ} (hg : g 1 0 = 0)
+    : Tendsto (fun τ ↦ g • τ) atImInfty atImInfty := by
   suffices Tendsto (fun τ ↦ |g 0 0 / g 1 1| * τ.im) atImInfty atTop by
     simpa [atImInfty, Function.comp_def, im_smul, num, denom, hg, abs_div, abs_mul,
       abs_of_pos (UpperHalfPlane.im_pos _), mul_div_right_comm]

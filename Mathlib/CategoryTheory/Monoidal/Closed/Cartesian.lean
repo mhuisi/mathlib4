@@ -28,9 +28,8 @@ open Category Limits MonoidalCategory CartesianMonoidalCategory
 
 variable {C : Type u} [Category.{v} C] [CartesianMonoidalCategory C] {Y : C}
 
-instance CartesianMonoidalCategory.isLeftAdjoint_prod_functor
-    (A : C) [Closed A] :
-    (prod.functor.obj A).IsLeftAdjoint :=
+instance CartesianMonoidalCategory.isLeftAdjoint_prod_functor (A : C) [Closed A]
+    : (prod.functor.obj A).IsLeftAdjoint :=
   Functor.isLeftAdjoint_of_iso (CartesianMonoidalCategory.tensorLeftIsoProd A)
 
 namespace CartesianClosed
@@ -44,15 +43,16 @@ open Lean PrettyPrinter.Delaborator SubExpr in
 /-- Delaborator for `Functor.obj` -/
 @[app_delab Functor.obj]
 meta def delabFunctorObjExp : Delab :=
-    whenPPOption getPPNotation <| withOverApp 6 do
-  let e ← getExpr
-  guard <| e.isAppOfArity' ``Functor.obj 6
-  let A ← withNaryArg 4 do
+  whenPPOption getPPNotation <| withOverApp 6 do
     let e ← getExpr
-    guard <| e.isAppOfArity' ``ihom 5
-    withNaryArg 3 delab
-  let B ← withNaryArg 5 delab
-  `($A ⟹ $B)
+    guard <| e.isAppOfArity' ``Functor.obj 6
+    let A ←
+      withNaryArg 4 do
+        let e ← getExpr
+        guard <| e.isAppOfArity' ``ihom 5
+        withNaryArg 3 delab
+    let B ← withNaryArg 5 delab
+    `($A ⟹ $B)
 
 -- Porting note: notation fails to elaborate with `quotPrecheck` on.
 set_option quotPrecheck false in
@@ -64,8 +64,9 @@ end CartesianClosed
 open CartesianClosed
 
 /-- The internal element which points at the given morphism. -/
-def internalizeHom {C : Type u} [Category.{v} C] [CartesianMonoidalCategory C] {A Y : C} [Closed A]
-    (f : A ⟶ Y) : 𝟙_ C ⟶ A ⟹ Y :=
+def internalizeHom
+    {C : Type u} [Category.{v} C] [CartesianMonoidalCategory C] {A Y : C} [Closed A] (f : A ⟶ Y)
+    : 𝟙_ C ⟶ A ⟹ Y :=
   MonoidalClosed.curry (fst _ _ ≫ f)
 
 variable {A B : C} [Closed A]
@@ -86,8 +87,7 @@ def zeroMul {I : C} (t : IsInitial I) : A ⊗ I ≅ I where
   inv_hom_id := t.hom_ext _ _
 
 /-- If an initial object `0` exists in a CCC, then `0 ⨯ A ≅ 0`. -/
-def mulZero [BraidedCategory C] {I : C} (t : IsInitial I) : I ⊗ A ≅ I :=
-  β_ _ _ ≪≫ zeroMul t
+def mulZero [BraidedCategory C] {I : C} (t : IsInitial I) : I ⊗ A ≅ I := β_ _ _ ≪≫ zeroMul t
 
 /-- If an initial object `0` exists in a CCC then `0^B ≅ 1` for any `B`. -/
 def powZero [BraidedCategory C] {I : C} (t : IsInitial I) [MonoidalClosed C] : I ⟹ B ≅ 𝟙_ C where
@@ -97,7 +97,8 @@ def powZero [BraidedCategory C] {I : C} (t : IsInitial I) [MonoidalClosed C] : I
     rw [← curry_natural_left, curry_eq_iff, ← cancel_epi (mulZero t).inv]
     apply t.hom_ext
 
-/-- If an initial object `I` exists in a CCC then it is a strict initial object,
+/--
+If an initial object `I` exists in a CCC then it is a strict initial object,
 i.e. any morphism to `I` is an iso.
 This actually shows a slightly stronger version: any morphism to an initial object from an
 exponentiable object is an isomorphism.
@@ -128,7 +129,8 @@ section Functor
 
 variable [CartesianMonoidalCategory D]
 
-/-- Transport the property of being Cartesian closed across an equivalence of categories.
+/--
+Transport the property of being Cartesian closed across an equivalence of categories.
 
 Note we didn't require any coherence between the choice of finite products here, since we transport
 along the `prodComparison` isomorphism.

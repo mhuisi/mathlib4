@@ -34,9 +34,10 @@ be calculated using exradius.
 
 namespace Affine.Simplex
 
-variable {V P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricSpace P]
-  [NormedAddTorsor V P] {n : ℕ} [NeZero n] (s : Simplex ℝ P n) (signs : Finset (Fin (n + 1)))
-  (i : Fin (n + 1))
+variable
+  {V P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricSpace P] [NormedAddTorsor V P]
+  {n : ℕ} [NeZero n]
+  (s : Simplex ℝ P n) (signs : Finset (Fin (n + 1))) (i : Fin (n + 1))
 
 /--
 Similar to `Affine.Simplex.excenterWeightsUnnorm`, these are unnormalized weights whose affine
@@ -54,57 +55,57 @@ theorem excenterWeightsFace_ne_zero : s.excenterWeightsFace signs i ≠ 0 := by
 theorem excenterWeightsFace_empty : s.excenterWeightsFace ∅ i = (s.faceOpposite i).volume := by
   simp [excenterWeightsFace]
 
-theorem excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm :
-    s.excenterWeightsFace signs i = n * s.volume * s.excenterWeightsUnnorm signs i := by
+theorem excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm
+    : s.excenterWeightsFace signs i = n * s.volume * s.excenterWeightsUnnorm signs i := by
   rw [s.volume_eq i, excenterWeightsUnnorm, excenterWeightsFace]
   field [‹NeZero n›.ne]
 
-theorem excenterWeightsFace_reindex {m : ℕ} [NeZero m] (e : Fin (n + 1) ≃ Fin (m + 1))
-    (signs : Finset (Fin (m + 1))) :
-    (s.reindex e).excenterWeightsFace signs =
-      s.excenterWeightsFace (Finset.map e.symm.toEmbedding signs) ∘ e.symm := by
+theorem excenterWeightsFace_reindex
+    {m : ℕ} [NeZero m] (e : Fin (n + 1) ≃ Fin (m + 1)) (signs : Finset (Fin (m + 1)))
+    : (s.reindex e).excenterWeightsFace signs
+      = s.excenterWeightsFace (Finset.map e.symm.toEmbedding signs) ∘ e.symm := by
   have h : n = m := by simpa using Fin.equiv_iff_eq.mp ⟨e⟩
   ext
   simp [excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm, excenterWeightsUnnorm_reindex, h]
 
 @[simp]
-theorem excenterWeightsFace_map {P₂ : Type*} [MetricSpace P₂] [NormedAddTorsor V P₂]
-    (f : P →ᵃⁱ[ℝ] P₂) :
-    (s.map f.toAffineMap f.injective).excenterWeightsFace = s.excenterWeightsFace := by
+theorem excenterWeightsFace_map
+    {P₂ : Type*} [MetricSpace P₂] [NormedAddTorsor V P₂] (f : P →ᵃⁱ[ℝ] P₂)
+    : (s.map f.toAffineMap f.injective).excenterWeightsFace = s.excenterWeightsFace := by
   ext
   simp [excenterWeightsFace]
 
 @[simp]
-theorem excenterWeightsFace_restrict (S : AffineSubspace ℝ P)
-    (hS : affineSpan ℝ (Set.range s.points) ≤ S) :
-    haveI := Nonempty.map (AffineSubspace.inclusion hS) inferInstance
-    (s.restrict S hS).excenterWeightsFace = s.excenterWeightsFace := by
+theorem excenterWeightsFace_restrict
+    (S : AffineSubspace ℝ P) (hS : affineSpan ℝ (Set.range s.points) ≤ S)
+    : haveI := Nonempty.map (AffineSubspace.inclusion hS) inferInstance
+      (s.restrict S hS).excenterWeightsFace = s.excenterWeightsFace := by
   have := Nonempty.map (AffineSubspace.inclusion hS) inferInstance
   ext
   simp [excenterWeightsFace, faceOpposite_restrict]
 
-theorem excenterExists_iff_sum_excenterWeightsFace_ne_zero :
-    s.ExcenterExists signs ↔ ∑ i, s.excenterWeightsFace signs i ≠ 0 := by
-  simp [excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm, ← Finset.mul_sum,
-    ExcenterExists, ‹NeZero n›.ne, s.volume_pos.ne']
+theorem excenterExists_iff_sum_excenterWeightsFace_ne_zero
+    : s.ExcenterExists signs ↔ ∑ i, s.excenterWeightsFace signs i ≠ 0 := by
+  simp [excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm, ← Finset.mul_sum, ExcenterExists,
+    ‹NeZero n›.ne, s.volume_pos.ne']
 
-theorem excenterWeights_eq_excenterWeightsFace_div :
-    s.excenterWeights signs i =
-      s.excenterWeightsFace signs i / ∑ j, s.excenterWeightsFace signs j := by
+theorem excenterWeights_eq_excenterWeightsFace_div
+    : s.excenterWeights signs i
+      = s.excenterWeightsFace signs i / ∑ j, s.excenterWeightsFace signs j := by
   simp_rw [excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm, ← Finset.mul_sum,
     excenterWeights, Pi.smul_apply, smul_eq_mul]
   field [‹NeZero n›.ne]
 
 variable {s signs} in
-theorem ExcenterExists.volume_eq_exradius_mul (h : s.ExcenterExists signs) :
-    s.volume = (↑n)⁻¹ * s.exradius signs * |∑ i, s.excenterWeightsFace signs i| := by
+theorem ExcenterExists.volume_eq_exradius_mul (h : s.ExcenterExists signs)
+    : s.volume = (↑n)⁻¹ * s.exradius signs * |∑ i, s.excenterWeightsFace signs i| := by
   have : |∑ i, s.excenterWeightsUnnorm signs i| ≠ 0 := by simpa [ExcenterExists] using h
   simp_rw [excenterWeightsFace_eq_volume_mul_excenterWeightsUnnorm, ← Finset.mul_sum, abs_mul,
     exradius_eq_abs_inv_sum, abs_inv, Nat.abs_cast, abs_of_nonneg s.volume_pos.le]
   field [‹NeZero n›.ne]
 
-theorem volume_eq_inradius_mul :
-    s.volume = (↑n)⁻¹ * s.inradius * ∑ i, (s.faceOpposite i).volume := by
+theorem volume_eq_inradius_mul
+    : s.volume = (↑n)⁻¹ * s.inradius * ∑ i, (s.faceOpposite i).volume := by
   have : 0 < ∑ x, (s.faceOpposite x).volume := by positivity
   simpa [abs_of_nonneg this.le] using s.excenterExists_empty.volume_eq_exradius_mul
 

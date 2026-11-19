@@ -36,8 +36,10 @@ variable (K L : Type*) [Field K] [Field L]
 
 /-! ### The absolute Galois group -/
 
-/-- The absolute Galois group of `K`, defined as the Galois group of the field extension `K^al/K`,
-  where `K^al` is an algebraic closure of `K`. -/
+/--
+The absolute Galois group of `K`, defined as the Galois group of the field extension `K^al/K`,
+where `K^al` is an algebraic closure of `K`.
+-/
 def absoluteGaloisGroup := AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K
 deriving Group, TopologicalSpace, IsTopologicalGroup
 
@@ -48,16 +50,20 @@ local notation "G_K" => absoluteGaloisGroup
 
 section
 
-variable [Algebra K L] [Algebra (AlgebraicClosure K) (AlgebraicClosure L)]
+variable
+  [Algebra K L] [Algebra (AlgebraicClosure K) (AlgebraicClosure L)]
   [IsScalarTower K (AlgebraicClosure K) (AlgebraicClosure L)]
 
 open IntermediateField in
-/-- A commuting square of two fields and their algebraic closures induces a continuous homomorphism
-of their absolute Galois groups. -/
+/--
+A commuting square of two fields and their algebraic closures induces a continuous homomorphism
+of their absolute Galois groups.
+-/
 @[simps!]
 noncomputable def absoluteGaloisGroup.mapOfAlgebra : G_K L →ₜ* G_K K :=
   letI F : G_K L →* G_K K := (AlgEquiv.restrictNormalHom _).comp (AlgEquiv.restrictScalarsHom K)
-  { __ := F
+  {
+    __ := F
     continuous_toFun := by
       classical
       let f := IsScalarTower.toAlgHom K (AlgebraicClosure K) (AlgebraicClosure L)
@@ -74,14 +80,18 @@ noncomputable def absoluteGaloisGroup.mapOfAlgebra : G_K L →ₜ* G_K K :=
         obtain ⟨s, rfl⟩ := hF
         use s.image f
         rw [adjoin_map, adjoin_adjoin_right, Finset.coe_image]
-      · exact f.injective <| ((σ.restrictScalarsHom K).restrictNormal_commutes
-          (AlgebraicClosure K) x).trans <| hσ ⟨f x, subset_adjoin _ _ ⟨_, x.property, rfl⟩⟩ }
+      · exact f.injective <|
+          ((σ.restrictScalarsHom K).restrictNormal_commutes (AlgebraicClosure K) x).trans <|
+            hσ ⟨f x, subset_adjoin _ _ ⟨_, x.property, rfl⟩⟩
+  }
 
 end
 
 variable {K L} in
-/-- An embedding of fields induces a continuous homomorphism of absolute Galois groups.
-Note that this depends on an arbitrary choice of embedding of the algebraic closures. -/
+/--
+An embedding of fields induces a continuous homomorphism of absolute Galois groups.
+Note that this depends on an arbitrary choice of embedding of the algebraic closures.
+-/
 @[simps!]
 noncomputable def absoluteGaloisGroup.map (f : K →+* L) : G_K L →ₜ* G_K K :=
   letI : Algebra K L := f.toAlgebra
@@ -91,12 +101,14 @@ noncomputable def absoluteGaloisGroup.map (f : K →+* L) : G_K L →ₜ* G_K K 
 
 /-! ### The topological abelianization of the absolute Galois group -/
 
-instance absoluteGaloisGroup.commutator_closure_isNormal :
-    (commutator (G_K K)).topologicalClosure.Normal :=
+instance absoluteGaloisGroup.commutator_closure_isNormal
+    : (commutator (G_K K)).topologicalClosure.Normal :=
   Subgroup.is_normal_topologicalClosure (commutator (G_K K))
 
-/-- The topological abelianization of `absoluteGaloisGroup`, that is, the quotient of
-  `absoluteGaloisGroup` by the topological closure of its commutator subgroup. -/
+/--
+The topological abelianization of `absoluteGaloisGroup`, that is, the quotient of
+`absoluteGaloisGroup` by the topological closure of its commutator subgroup.
+-/
 abbrev absoluteGaloisGroupAbelianization := TopologicalAbelianization (G_K K)
 
 local notation "G_K_ab" => absoluteGaloisGroupAbelianization

@@ -75,8 +75,10 @@ def opEquiv : Subring R ≃o Subring Rᵐᵒᵖ where
 
 theorem op_injective : (@Subring.op R _).Injective := opEquiv.injective
 theorem unop_injective : (@Subring.unop R _).Injective := opEquiv.symm.injective
-@[simp] theorem op_inj {S T : Subring R} : S.op = T.op ↔ S = T := opEquiv.eq_iff_eq
-@[simp] theorem unop_inj {S T : Subring Rᵐᵒᵖ} : S.unop = T.unop ↔ S = T := opEquiv.symm.eq_iff_eq
+@[simp]
+theorem op_inj {S T : Subring R} : S.op = T.op ↔ S = T := opEquiv.eq_iff_eq
+@[simp]
+theorem unop_inj {S T : Subring Rᵐᵒᵖ} : S.unop = T.unop ↔ S = T := opEquiv.symm.eq_iff_eq
 
 @[simp]
 theorem op_bot : (⊥ : Subring R).op = ⊥ := opEquiv.map_bot
@@ -102,8 +104,7 @@ theorem unop_top : (⊤ : Subring Rᵐᵒᵖ).unop = ⊤ := rfl
 @[simp]
 theorem unop_eq_top {S : Subring Rᵐᵒᵖ} : S.unop = ⊤ ↔ S = ⊤ := unop_injective.eq_iff' unop_top
 
-theorem op_sup (S₁ S₂ : Subring R) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op :=
-  opEquiv.map_sup _ _
+theorem op_sup (S₁ S₂ : Subring R) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op := opEquiv.map_sup _ _
 
 theorem unop_sup (S₁ S₂ : Subring Rᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
   opEquiv.symm.map_sup _ _

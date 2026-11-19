@@ -32,8 +32,10 @@ namespace Graph
 
 section Map
 
-/-- Map `G : Graph α β` to a `Graph α' β` with the same edge set by applying a function `f : α → α'`
-  to each vertex. Edges between identified vertices become loops. -/
+/--
+Map `G : Graph α β` to a `Graph α' β` with the same edge set by applying a function `f : α → α'`
+to each vertex. Edges between identified vertices become loops.
+-/
 @[expose, simps! (attr := grind =)]
 def map (f : α → α') (G : Graph α β) : Graph α' β where
   vertexSet := f '' V(G)
@@ -64,8 +66,9 @@ protected lemma Inc.map (f : α → α') (h : G.Inc e v) : (G.map f).Inc e (f v)
   exact ⟨f w, hw.map f⟩
 
 @[simp]
-lemma map_isLoopAt (f : α → α') :
-    (G.map f).IsLoopAt e x ↔ ∃ u v, G.IsLink e u v ∧ f u = x ∧ f v = x := Iff.rfl
+lemma map_isLoopAt (f : α → α')
+    : (G.map f).IsLoopAt e x ↔ ∃ u v, G.IsLink e u v ∧ f u = x ∧ f v = x :=
+  Iff.rfl
 
 protected lemma IsLoopAt.map (f : α → α') (h : G.IsLoopAt e v) : (G.map f).IsLoopAt e (f v) :=
   IsLink.map f h
@@ -79,7 +82,8 @@ protected lemma Adj.map (f : α → α') (h : G.Adj u v) : (G.map f).Adj (f u) (
   obtain ⟨e, h⟩ := h
   exact ⟨e, h.map f⟩
 
-@[simp] lemma map_id : G.map id = G := by ext a b c <;> simp
+@[simp]
+lemma map_id : G.map id = G := by ext a b c <;> simp
 
 @[simp]
 lemma map_map (f : α → α') (f' : α' → α'') : (G.map f).map f' = G.map (f' ∘ f) := by
@@ -99,7 +103,7 @@ protected lemma IsSpanningSubgraph.map (f : α → α') (hsle : G ≤s H) : G.ma
 @[gcongr only]
 lemma map_eq_of_eqOn (h : EqOn f g V(G)) : G.map f = G.map g := by
   refine Graph.ext (by grind) fun _ _ _ ↦ ⟨fun ⟨_, _, hvw, _, _⟩ ↦ ?_, fun ⟨_, _, hvw, _, _⟩ ↦ ?_⟩
-  <;> grind [h hvw.left_mem, h hvw.right_mem, hvw.map]
+    <;> grind [h hvw.left_mem, h hvw.right_mem, hvw.map]
 
 end Map
 

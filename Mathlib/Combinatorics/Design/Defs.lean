@@ -43,9 +43,11 @@ if desired. Duplicate blocks are permitted unless `IncidenceSystem.IsSimple` is 
 
 variable (α β : Type*)
 
-/-- An incidence system consists of a carrier set and subsets called blocks. We index our blocks
+/--
+An incidence system consists of a carrier set and subsets called blocks. We index our blocks
 by a subset of an indexing type `β` to make it easy to add and remove blocks if desired.
-Duplicate blocks are permitted unless `IncidenceSystem.IsSimple` is imposed. -/
+Duplicate blocks are permitted unless `IncidenceSystem.IsSimple` is imposed.
+-/
 structure IncidenceSystem where
   /-- The ambient set for the incidence system. -/
   carrier : Set α
@@ -65,12 +67,12 @@ namespace IncidenceSystem
 
 variable {α β}
 
-theorem biUnion_block_subset (d : IncidenceSystem α β) :
-    ⋃ b ∈ d.blockSet, d.block b ⊆ d.carrier :=
+theorem biUnion_block_subset (d : IncidenceSystem α β) : ⋃ b ∈ d.blockSet, d.block b ⊆ d.carrier :=
   Set.iUnion₂_subset @d.block_subset
 
-theorem mem_of_mem_block (d : IncidenceSystem α β) {b : β} {x : α} (hx : x ∈ d.block b)
-    (hb : b ∈ d.blockSet) : x ∈ d.carrier := by
+theorem mem_of_mem_block
+    (d : IncidenceSystem α β) {b : β} {x : α} (hx : x ∈ d.block b) (hb : b ∈ d.blockSet)
+    : x ∈ d.carrier := by
   grind
 
 /-- Every hypergraph can be viewed as an incidence system where the hyperedges become the blocks. -/
@@ -81,8 +83,10 @@ def ofHypergraph (H : Hypergraph α) : IncidenceSystem α (Set α) where
   block x := x
   block_subset := H.subset_vertexSet_of_mem_edgeSet
 
-/-- Every incidence system can be viewed as a hypergraph where the blocks become the hyperedges.
-Note that hypergraphs are simple in mathlib, so this function will collapse duplicate blocks. -/
+/--
+Every incidence system can be viewed as a hypergraph where the blocks become the hyperedges.
+Note that hypergraphs are simple in mathlib, so this function will collapse duplicate blocks.
+-/
 @[simps]
 def toHypergraph (d : IncidenceSystem α β) : Hypergraph α where
   vertexSet := d.carrier
@@ -133,18 +137,20 @@ protected theorem IsUniform.discrete (s : Set α) : (discrete s).IsUniform 1 whe
   uniform {x} _ := by simp
 
 @[simp, grind .]
-protected theorem IsUniform.indiscrete (s : Set α) (b : β) :
-    (indiscrete s b).IsUniform s.ncard where
+protected theorem IsUniform.indiscrete (s : Set α) (b : β)
+    : (indiscrete s b).IsUniform s.ncard where
   uniform _ := by simp
 
-theorem IsUniform.nonempty_block {d : IncidenceSystem α β}
-    {k : ℕ} (hd : d.IsUniform k) (hk : k ≠ 0) {b : β} (hb : b ∈ d.blockSet) :
-    (d.block b).Nonempty := by
+theorem IsUniform.nonempty_block
+    {d : IncidenceSystem α β} {k : ℕ} (hd : d.IsUniform k) (hk : k ≠ 0)
+    {b : β} (hb : b ∈ d.blockSet)
+    : (d.block b).Nonempty := by
   grind [Set.nonempty_of_ncard_ne_zero]
 
-theorem IsUniform.finite_block {d : IncidenceSystem α β}
-    {k : ℕ} (hd : d.IsUniform k) (hk : k ≠ 0) {b : β} (hb : b ∈ d.blockSet) :
-    (d.block b).Finite := by
+theorem IsUniform.finite_block
+    {d : IncidenceSystem α β} {k : ℕ} (hd : d.IsUniform k) (hk : k ≠ 0)
+    {b : β} (hb : b ∈ d.blockSet)
+    : (d.block b).Finite := by
   grind [Set.finite_of_ncard_ne_zero]
 
 end IncidenceSystem

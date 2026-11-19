@@ -6,7 +6,8 @@ import Mathlib.Order.SetNotation
 import Mathlib.Tactic.Basic
 import Mathlib.Tactic.Contrapose
 -- This import line is longer than a 100 characters, and used to trigger the longLine linter.
-import all MathlibTest.AModuleWithAVeryLongModuleNameToTestTheLineLengthLinterXXXXXXXXXXXXXXXXXXXXXXXX
+import all
+  MathlibTest.AModuleWithAVeryLongModuleNameToTestTheLineLengthLinterXXXXXXXXXXXXXXXXXXXXXXXX
 
 /-!
 # Tests for all the style syntax linters
@@ -226,7 +227,8 @@ warning: Please, use `·` (typed as `\.`) instead of `.` as `cdot`.
 Note: This linter can be disabled with `set_option linter.style.cdot false`
 -/
 #guard_msgs in
-example : Add Nat where add := (. + ·)
+example : Add Nat where
+  add := (. + ·)
 
 /--
 warning: Please, use `·` (typed as `\.`) instead of `.` as `cdot`.
@@ -234,7 +236,8 @@ warning: Please, use `·` (typed as `\.`) instead of `.` as `cdot`.
 Note: This linter can be disabled with `set_option linter.style.cdot false`
 -/
 #guard_msgs in
-example : Add Nat where add := (. + ·)
+example : Add Nat where
+  add := (. + ·)
 
 /--
 warning: This central dot `·` is isolated; please merge it with the next line.
@@ -256,7 +259,6 @@ example : Nat := by
       -- some empty have
       have := 0
       ·
-
         -- another
         have := 1
         . exact 2
@@ -369,14 +371,16 @@ Note: This linter can be disabled with `set_option linter.style.lambdaSyntax fal
 #guard_msgs in
 example : True := by
   have : 0 = 0 ∧ 0 = 0 ∧ 1 + 3 = 4 := by
-    refine ⟨by trivial, by
-      let _f := λ n : ℕ ↦ 0;
-      have : ℕ := by
-        · -- comment
-          · have := λ k : ℕ ↦ -5
-            · exact 0
-      refine ⟨by trivial, have := λ k : ℕ ↦ -5; by simp⟩
-      ⟩
+    refine ⟨
+      by trivial,
+      by
+        let _f := λ n : ℕ ↦ 0
+        have : ℕ := by
+          · -- comment
+            · have := λ k : ℕ ↦ -5
+              · exact 0
+        refine ⟨by trivial, have := λ k : ℕ ↦ -5; by simp⟩
+    ⟩
   trivial
 
 -- Code such as the following would require walking the infotree instead:
@@ -426,7 +430,8 @@ warning: This line exceeds the 100 character limit, please shorten it!
 
 Note: This linter can be disabled with `set_option linter.style.longLine false`
 -/
-#guard_msgs in                                                                            #guard true
+#guard_msgs in
+#guard true
 
 -- However, the *doc-string* of #guard_msgs is exempt from the linter:
 -- these are automatically generated, hence linting them is not helpful.
@@ -441,7 +446,7 @@ info: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 /-- info: "                              \"                " : String -/
 #guard_msgs in
 #check "                              \"                \
-                                                                  "
+  "
 
 /-! Tests for the `nameCheck` linter -/
 section

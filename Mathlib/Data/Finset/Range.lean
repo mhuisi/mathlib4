@@ -41,7 +41,6 @@ open Multiset
 
 /-! ### range -/
 
-
 section Range
 
 open Nat
@@ -49,31 +48,26 @@ open Nat
 variable {n m : ℕ}
 
 /-- `range n` is the set of natural numbers less than `n`. -/
-def range (n : ℕ) : Finset ℕ :=
-  ⟨_, nodup_range n⟩
+def range (n : ℕ) : Finset ℕ := ⟨_, nodup_range n⟩
 
 @[simp]
-theorem range_val (n : ℕ) : (range n).val = Multiset.range n :=
-  rfl
+theorem range_val (n : ℕ) : (range n).val = Multiset.range n := rfl
 
-@[simp] lemma _root_.Multiset.toFinset_range (n : ℕ) : (Multiset.range n).toFinset = .range n :=
+@[simp]
+lemma _root_.Multiset.toFinset_range (n : ℕ) : (Multiset.range n).toFinset = .range n :=
   Finset.val_injective (Finset.range n).nodup.dedup
 
 @[simp, grind =]
-theorem mem_range : m ∈ range n ↔ m < n :=
-  Multiset.mem_range
+theorem mem_range : m ∈ range n ↔ m < n := Multiset.mem_range
 
 @[simp, grind =, norm_cast]
-theorem coe_range (n : ℕ) : (range n : Set ℕ) = Set.Iio n :=
-  Set.ext fun _ => mem_range
+theorem coe_range (n : ℕ) : (range n : Set ℕ) = Set.Iio n := Set.ext fun _ => mem_range
 
 @[simp]
-theorem range_zero : range 0 = ∅ :=
-  rfl
+theorem range_zero : range 0 = ∅ := rfl
 
 @[simp]
-theorem range_one : range 1 = {0} :=
-  rfl
+theorem range_one : range 1 = {0} := rfl
 
 theorem range_add_one : range (n + 1) = insert n (range n) := by grind
 
@@ -108,12 +102,10 @@ theorem nonempty_range_iff : (range n).Nonempty ↔ n ≠ 0 :=
 protected alias ⟨_, Aesop.range_nonempty⟩ := nonempty_range_iff
 
 @[simp]
-theorem range_eq_empty_iff : range n = ∅ ↔ n = 0 := by
-  grind [nonempty_range_iff]
+theorem range_eq_empty_iff : range n = ∅ ↔ n = 0 := by grind [nonempty_range_iff]
 
 @[aesop safe apply (rule_sets := [finsetNonempty])]
-theorem nonempty_range_add_one : (range <| n + 1).Nonempty :=
-  nonempty_range_iff.2 n.succ_ne_zero
+theorem nonempty_range_add_one : (range <| n + 1).Nonempty := nonempty_range_iff.2 n.succ_ne_zero
 
 lemma range_nontrivial {n : ℕ} (hn : 1 < n) : (range n).Nontrivial := by
   rw [Finset.Nontrivial, Finset.coe_range]
@@ -129,18 +121,18 @@ end Finset
 open Finset
 
 /-- Equivalence between the set of natural numbers which are `≥ k` and `ℕ`, given by `n → n - k`. -/
-def notMemRangeEquiv (k : ℕ) : { n // n ∉ range k } ≃ ℕ where
+def notMemRangeEquiv (k : ℕ) : {n // n ∉ range k} ≃ ℕ where
   toFun i := i.val - k
   invFun j := ⟨j + k, by simp⟩
   left_inv := by grind
   right_inv := by grind
 
 @[simp]
-theorem coe_notMemRangeEquiv (k : ℕ) :
-    (notMemRangeEquiv k : { n // n ∉ range k } → ℕ) = fun (i : { n // n ∉ range k }) => i - k :=
+theorem coe_notMemRangeEquiv (k : ℕ)
+    : (notMemRangeEquiv k : {n // n ∉ range k} → ℕ) = fun (i : {n // n ∉ range k}) => i - k :=
   rfl
 
 @[simp]
-theorem coe_notMemRangeEquiv_symm (k : ℕ) :
-    ((notMemRangeEquiv k).symm : ℕ → { n // n ∉ range k }) = fun j => ⟨j + k, by simp⟩ :=
+theorem coe_notMemRangeEquiv_symm (k : ℕ)
+    : ((notMemRangeEquiv k).symm : ℕ → {n // n ∉ range k}) = fun j => ⟨j + k, by simp⟩ :=
   rfl

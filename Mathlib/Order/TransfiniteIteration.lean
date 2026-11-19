@@ -38,37 +38,39 @@ variable {I J : Type*} [LinearOrder J] [WellFoundedLT J] (φ : I → I) (i₀ : 
 section SupSet
 variable [SupSet I]
 
-/-- The `j`th-iteration of a function `φ : I → I` when `j : J` belongs to a well-ordered type,
-defined by taking *suprema* at limit points. -/
+/--
+The `j`th-iteration of a function `φ : I → I` when `j : J` belongs to a well-ordered type,
+defined by taking *suprema* at limit points.
+-/
 @[to_dual (dont_translate := J)
-/-- The `j`th-iteration of a function `φ : I → I` when `j : J` belongs to a well-ordered type,
+  /-- The `j`th-iteration of a function `φ : I → I` when `j : J` belongs to a well-ordered type,
 defined by taking *infima* at limit points. -/]
 noncomputable def supTransfiniteIterate (j : J) : I → I :=
   let := SuccOrder.ofLinearWellFoundedLT J
   SuccOrder.limitRecOn j
-    (fun _ _ ↦ id) (fun _ _ g ↦ φ ∘ g)
+    (fun _ _ ↦ id)
+    (fun _ _ g ↦ φ ∘ g)
     (fun y _ h ↦ ⨆ x : Set.Iio y, h x.val (Set.mem_Iio.1 x.property))
 
 @[deprecated (since := "2026-09-15")]
 alias transfiniteIterate := supTransfiniteIterate
 
 @[to_dual (dont_translate := J) (attr := simp) infTransfiniteIterate_of_isMin]
-theorem supTransfiniteIterate_of_isMin {j : J} (hj : IsMin j) :
-    supTransfiniteIterate φ j i₀ = i₀ := by
+theorem supTransfiniteIterate_of_isMin {j : J} (hj : IsMin j)
+    : supTransfiniteIterate φ j i₀ = i₀ := by
   let := SuccOrder.ofLinearWellFoundedLT J
   rw [supTransfiniteIterate, SuccOrder.limitRecOn_isMin _ _ _ hj]
   rfl
 
 @[to_dual (dont_translate := J) infTransfiniteIterate_bot]
-theorem supTransfiniteIterate_bot [OrderBot J] : supTransfiniteIterate φ (⊥ : J) i₀ = i₀ := by
-  simp
+theorem supTransfiniteIterate_bot [OrderBot J] : supTransfiniteIterate φ (⊥ : J) i₀ = i₀ := by simp
 
 @[deprecated (since := "2026-09-15")]
 alias transfiniteIterate_bot := supTransfiniteIterate_bot
 
 @[to_dual (dont_translate := J) infTransfiniteIterate_succ_of_not_isMax]
-theorem supTransfiniteIterate_succ_of_not_isMax [SuccOrder J] {j : J} (hj : ¬ IsMax j) :
-    supTransfiniteIterate φ (Order.succ j) i₀ = φ (supTransfiniteIterate φ j i₀) := by
+theorem supTransfiniteIterate_succ_of_not_isMax [SuccOrder J] {j : J} (hj : ¬ IsMax j)
+    : supTransfiniteIterate φ (Order.succ j) i₀ = φ (supTransfiniteIterate φ j i₀) := by
   obtain rfl : ‹_› = SuccOrder.ofLinearWellFoundedLT J := by subsingleton
   let := SuccOrder.ofLinearWellFoundedLT J
   rw [supTransfiniteIterate, SuccOrder.limitRecOn_succ_of_not_isMax _ _ _ hj]
@@ -78,13 +80,13 @@ theorem supTransfiniteIterate_succ_of_not_isMax [SuccOrder J] {j : J} (hj : ¬ I
 alias transfiniteIterate_succ := supTransfiniteIterate_succ_of_not_isMax
 
 @[to_dual (dont_translate := J) (attr := simp) infTransfiniteIterate_succ]
-theorem supTransfiniteIterate_succ [SuccOrder J] [NoMaxOrder J] (j : J) :
-    supTransfiniteIterate φ (Order.succ j) i₀ = φ (supTransfiniteIterate φ j i₀) :=
+theorem supTransfiniteIterate_succ [SuccOrder J] [NoMaxOrder J] (j : J)
+    : supTransfiniteIterate φ (Order.succ j) i₀ = φ (supTransfiniteIterate φ j i₀) :=
   supTransfiniteIterate_succ_of_not_isMax _ _ (not_isMax j)
 
 @[to_dual (dont_translate := J) infTransfiniteIterate_limit]
-theorem supTransfiniteIterate_limit {j : J} (hj : Order.IsSuccLimit j) :
-    supTransfiniteIterate φ j i₀ = ⨆ x : Set.Iio j, supTransfiniteIterate φ x.val i₀ := by
+theorem supTransfiniteIterate_limit {j : J} (hj : Order.IsSuccLimit j)
+    : supTransfiniteIterate φ j i₀ = ⨆ x : Set.Iio j, supTransfiniteIterate φ x.val i₀ := by
   let := SuccOrder.ofLinearWellFoundedLT J
   unfold supTransfiniteIterate
   simp [SuccOrder.limitRecOn_of_isSuccLimit _ _ _ hj]
@@ -94,8 +96,8 @@ alias transfiniteIterate_limit := supTransfiniteIterate_limit
 
 open OrderDual in
 @[to_dual (dont_translate := J)]
-theorem supTransfiniteIterate_dual (j : J) :
-    supTransfiniteIterate φ j i₀ = infTransfiniteIterate (toDual ∘ φ ∘ ofDual) j (toDual i₀) :=
+theorem supTransfiniteIterate_dual (j : J)
+    : supTransfiniteIterate φ j i₀ = infTransfiniteIterate (toDual ∘ φ ∘ ofDual) j (toDual i₀) :=
   (rfl)
 
 end SupSet
@@ -104,8 +106,8 @@ section CompleteLattice
 variable [CompleteLattice I] {φ : I → I}
 
 @[to_dual (dont_translate := J) (attr := gcongr) infTransfiniteIterate_anti]
-theorem supTransfiniteIterate_mono (hφ : ∀ i, i ≤ φ i) {j k : J} (h : j ≤ k) :
-    supTransfiniteIterate φ j i₀ ≤ supTransfiniteIterate φ k i₀ := by
+theorem supTransfiniteIterate_mono (hφ : ∀ i, i ≤ φ i) {j k : J} (h : j ≤ k)
+    : supTransfiniteIterate φ j i₀ ≤ supTransfiniteIterate φ k i₀ := by
   have := SuccOrder.ofLinearWellFoundedLT J
   induction k using SuccOrder.limitRecOn with
   | isMin k' hk' =>
@@ -122,33 +124,35 @@ theorem supTransfiniteIterate_mono (hφ : ∀ i, i ≤ φ i) {j k : J} (h : j �
       exact le_iSup (fun l : Set.Iio k' ↦ supTransfiniteIterate φ l.val i₀) ⟨j, Set.mem_Iio.1 h⟩
     · rfl
 
-theorem supTransfiniteIterate_monotone (hφ : ∀ i, i ≤ φ i) :
-    Monotone (fun j : J ↦ supTransfiniteIterate φ j i₀) :=
-  fun _ _ h ↦ supTransfiniteIterate_mono _ hφ h
+theorem supTransfiniteIterate_monotone (hφ : ∀ i, i ≤ φ i)
+    : Monotone (fun j : J ↦ supTransfiniteIterate φ j i₀) := fun _ _ h ↦
+  supTransfiniteIterate_mono _ hφ h
 
 @[deprecated (since := "2026-09-15")]
 alias monotone_transfiniteIterate := supTransfiniteIterate_monotone
 
-theorem infTransfiniteIterate_antitone (hφ : ∀ i, φ i ≤ i) :
-    Antitone (fun j : J ↦ infTransfiniteIterate φ j i₀) :=
-  fun _ _ h ↦ infTransfiniteIterate_anti _ hφ h
+theorem infTransfiniteIterate_antitone (hφ : ∀ i, φ i ≤ i)
+    : Antitone (fun j : J ↦ infTransfiniteIterate φ j i₀) := fun _ _ h ↦
+  infTransfiniteIterate_anti _ hφ h
 
 -- TODO: prove that if `∀ i, i ≤ φ i` and `supTransfiniteIterate` isn't injective, then it is
 -- eventually constant.
 
 @[to_dual (dont_translate := J) top_mem_range_infTransfiniteIterate]
-theorem top_mem_range_supTransfiniteIterate {i₀ : I}
+theorem top_mem_range_supTransfiniteIterate
+    {i₀ : I}
     (hφ' : ∀ i ≠ (⊤ : I), i < φ i) (φtop : φ ⊤ = ⊤)
-    (H : ¬ Function.Injective (fun j : J ↦ supTransfiniteIterate φ j i₀)) :
-    ∃ j : J, supTransfiniteIterate φ j i₀ = ⊤ := by
+    (H : ¬ Function.Injective (fun j : J ↦ supTransfiniteIterate φ j i₀))
+    : ∃ j : J, supTransfiniteIterate φ j i₀ = ⊤ := by
   have := SuccOrder.ofLinearWellFoundedLT J
   have hφ (i : I) : i ≤ φ i := by
     by_cases hi : i = ⊤
     · subst hi
       rw [φtop]
     · exact (hφ' i hi).le
-  obtain ⟨j₁, j₂, hj, eq⟩ : ∃ (j₁ j₂ : J) (hj : j₁ < j₂),
-      supTransfiniteIterate φ j₁ i₀ = supTransfiniteIterate φ j₂ i₀ := by
+  obtain ⟨j₁, j₂, hj, eq⟩
+      : ∃ (j₁ j₂ : J) (hj : j₁ < j₂),
+        supTransfiniteIterate φ j₁ i₀ = supTransfiniteIterate φ j₂ i₀ := by
     grind [Function.Injective]
   by_contra!
   suffices supTransfiniteIterate φ j₁ i₀ < supTransfiniteIterate φ j₂ i₀ by

@@ -53,28 +53,24 @@ class IsPerfect where
 attribute [simp] IsPerfect.commutator_eq_top
 
 @[to_additive]
-lemma isPerfect_def : IsPerfect G ↔ commutator G = ⊤ :=
-  ⟨fun h ↦ h.commutator_eq_top, fun h ↦ ⟨h⟩⟩
+lemma isPerfect_def : IsPerfect G ↔ commutator G = ⊤ := ⟨fun h ↦ h.commutator_eq_top, fun h ↦ ⟨h⟩⟩
 
 @[to_additive]
 lemma _root_.Subgroup.isPerfect_iff : IsPerfect H ↔ ⁅H, H⁆ = H := by
-  rw [Group.isPerfect_def, ← map_subtype_inj,
-    map_subtype_commutator, Subgroup.map_top, range_subtype]
+  rw [Group.isPerfect_def, ← map_subtype_inj, map_subtype_commutator, Subgroup.map_top,
+    range_subtype]
 
 @[to_additive]
-lemma _root_.Subgroup.commutator_eq_self [hH : IsPerfect H] : ⁅H, H⁆ = H :=
-  isPerfect_iff.mp hH
+lemma _root_.Subgroup.commutator_eq_self [hH : IsPerfect H] : ⁅H, H⁆ = H := isPerfect_iff.mp hH
 
 @[to_additive]
-theorem subsingleton_abelianization_iff_isPerfect :
-    Subsingleton (Abelianization G) ↔ IsPerfect G :=
+theorem subsingleton_abelianization_iff_isPerfect : Subsingleton (Abelianization G) ↔ IsPerfect G :=
   QuotientGroup.subsingleton_iff.trans isPerfect_def.symm
 
 namespace IsPerfect
 
 @[to_additive]
-lemma mem_commutator [hP : IsPerfect G] {g : G} : g ∈ commutator G := by
-  simp
+lemma mem_commutator [hP : IsPerfect G] {g : G} : g ∈ commutator G := by simp
 
 /-- The trivial group is perfect. -/
 @[to_additive /-- The trivial group is perfect. -/]
@@ -83,12 +79,11 @@ instance [Subsingleton G] : IsPerfect G where
 
 @[to_additive]
 theorem top_iff : IsPerfect (⊤ : Subgroup G) ↔ IsPerfect G := by
-  rw [isPerfect_def, isPerfect_def, ← map_subtype_inj,
-    map_subtype_commutator, Subgroup.map_top, subtype_range, commutator_def]
+  rw [isPerfect_def, isPerfect_def, ← map_subtype_inj, map_subtype_commutator, Subgroup.map_top,
+    subtype_range, commutator_def]
 
 @[to_additive]
-instance [IsPerfect G] : IsPerfect (⊤ : Subgroup G) :=
-  top_iff.mpr inferInstance
+instance [IsPerfect G] : IsPerfect (⊤ : Subgroup G) := top_iff.mpr inferInstance
 
 variable (G) in
 @[to_additive]
@@ -98,18 +93,18 @@ lemma not_isSolvable [Nontrivial G] [IsPerfect G] : ¬ IsSolvable G := by
 
 variable (G) in
 @[to_additive]
-lemma not_isNilpotent [Nontrivial G] [IsPerfect G] : ¬ IsNilpotent G :=
-  fun _ ↦ not_isSolvable G inferInstance
+lemma not_isNilpotent [Nontrivial G] [IsPerfect G] : ¬ IsNilpotent G := fun _ ↦
+  not_isSolvable G inferInstance
 
 open scoped IsMulCommutative in
 variable (G) in
 @[to_additive]
-lemma not_isMulCommutative [Nontrivial G] [IsPerfect G] : ¬ IsMulCommutative G :=
-  fun _ ↦ not_isSolvable G inferInstance
+lemma not_isMulCommutative [Nontrivial G] [IsPerfect G] : ¬ IsMulCommutative G := fun _ ↦
+  not_isSolvable G inferInstance
 
 @[to_additive]
-theorem subsingleton_of_isMulCommutative
-    [hG : IsPerfect G] [h_comm : IsMulCommutative G] : Subsingleton G := by
+theorem subsingleton_of_isMulCommutative [hG : IsPerfect G] [h_comm : IsMulCommutative G]
+    : Subsingleton G := by
   by_contra! h_not_subsingleton
   exact not_isMulCommutative G h_comm
 
@@ -137,21 +132,19 @@ variable (G) in
 theorem derivedSeries_eq_top [IsPerfect G] (n : ℕ) : Subgroup.derivedSeries G n = ⊤ := by
   match n with
   | 0 => simp
-  | n + 1 =>
-    rw [Subgroup.derivedSeries_succ, derivedSeries_eq_top, commutator_eq_self]
+  | n + 1 => rw [Subgroup.derivedSeries_succ, derivedSeries_eq_top, commutator_eq_self]
 
 @[to_additive (attr := simp)]
-theorem lowerCentralSeries_eq_top (H : Subgroup G) [IsPerfect H] (n : ℕ) :
-    H.lowerCentralSeries n = H := by
+theorem lowerCentralSeries_eq_top (H : Subgroup G) [IsPerfect H] (n : ℕ)
+    : H.lowerCentralSeries n = H := by
   match n with
   | 0 => simp
-  | n + 1 =>
-    rw [Subgroup.lowerCentralSeries_succ, lowerCentralSeries_eq_top, commutator_eq_self]
+  | n + 1 => rw [Subgroup.lowerCentralSeries_succ, lowerCentralSeries_eq_top, commutator_eq_self]
 
 variable (G) in
 @[to_additive (attr := simp)]
-theorem upperCentralSeries_eq_center [IsPerfect G] {n : ℕ} (hn : n ≠ 0) :
-    Subgroup.upperCentralSeries G n = center G := by
+theorem upperCentralSeries_eq_center [IsPerfect G] {n : ℕ} (hn : n ≠ 0)
+    : Subgroup.upperCentralSeries G n = center G := by
   rw [← Subgroup.upperCentralSeries_one, eq_comm]
   apply Subgroup.upperCentralSeries.eq_ge_of_eq_succ <| by lia
   apply le_antisymm <| Subgroup.upperCentralSeries_mono G one_le_two

@@ -36,9 +36,11 @@ open Module.DirectLimit
 namespace fgSystem
 
 instance : IsDirectedOrder {N : Submodule R M // N.FG} where
-  directed N₁ N₂ :=
-    ⟨⟨_, N₁.property.sup N₂.property⟩, Subtype.coe_le_coe.mp le_sup_left,
-      Subtype.coe_le_coe.mp le_sup_right⟩
+  directed N₁ N₂ := ⟨
+    ⟨_, N₁.property.sup N₂.property⟩,
+    Subtype.coe_le_coe.mp le_sup_left,
+    Subtype.coe_le_coe.mp le_sup_right
+  ⟩
 
 instance : DirectedSystem _ (fgSystem R M · · · ·) where
   map_self _ _ := rfl
@@ -49,15 +51,16 @@ variable [DecidableEq (Submodule R M)]
 open Submodule in
 /-- Every module is the direct limit of its finitely generated submodules. -/
 noncomputable def equiv : DirectLimit _ (fgSystem R M) ≃ₗ[R] M :=
-  .ofBijective (lift _ _ _ _ (fun _ ↦ Submodule.subtype _) fun _ _ _ _ ↦ rfl)
-    ⟨lift_injective _ _ fun _ ↦ Subtype.val_injective, fun x ↦
-      ⟨of _ _ _ _ ⟨_, fg_span_singleton x⟩ ⟨x, subset_span <| by rfl⟩, lift_of ..⟩⟩
+  .ofBijective (lift _ _ _ _ (fun _ ↦ Submodule.subtype _) fun _ _ _ _ ↦ rfl) ⟨
+    lift_injective _ _ fun _ ↦ Subtype.val_injective,
+    fun x ↦ ⟨of _ _ _ _ ⟨_, fg_span_singleton x⟩ ⟨x, subset_span <| by rfl⟩, lift_of ..⟩
+  ⟩
 
 variable {R M}
 
 set_option backward.isDefEq.respectTransparency.types false in
-lemma equiv_comp_of (N : {N : Submodule R M // N.FG}) :
-    (equiv R M).toLinearMap ∘ₗ of _ _ _ _ N = N.val.subtype := by
+lemma equiv_comp_of (N : {N : Submodule R M // N.FG})
+    : (equiv R M).toLinearMap ∘ₗ of _ _ _ _ N = N.val.subtype := by
   ext; simp [equiv]
 
 end fgSystem

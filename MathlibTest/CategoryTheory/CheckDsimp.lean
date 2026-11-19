@@ -23,9 +23,11 @@ theory are tagged with `@[defeq]`.
 You should feel free to add more here when tagging definitions with `@[implicit_reducible]`.
 -/
 
-/-- Throwaway command for this test: `#ensure_defeq foo` returns an error if
+/--
+Throwaway command for this test: `#ensure_defeq foo` returns an error if
 the declaration `foo` does not have the `@[defeq]` tag (e.g., if it has
-the `@[backward_defeq]` tag instead). -/
+the `@[backward_defeq]` tag instead).
+-/
 syntax (name := ensureDefeqCmd) "#ensure_defeq " ident : command
 
 open Lean in
@@ -152,11 +154,15 @@ elab_rules : command
 #guard_msgs in
 #ensure_defeq CategoryTheory.prod.associativity_unitIso
 
-/-- info: `CategoryTheory.prod.prodFunctorToFunctorProdAssociator_hom_app_app` is tagged with @[defeq] -/
+/--
+info: `CategoryTheory.prod.prodFunctorToFunctorProdAssociator_hom_app_app` is tagged with @[defeq]
+-/
 #guard_msgs in
 #ensure_defeq CategoryTheory.prod.prodFunctorToFunctorProdAssociator_hom_app_app
 
-/-- info: `CategoryTheory.prod.functorProdToProdFunctorAssociator_hom_app` is tagged with @[defeq] -/
+/--
+info: `CategoryTheory.prod.functorProdToProdFunctorAssociator_hom_app` is tagged with @[defeq]
+-/
 #guard_msgs in
 #ensure_defeq CategoryTheory.prod.functorProdToProdFunctorAssociator_hom_app
 

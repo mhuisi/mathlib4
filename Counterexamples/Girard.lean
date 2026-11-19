@@ -31,13 +31,16 @@ Based on Watkins' LF implementation of Hurkens' simplification of Girard's parad
 
 namespace Counterexample
 
-/-- **Girard's paradox**: there are no universes `u` such that `Type u : Type u`.
+/--
+**Girard's paradox**: there are no universes `u` such that `Type u : Type u`.
 Since we can't actually change the type of Lean's `Π` operator, we assume the existence of
 `pi`, `lam`, `app` and the `beta` rule equivalent to the `Π` and `app` constructors of type theory.
 -/
-theorem girard.{u} (pi : (Type u → Type u) → Type u)
-    (lam : ∀ {A : Type u → Type u}, (∀ x, A x) → pi A) (app : ∀ {A}, pi A → ∀ x, A x)
-    (beta : ∀ {A : Type u → Type u} (f : ∀ x, A x) (x), app (lam f) x = f x) : False :=
+theorem girard.{u}
+    (pi : (Type u → Type u) → Type u) (lam : ∀ {A : Type u → Type u}, (∀ x, A x) → pi A)
+    (app : ∀ {A}, pi A → ∀ x, A x)
+    (beta : ∀ {A : Type u → Type u} (f : ∀ x, A x) (x), app (lam f) x = f x)
+    : False :=
   let F (X) := (Set (Set X) → X) → Set (Set X)
   let U := pi F
   let G (T : Set (Set U)) (X) : F X := fun f => {p | {x : U | f (app x X f) ∈ p} ∈ T}

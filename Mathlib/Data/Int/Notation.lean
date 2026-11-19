@@ -16,4 +16,5 @@ set_option doc.verso.suggestions false
 
 public section
 
-@[inherit_doc] notation "ℤ" => Int
+@[inherit_doc]
+notation "ℤ" => Int

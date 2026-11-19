@@ -45,15 +45,16 @@ lemma exists_generator_lt_one : ∃ (a : G), a < 1 ∧ Subgroup.zpowers a = H :=
   · use a⁻¹, Left.inv_lt_one_iff.mpr ha1
     rw [Subgroup.zpowers_inv, ha]
 
-/-- Given a subgroup of a cyclic linearly ordered commutative group, this is a generator of
-the subgroup that is `< 1`. -/
+/--
+Given a subgroup of a cyclic linearly ordered commutative group, this is a generator of
+the subgroup that is `< 1`.
+-/
 @[to_additive negGen /-- Given an additive subgroup of an additive cyclic linearly ordered
 commutative group, this is a negative generator of the subgroup. -/]
 protected noncomputable def genLTOne : G := H.exists_generator_lt_one.choose
 
 @[to_additive negGen_neg]
-lemma genLTOne_lt_one : H.genLTOne < 1 :=
-  H.exists_generator_lt_one.choose_spec.1
+lemma genLTOne_lt_one : H.genLTOne < 1 := H.exists_generator_lt_one.choose_spec.1
 
 @[to_additive (attr := simp) negGen_zmultiples_eq_top]
 lemma genLTOne_zpowers_eq_top : Subgroup.zpowers H.genLTOne = H :=
@@ -71,8 +72,9 @@ lemma genLTOne_unique {g : G} (hg : g < 1) (hH : Subgroup.zpowers g = H) : g = H
   rw [← one_lt_inv', h] at hg
   exact (not_lt_of_gt hg <| Subgroup.genLTOne_lt_one _).elim
 
-lemma genLTOne_unique_of_zpowers_eq {g1 g2 : G} (hg1 : g1 < 1) (hg2 : g2 < 1)
-    (h : Subgroup.zpowers g1 = Subgroup.zpowers g2) : g1 = g2 := by
+lemma genLTOne_unique_of_zpowers_eq
+    {g1 g2 : G} (hg1 : g1 < 1) (hg2 : g2 < 1) (h : Subgroup.zpowers g1 = Subgroup.zpowers g2)
+    : g1 = g2 := by
   rcases (Subgroup.zpowers g2).bot_or_nontrivial with (h' | h')
   · rw [h'] at h
     simp_all only [Subgroup.zpowers_eq_bot]
@@ -105,11 +107,14 @@ namespace OrderMonoidIso
 
 open LinearOrderedCommGroup.Subgroup
 
-variable {A B : Type*} [LinearOrder A] [CommGroup A] [IsOrderedMonoid A] [Nontrivial A] [IsCyclic A]
-  [LinearOrder B] [CommGroup B] [IsOrderedMonoid B] [Nontrivial B] [IsCyclic B] (f : A ≃*o B)
+variable
+  {A B : Type*} [LinearOrder A] [CommGroup A] [IsOrderedMonoid A] [Nontrivial A] [IsCyclic A]
+  [LinearOrder B] [CommGroup B] [IsOrderedMonoid B] [Nontrivial B] [IsCyclic B]
+  (f : A ≃*o B)
 
-theorem map_genLTOne : f (LinearOrderedCommGroup.Subgroup.genLTOne ⊤) =
-      LinearOrderedCommGroup.Subgroup.genLTOne ⊤ := by
+theorem map_genLTOne
+    : f (LinearOrderedCommGroup.Subgroup.genLTOne ⊤)
+      = LinearOrderedCommGroup.Subgroup.genLTOne ⊤ := by
   apply genLTOne_unique
   · simpa [-map_one, ← map_one f, map_lt_map_iff] using genLTOne_lt_one ⊤
   · rw [Subgroup.eq_top_iff']
@@ -119,8 +124,8 @@ theorem map_genLTOne : f (LinearOrderedCommGroup.Subgroup.genLTOne ⊤) =
       simp [genLTOne_zpowers_eq_top]
     exact ⟨k, by simp [← hx, ← hk]⟩
 
-theorem map_genLTOne' :
-    f (LinearOrderedCommGroup.genLTOne A) = LinearOrderedCommGroup.genLTOne B := by
+theorem map_genLTOne'
+    : f (LinearOrderedCommGroup.genLTOne A) = LinearOrderedCommGroup.genLTOne B := by
   simp [LinearOrderedCommGroup.genLTOne_eq_of_top, map_genLTOne]
 
 end OrderMonoidIso

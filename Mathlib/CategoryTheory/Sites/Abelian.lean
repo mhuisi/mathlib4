@@ -20,7 +20,6 @@ Hence, `presheafToSheaf` is an additive functor (`presheafToSheaf_additive`).
 
 public section
 
-
 noncomputable section
 
 namespace CategoryTheory

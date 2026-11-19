@@ -30,22 +30,26 @@ def midpoint (a b : Dyadic) : Dyadic :=
 
 /-- Map `F` over the intervals produced by bisecting `I` to depth `n`, coarsening the results. -/
 @[specialize]
-def binarySplitMap {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β] :
-    ℕ → Interval Dyadic → (Interval Dyadic → Iβ) → Iβ
+def binarySplitMap {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β]
+    : ℕ → Interval Dyadic → (Interval Dyadic → Iβ) → Iβ
   | 0, I, F => F I
   | n + 1, I, F =>
-      match I with
-      | ⟨some l, some u⟩ =>
-          let m := midpoint l u
-          Coarsen.coarsen β (binarySplitMap n ⟨l, m⟩ F) (binarySplitMap n ⟨m, u⟩ F)
-      | _ => F I
+    match I with
+    | ⟨some l, some u⟩ =>
+      let m := midpoint l u
+      Coarsen.coarsen β (binarySplitMap n ⟨l, m⟩ F) (binarySplitMap n ⟨m, u⟩ F)
+    | _ => F I
 
-theorem mem_binarySplitMap {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β]
-    (n : ℕ) {I : Interval Dyadic} {F : Interval Dyadic → Iβ} {y : β} {r : ℝ}
-    (hr : r ∈ I) (hy : ∀ J, r ∈ J → y ∈ F J) : y ∈ binarySplitMap n I F := by
+theorem mem_binarySplitMap
+    {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β]
+    (n : ℕ)
+    {I : Interval Dyadic} {F : Interval Dyadic → Iβ} {y : β} {r : ℝ}
+    (hr : r ∈ I) (hy : ∀ J, r ∈ J → y ∈ F J)
+    : y ∈ binarySplitMap n I F := by
   induction n generalizing I with
   | zero => exact hy I hr
-  | succ n ih => match I with
+  | succ n ih =>
+    match I with
     | ⟨some l, some u⟩ =>
       let m := midpoint l u
       by_cases hl : r ≤ Dyadic.toReal m

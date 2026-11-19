@@ -30,20 +30,18 @@ open Limits CategoryTheory.Functor
 
 variable {C : Type*} [Category* C] (F : C ⥤ FintypeCat.{u})
 
-/-- Any (fiber) functor `F : C ⥤ FintypeCat` naturally factors via
-the forgetful functor from `Action FintypeCat (Aut F)` to `FintypeCat`. -/
+/--
+Any (fiber) functor `F : C ⥤ FintypeCat` naturally factors via
+the forgetful functor from `Action FintypeCat (Aut F)` to `FintypeCat`.
+-/
 def functorToAction : C ⥤ Action FintypeCat.{u} (Aut F) where
   obj X := Action.FintypeCat.ofMulAction (Aut F) (F.obj X)
-  map f := {
-    hom := F.map f
-    comm g := symm <| g.asIso.hom.naturality f
-  }
+  map f := { hom := F.map f, comm g := symm <| g.asIso.hom.naturality f }
 
 lemma functorToAction_comp_forget₂_eq : functorToAction F ⋙ forget₂ _ FintypeCat = F := rfl
 
 @[simp]
-lemma functorToAction_map {X Y : C} (f : X ⟶ Y) : ((functorToAction F).map f).hom = F.map f :=
-  rfl
+lemma functorToAction_map {X Y : C} (f : X ⟶ Y) : ((functorToAction F).map f).hom = F.map f := rfl
 
 instance (X : C) : MulAction (Aut X) ((functorToAction F).obj X).V :=
   inferInstanceAs <| MulAction (Aut X) (F.obj X)
@@ -71,15 +69,17 @@ instance : Functor.ReflectsIsomorphisms (functorToAction F) where
     isIso_of_reflects_iso f F
 
 noncomputable instance : PreservesFiniteCoproducts (functorToAction F) :=
-  ⟨fun _ ↦ Action.preservesColimitsOfShape_of_preserves (functorToAction F)
-    (inferInstanceAs <| PreservesColimitsOfShape (Discrete _) F)⟩
+  ⟨fun _ ↦
+    Action.preservesColimitsOfShape_of_preserves (functorToAction F)
+      (inferInstanceAs <| PreservesColimitsOfShape (Discrete _) F)⟩
 
 noncomputable instance : PreservesFiniteProducts (functorToAction F) :=
-  ⟨fun _ ↦ Action.preservesLimitsOfShape_of_preserves (functorToAction F)
-    (inferInstanceAs <| PreservesLimitsOfShape (Discrete _) F)⟩
+  ⟨fun _ ↦
+    Action.preservesLimitsOfShape_of_preserves (functorToAction F)
+      (inferInstanceAs <| PreservesLimitsOfShape (Discrete _) F)⟩
 
-noncomputable instance (G : Type*) [Group G] [Finite G] :
-    PreservesColimitsOfShape (SingleObj G) (functorToAction F) :=
+noncomputable instance (G : Type*) [Group G] [Finite G]
+    : PreservesColimitsOfShape (SingleObj G) (functorToAction F) :=
   Action.preservesColimitsOfShape_of_preserves _ <|
     inferInstanceAs <| PreservesColimitsOfShape (SingleObj G) F
 

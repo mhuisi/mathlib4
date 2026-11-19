@@ -64,7 +64,7 @@ lemma preimage_val_sInter : A ↓∩ (⋂₀ S) = ⋂₀ { (A ↓∩ B) | B ∈ 
   rw [← Set.image, sInter_image]
   simp_rw [sInter_eq_biInter, preimage_iInter]
 
-lemma preimage_val_sInter_eq_sInter : A ↓∩ (⋂₀ S) = ⋂₀ ((A ↓∩ ·) '' S) := by
+lemma preimage_val_sInter_eq_sInter : A ↓∩ (⋂₀ S) = ⋂₀((A ↓∩ ·) '' S) := by
   simp only [preimage_sInter, sInter_image]
 
 lemma eq_of_preimage_val_eq_of_subset (hB : B ⊆ A) (hC : C ⊆ A) (h : A ↓∩ B = A ↓∩ C) : B = C := by
@@ -93,14 +93,13 @@ lemma image_val_compl : ↑(Dᶜ) = A \ ↑D := by
   rw [compl_eq_univ_sdiff, image_val_sdiff, image_univ, Subtype.range_coe_subtype, ofPred_mem_eq]
 
 @[simp]
-lemma image_val_sUnion : ↑(⋃₀ T) = ⋃₀ { (B : Set α) | B ∈ T} := by
-  rw [image_sUnion, image]
+lemma image_val_sUnion : ↑(⋃₀T) = ⋃₀ { (B : Set α) | B ∈ T} := by rw [image_sUnion, image]
 
 @[simp]
 lemma image_val_iUnion : ↑(⋃ i, t i) = ⋃ i, (t i : Set α) := image_iUnion
 
 @[simp]
-lemma image_val_sInter (hT : T.Nonempty) : (↑(⋂₀ T) : Set α) = ⋂₀ { (↑B : Set α) | B ∈ T } := by
+lemma image_val_sInter (hT : T.Nonempty) : (↑(⋂₀T) : Set α) = ⋂₀ { (↑B : Set α) | B ∈ T } := by
   rw [← Set.image, sInter_image, sInter_eq_biInter, Subtype.val_injective.injOn.image_biInter_eq hT]
 
 @[simp]
@@ -135,8 +134,7 @@ lemma image_val_mono (h : D ⊆ E) : (↑D : Set α) ⊆ ↑E :=
 Relations between restriction and coercion.
 -/
 
-lemma image_val_preimage_val_subset_self : ↑(A ↓∩ B) ⊆ B :=
-  image_preimage_subset _ _
+lemma image_val_preimage_val_subset_self : ↑(A ↓∩ B) ⊆ B := image_preimage_subset _ _
 
 lemma preimage_val_image_val_eq_self : A ↓∩ ↑D = D :=
   Function.Injective.preimage_image Subtype.val_injective _

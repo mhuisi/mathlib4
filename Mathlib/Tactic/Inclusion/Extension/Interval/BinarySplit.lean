@@ -27,13 +27,16 @@ meta def binarySplitParam : InclusionParamDecl where
   name := `binSplit
   type := q(ℕ)
 
-/-- Construct the binary-splitting cover from the `binSplit` parameter.
+/--
+Construct the binary-splitting cover from the `binSplit` parameter.
 If `binSplit` is omitted, return `none`. Otherwise, for `binSplit := n`, return `some` of the
-expression `cover n`. -/
+expression `cover n`.
+-/
 @[inline]
-meta def mkBinarySplitCover {u v : Level} {Iα : Q(Type u)} {α : Q(Type v)}
-    {inst : Q(ToSet $Iα $α)} (cover : Q(ℕ → @Cover.{0} $Iα $α $inst)) :
-    InclusionM (Option Expr) := do
+meta def mkBinarySplitCover
+    {u v : Level} {Iα : Q(Type u)} {α : Q(Type v)} {inst : Q(ToSet $Iα $α)}
+    (cover : Q(ℕ → @Cover.{0} $Iα $α $inst))
+    : InclusionM (Option Expr) := do
   return (← InclusionM.getParam? `binSplit).map (mkApp cover)
 
 end Inclusion.Interval

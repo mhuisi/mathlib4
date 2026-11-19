@@ -71,8 +71,7 @@ class IsAddQuantale (α : Type*) [AddSemigroup α] [CompleteLattice α] where
 
 /-- A quantale is a semigroup distributing over a complete lattice. -/
 @[variable_alias]
-structure AddQuantale (α : Type*)
-  [AddSemigroup α] [CompleteLattice α] [IsAddQuantale α]
+structure AddQuantale (α : Type*) [AddSemigroup α] [CompleteLattice α] [IsAddQuantale α]
 
 /-- A quantale is a semigroup distributing over a complete lattice. -/
 @[to_additive]
@@ -84,8 +83,7 @@ class IsQuantale (α : Type*) [Semigroup α] [CompleteLattice α] where
 
 /-- A quantale is a semigroup distributing over a complete lattice. -/
 @[variable_alias, to_additive]
-structure Quantale (α : Type*)
-  [Semigroup α] [CompleteLattice α] [IsQuantale α]
+structure Quantale (α : Type*) [Semigroup α] [CompleteLattice α] [IsQuantale α]
 
 variable {α ι : Type*} [Semigroup α] [CompleteLattice α] [IsQuantale α]
 variable {x y z : α} {s : Set α} {f : ι → α}
@@ -98,20 +96,24 @@ theorem sSup_mul_distrib : sSup s * x = ⨆ y ∈ s, y * x := IsQuantale.sSup_mu
 
 namespace Quantale
 
-/-- Left- and right-residuation operators on a quantale are similar to the Heyting
+/--
+Left- and right-residuation operators on a quantale are similar to the Heyting
 operator on complete lattices, but for a non-commutative logic.
-I.e. `x ≤ y ⇨ₗ z ↔ x * y ≤ z` or alternatively `x ⇨ₗ y = sSup { z | z * x ≤ y }`. -/
+I.e. `x ≤ y ⇨ₗ z ↔ x * y ≤ z` or alternatively `x ⇨ₗ y = sSup { z | z * x ≤ y }`.
+-/
 @[to_additive
-/-- Left- and right- residuation operators on an additive quantale are similar
+  /-- Left- and right- residuation operators on an additive quantale are similar
 to the Heyting operator on complete lattices, but for a non-commutative logic.
 I.e. `x ≤ y ⇨ₗ z ↔ x + y ≤ z` or alternatively `x ⇨ₗ y = sSup { z | z + x ≤ y }`. -/]
 def leftMulResiduation (x y : α) := sSup {z | z * x ≤ y}
 
-/-- Left- and right- residuation operators on a quantale are similar to the Heyting
+/--
+Left- and right- residuation operators on a quantale are similar to the Heyting
 operator on complete lattices, but for a non-commutative logic.
-I.e. `x ≤ y ⇨ᵣ z ↔ y * x ≤ z` or alternatively `x ⇨ₗ y = sSup { z | x * z ≤ y }`. -/
+I.e. `x ≤ y ⇨ᵣ z ↔ y * x ≤ z` or alternatively `x ⇨ₗ y = sSup { z | x * z ≤ y }`.
+-/
 @[to_additive
-/-- Left- and right- residuation operators on an additive quantale are similar
+  /-- Left- and right- residuation operators on an additive quantale are similar
 to the Heyting operator on complete lattices, but for a non-commutative logic.
 I.e. `x ≤ y ⇨ᵣ z ↔ y + x ≤ z` or alternatively `x ⇨ₗ y = sSup { z | x + z ≤ y }`." -/]
 def rightMulResiduation (x y : α) := sSup {z | x * z ≤ y}
@@ -129,8 +131,7 @@ scoped[AddQuantale] infixr:60 " ⇨ₗ " => leftAddResiduation
 scoped[AddQuantale] infixr:60 " ⇨ᵣ " => rightAddResiduation
 
 @[to_additive]
-theorem mul_iSup_distrib : x * ⨆ i, f i = ⨆ i, x * f i := by
-  rw [iSup, mul_sSup_distrib, iSup_range]
+theorem mul_iSup_distrib : x * ⨆ i, f i = ⨆ i, x * f i := by rw [iSup, mul_sSup_distrib, iSup_range]
 
 @[to_additive]
 theorem iSup_mul_distrib : (⨆ i, f i) * x = ⨆ i, f i * x := by
@@ -147,29 +148,33 @@ theorem sup_mul_distrib : (x ⊔ y) * z = (x * z) ⊔ (y * z) := by
 @[to_additive]
 instance (priority := 90) : MulLeftMono α where
   elim := by
-    intro _ _ _; simp only; intro
+    intro _ _ _
+    simp only
+    intro
     rwa [← left_eq_sup, ← mul_sup_distrib, sup_of_le_left]
 
 @[to_additive]
 instance (priority := 90) : MulRightMono α where
   elim := by
-    intro _ _ _; simp only; intro
+    intro _ _ _
+    simp only
+    intro
     rwa [← left_eq_sup, ← sup_mul_distrib, sup_of_le_left]
 
 @[to_additive]
 theorem leftMulResiduation_le_iff_mul_le : x ≤ y ⇨ₗ z ↔ x * y ≤ z where
   mp h1 := by
     grw [h1]
-    simp_all only [leftMulResiduation, sSup_mul_distrib, Set.mem_ofPred_eq,
-      iSup_le_iff, implies_true]
+    simp_all only [leftMulResiduation, sSup_mul_distrib, Set.mem_ofPred_eq, iSup_le_iff,
+      implies_true]
   mpr h1 := le_sSup h1
 
 @[to_additive]
 theorem rightMulResiduation_le_iff_mul_le : x ≤ y ⇨ᵣ z ↔ y * x ≤ z where
   mp h1 := by
     grw [h1]
-    simp_all only [rightMulResiduation, mul_sSup_distrib, Set.mem_ofPred_eq,
-      iSup_le_iff, implies_true]
+    simp_all only [rightMulResiduation, mul_sSup_distrib, Set.mem_ofPred_eq, iSup_le_iff,
+      implies_true]
   mpr h1 := le_sSup h1
 
 section Zero

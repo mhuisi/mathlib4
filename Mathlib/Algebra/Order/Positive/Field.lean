@@ -20,25 +20,21 @@ ordered commutative group.
 
 public section
 
-
 variable {K : Type*} [Field K] [LinearOrder K] [IsStrictOrderedRing K]
 
 namespace Positive
 
-instance Subtype.inv : Inv { x : K // 0 < x } := ⟨fun x => ⟨x⁻¹, inv_pos.2 x.property⟩⟩
+instance Subtype.inv : Inv {x : K // 0 < x} := ⟨fun x => ⟨x⁻¹, inv_pos.2 x.property⟩⟩
 
 @[simp]
-theorem coe_inv (x : { x : K // 0 < x }) : ↑x⁻¹ = (x⁻¹ : K) :=
-  rfl
+theorem coe_inv (x : {x : K // 0 < x}) : ↑x⁻¹ = (x⁻¹ : K) := rfl
 
-instance : Pow { x : K // 0 < x } ℤ :=
-  ⟨fun x n => ⟨(x : K) ^ n, zpow_pos x.property _⟩⟩
+instance : Pow {x : K // 0 < x} ℤ := ⟨fun x n => ⟨(x : K) ^ n, zpow_pos x.property _⟩⟩
 
 @[simp]
-theorem coe_zpow (x : { x : K // 0 < x }) (n : ℤ) : ↑(x ^ n) = (x : K) ^ n :=
-  rfl
+theorem coe_zpow (x : {x : K // 0 < x}) (n : ℤ) : ↑(x ^ n) = (x : K) ^ n := rfl
 
-instance : CommGroup { x : K // 0 < x } where
+instance : CommGroup {x : K // 0 < x} where
   inv_mul_cancel a := Subtype.ext <| inv_mul_cancel₀ a.property.ne'
   zpow_zero' x := Subtype.ext <| zpow_zero _
   zpow_succ' n x := Subtype.ext <| DivInvMonoid.zpow_succ' _ _

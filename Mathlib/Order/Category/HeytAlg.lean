@@ -19,7 +19,6 @@ This file defines `HeytAlg`, the category of Heyting algebras.
 
 @[expose] public section
 
-
 universe u
 
 open CategoryTheory Order
@@ -36,8 +35,7 @@ initialize_simps_projections HeytAlg (carrier → coe, -str)
 
 namespace HeytAlg
 
-instance : CoeSort HeytAlg (Type _) :=
-  ⟨HeytAlg.carrier⟩
+instance : CoeSort HeytAlg (Type _) := ⟨HeytAlg.carrier⟩
 
 attribute [coe] HeytAlg.carrier
 
@@ -66,18 +64,16 @@ instance : ConcreteCategory HeytAlg (HeytingHom · ·) where
   ofHom := Hom._mkInternal
 
 /-- Turn a morphism in `HeytAlg` back into a `HeytingHom`. -/
-abbrev Hom.hom {X Y : HeytAlg.{u}} (f : Hom X Y) :=
-  ConcreteCategory.hom (C := HeytAlg) f
+abbrev Hom.hom {X Y : HeytAlg.{u}} (f : Hom X Y) := ConcreteCategory.hom (C := HeytAlg) f
 
 /-- Typecheck a `HeytingHom` as a morphism in `HeytAlg`. -/
-abbrev ofHom {X Y : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] (f : HeytingHom X Y) :
-    of X ⟶ of Y :=
+abbrev ofHom {X Y : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] (f : HeytingHom X Y)
+    : of X ⟶ of Y :=
   ConcreteCategory.ofHom (C := HeytAlg) f
 
 variable {R} in
 /-- Use the `ConcreteCategory.hom` projection for `@[simps]` lemmas. -/
-def Hom.Simps.hom (X Y : HeytAlg.{u}) (f : Hom X Y) :=
-  f.hom
+def Hom.Simps.hom (X Y : HeytAlg.{u}) (f : Hom X Y) := f.hom
 
 initialize_simps_projections Hom (hom' → hom)
 
@@ -92,8 +88,7 @@ lemma coe_id {X : HeytAlg} : (𝟙 X : X → X) = id := rfl
 lemma coe_comp {X Y Z : HeytAlg} {f : X ⟶ Y} {g : Y ⟶ Z} : (f ≫ g : X → Z) = g ∘ f := rfl
 
 @[simp]
-lemma forget_map {X Y : HeytAlg} (f : X ⟶ Y) :
-    (forget HeytAlg).map f = (f : _ → _) := rfl
+lemma forget_map {X Y : HeytAlg} (f : X ⟶ Y) : (forget HeytAlg).map f = (f : _ → _) := rfl
 
 @[ext]
 lemma ext {X Y : HeytAlg} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
@@ -106,51 +101,44 @@ theorem coe_of (X : Type u) [HeytingAlgebra X] : (HeytAlg.of X : Type u) = X := 
 lemma hom_id {X : HeytAlg} : (𝟙 X : X ⟶ X).hom = HeytingHom.id _ := rfl
 
 /- Provided for rewriting. -/
-lemma id_apply (X : HeytAlg) (x : X) :
-    (𝟙 X : X ⟶ X) x = x := by simp
+lemma id_apply (X : HeytAlg) (x : X) : (𝟙 X : X ⟶ X) x = x := by simp
 
 @[simp]
-lemma hom_comp {X Y Z : HeytAlg} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).hom = g.hom.comp f.hom := rfl
+lemma hom_comp {X Y Z : HeytAlg} (f : X ⟶ Y) (g : Y ⟶ Z) : (f ≫ g).hom = g.hom.comp f.hom := rfl
 
 /- Provided for rewriting. -/
-lemma comp_apply {X Y Z : HeytAlg} (f : X ⟶ Y) (g : Y ⟶ Z) (x : X) :
-    (f ≫ g) x = g (f x) := by simp
+lemma comp_apply {X Y Z : HeytAlg} (f : X ⟶ Y) (g : Y ⟶ Z) (x : X) : (f ≫ g) x = g (f x) := by simp
 
 @[ext]
-lemma hom_ext {X Y : HeytAlg} {f g : X ⟶ Y} (hf : f.hom = g.hom) : f = g :=
-  Hom.ext hf
+lemma hom_ext {X Y : HeytAlg} {f g : X ⟶ Y} (hf : f.hom = g.hom) : f = g := Hom.ext hf
 
 @[simp]
-lemma hom_ofHom {X Y : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] (f : HeytingHom X Y) :
-    (ofHom f).hom = f :=
+lemma hom_ofHom {X Y : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] (f : HeytingHom X Y)
+    : (ofHom f).hom = f :=
   rfl
 
 @[simp]
-lemma ofHom_hom {X Y : HeytAlg} (f : X ⟶ Y) :
-    ofHom (Hom.hom f) = f := rfl
+lemma ofHom_hom {X Y : HeytAlg} (f : X ⟶ Y) : ofHom (Hom.hom f) = f := rfl
 
 @[simp]
 lemma ofHom_id {X : Type u} [HeytingAlgebra X] : ofHom (HeytingHom.id _) = 𝟙 (of X) := rfl
 
 @[simp]
-lemma ofHom_comp {X Y Z : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] [HeytingAlgebra Z]
-    (f : HeytingHom X Y) (g : HeytingHom Y Z) :
-    ofHom (g.comp f) = ofHom f ≫ ofHom g :=
+lemma ofHom_comp
+    {X Y Z : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] [HeytingAlgebra Z]
+    (f : HeytingHom X Y) (g : HeytingHom Y Z)
+    : ofHom (g.comp f) = ofHom f ≫ ofHom g :=
   rfl
 
-lemma ofHom_apply {X Y : Type u} [HeytingAlgebra X] [HeytingAlgebra Y]
-    (f : HeytingHom X Y) (x : X) :
-    (ofHom f) x = f x := rfl
+lemma ofHom_apply {X Y : Type u} [HeytingAlgebra X] [HeytingAlgebra Y] (f : HeytingHom X Y) (x : X)
+    : (ofHom f) x = f x :=
+  rfl
 
-lemma inv_hom_apply {X Y : HeytAlg} (e : X ≅ Y) (x : X) : e.inv (e.hom x) = x := by
-  simp
+lemma inv_hom_apply {X Y : HeytAlg} (e : X ≅ Y) (x : X) : e.inv (e.hom x) = x := by simp
 
-lemma hom_inv_apply {X Y : HeytAlg} (e : X ≅ Y) (s : Y) : e.hom (e.inv s) = s := by
-  simp
+lemma hom_inv_apply {X Y : HeytAlg} (e : X ≅ Y) (s : Y) : e.hom (e.inv s) = s := by simp
 
-instance : Inhabited HeytAlg :=
-  ⟨of PUnit⟩
+instance : Inhabited HeytAlg := ⟨of PUnit⟩
 
 @[simps]
 instance hasForgetToLat : HasForget₂ HeytAlg BddDistLat where

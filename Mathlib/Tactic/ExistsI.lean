@@ -36,7 +36,6 @@ example : ∃ x : Nat, ∃ y : Nat, x = y := by
   rfl
 ```
 -/
-macro "existsi " es:term,+ : tactic =>
-  `(tactic| refine ⟨$es,*, ?_⟩)
+macro "existsi " es:term,+ : tactic => `(tactic| refine ⟨$es,*, ?_⟩)
 
 end Mathlib.Tactic

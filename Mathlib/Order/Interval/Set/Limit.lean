@@ -22,10 +22,11 @@ universe u
 
 namespace Set.Ici
 
-lemma isSuccLimit_coe {J : Type u} [LinearOrder J] {j : J}
-    (m : Set.Ici j) (hm : Order.IsSuccLimit m) :
-    Order.IsSuccLimit m.val :=
-  ⟨Set.not_isMin_coe _ hm.not_isMin, fun b ↦ by
+lemma isSuccLimit_coe
+    {J : Type u} [LinearOrder J] {j : J} (m : Set.Ici j) (hm : Order.IsSuccLimit m)
+    : Order.IsSuccLimit m.val := ⟨
+  Set.not_isMin_coe _ hm.not_isMin,
+  fun b ↦ by
     simp only [CovBy, not_lt, not_and, not_forall, not_le]
     intro hb
     by_cases hb' : j ≤ b
@@ -38,6 +39,7 @@ lemma isSuccLimit_coe {J : Type u} [LinearOrder J] {j : J}
       by_contra!
       apply hm.not_isMin
       rintro ⟨k, hk⟩ _
-      exact this.trans (by simpa using hk)⟩
+      exact this.trans (by simpa using hk)
+⟩
 
 end Set.Ici

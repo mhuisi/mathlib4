@@ -24,18 +24,17 @@ open Set
 
 section ESeminormedAddMonoid
 
-variable {α ε : Type*} [TopologicalSpace ε] [ESeminormedAddMonoid ε]
-  {s t : Set α} (f : α → ε) (a : α)
+variable
+  {α ε : Type*} [TopologicalSpace ε] [ESeminormedAddMonoid ε] {s t : Set α} (f : α → ε) (a : α)
 
-lemma eNorm_indicator_eq_indicator_eNorm :
-    ‖indicator s f a‖ₑ = indicator s (fun a => ‖f a‖ₑ) a :=
+lemma eNorm_indicator_eq_indicator_eNorm : ‖indicator s f a‖ₑ = indicator s (fun a => ‖f a‖ₑ) a :=
   congr($((indicator_comp_of_zero (eNorm_zero (E := ε))).symm) a)
 
 @[deprecated (since := "2026-11-06")]
 alias enorm_indicator_eq_indicator_enorm := eNorm_indicator_eq_indicator_eNorm
 
-theorem eNorm_indicator_le_of_subset (h : s ⊆ t) (f : α → ε) (a : α) :
-    ‖indicator s f a‖ₑ ≤ ‖indicator t f a‖ₑ := by
+theorem eNorm_indicator_le_of_subset (h : s ⊆ t) (f : α → ε) (a : α)
+    : ‖indicator s f a‖ₑ ≤ ‖indicator t f a‖ₑ := by
   simp only [eNorm_indicator_eq_indicator_eNorm]
   grw [h]
 
@@ -64,15 +63,15 @@ variable {α E : Type*} [SeminormedAddGroup E] {s t : Set α} (f : α → E) (a 
 theorem norm_indicator_eq_indicator_norm : ‖indicator s f a‖ = indicator s (fun a => ‖f a‖) a :=
   congr($((indicator_comp_of_zero norm_zero).symm) a)
 
-theorem nnNorm_indicator_eq_indicator_nnNorm :
-    ‖indicator s f a‖₊ = indicator s (fun a => ‖f a‖₊) a :=
+theorem nnNorm_indicator_eq_indicator_nnNorm
+    : ‖indicator s f a‖₊ = indicator s (fun a => ‖f a‖₊) a :=
   congr($((indicator_comp_of_zero nnNorm_zero).symm) a)
 
 @[deprecated (since := "2026-10-31")]
 alias nnnorm_indicator_eq_indicator_nnnorm := nnNorm_indicator_eq_indicator_nnNorm
 
-theorem norm_indicator_le_of_subset (h : s ⊆ t) (f : α → E) (a : α) :
-    ‖indicator s f a‖ ≤ ‖indicator t f a‖ := by
+theorem norm_indicator_le_of_subset (h : s ⊆ t) (f : α → E) (a : α)
+    : ‖indicator s f a‖ ≤ ‖indicator t f a‖ := by
   simp only [norm_indicator_eq_indicator_norm]
   grw [h]
 

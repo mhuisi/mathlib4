@@ -9,8 +9,10 @@ set_option linter.style.numericProjections true
 
 open Lean
 
-structure Foo where a : Nat
-structure Bar extends Foo where b : Nat
+structure Foo where
+  a : Nat
+structure Bar extends Foo where
+  b : Nat
 
 variable (r : Rat) (bar : Bar)
 
@@ -58,7 +60,8 @@ Note: This linter can be disabled with `set_option linter.style.numericProjectio
 #guard_msgs in
 example := bar.1.1
 
-structure Fn where f : Nat → Nat
+structure Fn where
+  f : Nat → Nat
 
 /--
 warning: Numeric projections are disallowed.
@@ -106,7 +109,8 @@ example (h : MyFn) := h.1
 
 /-! There is no named field to suggest for an `inductive` with one constructor. -/
 
-inductive Ind | mk (x y : Nat)
+inductive Ind
+  | mk (x y : Nat)
 
 example (i : Ind) := i.2
 
@@ -117,24 +121,29 @@ The following tests attempt to test the linter in many different circumstances.
 -/
 
 open Elab Command in
-/-- Elaborates `cmd`, then reports how many `TermInfo`s are numeric projections. The
+/--
+Elaborates `cmd`, then reports how many `TermInfo`s are numeric projections. The
 `numericProjections` linter expects the `expr`s of all such infos to be constants (no metavariables
 or metadata/annotations), so this ensures that this is indeed the case (and that we capture all the
 projection infos we expect to).
 
 If this output changes, consider following the advice in the body of `numericProjFn?` in the linter
-and accounting for metavariables and annotations. -/
+and accounting for metavariables and annotations.
+-/
 elab tk:"#numeric_proj_infos" " in " ppLine cmd:command : command => do
   elabCommand cmd
   let mut numInfos := 0
   let mut bad : Array MessageData := #[]
   for t in (← getInfoState).substituteLazy.get.trees do
-    let numericProjInfos := t.foldInfo (init := #[]) fun _ info acc => match info with
-      | .ofTermInfo i =>
-        if i.stx.isOfKind Parser.Term.identProjKind && i.stx[0].isOfKind fieldIdxKind then
-          acc.push i
-        else acc
-      | _ => acc
+    let numericProjInfos :=
+      t.foldInfo (init := #[]) fun _ info acc =>
+        match info with
+        | .ofTermInfo i =>
+          if i.stx.isOfKind Parser.Term.identProjKind && i.stx[0].isOfKind fieldIdxKind then
+            acc.push i
+          else
+            acc
+        | _ => acc
     numInfos := numInfos + numericProjInfos.size
     for i in numericProjInfos do
       unless i.expr.constName?.isSome do
@@ -142,11 +151,13 @@ elab tk:"#numeric_proj_infos" " in " ppLine cmd:command : command => do
   if bad.isEmpty then
     logInfoAt tk m!"Found {numInfos} numeric projection infos, all of which were `Expr.const`s"
   else
-    logWarningAt tk m!"Found {numInfos} numeric projection infos, but some were not `Expr.const`s:\
-      {indentD <| m!"\n".joinSep bad.toList}"
+    logWarningAt tk
+      m!"Found {numInfos} numeric projection infos, but some were not `Expr.const`s:\
+        {indentD <| m!"\n".joinSep bad.toList}"
 
 def MyBar := Bar
-class C (α : Type) where c : α
+class C (α : Type) where
+  c : α
 
 /-!
 Term-mode elaboration paths: postponement, wrappers, `by` blocks, unfolding, classes,
@@ -469,4 +480,6 @@ To allow numeric projections for all terms of type `Bar`, add `@[allow_numeric_p
 Note: This linter can be disabled with `set_option linter.style.numericProjections false`
 -/
 #guard_msgs in
-example (y : Foo) (h : y.a = bar.b) : Nat := match y, h with | ⟨.(bar.2)⟩, rfl => 0
+example (y : Foo) (h : y.a = bar.b) : Nat :=
+  match y, h with
+  | ⟨.(bar.2)⟩, rfl => 0

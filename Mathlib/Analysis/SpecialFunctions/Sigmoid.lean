@@ -129,15 +129,14 @@ open Filter
 open scoped Topology
 
 lemma tendsto_sigmoid_atTop : Tendsto sigmoid atTop (𝓝 1) := by
-  simpa using! Real.tendsto_exp_comp_nhds_zero.mpr tendsto_neg_atTop_atBot |>.const_add 1 |>.inv₀ <|
-    by simp
+  simpa using!
+    Real.tendsto_exp_comp_nhds_zero.mpr tendsto_neg_atTop_atBot |>.const_add 1 |>.inv₀ <| by simp
 
 lemma tendsto_sigmoid_atBot : Tendsto sigmoid atBot (𝓝 0) :=
   tendsto_const_nhds.add_atTop (tendsto_exp_comp_atTop.mpr tendsto_neg_atBot_atTop)
     |>.inv_tendsto_atTop
 
-lemma hasDerivAt_sigmoid (x : ℝ) :
-    HasDerivAt sigmoid (sigmoid x * (1 - sigmoid x)) x := by
+lemma hasDerivAt_sigmoid (x : ℝ) : HasDerivAt sigmoid (sigmoid x * (1 - sigmoid x)) x := by
   convert! (hasDerivAt_neg' x |>.exp.const_add 1 |>.inv <| by positivity) using 1
   rw [← sigmoid_neg, ← sigmoid_mul_rexp_neg x, sigmoid_def]
   field [sq]
@@ -160,17 +159,16 @@ lemma AnalyticAt.sigmoid {x : E} (fa : AnalyticAt ℝ f x) : AnalyticAt ℝ (sig
   analyticAt_sigmoid.comp fa
 
 @[fun_prop]
-lemma AnalyticAt.sigmoid' {x : E} (fa : AnalyticAt ℝ f x) :
-    AnalyticAt ℝ (fun z ↦ Real.sigmoid (f z)) x := fa.sigmoid
+lemma AnalyticAt.sigmoid' {x : E} (fa : AnalyticAt ℝ f x)
+    : AnalyticAt ℝ (fun z ↦ Real.sigmoid (f z)) x :=
+  fa.sigmoid
 
-lemma analyticOnNhd_sigmoid : AnalyticOnNhd ℝ sigmoid Set.univ :=
-  fun _ _ ↦ analyticAt_sigmoid
+lemma analyticOnNhd_sigmoid : AnalyticOnNhd ℝ sigmoid Set.univ := fun _ _ ↦ analyticAt_sigmoid
 
 lemma AnalyticOnNhd.sigmoid (fs : AnalyticOnNhd ℝ f s) : AnalyticOnNhd ℝ (sigmoid ∘ f) s :=
   fun z n ↦ analyticAt_sigmoid.comp (fs z n)
 
-lemma analyticOn_sigmoid : AnalyticOn ℝ sigmoid Set.univ :=
-  analyticOnNhd_sigmoid.analyticOn
+lemma analyticOn_sigmoid : AnalyticOn ℝ sigmoid Set.univ := analyticOnNhd_sigmoid.analyticOn
 
 lemma AnalyticOn.sigmoid (fs : AnalyticOn ℝ f s) : AnalyticOn ℝ (sigmoid ∘ f) s :=
   analyticOnNhd_sigmoid.comp_analyticOn fs (mapsTo_univ _ _)
@@ -178,8 +176,9 @@ lemma AnalyticOn.sigmoid (fs : AnalyticOn ℝ f s) : AnalyticOn ℝ (sigmoid ∘
 lemma analyticWithinAt_sigmoid {s : Set ℝ} : AnalyticWithinAt ℝ sigmoid s x :=
   analyticAt_sigmoid.analyticWithinAt
 
-lemma AnalyticWithinAt.sigmoid {x : E} (fa : AnalyticWithinAt ℝ f s x) :
-  AnalyticWithinAt ℝ (sigmoid ∘ f) s x := analyticAt_sigmoid.comp_analyticWithinAt fa
+lemma AnalyticWithinAt.sigmoid {x : E} (fa : AnalyticWithinAt ℝ f s x)
+    : AnalyticWithinAt ℝ (sigmoid ∘ f) s x :=
+  analyticAt_sigmoid.comp_analyticWithinAt fa
 
 open ContDiff in
 @[fun_prop]
@@ -199,16 +198,16 @@ lemma Differentiable.sigmoid (hf : Differentiable ℝ f) : Differentiable ℝ (s
   differentiable_sigmoid.comp hf
 
 @[fun_prop]
-lemma differentiableAt_sigmoid : DifferentiableAt ℝ sigmoid x :=
-  differentiable_sigmoid x
+lemma differentiableAt_sigmoid : DifferentiableAt ℝ sigmoid x := differentiable_sigmoid x
 
 @[fun_prop]
-lemma DifferentiableAt.sigmoid {x : E} (hf : DifferentiableAt ℝ f x) :
-    DifferentiableAt ℝ (sigmoid ∘ f) x := differentiableAt_sigmoid.comp x hf
+lemma DifferentiableAt.sigmoid {x : E} (hf : DifferentiableAt ℝ f x)
+    : DifferentiableAt ℝ (sigmoid ∘ f) x :=
+  differentiableAt_sigmoid.comp x hf
 
 @[fun_prop]
 lemma continuous_sigmoid : Continuous sigmoid := by
-  apply Differentiable.continuous (𝕜 := ℝ)  -- fun_prop can't choose `𝕜`
+  apply Differentiable.continuous (𝕜 := ℝ) -- fun_prop can't choose `𝕜`
   fun_prop
 
 omit [NormedSpace ℝ E] in
@@ -282,16 +281,16 @@ noncomputable def OrderEmbedding.sigmoid : ℝ ↪o I :=
   OrderEmbedding.ofStrictMono unitInterval.sigmoid unitInterval.sigmoid_strictMono
 
 lemma Topology.isEmbedding_sigmoid : IsEmbedding unitInterval.sigmoid :=
-  OrderEmbedding.sigmoid.isEmbedding_of_ordConnected (ordConnected_of_Ioo <|
-    fun a _ b _ _ => unitInterval.range_sigmoid ▸ Ioo_subset_Ioo a.property.1 b.property.2)
+  OrderEmbedding.sigmoid.isEmbedding_of_ordConnected (ordConnected_of_Ioo <| fun a _ b _ _ =>
+    unitInterval.range_sigmoid ▸ Ioo_subset_Ioo a.property.1 b.property.2)
 
 lemma measurableEmbedding_sigmoid : MeasurableEmbedding unitInterval.sigmoid :=
   Topology.isEmbedding_sigmoid.measurableEmbedding <| unitInterval.range_sigmoid ▸ measurableSet_Ioo
 
 variable (α : Type*) [MeasurableSpace α] [StandardBorelSpace α]
 
-lemma measurableEmbedding_sigmoid_comp_embeddingReal :
-    MeasurableEmbedding (unitInterval.sigmoid ∘ MeasureTheory.embeddingReal α) :=
+lemma measurableEmbedding_sigmoid_comp_embeddingReal
+    : MeasurableEmbedding (unitInterval.sigmoid ∘ MeasureTheory.embeddingReal α) :=
   measurableEmbedding_sigmoid.comp (MeasureTheory.measurableEmbedding_embeddingReal α)
 
 end Embedding

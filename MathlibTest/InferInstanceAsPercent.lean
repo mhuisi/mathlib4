@@ -29,12 +29,10 @@ def MyNat : Type := Nat
 
 -- `inferInstanceAs` leaks the source type `Nat` as the carrier
 @[instance_reducible]
-def myNatInv_leaky : MyInv MyNat :=
-  inferInstanceAs (MyInv Nat)
+def myNatInv_leaky : MyInv MyNat := inferInstanceAs (MyInv Nat)
 
 -- `inferInstanceAs%` fixes this — the carrier and lambda domain are `MyNat`
-instance myNatInv_fixed : MyInv MyNat :=
-  inferInstanceAs% (MyInv Nat)
+instance myNatInv_fixed : MyInv MyNat := inferInstanceAs% (MyInv Nat)
 
 -- The binder type is `MyNat`:
 /--

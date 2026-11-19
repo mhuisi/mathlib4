@@ -21,8 +21,10 @@ namespace CategoryTheory
 
 variable {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
 
-/-- An object `X` is a retract of `Y` if there are morphisms `i : X ⟶ Y` and `r : Y ⟶ X` such
-that `i ≫ r = 𝟙 X`. -/
+/--
+An object `X` is a retract of `Y` if there are morphisms `i : X ⟶ Y` and `r : Y ⟶ X` such
+that `i ≫ r = 𝟙 X`.
+-/
 structure Retract (X Y : C) where
   /-- the split monomorphism -/
   i : X ⟶ Y
@@ -92,12 +94,13 @@ def ofIso (e : X ≅ Y) : Retract X Y where
   r := e.inv
 
 @[reassoc (attr := simp)]
-lemma retract_app {F G : C ⥤ D} (r : Retract F G) (X : C) :
-    r.i.app X ≫ r.r.app X = 𝟙 _ :=
+lemma retract_app {F G : C ⥤ D} (r : Retract F G) (X : C) : r.i.app X ≫ r.r.app X = 𝟙 _ :=
   congr($(r.retract).app X)
 
-/-- If a functor `F` is a retract of `G`, then for any object `X`,
-`F.obj X` is a retract of `G.obj X`. -/
+/--
+If a functor `F` is a retract of `G`, then for any object `X`,
+`F.obj X` is a retract of `G.obj X`.
+-/
 @[simps]
 def app {F G : C ⥤ D} (r : Retract F G) (X : C) : Retract (F.obj X) (G.obj X) where
   i := r.i.app X
@@ -116,7 +119,8 @@ end Retract
 
 ```
 A morphism `f : X ⟶ Y` is a retract of `g : Z ⟶ W` if there are morphisms `i : f ⟶ g`
-and `r : g ⟶ f` in the arrow category such that `i ≫ r = 𝟙 f`. -/
+and `r : g ⟶ f` in the arrow category such that `i ≫ r = 𝟙 f`.
+-/
 @[to_dual self]
 abbrev RetractArrow {X Y Z W : C} (f : X ⟶ Y) (g : Z ⟶ W) := Retract (Arrow.mk f) (Arrow.mk g)
 
@@ -139,7 +143,7 @@ lemma r_w : h.r.left ≫ f = g ≫ h.r.right := h.r.w
 set_option backward.isDefEq.respectTransparency.types false in
 /-- The top of a retract diagram of morphisms determines a retract of objects. -/
 @[to_dual (attr := simps!)
-/-- The bottom of a retract diagram of morphisms determines a retract of objects. -/]
+  /-- The bottom of a retract diagram of morphisms determines a retract of objects. -/]
 def left : Retract X Z := h.map Arrow.leftFunc
 
 @[to_dual (attr := reassoc (attr := simp))]
@@ -151,11 +155,12 @@ instance : IsSplitEpi h.r.left := ⟨⟨h.left.splitEpi⟩⟩
 @[to_dual]
 instance : IsSplitEpi h.r.right := ⟨⟨h.right.splitEpi⟩⟩
 
-/-- If a morphism `f` is a retract of `g`,
-then `F.map f` is a retract of `F.map g` for any functor `F`. -/
+/--
+If a morphism `f` is a retract of `g`,
+then `F.map f` is a retract of `F.map g` for any functor `F`.
+-/
 @[to_dual self, simps!]
-def map (F : C ⥤ D) : RetractArrow (F.map f) (F.map g) :=
-  Retract.map h F.mapArrow
+def map (F : C ⥤ D) : RetractArrow (F.map f) (F.map g) := Retract.map h F.mapArrow
 
 attribute [to_dual existing] map_i_left map_i_right
 
@@ -168,11 +173,13 @@ def op : RetractArrow f.op g.op where
 
 attribute [to_dual existing (reorder := X Y, Z W)] op_i
 
-/-- If a morphism `f` in the opposite category is a retract of `g`,
-then `f.unop` is a retract of `g.unop`. -/
+/--
+If a morphism `f` in the opposite category is a retract of `g`,
+then `f.unop` is a retract of `g.unop`.
+-/
 @[to_dual self, simps]
-def unop {X Y Z W : Cᵒᵖ} {f : X ⟶ Y} {g : Z ⟶ W} (h : RetractArrow f g) :
-    RetractArrow f.unop g.unop where
+def unop {X Y Z W : Cᵒᵖ} {f : X ⟶ Y} {g : Z ⟶ W} (h : RetractArrow f g)
+    : RetractArrow f.unop g.unop where
   i := Arrow.homMk (h.r.right.unop) (h.r.left.unop) (by simp [← unop_comp])
   r := Arrow.homMk (h.i.right.unop) (h.i.left.unop) (by simp [← unop_comp])
   retract := by ext <;> simp [← unop_comp]
@@ -193,11 +200,13 @@ attribute [to_dual existing] retract_i
 
 end Iso
 
-/-- If `X` is a retract of `Y`, then for any natural transformation `τ`,
-the natural transformation `τ.app X` is a retract of `τ.app Y`. -/
+/--
+If `X` is a retract of `Y`, then for any natural transformation `τ`,
+the natural transformation `τ.app X` is a retract of `τ.app Y`.
+-/
 @[to_dual self, simps]
-def NatTrans.retractArrowApp {F G : C ⥤ D}
-    (τ : F ⟶ G) {X Y : C} (h : Retract X Y) : RetractArrow (τ.app X) (τ.app Y) where
+def NatTrans.retractArrowApp {F G : C ⥤ D} (τ : F ⟶ G) {X Y : C} (h : Retract X Y)
+    : RetractArrow (τ.app X) (τ.app Y) where
   i := Arrow.homMk (F.map h.i) (G.map h.i) (by simp)
   r := Arrow.homMk (F.map h.r) (G.map h.r) (by simp)
   retract := by ext <;> simp [← Functor.map_comp]

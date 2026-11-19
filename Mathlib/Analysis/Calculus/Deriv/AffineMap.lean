@@ -28,9 +28,11 @@ affine map, derivative, differentiability
 
 public section
 
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+variable
+  {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
-  (f : 𝕜 →ᵃ[𝕜] E) {a b : E} {L : Filter (𝕜 × 𝕜)} {s : Set 𝕜} {x : 𝕜}
+  (f : 𝕜 →ᵃ[𝕜] E)
+  {a b : E} {L : Filter (𝕜 × 𝕜)} {s : Set 𝕜} {x : 𝕜}
 
 namespace AffineMap
 
@@ -42,11 +44,11 @@ theorem hasStrictDerivAt : HasStrictDerivAt f (f.linear 1) x := f.hasDerivAtFilt
 theorem hasDerivWithinAt : HasDerivWithinAt f (f.linear 1) s x := f.hasDerivAtFilter
 theorem hasDerivAt : HasDerivAt f (f.linear 1) x := f.hasDerivAtFilter
 
-protected theorem derivWithin (hs : UniqueDiffWithinAt 𝕜 s x) :
-    derivWithin f s x = f.linear 1 :=
+protected theorem derivWithin (hs : UniqueDiffWithinAt 𝕜 s x) : derivWithin f s x = f.linear 1 :=
   f.hasDerivWithinAt.derivWithin hs
 
-@[simp] protected theorem deriv : deriv f x = f.linear 1 := f.hasDerivAt.deriv
+@[simp]
+protected theorem deriv : deriv f x = f.linear 1 := f.hasDerivAt.deriv
 
 protected theorem differentiableAt : DifferentiableAt 𝕜 f x := f.hasDerivAt.differentiableAt
 protected theorem differentiable : Differentiable 𝕜 f := fun _ ↦ f.differentiableAt

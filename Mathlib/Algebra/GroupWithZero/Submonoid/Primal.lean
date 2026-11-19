@@ -20,8 +20,8 @@ set_option doc.verso.suggestions false
 assert_not_exists RelIso Ring
 
 /-- The submonoid of primal elements in a cancellative commutative monoid with zero. -/
-def Submonoid.isPrimal (M₀ : Type*) [CommMonoidWithZero M₀] [IsCancelMulZero M₀] :
-    Submonoid M₀ where
+def Submonoid.isPrimal (M₀ : Type*) [CommMonoidWithZero M₀] [IsCancelMulZero M₀]
+    : Submonoid M₀ where
   carrier := {a | IsPrimal a}
   mul_mem' := .mul
   one_mem' := isUnit_one.isPrimal

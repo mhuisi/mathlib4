@@ -73,39 +73,47 @@ coproducts are exact.
 @[stacks 079B]
 abbrev AB4 [HasCoproducts C] := AB4OfSize.{v} C
 
-lemma AB4OfSize_shrink [HasCoproducts.{max w w'} C] [AB4OfSize.{max w w'} C] :
-    haveI : HasCoproducts.{w} C := hasCoproducts_shrink.{w, w'}
-    AB4OfSize.{w} C :=
+lemma AB4OfSize_shrink [HasCoproducts.{max w w'} C] [AB4OfSize.{max w w'} C]
+    : haveI : HasCoproducts.{w} C := hasCoproducts_shrink.{w, w'}
+      AB4OfSize.{w} C :=
   haveI := hasCoproducts_shrink.{w, w'} (C := C)
-  ⟨fun J ↦ HasExactColimitsOfShape.of_domain_equivalence C
-    (Discrete.equivalence Equiv.ulift : Discrete (ULift.{w'} J) ≌ _)⟩
+  ⟨fun J ↦
+    HasExactColimitsOfShape.of_domain_equivalence C
+      (Discrete.equivalence Equiv.ulift : Discrete (ULift.{w'} J) ≌ _)⟩
 
-instance (priority := 100) [HasCoproducts.{w} C] [AB4OfSize.{w} C] :
-    haveI : HasCoproducts.{0} C := hasCoproducts_shrink
-    AB4OfSize.{0} C := AB4OfSize_shrink C
+instance (priority := 100) [HasCoproducts.{w} C] [AB4OfSize.{w} C]
+    : haveI : HasCoproducts.{0} C := hasCoproducts_shrink
+      AB4OfSize.{0} C :=
+  AB4OfSize_shrink C
 
-/-- A category `C` which has products is said to have `AB4Star` (in literature AB4\*)
-provided that products are exact. -/
+/--
+A category `C` which has products is said to have `AB4Star` (in literature AB4\*)
+provided that products are exact.
+-/
 @[pp_with_univ, stacks 079B]
 class AB4StarOfSize [HasProducts.{w} C] where
   ofShape (α : Type w) : HasExactLimitsOfShape (Discrete α) C
 
 attribute [instance] AB4StarOfSize.ofShape
 
-/-- A category `C` which has products is said to have `AB4Star` (in literature AB4\*)
-provided that products are exact. -/
+/--
+A category `C` which has products is said to have `AB4Star` (in literature AB4\*)
+provided that products are exact.
+-/
 abbrev AB4Star [HasProducts C] := AB4StarOfSize.{v} C
 
-lemma AB4StarOfSize_shrink [HasProducts.{max w w'} C] [AB4StarOfSize.{max w w'} C] :
-    haveI : HasProducts.{w} C := hasProducts_shrink.{w, w'}
-    AB4StarOfSize.{w} C :=
+lemma AB4StarOfSize_shrink [HasProducts.{max w w'} C] [AB4StarOfSize.{max w w'} C]
+    : haveI : HasProducts.{w} C := hasProducts_shrink.{w, w'}
+      AB4StarOfSize.{w} C :=
   haveI := hasProducts_shrink.{w, w'} (C := C)
-  ⟨fun J ↦ HasExactLimitsOfShape.of_domain_equivalence C
-    (Discrete.equivalence Equiv.ulift : Discrete (ULift.{w'} J) ≌ _)⟩
+  ⟨fun J ↦
+    HasExactLimitsOfShape.of_domain_equivalence C
+      (Discrete.equivalence Equiv.ulift : Discrete (ULift.{w'} J) ≌ _)⟩
 
-instance (priority := 100) [HasProducts.{w} C] [AB4StarOfSize.{w} C] :
-    haveI : HasProducts.{0} C := hasProducts_shrink
-    AB4StarOfSize.{0} C := AB4StarOfSize_shrink C
+instance (priority := 100) [HasProducts.{w} C] [AB4StarOfSize.{w} C]
+    : haveI : HasProducts.{0} C := hasProducts_shrink
+      AB4StarOfSize.{0} C :=
+  AB4StarOfSize_shrink C
 
 /--
 A category `C` which has countable coproducts is said to have countable `AB4` provided that
@@ -149,22 +157,24 @@ filtered colimits are exact.
 @[stacks 079B]
 abbrev AB5 [HasFilteredColimits C] := AB5OfSize.{v, v} C
 
-lemma AB5OfSize_of_univLE [HasFilteredColimitsOfSize.{w₂, w₂'} C] [UnivLE.{w, w₂}]
-    [UnivLE.{w', w₂'}] [AB5OfSize.{w₂, w₂'} C] :
-    haveI : HasFilteredColimitsOfSize.{w, w'} C := hasFilteredColimitsOfSize_of_univLE.{w}
-    AB5OfSize.{w, w'} C := by
+lemma AB5OfSize_of_univLE
+    [HasFilteredColimitsOfSize.{w₂, w₂'} C] [UnivLE.{w, w₂}] [UnivLE.{w', w₂'}]
+    [AB5OfSize.{w₂, w₂'} C]
+    : haveI : HasFilteredColimitsOfSize.{w, w'} C := hasFilteredColimitsOfSize_of_univLE.{w}
+      AB5OfSize.{w, w'} C := by
   have : HasFilteredColimitsOfSize.{w, w'} C := hasFilteredColimitsOfSize_of_univLE.{w}
   constructor
   intro J _ _
-  have := IsFiltered.of_equivalence ((ShrinkHoms.equivalence.{w₂} J).trans <|
-    Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J))
-  exact HasExactColimitsOfShape.of_domain_equivalence _ ((ShrinkHoms.equivalence.{w₂} J).trans <|
-    Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J)).symm
+  have :=
+    IsFiltered.of_equivalence ((ShrinkHoms.equivalence.{w₂} J).trans <|
+      Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J))
+  exact HasExactColimitsOfShape.of_domain_equivalence _
+    ((ShrinkHoms.equivalence.{w₂} J).trans <| Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J)).symm
 
-lemma AB5OfSize_shrink [HasFilteredColimitsOfSize.{max w w₂, max w' w₂'} C]
-    [AB5OfSize.{max w w₂, max w' w₂'} C] :
-    haveI : HasFilteredColimitsOfSize.{w, w'} C := hasFilteredColimitsOfSize_shrink
-    AB5OfSize.{w, w'} C :=
+lemma AB5OfSize_shrink
+    [HasFilteredColimitsOfSize.{max w w₂, max w' w₂'} C] [AB5OfSize.{max w w₂, max w' w₂'} C]
+    : haveI : HasFilteredColimitsOfSize.{w, w'} C := hasFilteredColimitsOfSize_shrink
+      AB5OfSize.{w, w'} C :=
   AB5OfSize_of_univLE C
 
 /--
@@ -183,38 +193,45 @@ provided that cofiltered limits are exact.
 -/
 abbrev AB5Star [HasCofilteredLimits C] := AB5StarOfSize.{v, v} C
 
-lemma AB5StarOfSize_of_univLE [HasCofilteredLimitsOfSize.{w₂, w₂'} C] [UnivLE.{w, w₂}]
-    [UnivLE.{w', w₂'}] [AB5StarOfSize.{w₂, w₂'} C] :
-    haveI : HasCofilteredLimitsOfSize.{w, w'} C := hasCofilteredLimitsOfSize_of_univLE.{w}
-    AB5StarOfSize.{w, w'} C := by
+lemma AB5StarOfSize_of_univLE
+    [HasCofilteredLimitsOfSize.{w₂, w₂'} C] [UnivLE.{w, w₂}] [UnivLE.{w', w₂'}]
+    [AB5StarOfSize.{w₂, w₂'} C]
+    : haveI : HasCofilteredLimitsOfSize.{w, w'} C := hasCofilteredLimitsOfSize_of_univLE.{w}
+      AB5StarOfSize.{w, w'} C := by
   have : HasCofilteredLimitsOfSize.{w, w'} C := hasCofilteredLimitsOfSize_of_univLE.{w}
   constructor
   intro J _ _
-  have := IsCofiltered.of_equivalence ((ShrinkHoms.equivalence.{w₂} J).trans <|
-    Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J))
-  exact HasExactLimitsOfShape.of_domain_equivalence _ ((ShrinkHoms.equivalence.{w₂} J).trans <|
-    Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J)).symm
+  have :=
+    IsCofiltered.of_equivalence ((ShrinkHoms.equivalence.{w₂} J).trans <|
+      Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J))
+  exact HasExactLimitsOfShape.of_domain_equivalence _
+    ((ShrinkHoms.equivalence.{w₂} J).trans <| Shrink.equivalence.{w₂', w₂} (ShrinkHoms.{w'} J)).symm
 
-lemma AB5StarOfSize_shrink [HasCofilteredLimitsOfSize.{max w w₂, max w' w₂'} C]
-    [AB5StarOfSize.{max w w₂, max w' w₂'} C] :
-    haveI : HasCofilteredLimitsOfSize.{w, w'} C := hasCofilteredLimitsOfSize_shrink
-    AB5StarOfSize.{w, w'} C :=
+lemma AB5StarOfSize_shrink
+    [HasCofilteredLimitsOfSize.{max w w₂, max w' w₂'} C] [AB5StarOfSize.{max w w₂, max w' w₂'} C]
+    : haveI : HasCofilteredLimitsOfSize.{w, w'} C := hasCofilteredLimitsOfSize_shrink
+      AB5StarOfSize.{w, w'} C :=
   AB5StarOfSize_of_univLE C
 
 /-- `HasExactColimitsOfShape` can be "pushed forward" along final functors -/
-lemma hasExactColimitsOfShape_of_final [HasFiniteLimits C]
+lemma hasExactColimitsOfShape_of_final
+    [HasFiniteLimits C]
     {J J' : Type*} [Category* J] [Category* J']
-    (F : J ⥤ J') [F.Final] [HasColimitsOfShape J' C] [HasColimitsOfShape J C]
-    [HasExactColimitsOfShape J C] : HasExactColimitsOfShape J' C where
+    (F : J ⥤ J')
+    [F.Final] [HasColimitsOfShape J' C] [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+    : HasExactColimitsOfShape J' C where
   preservesFiniteLimits :=
     letI : PreservesFiniteLimits ((whiskeringLeft J J' C).obj F) := ⟨fun _ ↦ inferInstance⟩
     letI := comp_preservesFiniteLimits ((whiskeringLeft J J' C).obj F) colim
     preservesFiniteLimits_of_natIso (Functor.Final.colimIso F)
 
 /-- `HasExactLimitsOfShape` can be "pushed forward" along initial functors -/
-lemma hasExactLimitsOfShape_of_initial [HasFiniteColimits C] {J J' : Type*} [Category* J]
-    [Category* J'] (F : J ⥤ J') [F.Initial] [HasLimitsOfShape J' C] [HasLimitsOfShape J C]
-    [HasExactLimitsOfShape J C] : HasExactLimitsOfShape J' C where
+lemma hasExactLimitsOfShape_of_initial
+    [HasFiniteColimits C]
+    {J J' : Type*} [Category* J] [Category* J']
+    (F : J ⥤ J')
+    [F.Initial] [HasLimitsOfShape J' C] [HasLimitsOfShape J C] [HasExactLimitsOfShape J C]
+    : HasExactLimitsOfShape J' C where
   preservesFiniteColimits :=
     letI : PreservesFiniteColimits ((whiskeringLeft J J' C).obj F) := ⟨fun _ ↦ inferInstance⟩
     letI := comp_preservesFiniteColimits ((whiskeringLeft J J' C).obj F) lim
@@ -233,8 +250,8 @@ instance preservesFiniteLimits_liftToFinset : PreservesFiniteLimits (liftToFinse
     letI : PreservesFiniteLimits ((whiskeringLeft (Discrete I) (Discrete α) C).obj
         (Discrete.functor fun x ↦ ↑x)) :=
       ⟨fun J _ _ => whiskeringLeft_preservesLimitsOfShape J _⟩
-    letI : PreservesFiniteLimits ((whiskeringLeft (Discrete I) (Discrete α) C).obj
-        (Discrete.functor (·.val)) ⋙ colim) :=
+    letI : PreservesFiniteLimits
+        ((whiskeringLeft (Discrete I) (Discrete α) C).obj (Discrete.functor (·.val)) ⋙ colim) :=
       comp_preservesFiniteLimits _ _
     preservesFiniteLimits_of_natIso (liftToFinsetEvaluationIso I).symm
 
@@ -245,28 +262,27 @@ variable (J : Type*)
 -/
 lemma hasExactColimitsOfShape_discrete_of_hasExactColimitsOfShape_finset_discrete
     [HasColimitsOfShape (Discrete J) C] [HasColimitsOfShape (Finset (Discrete J)) C]
-    [HasExactColimitsOfShape (Finset (Discrete J)) C] : HasExactColimitsOfShape (Discrete J) C where
+    [HasExactColimitsOfShape (Finset (Discrete J)) C]
+    : HasExactColimitsOfShape (Discrete J) C where
   preservesFiniteLimits :=
-    letI : PreservesFiniteLimits (liftToFinset C J ⋙ colim) :=
-      comp_preservesFiniteLimits _ _
+    letI : PreservesFiniteLimits (liftToFinset C J ⋙ colim) := comp_preservesFiniteLimits _ _
     preservesFiniteLimits_of_natIso (liftToFinsetColimIso)
 
 attribute [local instance] hasCoproducts_of_finite_and_filtered in
 /-- A category with finite biproducts and finite limits is AB4 if it is AB5. -/
-lemma AB4.of_AB5 [HasFilteredColimitsOfSize.{w, w} C]
-    [AB5OfSize.{w, w} C] : AB4OfSize.{w} C where
+lemma AB4.of_AB5 [HasFilteredColimitsOfSize.{w, w} C] [AB5OfSize.{w, w} C] : AB4OfSize.{w} C where
   ofShape _ := hasExactColimitsOfShape_discrete_of_hasExactColimitsOfShape_finset_discrete _ _
 
 /--
 A category with finite biproducts and finite limits has countable AB4 if sequential colimits are
 exact.
 -/
-lemma CountableAB4.of_countableAB5 [HasColimitsOfShape ℕ C] [HasExactColimitsOfShape ℕ C]
-    [HasCountableCoproducts C] : CountableAB4 C where
+lemma CountableAB4.of_countableAB5
+    [HasColimitsOfShape ℕ C] [HasExactColimitsOfShape ℕ C] [HasCountableCoproducts C]
+    : CountableAB4 C where
   ofShape J :=
     have : HasColimitsOfShape (Finset (Discrete J)) C :=
-      Functor.Final.hasColimitsOfShape_of_final
-        (IsFiltered.sequentialFunctor (Finset (Discrete J)))
+      Functor.Final.hasColimitsOfShape_of_final (IsFiltered.sequentialFunctor (Finset (Discrete J)))
     have := hasExactColimitsOfShape_of_final C (IsFiltered.sequentialFunctor (Finset (Discrete J)))
     hasExactColimitsOfShape_discrete_of_hasExactColimitsOfShape_finset_discrete _ _
 
@@ -283,9 +299,10 @@ instance preservesFiniteColimits_liftToFinset : PreservesFiniteColimits (liftToF
     letI : PreservesFiniteColimits (lim (J := Discrete I) (C := C)) :=
       preservesFiniteColimits_of_natIso HasBiproductsOfShape.colimIsoLim
     letI : PreservesFiniteColimits ((whiskeringLeft (Discrete I) (Discrete α) C).obj
-        (Discrete.functor fun x ↦ ↑x)) := ⟨fun _ _ _ => inferInstance⟩
-    letI : PreservesFiniteColimits ((whiskeringLeft (Discrete I) (Discrete α) C).obj
-        (Discrete.functor (·.val)) ⋙ lim) :=
+        (Discrete.functor fun x ↦ ↑x)) :=
+      ⟨fun _ _ _ => inferInstance⟩
+    letI : PreservesFiniteColimits
+        ((whiskeringLeft (Discrete I) (Discrete α) C).obj (Discrete.functor (·.val)) ⋙ lim) :=
       comp_preservesFiniteColimits _ _
     preservesFiniteColimits_of_natIso (liftToFinsetEvaluationIso _ _ I).symm
 
@@ -296,8 +313,8 @@ variable (J : Type*)
 -/
 lemma hasExactLimitsOfShape_discrete_of_hasExactLimitsOfShape_finset_discrete_op
     [HasLimitsOfShape (Discrete J) C] [HasLimitsOfShape (Finset (Discrete J))ᵒᵖ C]
-    [HasExactLimitsOfShape (Finset (Discrete J))ᵒᵖ C] :
-    HasExactLimitsOfShape (Discrete J) C where
+    [HasExactLimitsOfShape (Finset (Discrete J))ᵒᵖ C]
+    : HasExactLimitsOfShape (Discrete J) C where
   preservesFiniteColimits :=
     letI : PreservesFiniteColimits (ProductsFromFiniteCofiltered.liftToFinset C J ⋙ lim) :=
       comp_preservesFiniteColimits _ _
@@ -305,22 +322,23 @@ lemma hasExactLimitsOfShape_discrete_of_hasExactLimitsOfShape_finset_discrete_op
 
 attribute [local instance] hasProducts_of_finite_and_cofiltered in
 /-- A category with finite biproducts and finite limits is AB4 if it is AB5. -/
-lemma AB4Star.of_AB5Star [HasCofilteredLimitsOfSize.{w, w} C] [AB5StarOfSize.{w, w} C] :
-    AB4StarOfSize.{w} C where
+lemma AB4Star.of_AB5Star [HasCofilteredLimitsOfSize.{w, w} C] [AB5StarOfSize.{w, w} C]
+    : AB4StarOfSize.{w} C where
   ofShape _ := hasExactLimitsOfShape_discrete_of_hasExactLimitsOfShape_finset_discrete_op _ _
 
 /--
 A category with finite biproducts and finite limits has countable AB4\* if sequential limits are
 exact.
 -/
-lemma CountableAB4Star.of_countableAB5Star [HasLimitsOfShape ℕᵒᵖ C] [HasExactLimitsOfShape ℕᵒᵖ C]
-    [HasCountableProducts C] : CountableAB4Star C where
+lemma CountableAB4Star.of_countableAB5Star
+    [HasLimitsOfShape ℕᵒᵖ C] [HasExactLimitsOfShape ℕᵒᵖ C] [HasCountableProducts C]
+    : CountableAB4Star C where
   ofShape J :=
     have : HasLimitsOfShape (Finset (Discrete J))ᵒᵖ C :=
-      Functor.Initial.hasLimitsOfShape_of_initial
-        (IsFiltered.sequentialFunctor (Finset (Discrete J))).op
-    have := hasExactLimitsOfShape_of_initial C
-      (IsFiltered.sequentialFunctor (Finset (Discrete J))).op
+      Functor.Initial.hasLimitsOfShape_of_initial (IsFiltered.sequentialFunctor (Finset (Discrete
+        J))).op
+    have :=
+      hasExactLimitsOfShape_of_initial C (IsFiltered.sequentialFunctor (Finset (Discrete J))).op
     hasExactLimitsOfShape_discrete_of_hasExactLimitsOfShape_finset_discrete_op _ _
 
 end AB4StarOfAB5Star
@@ -329,10 +347,11 @@ end AB4StarOfAB5Star
 Checking exactness of colimits of shape `Discrete ℕ` and `Discrete J` for finite `J` is enough for
 countable AB4.
 -/
-lemma CountableAB4.of_hasExactColimitsOfShape_nat_and_finite [HasCountableCoproducts C]
-    [HasFiniteLimits C] [∀ (J : Type) [Finite J], HasExactColimitsOfShape (Discrete J) C]
-    [HasExactColimitsOfShape (Discrete ℕ) C] :
-    CountableAB4 C where
+lemma CountableAB4.of_hasExactColimitsOfShape_nat_and_finite
+    [HasCountableCoproducts C] [HasFiniteLimits C]
+    [∀ (J : Type) [Finite J], HasExactColimitsOfShape (Discrete J) C]
+    [HasExactColimitsOfShape (Discrete ℕ) C]
+    : CountableAB4 C where
   ofShape J := by
     by_cases h : Finite J
     · infer_instance
@@ -345,10 +364,11 @@ lemma CountableAB4.of_hasExactColimitsOfShape_nat_and_finite [HasCountableCoprod
 Checking exactness of limits of shape `Discrete ℕ` and `Discrete J` for finite `J` is enough for
 countable AB4\*.
 -/
-lemma CountableAB4Star.of_hasExactLimitsOfShape_nat_and_finite [HasCountableProducts C]
-    [HasFiniteColimits C] [∀ (J : Type) [Finite J], HasExactLimitsOfShape (Discrete J) C]
-    [HasExactLimitsOfShape (Discrete ℕ) C] :
-    CountableAB4Star C where
+lemma CountableAB4Star.of_hasExactLimitsOfShape_nat_and_finite
+    [HasCountableProducts C] [HasFiniteColimits C]
+    [∀ (J : Type) [Finite J], HasExactLimitsOfShape (Discrete J) C]
+    [HasExactLimitsOfShape (Discrete ℕ) C]
+    : CountableAB4Star C where
   ofShape J := by
     by_cases h : Finite J
     · infer_instance
@@ -359,25 +379,25 @@ lemma CountableAB4Star.of_hasExactLimitsOfShape_nat_and_finite [HasCountableProd
 
 section EpiMono
 
-
 section
 
 variable [HasZeroMorphisms C] [HasFiniteBiproducts C]
 
-noncomputable instance hasExactColimitsOfShape_discrete_finite (J : Type*) [Finite J] :
-    HasExactColimitsOfShape (Discrete J) C where
+noncomputable instance hasExactColimitsOfShape_discrete_finite (J : Type*) [Finite J]
+    : HasExactColimitsOfShape (Discrete J) C where
   preservesFiniteLimits := preservesFiniteLimits_of_natIso HasBiproductsOfShape.colimIsoLim.symm
 
-noncomputable instance hasExactLimitsOfShape_discrete_finite {J : Type*} [Finite J] :
-    HasExactLimitsOfShape (Discrete J) C where
+noncomputable instance hasExactLimitsOfShape_discrete_finite {J : Type*} [Finite J]
+    : HasExactLimitsOfShape (Discrete J) C where
   preservesFiniteColimits := preservesFiniteColimits_of_natIso HasBiproductsOfShape.colimIsoLim
 
 /--
 Checking exact colimits of shape `Discrete ℕ` is enough for countable AB4, provided that the
 category has finite biproducts and finite limits.
 -/
-lemma CountableAB4.of_hasExactColimitsOfShape_nat [HasFiniteLimits C] [HasCountableCoproducts C]
-    [HasExactColimitsOfShape (Discrete ℕ) C] : CountableAB4 C := by
+lemma CountableAB4.of_hasExactColimitsOfShape_nat
+    [HasFiniteLimits C] [HasCountableCoproducts C] [HasExactColimitsOfShape (Discrete ℕ) C]
+    : CountableAB4 C := by
   apply +allowSynthFailures CountableAB4.of_hasExactColimitsOfShape_nat_and_finite
   exact fun _ ↦ inferInstance
 
@@ -385,8 +405,9 @@ lemma CountableAB4.of_hasExactColimitsOfShape_nat [HasFiniteLimits C] [HasCounta
 Checking exact limits of shape `Discrete ℕ` is enough for countable AB4\*, provided that the
 category has finite biproducts and finite colimits.
 -/
-lemma CountableAB4Star.of_hasExactLimitsOfShape_nat [HasFiniteColimits C]
-    [HasCountableProducts C] [HasExactLimitsOfShape (Discrete ℕ) C] : CountableAB4Star C := by
+lemma CountableAB4Star.of_hasExactLimitsOfShape_nat
+    [HasFiniteColimits C] [HasCountableProducts C] [HasExactLimitsOfShape (Discrete ℕ) C]
+    : CountableAB4Star C := by
   apply +allowSynthFailures CountableAB4Star.of_hasExactLimitsOfShape_nat_and_finite
   exact fun _ ↦ inferInstance
 
@@ -394,15 +415,17 @@ end
 
 variable [Abelian C] (J : Type u') [Category.{v'} J]
 
-attribute [local instance] preservesBinaryBiproducts_of_preservesBinaryCoproducts
+attribute [local instance]
+  preservesBinaryBiproducts_of_preservesBinaryCoproducts
   preservesBinaryBiproducts_of_preservesBinaryProducts
 
 /--
 If `colim` of shape `J` into an abelian category `C` preserves monomorphisms, then `C` has exact
 colimits of shape `J`.
 -/
-lemma hasExactColimitsOfShape_of_preservesMono [HasColimitsOfShape J C]
-    [PreservesMonomorphisms (colim (J := J) (C := C))] : HasExactColimitsOfShape J C where
+lemma hasExactColimitsOfShape_of_preservesMono
+    [HasColimitsOfShape J C] [PreservesMonomorphisms (colim (J := J) (C := C))]
+    : HasExactColimitsOfShape J C where
   preservesFiniteLimits := by
     apply +allowSynthFailures preservesFiniteLimits_of_preservesHomology
     · exact preservesHomology_of_preservesMonos_and_cokernels _
@@ -412,8 +435,9 @@ lemma hasExactColimitsOfShape_of_preservesMono [HasColimitsOfShape J C]
 If `lim` of shape `J` into an abelian category `C` preserves epimorphisms, then `C` has exact
 limits of shape `J`.
 -/
-lemma hasExactLimitsOfShape_of_preservesEpi [HasLimitsOfShape J C]
-    [PreservesEpimorphisms (lim (J := J) (C := C))] : HasExactLimitsOfShape J C where
+lemma hasExactLimitsOfShape_of_preservesEpi
+    [HasLimitsOfShape J C] [PreservesEpimorphisms (lim (J := J) (C := C))]
+    : HasExactLimitsOfShape J C where
   preservesFiniteColimits := by
     apply +allowSynthFailures preservesFiniteColimits_of_preservesHomology
     · exact preservesHomology_of_preservesEpis_and_kernels _

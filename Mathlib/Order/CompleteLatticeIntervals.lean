@@ -34,42 +34,46 @@ section SupSet
 variable [Preorder α] [SupSet α]
 
 open scoped Classical in
-/-- `SupSet` structure on a nonempty subset `s` of a preorder with `SupSet`. This definition is
+/--
+`SupSet` structure on a nonempty subset `s` of a preorder with `SupSet`. This definition is
 non-canonical (it uses `default s`); it should be used only as here, as an auxiliary instance in the
-construction of the `ConditionallyCompleteLinearOrder` structure. -/
+construction of the `ConditionallyCompleteLinearOrder` structure.
+-/
 @[instance_reducible, deprecated "deprecated without replacement" (since := "2026-10-26")]
 noncomputable def subsetSupSet [Inhabited s] : SupSet s where
   sSup t :=
-    if ht : t.Nonempty ∧ BddAbove t ∧ sSup ((↑) '' t : Set α) ∈ s
-    then ⟨sSup ((↑) '' t : Set α), ht.2.2⟩
-    else default
+    if ht : t.Nonempty ∧ BddAbove t ∧ sSup ((↑) '' t : Set α) ∈ s then
+      ⟨sSup ((↑) '' t : Set α), ht.2.2⟩
+    else
+      default
 
 attribute [local instance] subsetSupSet in
 open scoped Classical in
 @[simp, deprecated "deprecated without replacement" (since := "2026-10-26")]
-theorem subset_sSup_def [Inhabited s] :
-    @sSup s _ = fun t =>
-      if ht : t.Nonempty ∧ BddAbove t ∧ sSup ((↑) '' t : Set α) ∈ s
-      then ⟨sSup ((↑) '' t : Set α), ht.2.2⟩
-      else default :=
+theorem subset_sSup_def [Inhabited s]
+    : @sSup s _
+      = fun t =>
+        if ht : t.Nonempty ∧ BddAbove t ∧ sSup ((↑) '' t : Set α) ∈ s then
+          ⟨sSup ((↑) '' t : Set α), ht.2.2⟩
+        else
+          default :=
   rfl
 
 set_option linter.deprecated false in -- will be deprecated later
 attribute [local instance] subsetSupSet in
-theorem subset_sSup_of_within [Inhabited s] {t : Set s}
-    (h' : t.Nonempty) (h'' : BddAbove t) (h : sSup ((↑) '' t : Set α) ∈ s) :
-    sSup ((↑) '' t : Set α) = (@sSup s _ t : α) := by simp [h, h', h'']
+theorem subset_sSup_of_within
+    [Inhabited s] {t : Set s} (h' : t.Nonempty) (h'' : BddAbove t) (h : sSup ((↑) '' t : Set α) ∈ s)
+    : sSup ((↑) '' t : Set α) = (@sSup s _ t : α) := by
+  simp [h, h', h'']
 
 set_option linter.deprecated false in -- will be deprecated later
 attribute [local instance] subsetSupSet in
-theorem subset_sSup_emptyset [Inhabited s] :
-    sSup (∅ : Set s) = default := by
-  simp [sSup]
+theorem subset_sSup_emptyset [Inhabited s] : sSup (∅ : Set s) = default := by simp [sSup]
 
 set_option linter.deprecated false in -- will be deprecated later
 attribute [local instance] subsetSupSet in
-theorem subset_sSup_of_not_bddAbove [Inhabited s] {t : Set s} (ht : ¬BddAbove t) :
-    sSup t = default := by
+theorem subset_sSup_of_not_bddAbove [Inhabited s] {t : Set s} (ht : ¬ BddAbove t)
+    : sSup t = default := by
   simp [sSup, ht]
 
 end SupSet
@@ -79,67 +83,76 @@ section InfSet
 variable [Preorder α] [InfSet α]
 
 open scoped Classical in
-/-- `InfSet` structure on a nonempty subset `s` of a preorder with `InfSet`. This definition is
+/--
+`InfSet` structure on a nonempty subset `s` of a preorder with `InfSet`. This definition is
 non-canonical (it uses `default s`); it should be used only as here, as an auxiliary instance in the
-construction of the `ConditionallyCompleteLinearOrder` structure. -/
+construction of the `ConditionallyCompleteLinearOrder` structure.
+-/
 @[instance_reducible, deprecated "deprecated without replacement" (since := "2026-10-26")]
 noncomputable def subsetInfSet [Inhabited s] : InfSet s where
   sInf t :=
-    if ht : t.Nonempty ∧ BddBelow t ∧ sInf ((↑) '' t : Set α) ∈ s
-    then ⟨sInf ((↑) '' t : Set α), ht.2.2⟩
-    else default
+    if ht : t.Nonempty ∧ BddBelow t ∧ sInf ((↑) '' t : Set α) ∈ s then
+      ⟨sInf ((↑) '' t : Set α), ht.2.2⟩
+    else
+      default
 
 attribute [local instance] subsetInfSet in
 open scoped Classical in
 @[simp, deprecated "deprecated without replacement" (since := "2026-10-26")]
-theorem subset_sInf_def [Inhabited s] :
-    @sInf s _ = fun t =>
-      if ht : t.Nonempty ∧ BddBelow t ∧ sInf ((↑) '' t : Set α) ∈ s
-      then ⟨sInf ((↑) '' t : Set α), ht.2.2⟩ else
-      default :=
+theorem subset_sInf_def [Inhabited s]
+    : @sInf s _
+      = fun t =>
+        if ht : t.Nonempty ∧ BddBelow t ∧ sInf ((↑) '' t : Set α) ∈ s then
+          ⟨sInf ((↑) '' t : Set α), ht.2.2⟩
+        else
+          default :=
   rfl
 
 set_option linter.deprecated false in -- will be deprecated later
 attribute [local instance] subsetInfSet in
-theorem subset_sInf_of_within [Inhabited s] {t : Set s}
-    (h' : t.Nonempty) (h'' : BddBelow t) (h : sInf ((↑) '' t : Set α) ∈ s) :
-    sInf ((↑) '' t : Set α) = (@sInf s _ t : α) := by simp [h, h', h'']
+theorem subset_sInf_of_within
+    [Inhabited s] {t : Set s} (h' : t.Nonempty) (h'' : BddBelow t) (h : sInf ((↑) '' t : Set α) ∈ s)
+    : sInf ((↑) '' t : Set α) = (@sInf s _ t : α) := by
+  simp [h, h', h'']
 
 set_option linter.deprecated false in -- will be deprecated later
 attribute [local instance] subsetInfSet in
-theorem subset_sInf_emptyset [Inhabited s] :
-    sInf (∅ : Set s) = default := by
-  simp [sInf]
+theorem subset_sInf_emptyset [Inhabited s] : sInf (∅ : Set s) = default := by simp [sInf]
 
 set_option linter.deprecated false in -- will be deprecated later
 attribute [local instance] subsetInfSet in
-theorem subset_sInf_of_not_bddBelow [Inhabited s] {t : Set s} (ht : ¬BddBelow t) :
-    sInf t = default := by
+theorem subset_sInf_of_not_bddBelow [Inhabited s] {t : Set s} (ht : ¬ BddBelow t)
+    : sInf t = default := by
   simp [sInf, ht]
 
 end InfSet
 
 @[to_dual]
-theorem Subtype.isLUB_of_csSup_image_mem [ConditionallyCompleteLattice α] {s : Set α} {t : Set s}
-    (ht : t.Nonempty) (h_bdd : BddAbove t) (h : sSup ((↑) '' t : Set α) ∈ s) :
-    IsLUB t ⟨sSup ((↑) '' t : Set α), h⟩ :=
+theorem Subtype.isLUB_of_csSup_image_mem
+    [ConditionallyCompleteLattice α]
+    {s : Set α} {t : Set s} (ht : t.Nonempty) (h_bdd : BddAbove t) (h : sSup ((↑) '' t : Set α) ∈ s)
+    : IsLUB t ⟨sSup ((↑) '' t : Set α), h⟩ :=
   .of_image Subtype.coe_le_coe (isLUB_csSup (ht.image _) ((Subtype.mono_coe _).map_bddAbove h_bdd))
 
 section OrdConnected
 
 variable [ConditionallyCompleteLinearOrder α]
 
-/-- For a nonempty subset of a conditionally complete linear order to be a conditionally complete
+/--
+For a nonempty subset of a conditionally complete linear order to be a conditionally complete
 linear order, it suffices that it contain the `sSup` of all its nonempty bounded-above subsets, and
 the `sInf` of all its nonempty bounded-below subsets.
-See note [reducible non-instances]. -/
-noncomputable abbrev subsetConditionallyCompleteLinearOrder [Inhabited s]
+See note [reducible non-instances].
+-/
+noncomputable abbrev subsetConditionallyCompleteLinearOrder
+    [Inhabited s]
     (h_Sup : ∀ {t : Set s} (_ : t.Nonempty) (_h_bdd : BddAbove t), sSup ((↑) '' t : Set α) ∈ s)
-    (h_Inf : ∀ {t : Set s} (_ : t.Nonempty) (_h_bdd : BddBelow t), sInf ((↑) '' t : Set α) ∈ s) :
-    ConditionallyCompleteLinearOrder s :=
+    (h_Inf : ∀ {t : Set s} (_ : t.Nonempty) (_h_bdd : BddBelow t), sInf ((↑) '' t : Set α) ∈ s)
+    : ConditionallyCompleteLinearOrder s :=
   letI := OrderSupSet.chooseBot (default : s)
   letI := OrderInfSet.chooseTop (default : s)
-  { DistribLattice.toLattice, (inferInstance : LinearOrder s) with
+  {
+    DistribLattice.toLattice, (inferInstance : LinearOrder s) with
     isLUB_csSup _ ht h_bdd :=
       (Subtype.isLUB_of_csSup_image_mem ht h_bdd (h_Sup ht h_bdd)).isLUB_sSup
     isGLB_csInf _ ht h_bdd :=
@@ -147,45 +160,55 @@ noncomputable abbrev subsetConditionallyCompleteLinearOrder [Inhabited s]
     csSup_of_not_bddAbove _ ht :=
       OrderSupSet.chooseBot_sSup_of_not_exists (ht ·.choose_spec.bddAbove)
     csInf_of_not_bddBelow _ ht :=
-      OrderInfSet.chooseTop_sInf_of_not_exists (ht ·.choose_spec.bddBelow) }
+      OrderInfSet.chooseTop_sInf_of_not_exists (ht ·.choose_spec.bddBelow)
+  }
 
-/-- The `sSup` function on a nonempty `OrdConnected` set `s` in a conditionally complete linear
-order takes values within `s`, for all nonempty bounded-above subsets of `s`. -/
-theorem Set.OrdConnected.csSup_image_mem {s : Set α} [hs : OrdConnected s] ⦃t : Set s⦄
-    (ht : t.Nonempty) (h_bdd : BddAbove t) : sSup ((↑) '' t : Set α) ∈ s := by
+/--
+The `sSup` function on a nonempty `OrdConnected` set `s` in a conditionally complete linear
+order takes values within `s`, for all nonempty bounded-above subsets of `s`.
+-/
+theorem Set.OrdConnected.csSup_image_mem
+    {s : Set α} [hs : OrdConnected s] ⦃t : Set s⦄ (ht : t.Nonempty) (h_bdd : BddAbove t)
+    : sSup ((↑) '' t : Set α) ∈ s := by
   obtain ⟨c, hct⟩ : ∃ c, c ∈ t := ht
   obtain ⟨B, hB⟩ : ∃ B, B ∈ upperBounds t := h_bdd
   refine hs.out c.property B.property ⟨?_, ?_⟩
   · exact (Subtype.mono_coe (· ∈ s)).le_csSup_image hct ⟨B, hB⟩
   · exact (Subtype.mono_coe (· ∈ s)).csSup_image_le ⟨c, hct⟩ hB
 
-/-- The `sInf` function on a nonempty `OrdConnected` set `s` in a conditionally complete linear
-order takes values within `s`, for all nonempty bounded-below subsets of `s`. -/
-theorem Set.OrdConnected.csInf_image_mem {s : Set α} [hs : OrdConnected s] ⦃t : Set s⦄
-    (ht : t.Nonempty) (h_bdd : BddBelow t) : sInf ((↑) '' t : Set α) ∈ s := by
+/--
+The `sInf` function on a nonempty `OrdConnected` set `s` in a conditionally complete linear
+order takes values within `s`, for all nonempty bounded-below subsets of `s`.
+-/
+theorem Set.OrdConnected.csInf_image_mem
+    {s : Set α} [hs : OrdConnected s] ⦃t : Set s⦄ (ht : t.Nonempty) (h_bdd : BddBelow t)
+    : sInf ((↑) '' t : Set α) ∈ s := by
   obtain ⟨c, hct⟩ : ∃ c, c ∈ t := ht
   obtain ⟨B, hB⟩ : ∃ B, B ∈ lowerBounds t := h_bdd
   refine hs.out B.property c.property ⟨?_, ?_⟩
   · exact (Subtype.mono_coe (· ∈ s)).le_csInf_image ⟨c, hct⟩ hB
   · exact (Subtype.mono_coe (· ∈ s)).csInf_image_le hct ⟨B, hB⟩
 
-/-- A nonempty `OrdConnected` set in a conditionally complete linear order is naturally a
-conditionally complete linear order. -/
-noncomputable instance Set.OrdConnected.conditionallyCompleteLinearOrder [Inhabited s]
-    [OrdConnected s] : ConditionallyCompleteLinearOrder s :=
+/--
+A nonempty `OrdConnected` set in a conditionally complete linear order is naturally a
+conditionally complete linear order.
+-/
+noncomputable instance Set.OrdConnected.conditionallyCompleteLinearOrder
+    [Inhabited s] [OrdConnected s]
+    : ConditionallyCompleteLinearOrder s :=
   subsetConditionallyCompleteLinearOrder s
     (fun h => OrdConnected.csSup_image_mem h)
     (fun h => OrdConnected.csInf_image_mem h)
 
 variable [Inhabited s] [OrdConnected s]
 
-theorem Set.OrdConnected.coe_sSup {t : Set s} (ht : t.Nonempty) (h_bdd : BddAbove t) :
-    ((sSup t : s) : α) = sSup ((↑) '' t : Set α) :=
+theorem Set.OrdConnected.coe_sSup {t : Set s} (ht : t.Nonempty) (h_bdd : BddAbove t)
+    : ((sSup t : s) : α) = sSup ((↑) '' t : Set α) :=
   congrArg Subtype.val <|
     (Subtype.isLUB_of_csSup_image_mem ht h_bdd (csSup_image_mem ht h_bdd)).csSup_eq ht
 
-theorem Set.OrdConnected.coe_sInf {t : Set s} (ht : t.Nonempty) (h_bdd : BddBelow t) :
-    ((sInf t : s) : α) = sInf ((↑) '' t : Set α) :=
+theorem Set.OrdConnected.coe_sInf {t : Set s} (ht : t.Nonempty) (h_bdd : BddBelow t)
+    : ((sInf t : s) : α) = sInf ((↑) '' t : Set α) :=
   congrArg Subtype.val <|
     (Subtype.isGLB_of_csInf_image_mem ht h_bdd (csInf_image_mem ht h_bdd)).csInf_eq ht
 
@@ -200,24 +223,38 @@ end OrdConnected
 section Icc
 
 /-- Complete lattice structure on `Set.Icc` -/
-noncomputable instance Set.Icc.completeLattice [ConditionallyCompleteLattice α]
-    {a b : α} [Fact (a ≤ b)] : CompleteLattice (Set.Icc a b) where
+noncomputable instance Set.Icc.completeLattice
+    [ConditionallyCompleteLattice α] {a b : α} [Fact (a ≤ b)]
+    : CompleteLattice (Set.Icc a b) where
   __ := (inferInstance : BoundedOrder ↑(Icc a b))
-  sSup S := if hS : S = ∅ then ⟨a, le_rfl, Fact.out⟩ else ⟨sSup ((↑) '' S), by
-    rw [← Set.not_nonempty_iff_eq_empty, not_not] at hS
-    refine ⟨?_, csSup_le (hS.image Subtype.val) (fun _ ⟨c, _, hc⟩ ↦ hc ▸ c.property.2)⟩
-    obtain ⟨c, hc⟩ := hS
-    exact c.property.1.trans (le_csSup ⟨b, fun _ ⟨d, _, hd⟩ ↦ hd ▸ d.property.2⟩ ⟨c, hc, rfl⟩)⟩
+  sSup S :=
+    if hS : S = ∅ then
+      ⟨a, le_rfl, Fact.out⟩
+    else ⟨
+      sSup ((↑) '' S),
+      by
+        rw [← Set.not_nonempty_iff_eq_empty, not_not] at hS
+        refine ⟨?_, csSup_le (hS.image Subtype.val) (fun _ ⟨c, _, hc⟩ ↦ hc ▸ c.property.2)⟩
+        obtain ⟨c, hc⟩ := hS
+        exact c.property.1.trans (le_csSup ⟨b, fun _ ⟨d, _, hd⟩ ↦ hd ▸ d.property.2⟩ ⟨c, hc, rfl⟩)
+    ⟩
   isLUB_sSup S := by
     split_ifs with hS
     · subst hS; simp only [isLUB_empty_iff, isBot_iff_eq_bot]; rfl
     · exact .of_image Subtype.coe_le_coe <| isLUB_csSup ((Set.ne_empty_iff_nonempty.mp hS).image _)
         ((Subtype.mono_coe _).map_bddAbove (OrderTop.bddAbove S))
-  sInf S := if hS : S = ∅ then ⟨b, Fact.out, le_rfl⟩ else ⟨sInf ((↑) '' S), by
-    rw [← Set.not_nonempty_iff_eq_empty, not_not] at hS
-    refine ⟨le_csInf (hS.image Subtype.val) (fun _ ⟨c, _, hc⟩ ↦ hc ▸ c.property.1), ?_⟩
-    obtain ⟨c, hc⟩ := hS
-    exact le_trans (csInf_le ⟨a, fun _ ⟨d, _, hd⟩ ↦ hd ▸ d.property.1⟩ ⟨c, hc, rfl⟩) c.property.2⟩
+  sInf S :=
+    if hS : S = ∅ then
+      ⟨b, Fact.out, le_rfl⟩
+    else ⟨
+      sInf ((↑) '' S),
+      by
+        rw [← Set.not_nonempty_iff_eq_empty, not_not] at hS
+        refine ⟨le_csInf (hS.image Subtype.val) (fun _ ⟨c, _, hc⟩ ↦ hc ▸ c.property.1), ?_⟩
+        obtain ⟨c, hc⟩ := hS
+        exact le_trans (csInf_le ⟨a, fun _ ⟨d, _, hd⟩ ↦ hd ▸ d.property.1⟩ ⟨c, hc, rfl⟩)
+          c.property.2
+    ⟩
   isGLB_sInf S := by
     split_ifs with hS
     · subst hS; simp only [isGLB_empty_iff, isTop_iff_eq_top]; rfl
@@ -225,28 +262,33 @@ noncomputable instance Set.Icc.completeLattice [ConditionallyCompleteLattice α]
         ((Subtype.mono_coe _).map_bddBelow (OrderBot.bddBelow S))
 
 /-- Complete linear order structure on `Set.Icc` -/
-noncomputable instance [ConditionallyCompleteLinearOrder α] {a b : α} [Fact (a ≤ b)] :
-    CompleteLinearOrder (Set.Icc a b) :=
-  { Set.Icc.completeLattice, Subtype.instLinearOrder _, LinearOrder.toBiheytingAlgebra _ with }
+noncomputable instance [ConditionallyCompleteLinearOrder α] {a b : α} [Fact (a ≤ b)]
+    : CompleteLinearOrder (Set.Icc a b) := {
+  Set.Icc.completeLattice, Subtype.instLinearOrder _, LinearOrder.toBiheytingAlgebra _ with
+}
 
-lemma Set.Icc.coe_sSup [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b)
-    {S : Set (Set.Icc a b)} (hS : S.Nonempty) : have : Fact (a ≤ b) := ⟨h⟩
-    ↑(sSup S) = sSup ((↑) '' S : Set α) :=
+lemma Set.Icc.coe_sSup
+    [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b) {S : Set (Set.Icc a b)} (hS : S.Nonempty)
+    : have : Fact (a ≤ b) := ⟨h⟩
+      ↑(sSup S) = sSup ((↑) '' S : Set α) :=
   congrArg Subtype.val (dite_eq_right hS.ne_empty)
 
-lemma Set.Icc.coe_sInf [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b)
-    {S : Set (Set.Icc a b)} (hS : S.Nonempty) : have : Fact (a ≤ b) := ⟨h⟩
-    ↑(sInf S) = sInf ((↑) '' S : Set α) :=
+lemma Set.Icc.coe_sInf
+    [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b) {S : Set (Set.Icc a b)} (hS : S.Nonempty)
+    : have : Fact (a ≤ b) := ⟨h⟩
+      ↑(sInf S) = sInf ((↑) '' S : Set α) :=
   congrArg Subtype.val (dite_eq_right hS.ne_empty)
 
-lemma Set.Icc.coe_iSup [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b)
-    [Nonempty ι] {S : ι → Set.Icc a b} : have : Fact (a ≤ b) := ⟨h⟩
-    ↑(iSup S) = (⨆ i, S i : α) :=
+lemma Set.Icc.coe_iSup
+    [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b) [Nonempty ι] {S : ι → Set.Icc a b}
+    : have : Fact (a ≤ b) := ⟨h⟩
+      ↑(iSup S) = (⨆ i, S i : α) :=
   (Set.Icc.coe_sSup h (range_nonempty S)).trans (congrArg sSup (range_comp Subtype.val S).symm)
 
-lemma Set.Icc.coe_iInf [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b)
-    [Nonempty ι] {S : ι → Set.Icc a b} : have : Fact (a ≤ b) := ⟨h⟩
-    ↑(iInf S) = (⨅ i, S i : α) :=
+lemma Set.Icc.coe_iInf
+    [ConditionallyCompleteLattice α] {a b : α} (h : a ≤ b) [Nonempty ι] {S : ι → Set.Icc a b}
+    : have : Fact (a ≤ b) := ⟨h⟩
+      ↑(iInf S) = (⨅ i, S i : α) :=
   (Set.Icc.coe_sInf h (range_nonempty S)).trans (congrArg sInf (range_comp Subtype.val S).symm)
 
 end Icc
@@ -259,31 +301,34 @@ instance instCompleteLattice : CompleteLattice (Iic a) where
   sSup S := ⟨sSup ((↑) '' S), by simpa using fun b hb _ ↦ hb⟩
   sInf S := ⟨a ⊓ sInf ((↑) '' S), by simp⟩
   isLUB_sSup _ := .of_image Subtype.coe_le_coe (isLUB_sSup _)
-  isGLB_sInf _ :=
-    ⟨fun _ hb ↦ inf_le_of_right_le <| sInf_le <| mem_image_of_mem Subtype.val hb,
-      fun b hb ↦ le_inf_iff.mpr ⟨b.property, le_sInf fun _ ⟨_, hd, hd'⟩ ↦ hd' ▸ hb hd⟩⟩
+  isGLB_sInf _ := ⟨
+    fun _ hb ↦ inf_le_of_right_le <| sInf_le <| mem_image_of_mem Subtype.val hb,
+    fun b hb ↦ le_inf_iff.mpr ⟨b.property, le_sInf fun _ ⟨_, hd, hd'⟩ ↦ hd' ▸ hb hd⟩
+  ⟩
   le_top := by simp
   bot_le := by simp
 
 variable (S : Set <| Iic a) (f : ι → Iic a) (p : ι → Prop)
 
-@[simp] theorem coe_sSup : (↑(sSup S) : α) = sSup ((↑) '' S) := rfl
+@[simp]
+theorem coe_sSup : (↑(sSup S) : α) = sSup ((↑) '' S) := rfl
 
-@[simp] theorem coe_iSup : (↑(⨆ i, f i) : α) = ⨆ i, (f i : α) := by
-  rw [iSup, coe_sSup]; congr; ext; simp
+@[simp]
+theorem coe_iSup : (↑(⨆ i, f i) : α) = ⨆ i, (f i : α) := by rw [iSup, coe_sSup]; congr; ext; simp
 
 theorem coe_biSup : (↑(⨆ i, ⨆ (_ : p i), f i) : α) = ⨆ i, ⨆ (_ : p i), (f i : α) := by simp
 
-@[simp] theorem coe_sInf : (↑(sInf S) : α) = a ⊓ sInf ((↑) '' S) := rfl
+@[simp]
+theorem coe_sInf : (↑(sInf S) : α) = a ⊓ sInf ((↑) '' S) := rfl
 
-@[simp] theorem coe_iInf : (↑(⨅ i, f i) : α) = a ⊓ ⨅ i, (f i : α) := by
+@[simp]
+theorem coe_iInf : (↑(⨅ i, f i) : α) = a ⊓ ⨅ i, (f i : α) := by
   rw [iInf, coe_sInf]; congr; ext; simp
 
 theorem coe_biInf : (↑(⨅ i, ⨅ (_ : p i), f i) : α) = a ⊓ ⨅ i, ⨅ (_ : p i), (f i : α) := by
   cases isEmpty_or_nonempty ι
   · simp
   · simp_rw [coe_iInf, ← inf_iInf, ← inf_assoc, inf_idem]
-
 
 end Set.Iic
 
@@ -292,10 +337,10 @@ attribute [deprecated Subtype.isLUB_of_csSup_image_mem +typeChanged (since := "2
 attribute [deprecated Subtype.isGLB_of_csInf_image_mem +typeChanged (since := "2026-10-26")]
   subset_sInf_of_within
 attribute [deprecated Set.OrdConnected.sSup_empty_of_noBotOrder +typeChanged
-  (since := "2026-10-26")]
+    (since := "2026-10-26")]
   subset_sSup_emptyset
 attribute [deprecated Set.OrdConnected.sInf_empty_of_noTopOrder +typeChanged
-  (since := "2026-10-26")]
+    (since := "2026-10-26")]
   subset_sInf_emptyset
 attribute [deprecated csSup_of_not_bddAbove +typeChanged (since := "2026-10-26")]
   subset_sSup_of_not_bddAbove

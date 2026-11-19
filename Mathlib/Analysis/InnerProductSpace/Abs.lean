@@ -40,8 +40,8 @@ section Abs
 
 open scoped NNReal InnerProduct
 
-variable {E F : Type*}
-  [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
+variable
+  {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [CompleteSpace E]
   [NormedAddCommGroup F] [InnerProductSpace ℂ F] [CompleteSpace F]
 
 /-- The absolute value `|T| = √(T†∘T)` of a continuous linear map `T : E →L[ℂ] F`. -/
@@ -51,8 +51,7 @@ protected noncomputable def abs (T : E →L[ℂ] F) : E →L[ℂ] E := CFC.sqrt 
 protected theorem abs_def (T : E →L[ℂ] F) : T.abs = CFC.sqrt (T† ∘L T) := rfl
 
 @[simp]
-protected theorem abs_zero : (0 : E →L[ℂ] F).abs = 0 := by
-  simp [ContinuousLinearMap.abs_def]
+protected theorem abs_zero : (0 : E →L[ℂ] F).abs = 0 := by simp [ContinuousLinearMap.abs_def]
 
 @[simp]
 protected theorem abs_neg (T : E →L[ℂ] F) : (-T).abs = T.abs := by
@@ -78,15 +77,13 @@ theorem adjoint_abs (T : E →L[ℂ] F) : T.abs† = T.abs := T.isPositive_abs.i
 
 @[fun_prop]
 protected theorem continuous_abs : Continuous (ContinuousLinearMap.abs : (E →L[ℂ] F) → E →L[ℂ] E) :=
-  CFC.continuousOn_sqrt.comp_continuous (by fun_prop)
-    fun T => T.isPositive_adjoint_comp_self.nonneg
+  CFC.continuousOn_sqrt.comp_continuous (by fun_prop) fun T => T.isPositive_adjoint_comp_self.nonneg
 
 theorem abs_eq_cfcAbs (T : E →L[ℂ] E) : T.abs = CFC.abs T := rfl
 
 @[simp]
 protected theorem abs_eq_zero {T : E →L[ℂ] F} : T.abs = 0 ↔ T = 0 := by
-  simp [ContinuousLinearMap.abs_def,
-    CFC.sqrt_eq_zero_iff _ T.isPositive_adjoint_comp_self.nonneg]
+  simp [ContinuousLinearMap.abs_def, CFC.sqrt_eq_zero_iff _ T.isPositive_adjoint_comp_self.nonneg]
 
 @[simp]
 theorem abs_comp_abs (T : E →L[ℂ] F) : T.abs ∘L T.abs = T† ∘L T := by
@@ -99,8 +96,7 @@ theorem norm_abs_apply (T : E →L[ℂ] F) (x : E) : ‖T.abs x‖ = ‖T x‖ :
   simp [apply_norm_sq_eq_inner_adjoint_left]
 
 @[simp]
-theorem ker_abs (T : E →L[ℂ] F) : T.abs.ker = T.ker := by
-  simp [← ker_adjoint_comp_self]
+theorem ker_abs (T : E →L[ℂ] F) : T.abs.ker = T.ker := by simp [← ker_adjoint_comp_self]
 
 @[simp]
 protected theorem norm_abs (T : E →L[ℂ] F) : ‖T.abs‖ = ‖T‖ := by
@@ -110,19 +106,17 @@ protected theorem abs_nnrpow_two (T : E →L[ℂ] F) : T.abs ^ (2 : ℝ≥0) = T
   rw [CFC.nnrpow_two .., mul_def]
   exact abs_comp_abs T
 
-protected theorem abs_nnrpow_two_mul (T : E →L[ℂ] F) (x : ℝ≥0) :
-    T.abs ^ (2 * x) = (T† ∘L T) ^ x := by
+protected theorem abs_nnrpow_two_mul (T : E →L[ℂ] F) (x : ℝ≥0)
+    : T.abs ^ (2 * x) = (T† ∘L T) ^ x := by
   rw [← CFC.nnrpow_nnrpow, ContinuousLinearMap.abs_nnrpow_two]
 
-protected theorem abs_nnrpow (T : E →L[ℂ] F) (x : ℝ≥0) :
-    T.abs ^ x = (T† ∘L T) ^ (x / 2) := by
+protected theorem abs_nnrpow (T : E →L[ℂ] F) (x : ℝ≥0) : T.abs ^ x = (T† ∘L T) ^ (x / 2) := by
   simp [← ContinuousLinearMap.abs_nnrpow_two_mul, mul_div_left_comm]
 
 protected theorem abs_pow_two (T : E →L[ℂ] F) : T.abs ^ 2 = T† ∘L T := by
   rw [sq, mul_def, abs_comp_abs]
 
-protected theorem abs_pow_two_mul (T : E →L[ℂ] F) (n : ℕ) :
-    T.abs ^ (2 * n) = (T† ∘L T) ^ n := by
+protected theorem abs_pow_two_mul (T : E →L[ℂ] F) (n : ℕ) : T.abs ^ (2 * n) = (T† ∘L T) ^ n := by
   rw [pow_mul, ContinuousLinearMap.abs_pow_two]
 
 protected theorem IsPositive.abs_eq_self {S : E →L[ℂ] E} (hS : S.IsPositive) : S.abs = S := by
@@ -148,24 +142,25 @@ protected theorem abs_eq_neg_self {S : E →L[ℂ] E} : S.abs = -S ↔ (-S).IsPo
   ⟨fun h ↦ h ▸ S.isPositive_abs, fun h ↦ h.abs_eq_neg_self⟩
 
 @[simp]
-theorem abs_id : (ContinuousLinearMap.id ℂ E).abs = .id ℂ E :=
-  isPositive_one.abs_eq_self
+theorem abs_id : (ContinuousLinearMap.id ℂ E).abs = .id ℂ E := isPositive_one.abs_eq_self
 
 @[simp]
-protected theorem abs_one : (1 : E →L[ℂ] E).abs = 1 :=
-  isPositive_one.abs_eq_self
+protected theorem abs_one : (1 : E →L[ℂ] E).abs = 1 := isPositive_one.abs_eq_self
 
-protected theorem abs_smul {𝕜 : Type*} [RCLike 𝕜] [Module 𝕜 F] [ContinuousConstSMul 𝕜 F]
-    [NormedAlgebra 𝕜 ℂ] [IsScalarTower 𝕜 ℂ F] (c : 𝕜) (T : E →L[ℂ] F) :
-    (c • T).abs = ‖c‖ • T.abs := by
+protected theorem abs_smul
+    {𝕜 : Type*}
+    [RCLike 𝕜] [Module 𝕜 F] [ContinuousConstSMul 𝕜 F] [NormedAlgebra 𝕜 ℂ] [IsScalarTower 𝕜 ℂ F]
+    (c : 𝕜) (T : E →L[ℂ] F)
+    : (c • T).abs = ‖c‖ • T.abs := by
   rw [ContinuousLinearMap.abs_def, CFC.sqrt_eq_iff .., ← algebraMap_smul ℂ c T]
   simp [mul_def, ← smul_assoc, Complex.mul_conj', map_smulₛₗ, sq, -algebraMap_smul]
   norm_cast
 
 @[simp]
-theorem abs_linearIsometry_comp {G : Type*} [NormedAddCommGroup G] [InnerProductSpace ℂ G]
-    [CompleteSpace G] (U : F →ₗᵢ[ℂ] G) (T : E →L[ℂ] F) :
-    (U.toContinuousLinearMap ∘L T).abs = T.abs := by
+theorem abs_linearIsometry_comp
+    {G : Type*} [NormedAddCommGroup G] [InnerProductSpace ℂ G] [CompleteSpace G]
+    (U : F →ₗᵢ[ℂ] G) (T : E →L[ℂ] F)
+    : (U.toContinuousLinearMap ∘L T).abs = T.abs := by
   simp [ContinuousLinearMap.abs_def, comp_assoc, ← comp_assoc (U.toContinuousLinearMap†),
     (isometry_iff_adjoint_comp_self U.toContinuousLinearMap).mp U.isometry, one_def]
 

@@ -26,17 +26,17 @@ variable [Preorder α] [OrderBot α] [SuccOrder α]
 
 /-- The successor of `a : WithBot α` as an element of `α`. -/
 @[to_dual
-/-- The predecessor of `a : WithTop α` as an element of `α`. -/]
+  /-- The predecessor of `a : WithTop α` as an element of `α`. -/]
 def succ (a : WithBot α) : α := a.recBotCoe ⊥ Order.succ
 
 /-- Not to be confused with `WithBot.orderSucc_bot`, which is about `Order.succ`. -/
 @[to_dual (attr := simp)
-/-- Not to be confused with `WithTop.orderPred_top`, which is about `Order.pred`. -/]
+  /-- Not to be confused with `WithTop.orderPred_top`, which is about `Order.pred`. -/]
 lemma succ_bot : succ (⊥ : WithBot α) = ⊥ := rfl
 
 /-- Not to be confused with `WithBot.orderSucc_coe`, which is about `Order.succ`. -/
 @[to_dual (attr := simp)
-/-- Not to be confused with `WithTop.orderPred_coe`, which is about `Order.pred`. -/]
+  /-- Not to be confused with `WithTop.orderPred_coe`, which is about `Order.pred`. -/]
 lemma succ_coe (a : α) : succ (a : WithBot α) = Order.succ a := rfl
 
 @[to_dual]
@@ -45,8 +45,7 @@ lemma succ_eq_succ : ∀ a : WithBot α, succ a = Order.succ a
   | (a : α) => rfl
 
 @[to_dual pred_lt]
-lemma lt_succ [NoMaxOrder α] (x : WithBot α) : x < x.succ :=
-  succ_eq_succ x ▸ Order.lt_succ x
+lemma lt_succ [NoMaxOrder α] (x : WithBot α) : x < x.succ := succ_eq_succ x ▸ Order.lt_succ x
 
 @[to_dual]
 lemma succ_mono : Monotone (succ : WithBot α → α)
@@ -67,8 +66,7 @@ lemma succ_lt_succ [NoMaxOrder α] (hxy : x < y) : x.succ < y.succ := succ_stric
 end Preorder
 
 section PartialOrder
-variable [PartialOrder α] [OrderBot α] [PredOrder α]
-  [∀ a : α, Decidable (Order.pred a = a)]
+variable [PartialOrder α] [OrderBot α] [PredOrder α] [∀ a : α, Decidable (Order.pred a = a)]
 
 @[to_dual (attr := simp)]
 theorem succ_pred_coe [SuccOrder α] (a : α) : succ (Order.pred (a : WithBot α)) = a := by

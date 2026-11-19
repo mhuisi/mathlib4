@@ -43,23 +43,20 @@ All the instances are inherited from the corresponding structures on the reals.
 
 instance : TopologicalSpace ℝ≥0 := inferInstance
 
-instance : CompleteSpace ℝ≥0 :=
-  isClosed_Ici.completeSpace_coe
+instance : CompleteSpace ℝ≥0 := isClosed_Ici.completeSpace_coe
 
 @[fun_prop]
-theorem continuous_coe : Continuous ((↑) : ℝ≥0 → ℝ) :=
-  continuous_subtypeVal
+theorem continuous_coe : Continuous ((↑) : ℝ≥0 → ℝ) := continuous_subtypeVal
 
 /-- Embedding of `ℝ≥0` to `ℝ` as a bundled continuous map. -/
 @[simps -fullyApplied]
-def _root_.ContinuousMap.coeNNRealReal : C(ℝ≥0, ℝ) :=
-  ⟨(↑), continuous_coe⟩
+def _root_.ContinuousMap.coeNNRealReal : C(ℝ≥0, ℝ) := ⟨(↑), continuous_coe⟩
 
 @[simp]
 lemma coeNNRealReal_zero : ContinuousMap.coeNNRealReal 0 = 0 := rfl
 
-instance ContinuousMap.canLift {X : Type*} [TopologicalSpace X] :
-    CanLift C(X, ℝ) C(X, ℝ≥0) ContinuousMap.coeNNRealReal.comp fun f => ∀ x, 0 ≤ f x where
+instance ContinuousMap.canLift {X : Type*} [TopologicalSpace X]
+    : CanLift C(X, ℝ) C(X, ℝ≥0) ContinuousMap.coeNNRealReal.comp fun f => ∀ x, 0 ≤ f x where
   prf f hf :=
     ⟨⟨fun x => .mk (f x) (hf x), Continuous.subtype_mk (by fun_prop) _⟩, DFunLike.ext' rfl⟩
 

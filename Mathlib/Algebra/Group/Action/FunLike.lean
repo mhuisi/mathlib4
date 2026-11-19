@@ -38,17 +38,20 @@ protected theorem smulCommClass [SMulCommClass M M' β] : SMulCommClass M M' F w
 end SMulInstances
 
 include i in
-protected theorem isCentralScalar [SMul M F] [SMul Mᵐᵒᵖ F] [SMul M β] [SMul Mᵐᵒᵖ β]
-    [IsCentralScalar M β] [IsSMulApply M F] [IsSMulApply Mᵐᵒᵖ F] :
-    IsCentralScalar M F where
+protected theorem isCentralScalar
+    [SMul M F] [SMul Mᵐᵒᵖ F] [SMul M β] [SMul Mᵐᵒᵖ β] [IsCentralScalar M β] [IsSMulApply M F]
+    [IsSMulApply Mᵐᵒᵖ F]
+    : IsCentralScalar M F where
   op_smul_eq_smul a b := by apply DFunLike.ext; simp [op_smul_eq_smul]
 
-/-- A `FunLike` type with scalar multiplication that satisfies `(m • f) x = m • f x`
-is a `MulAction` if `β` is a `MulAction`. -/
+/--
+A `FunLike` type with scalar multiplication that satisfies `(m • f) x = m • f x`
+is a `MulAction` if `β` is a `MulAction`.
+-/
 @[to_additive /-- A `FunLike` type with scalar multiplication that satisfies `(m • f) x = m • f x`
 is an `AddAction` if `β` is an `AddAction`. -/]
-protected abbrev mulAction [SMul M F] [Monoid M] [MulAction M β] [IsSMulApply M F] :
-    MulAction M F :=
+protected abbrev mulAction [SMul M F] [Monoid M] [MulAction M β] [IsSMulApply M F]
+    : MulAction M F :=
   DFunLike.coe_injective.mulAction _ FunLike.coe_smul
 
 end FunLike

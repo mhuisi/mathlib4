@@ -52,20 +52,24 @@ namespace OrderType
 
 universe u v
 
-instance : ZeroLEOneClass OrderType :=
-  ⟨OrderType.zero_le _⟩
+instance : ZeroLEOneClass OrderType := ⟨OrderType.zero_le _⟩
 
 instance (priority := low) : HAdd OrderType.{u} OrderType.{v} OrderType.{max u v} where
-  hAdd o₁ o₂ := OrderType.liftOn₂ o₁ o₂ (fun r _ s _ ↦ type (r ⊕ₗ s))
-    fun _ _ _ _ _ _ _ _ ha hb ↦ OrderIso.sumLexCongr (Classical.choice <| type_eq_type.mp ha)
-      (Classical.choice <| type_eq_type.mp hb) |> type_congr
+  hAdd o₁ o₂ :=
+    OrderType.liftOn₂ o₁ o₂
+      (fun r _ s _ ↦ type (r ⊕ₗ s))
+      fun _ _ _ _ _ _ _ _ ha hb ↦
+        OrderIso.sumLexCongr (Classical.choice <| type_eq_type.mp ha)
+            (Classical.choice <| type_eq_type.mp hb)
+          |> type_congr
 
 instance : Add OrderType.{u} where
   add o₁ o₂ := o₁ + o₂
 
 @[simp]
-lemma type_lex_sum (α : Type u) (β : Type v) [LinearOrder α] [LinearOrder β] :
-    type (α ⊕ₗ β) = type α + type β := by simp [HAdd.hAdd]
+lemma type_lex_sum (α : Type u) (β : Type v) [LinearOrder α] [LinearOrder β]
+    : type (α ⊕ₗ β) = type α + type β := by
+  simp [HAdd.hAdd]
 
 instance : AddMonoid OrderType.{u} where
   add_assoc o₁ o₂ o₃ :=
@@ -82,16 +86,21 @@ instance : AddMonoid OrderType.{u} where
   nsmul := nsmulRec
 
 instance (priority := low) : HMul OrderType.{u} OrderType.{v} OrderType.{max u v} where
-  hMul o₁ o₂ := OrderType.liftOn₂ o₁ o₂ (fun r _ s _ ↦ type (s ×ₗ r))
-    fun _ _ _ _ _ _ _ _ ha hb ↦ Prod.Lex.prodLexCongr (Classical.choice <| type_eq_type.mp hb)
-      (Classical.choice <| type_eq_type.mp ha) |> type_congr
+  hMul o₁ o₂ :=
+    OrderType.liftOn₂ o₁ o₂
+      (fun r _ s _ ↦ type (s ×ₗ r))
+      fun _ _ _ _ _ _ _ _ ha hb ↦
+        Prod.Lex.prodLexCongr (Classical.choice <| type_eq_type.mp hb)
+            (Classical.choice <| type_eq_type.mp ha)
+          |> type_congr
 
 instance : Mul OrderType.{u} where
   mul o₁ o₂ := o₁ * o₂
 
 @[simp]
-lemma type_lex_prod (α : Type u) (β : Type v) [LinearOrder α] [LinearOrder β] :
-    type (α ×ₗ β) = type β * type α := by simp [HMul.hMul]
+lemma type_lex_prod (α : Type u) (β : Type v) [LinearOrder α] [LinearOrder β]
+    : type (α ×ₗ β) = type β * type α := by
+  simp [HMul.hMul]
 
 instance : Monoid OrderType.{u} where
   mul_assoc o₁ o₂ o₃ :=
@@ -111,26 +120,27 @@ section Cardinal
 
 open Cardinal
 
-/-- The cardinal of an `OrderType` is the cardinality of any type on which a relation
-with that order type is defined. -/
+/--
+The cardinal of an `OrderType` is the cardinality of any type on which a relation
+with that order type is defined.
+-/
 def card (o : OrderType) : Cardinal :=
-  o.liftOn (fun α _ ↦ #α)
-    fun _ _ _ _ hab ↦ mk_congr (type_eq_type.mp hab).some.toEquiv
+  o.liftOn (fun α _ ↦ #α) fun _ _ _ _ hab ↦ mk_congr (type_eq_type.mp hab).some.toEquiv
 
 @[simp]
-theorem card_type {α : Type u} [LinearOrder α] : card (type α) = #α := by
-  rw [card, liftOn_type]
+theorem card_type {α : Type u} [LinearOrder α] : card (type α) = #α := by rw [card, liftOn_type]
 
 @[gcongr]
 theorem card_mono {o₁ o₂ : OrderType} : o₁ ≤ o₂ → card o₁ ≤ card o₂ :=
-  inductionOn₂ o₁ o₂ fun _ _ _ _ hle ↦ by
-    simp [card, (type_le_type_iff.mp hle).some.cardinal_le]
+  inductionOn₂ o₁ o₂ fun _ _ _ _ hle ↦ by simp [card, (type_le_type_iff.mp hle).some.cardinal_le]
 
 theorem card_monotone : Monotone card := @card_mono
 
-@[simp] theorem card_zero : card 0 = 0 := by simpa using card_type (α := PEmpty)
+@[simp]
+theorem card_zero : card 0 = 0 := by simpa using card_type (α := PEmpty)
 
-@[simp] theorem card_one : card 1 = 1 := by simpa using card_type (α := PUnit)
+@[simp]
+theorem card_one : card 1 = 1 := by simpa using card_type (α := PUnit)
 
 end Cardinal
 

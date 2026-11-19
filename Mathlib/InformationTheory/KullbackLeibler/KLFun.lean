@@ -47,8 +47,10 @@ namespace InformationTheory
 
 variable {α : Type*} {mα : MeasurableSpace α} {μ ν : Measure α} {x : ℝ}
 
-/-- The function `x : ℝ ↦ x * log x + 1 - x`.
-The Kullback-Leibler divergence is an f-divergence for this function. -/
+/--
+The function `x : ℝ ↦ x * log x + 1 - x`.
+The Kullback-Leibler divergence is an f-divergence for this function.
+-/
 noncomputable def klFun (x : ℝ) : ℝ := x * log x + 1 - x
 
 lemma klFun_apply (x : ℝ) : klFun x = x * log x + 1 - x := rfl
@@ -65,8 +67,10 @@ lemma strictConvexOn_klFun : StrictConvexOn ℝ (Ici 0) klFun :=
 /-- `klFun` is convex on $[0,∞)$. -/
 lemma convexOn_klFun : ConvexOn ℝ (Ici 0) klFun := strictConvexOn_klFun.convexOn
 
-/-- `klFun` is convex on $(0,∞)$.
-This is an often useful consequence of `convexOn_klFun`, which states convexity on $[0, ∞)$. -/
+/--
+`klFun` is convex on $(0,∞)$.
+This is an often useful consequence of `convexOn_klFun`, which states convexity on $[0, ∞)$.
+-/
 lemma convexOn_Ioi_klFun : ConvexOn ℝ (Ioi 0) klFun :=
   convexOn_klFun.subset (Ioi_subset_Ici le_rfl) (convex_Ioi _)
 
@@ -92,8 +96,10 @@ lemma hasDerivAt_klFun (hx : x ≠ 0) : HasDerivAt klFun (log x) x := by
 lemma not_differentiableAt_klFun_zero : ¬ DifferentiableAt ℝ klFun 0 := by
   unfold klFun; simpa using not_DifferentiableAt_log_mul_zero
 
-/-- The derivative of `klFun` is `log x`. This also holds at `x = 0` although `klFun` is not
-differentiable there since the default value of `deriv` in that case is 0. -/
+/--
+The derivative of `klFun` is `log x`. This also holds at `x = 0` although `klFun` is not
+differentiable there since the default value of `deriv` in that case is 0.
+-/
 @[simp]
 lemma deriv_klFun : deriv klFun = log := by
   ext x
@@ -112,8 +118,10 @@ lemma not_differentiableWithinAt_klFun_Iio_zero : ¬ DifferentiableWithinAt ℝ 
   rw [deriv_klFun]
   exact tendsto_log_nhdsLT_zero
 
-/-- The right derivative of `klFun` is `log x`. This also holds at `x = 0` although `klFun` is not
-differentiable there since the default value of `derivWithin` in that case is 0. -/
+/--
+The right derivative of `klFun` is `log x`. This also holds at `x = 0` although `klFun` is not
+differentiable there since the default value of `derivWithin` in that case is 0.
+-/
 @[simp]
 lemma rightDeriv_klFun : derivWithin klFun (Ioi x) x = log x := by
   by_cases h0 : x = 0
@@ -121,8 +129,10 @@ lemma rightDeriv_klFun : derivWithin klFun (Ioi x) x = log x := by
     exact derivWithin_zero_of_not_differentiableWithinAt not_differentiableWithinAt_klFun_Ioi_zero
   · exact (hasDerivAt_klFun h0).hasDerivWithinAt.derivWithin (uniqueDiffWithinAt_Ioi x)
 
-/-- The left derivative of `klFun` is `log x`. This also holds at `x = 0` although `klFun` is not
-differentiable there since the default value of `derivWithin` in that case is 0. -/
+/--
+The left derivative of `klFun` is `log x`. This also holds at `x = 0` although `klFun` is not
+differentiable there since the default value of `derivWithin` in that case is 0.
+-/
 @[simp]
 lemma leftDeriv_klFun : derivWithin klFun (Iio x) x = log x := by
   by_cases h0 : x = 0
@@ -134,8 +144,8 @@ lemma rightDeriv_klFun_one : derivWithin klFun (Ioi 1) 1 = 0 := by simp
 
 lemma leftDeriv_klFun_one : derivWithin klFun (Iio 1) 1 = 0 := by simp
 
-lemma tendsto_rightDeriv_klFun_atTop :
-    Tendsto (fun x ↦ derivWithin klFun (Ioi x) x) atTop atTop := by
+lemma tendsto_rightDeriv_klFun_atTop
+    : Tendsto (fun x ↦ derivWithin klFun (Ioi x) x) atTop atTop := by
   simp only [rightDeriv_klFun]
   exact tendsto_log_atTop
 
@@ -163,20 +173,23 @@ section Integral
 
 variable [IsFiniteMeasure μ] [IsFiniteMeasure ν]
 
-/-- For two finite measures `μ ≪ ν`, the function `x ↦ klFun (μ.rnDeriv ν x).toReal` is integrable
-with respect to `ν` iff `llr μ ν` is integrable with respect to `μ`. -/
-lemma integrable_klFun_rnDeriv_iff (hμν : μ ≪ ν) :
-    Integrable (fun x ↦ klFun (μ.rnDeriv ν x).toReal) ν ↔ Integrable (llr μ ν) μ := by
-  suffices Integrable (fun x ↦ (μ.rnDeriv ν x).toReal * log (μ.rnDeriv ν x).toReal
-      + (1 - (μ.rnDeriv ν x).toReal)) ν ↔ Integrable (llr μ ν) μ by
+/--
+For two finite measures `μ ≪ ν`, the function `x ↦ klFun (μ.rnDeriv ν x).toReal` is integrable
+with respect to `ν` iff `llr μ ν` is integrable with respect to `μ`.
+-/
+lemma integrable_klFun_rnDeriv_iff (hμν : μ ≪ ν)
+    : Integrable (fun x ↦ klFun (μ.rnDeriv ν x).toReal) ν ↔ Integrable (llr μ ν) μ := by
+  suffices Integrable
+        (fun x ↦ (μ.rnDeriv ν x).toReal * log (μ.rnDeriv ν x).toReal + (1 - (μ.rnDeriv ν x).toReal))
+        ν
+      ↔ Integrable (llr μ ν) μ by
     convert! this using 3 with x
     rw [klFun, add_sub_assoc]
   rw [integrable_add_iff_integrable_left', integrable_rnDeriv_mul_log_iff hμν]
   fun_prop
 
-lemma integral_klFun_rnDeriv (hμν : μ ≪ ν) (h_int : Integrable (llr μ ν) μ) :
-    ∫ x, klFun (μ.rnDeriv ν x).toReal ∂ν
-      = ∫ x, llr μ ν x ∂μ + ν.real univ - μ.real univ := by
+lemma integral_klFun_rnDeriv (hμν : μ ≪ ν) (h_int : Integrable (llr μ ν) μ)
+    : ∫ x, klFun (μ.rnDeriv ν x).toReal ∂ν = ∫ x, llr μ ν x ∂μ + ν.real univ - μ.real univ := by
   unfold klFun
   rw [integral_sub, integral_add, integral_const, Measure.integral_toReal_rnDeriv hμν, smul_eq_mul,
     mul_one]

@@ -36,10 +36,12 @@ open Function
 
 variable {α : Type*}
 
-/-- Boolean algebra containing a given generalised Boolean algebra `α` as a sublattice.
+/--
+Boolean algebra containing a given generalised Boolean algebra `α` as a sublattice.
 
 This should be thought of as made of a copy of `α` (representing elements of `α`) living under
-another copy of `α` (representing complements of elements of `α`). -/
+another copy of `α` (representing complements of elements of `α`).
+-/
 def Booleanisation (α : Type*) := α ⊕ α
 
 namespace Booleanisation
@@ -47,12 +49,16 @@ namespace Booleanisation
 instance instDecidableEq [DecidableEq α] : DecidableEq (Booleanisation α) :=
   inferInstanceAs <| DecidableEq (α ⊕ α)
 
-/-- The natural inclusion `a ↦ a` from a generalized Boolean algebra to its generated Boolean
-algebra. -/
-@[match_pattern] def lift : α → Booleanisation α := Sum.inl
+/--
+The natural inclusion `a ↦ a` from a generalized Boolean algebra to its generated Boolean
+algebra.
+-/
+@[match_pattern]
+def lift : α → Booleanisation α := Sum.inl
 
 /-- The inclusion `a ↦ aᶜ` from a generalized Boolean algebra to its generated Boolean algebra. -/
-@[match_pattern] def comp : α → Booleanisation α := Sum.inr
+@[match_pattern]
+def comp : α → Booleanisation α := Sum.inr
 
 /-- The complement operator on `Booleanisation α` sends `a` to `aᶜ` and `aᶜ` to `a`, for `a : α`. -/
 instance instCompl : Compl (Booleanisation α) where
@@ -60,26 +66,32 @@ instance instCompl : Compl (Booleanisation α) where
     | lift a => comp a
     | comp a => lift a
 
-@[simp] lemma compl_lift (a : α) : (lift a)ᶜ = comp a := rfl
-@[simp] lemma compl_comp (a : α) : (comp a)ᶜ = lift a := rfl
+@[simp]
+lemma compl_lift (a : α) : (lift a)ᶜ = comp a := rfl
+@[simp]
+lemma compl_comp (a : α) : (comp a)ᶜ = lift a := rfl
 
 variable [GeneralizedBooleanAlgebra α]
 
-/-- The order on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The order on `Booleanisation α` is as follows: For `a b : α`,
 * `a ≤ b` iff `a ≤ b` in `α`
 * `a ≤ bᶜ` iff `a` and `b` are disjoint in `α`
 * `aᶜ ≤ bᶜ` iff `b ≤ a` in `α`
-* `¬ aᶜ ≤ b` -/
+* `¬ aᶜ ≤ b`
+-/
 protected inductive LE : Booleanisation α → Booleanisation α → Prop
   | protected lift {a b} : a ≤ b → Booleanisation.LE (lift a) (lift b)
   | protected comp {a b} : a ≤ b → Booleanisation.LE (comp b) (comp a)
   | protected sep {a b} : Disjoint a b → Booleanisation.LE (lift a) (comp b)
 
-/-- The order on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The order on `Booleanisation α` is as follows: For `a b : α`,
 * `a < b` iff `a < b` in `α`
 * `a < bᶜ` iff `a` and `b` are disjoint in `α`
 * `aᶜ < bᶜ` iff `b < a` in `α`
-* `¬ aᶜ < b` -/
+* `¬ aᶜ < b`
+-/
 protected inductive LT : Booleanisation α → Booleanisation α → Prop
   | protected lift {a b} : a < b → Booleanisation.LT (lift a) (lift b)
   | protected comp {a b} : a < b → Booleanisation.LT (comp b) (comp a)
@@ -93,11 +105,13 @@ instance instLE : LE (Booleanisation α) where
 instance instLT : LT (Booleanisation α) where
   lt := Booleanisation.LT
 
-/-- The supremum on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The supremum on `Booleanisation α` is as follows: For `a b : α`,
 * `a ⊔ b` is `a ⊔ b`
 * `a ⊔ bᶜ` is `(b \ a)ᶜ`
 * `aᶜ ⊔ b` is `(a \ b)ᶜ`
-* `aᶜ ⊔ bᶜ` is `(a ⊓ b)ᶜ` -/
+* `aᶜ ⊔ bᶜ` is `(a ⊓ b)ᶜ`
+-/
 instance instSup : Max (Booleanisation α) where
   max
     | lift a, lift b => lift (a ⊔ b)
@@ -105,11 +119,13 @@ instance instSup : Max (Booleanisation α) where
     | comp a, lift b => comp (a \ b)
     | comp a, comp b => comp (a ⊓ b)
 
-/-- The infimum on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The infimum on `Booleanisation α` is as follows: For `a b : α`,
 * `a ⊓ b` is `a ⊓ b`
 * `a ⊓ bᶜ` is `a \ b`
 * `aᶜ ⊓ b` is `b \ a`
-* `aᶜ ⊓ bᶜ` is `(a ⊔ b)ᶜ` -/
+* `aᶜ ⊓ bᶜ` is `(a ⊔ b)ᶜ`
+-/
 instance instInf : Min (Booleanisation α) where
   min
     | lift a, lift b => lift (a ⊓ b)
@@ -125,11 +141,13 @@ instance instBot : Bot (Booleanisation α) where
 instance instTop : Top (Booleanisation α) where
   top := comp ⊥
 
-/-- The difference operator on `Booleanisation α` is as follows: For `a b : α`,
+/--
+The difference operator on `Booleanisation α` is as follows: For `a b : α`,
 * `a \ b` is `a \ b`
 * `a \ bᶜ` is `a ⊓ b`
 * `aᶜ \ b` is `(a ⊔ b)ᶜ`
-* `aᶜ \ bᶜ` is `b \ a` -/
+* `aᶜ \ bᶜ` is `b \ a`
+-/
 instance instSDiff : SDiff (Booleanisation α) where
   sdiff
     | lift a, lift b => lift (a \ b)
@@ -139,33 +157,55 @@ instance instSDiff : SDiff (Booleanisation α) where
 
 variable {a b : α}
 
-@[simp] lemma lift_le_lift : lift a ≤ lift b ↔ a ≤ b := ⟨by rintro ⟨_⟩; assumption, LE.lift⟩
-@[simp] lemma comp_le_comp : comp a ≤ comp b ↔ b ≤ a := ⟨by rintro ⟨_⟩; assumption, LE.comp⟩
-@[simp] lemma lift_le_comp : lift a ≤ comp b ↔ Disjoint a b := ⟨by rintro ⟨_⟩; assumption, LE.sep⟩
-@[simp] lemma not_comp_le_lift : ¬ comp a ≤ lift b := fun h ↦ nomatch h
+@[simp]
+lemma lift_le_lift : lift a ≤ lift b ↔ a ≤ b := ⟨by rintro ⟨_⟩; assumption, LE.lift⟩
+@[simp]
+lemma comp_le_comp : comp a ≤ comp b ↔ b ≤ a := ⟨by rintro ⟨_⟩; assumption, LE.comp⟩
+@[simp]
+lemma lift_le_comp : lift a ≤ comp b ↔ Disjoint a b := ⟨by rintro ⟨_⟩; assumption, LE.sep⟩
+@[simp]
+lemma not_comp_le_lift : ¬ comp a ≤ lift b := fun h ↦ nomatch h
 
-@[simp] lemma lift_lt_lift : lift a < lift b ↔ a < b := ⟨by rintro ⟨_⟩; assumption, LT.lift⟩
-@[simp] lemma comp_lt_comp : comp a < comp b ↔ b < a := ⟨by rintro ⟨_⟩; assumption, LT.comp⟩
-@[simp] lemma lift_lt_comp : lift a < comp b ↔ Disjoint a b := ⟨by rintro ⟨_⟩; assumption, LT.sep⟩
-@[simp] lemma not_comp_lt_lift : ¬ comp a < lift b := fun h ↦ nomatch h
+@[simp]
+lemma lift_lt_lift : lift a < lift b ↔ a < b := ⟨by rintro ⟨_⟩; assumption, LT.lift⟩
+@[simp]
+lemma comp_lt_comp : comp a < comp b ↔ b < a := ⟨by rintro ⟨_⟩; assumption, LT.comp⟩
+@[simp]
+lemma lift_lt_comp : lift a < comp b ↔ Disjoint a b := ⟨by rintro ⟨_⟩; assumption, LT.sep⟩
+@[simp]
+lemma not_comp_lt_lift : ¬ comp a < lift b := fun h ↦ nomatch h
 
-@[simp] lemma lift_sup_lift (a b : α) : lift a ⊔ lift b = lift (a ⊔ b) := rfl
-@[simp] lemma lift_sup_comp (a b : α) : lift a ⊔ comp b = comp (b \ a) := rfl
-@[simp] lemma comp_sup_lift (a b : α) : comp a ⊔ lift b = comp (a \ b) := rfl
-@[simp] lemma comp_sup_comp (a b : α) : comp a ⊔ comp b = comp (a ⊓ b) := rfl
+@[simp]
+lemma lift_sup_lift (a b : α) : lift a ⊔ lift b = lift (a ⊔ b) := rfl
+@[simp]
+lemma lift_sup_comp (a b : α) : lift a ⊔ comp b = comp (b \ a) := rfl
+@[simp]
+lemma comp_sup_lift (a b : α) : comp a ⊔ lift b = comp (a \ b) := rfl
+@[simp]
+lemma comp_sup_comp (a b : α) : comp a ⊔ comp b = comp (a ⊓ b) := rfl
 
-@[simp] lemma lift_inf_lift (a b : α) : lift a ⊓ lift b = lift (a ⊓ b) := rfl
-@[simp] lemma lift_inf_comp (a b : α) : lift a ⊓ comp b = lift (a \ b) := rfl
-@[simp] lemma comp_inf_lift (a b : α) : comp a ⊓ lift b = lift (b \ a) := rfl
-@[simp] lemma comp_inf_comp (a b : α) : comp a ⊓ comp b = comp (a ⊔ b) := rfl
+@[simp]
+lemma lift_inf_lift (a b : α) : lift a ⊓ lift b = lift (a ⊓ b) := rfl
+@[simp]
+lemma lift_inf_comp (a b : α) : lift a ⊓ comp b = lift (a \ b) := rfl
+@[simp]
+lemma comp_inf_lift (a b : α) : comp a ⊓ lift b = lift (b \ a) := rfl
+@[simp]
+lemma comp_inf_comp (a b : α) : comp a ⊓ comp b = comp (a ⊔ b) := rfl
 
-@[simp] lemma lift_bot : lift (⊥ : α) = ⊥ := rfl
-@[simp] lemma comp_bot : comp (⊥ : α) = ⊤ := rfl
+@[simp]
+lemma lift_bot : lift (⊥ : α) = ⊥ := rfl
+@[simp]
+lemma comp_bot : comp (⊥ : α) = ⊤ := rfl
 
-@[simp] lemma lift_sdiff_lift (a b : α) : lift a \ lift b = lift (a \ b) := rfl
-@[simp] lemma lift_sdiff_comp (a b : α) : lift a \ comp b = lift (a ⊓ b) := rfl
-@[simp] lemma comp_sdiff_lift (a b : α) : comp a \ lift b = comp (a ⊔ b) := rfl
-@[simp] lemma comp_sdiff_comp (a b : α) : comp a \ comp b = lift (b \ a) := rfl
+@[simp]
+lemma lift_sdiff_lift (a b : α) : lift a \ lift b = lift (a \ b) := rfl
+@[simp]
+lemma lift_sdiff_comp (a b : α) : lift a \ comp b = lift (a ⊓ b) := rfl
+@[simp]
+lemma comp_sdiff_lift (a b : α) : comp a \ lift b = comp (a ⊔ b) := rfl
+@[simp]
+lemma comp_sdiff_comp (a b : α) : comp a \ comp b = lift (b \ a) := rfl
 
 instance instPreorder : Preorder (Booleanisation α) where
   lt := (· < ·)
@@ -238,8 +278,8 @@ instance instDistribLattice : DistribLattice (Booleanisation α) where
   le_sup_inf
     | lift _, lift _, lift _ => LE.lift le_sup_inf
     | lift a, lift b, comp c => LE.lift <| by simp [sup_comm, sup_assoc]
-    | lift a, comp b, lift c => LE.lift <| by
-      simp [sup_left_comm (a := b \ a), sup_comm (a := b \ a)]
+    | lift a, comp b, lift c =>
+      LE.lift <| by simp [sup_left_comm (a := b \ a), sup_comm (a := b \ a)]
     | lift a, comp b, comp c => LE.comp <| by rw [sup_sdiff]
     | comp a, lift b, lift c => LE.comp <| by rw [sdiff_inf]
     | comp a, lift b, comp c => LE.comp <| by rw [sdiff_sdiff_right']
