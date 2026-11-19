@@ -31,14 +31,17 @@ open Lean Parser Term
 meta def fun₀.matchAlts : Parser :=
   leading_parser withPosition <| ppRealGroup <| many1Indent (ppSpace >> ppGroup matchAlt)
 
-/-- `fun₀ | i => a` is notation for `Finsupp.single i a`, and with multiple match arms,
+/--
+`fun₀ | i => a` is notation for `Finsupp.single i a`, and with multiple match arms,
 `fun₀ ... | i => a` is notation for `Finsupp.update (fun₀ ...) i a`.
 
-As a result, if multiple match arms coincide, the last one takes precedence. -/
+As a result, if multiple match arms coincide, the last one takes precedence.
+-/
 @[term_parser]
-meta def fun₀ := leading_parser:maxPrec
-  -- Prefer `fun₀` over `λ₀` when pretty printing.
-  ppAllowUngrouped >> unicodeSymbol "λ₀" "fun₀" (preserveForPP := true) >> fun₀.matchAlts
+meta def fun₀ :=
+  leading_parser:maxPrec
+    -- Prefer `fun₀` over `λ₀` when pretty printing.
+    ppAllowUngrouped >> unicodeSymbol "λ₀" "fun₀" (preserveForPP := true) >> fun₀.matchAlts
 
 namespace Internal
 
@@ -86,7 +89,8 @@ meta def singleUnexpander : Lean.PrettyPrinter.Unexpander
 /-- Unexpander for the `fun₀ | i => x` notation. -/
 @[app_unexpander Finsupp.update]
 meta def updateUnexpander : Lean.PrettyPrinter.Unexpander
-  | `($_ $f $pat $val) => match f with
+  | `($_ $f $pat $val) =>
+    match f with
     | `(fun₀ $xs:matchAlt*) => `(fun₀ $xs:matchAlt* | $pat => $val)
     | _ => throw ()
   | _ => throw ()
@@ -97,9 +101,10 @@ unsafe instance instRepr {α β} [Repr α] [Repr β] [Zero β] : Repr (α →₀
     if #f.support = 0 then
       "0"
     else
-      let ret : Std.Format := f!"fun₀" ++ .nest 2 (
-        .group (.join <| f.support.val.unquot.map fun a =>
-          .line ++ .group (f!"| {repr a} =>" ++ .line ++ repr (f a))))
+      let ret : Std.Format :=
+        f!"fun₀" ++ .nest 2
+          (.group (.join <| f.support.val.unquot.map fun a =>
+            .line ++ .group (f!"| {repr a} =>" ++ .line ++ repr (f a))))
       if p ≥ eval_prec lead then Format.paren ret else ret
 
 -- This cannot be put in `Mathlib/Data/DFinsupp/Notation.lean` where it belongs, since doc-strings

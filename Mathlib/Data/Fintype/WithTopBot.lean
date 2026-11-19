@@ -20,8 +20,7 @@ public section
 variable {α : Type*}
 
 @[to_dual]
-instance [Fintype α] : Fintype (WithTop α) :=
-  inferInstanceAs <| Fintype (Option α)
+instance [Fintype α] : Fintype (WithTop α) := inferInstanceAs <| Fintype (Option α)
 
 @[to_dual]
 instance [Finite α] : Finite (WithTop α) :=

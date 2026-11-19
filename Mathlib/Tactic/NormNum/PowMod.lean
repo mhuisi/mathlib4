@@ -41,15 +41,17 @@ structure IsNatPowModT (p : Prop) (a b m c : Nat) : Prop where
   run' : p → Nat.mod (Nat.pow a b) m = c
 
 theorem IsNatPowModT.run
-    (p : IsNatPowModT (Nat.mod (Nat.pow a (nat_lit 1)) m = Nat.mod a m) a b m c) :
-    Nat.mod (Nat.pow a b) m = c := p.run' congr($(Nat.pow_one a) % m)
+    (p : IsNatPowModT (Nat.mod (Nat.pow a (nat_lit 1)) m = Nat.mod a m) a b m c)
+    : Nat.mod (Nat.pow a b) m = c :=
+  p.run' congr($(Nat.pow_one a) % m)
 
-theorem IsNatPowModT.trans (h1 : IsNatPowModT p a b m c)
-    (h2 : IsNatPowModT (Nat.mod (Nat.pow a b) m = c) a b' m c') : IsNatPowModT p a b' m c' :=
+theorem IsNatPowModT.trans
+    (h1 : IsNatPowModT p a b m c) (h2 : IsNatPowModT (Nat.mod (Nat.pow a b) m = c) a b' m c')
+    : IsNatPowModT p a b' m c' :=
   ⟨h2.run' ∘ h1.run'⟩
 
-theorem IsNatPowModT.bit0 :
-    IsNatPowModT (Nat.mod (Nat.pow a b) m = c) a (nat_lit 2 * b) m (Nat.mod (Nat.mul c c) m) :=
+theorem IsNatPowModT.bit0
+    : IsNatPowModT (Nat.mod (Nat.pow a b) m = c) a (nat_lit 2 * b) m (Nat.mod (Nat.mul c c) m) :=
   ⟨fun h1 => by simp only [two_mul, Nat.pow_eq, pow_add, ← h1, Nat.mul_eq]; exact Nat.mul_mod ..⟩
 
 theorem natPow_zero_natMod_zero : Nat.mod (Nat.pow a (nat_lit 0)) (nat_lit 0) = nat_lit 1 := by
@@ -58,14 +60,14 @@ theorem natPow_zero_natMod_zero : Nat.mod (Nat.pow a (nat_lit 0)) (nat_lit 0) = 
 theorem natPow_zero_natMod_one : Nat.mod (Nat.pow a (nat_lit 0)) (nat_lit 1) = nat_lit 0 := by
   simp [Nat.mod, Nat.modCore_eq]
 
-theorem natPow_zero_natMod_succ_succ :
-    Nat.mod (Nat.pow a (nat_lit 0)) (Nat.succ (Nat.succ m)) = nat_lit 1 := by
+theorem natPow_zero_natMod_succ_succ
+    : Nat.mod (Nat.pow a (nat_lit 0)) (Nat.succ (Nat.succ m)) = nat_lit 1 := by
   rfl
 
 theorem natPow_one_natMod : Nat.mod (Nat.pow a (nat_lit 1)) m = Nat.mod a m := by rw [natPow_one]
 
-theorem IsNatPowModT.bit1 :
-    IsNatPowModT (Nat.mod (Nat.pow a b) m = c) a (nat_lit 2 * b + 1) m
+theorem IsNatPowModT.bit1
+    : IsNatPowModT (Nat.mod (Nat.pow a b) m = c) a (nat_lit 2 * b + 1) m
       (Nat.mod (Nat.mul c (Nat.mod (Nat.mul c a) m)) m) :=
   ⟨by
     rintro rfl
@@ -101,9 +103,10 @@ partial def evalNatPowMod (a b m : Q(ℕ)) : (c : Q(ℕ)) × Q(Nat.mod (Nat.pow 
     ⟨c, q(($p).run)⟩
 where
   /-- Invariants: `a ^ b₀ % m = c₀`, `depth > 0`, `b >>> depth = b₀` -/
-  go (depth : Nat) (a m b₀ c₀ b : Q(ℕ))
-      (p : Q(Prop)) (hp : $p =Q (Nat.mod (Nat.pow $a $b₀) $m = $c₀)) :
-      (c : Q(ℕ)) × Q(IsNatPowModT $p $a $b $m $c) :=
+  go
+      (depth : Nat)
+      (a m b₀ c₀ b : Q(ℕ)) (p : Q(Prop)) (hp : $p =Q (Nat.mod (Nat.pow $a $b₀) $m = $c₀))
+      : (c : Q(ℕ)) × Q(IsNatPowModT $p $a $b $m $c) :=
     let b' := b.natLit!
     let m' := m.natLit!
     if depth ≤ 1 then

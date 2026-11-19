@@ -29,12 +29,12 @@ open Cardinal Function
 
 namespace OreLocalization
 
-variable {R : Type u} [Monoid R] (S : Submonoid R) [OreLocalization.OreSet S]
-  (X : Type v) [MulAction R X]
+variable
+  {R : Type u} [Monoid R] (S : Submonoid R) [OreLocalization.OreSet S] (X : Type v) [MulAction R X]
 
 @[to_additive]
-theorem oreDiv_one_surjective_of_finite_left [Finite S] :
-    Surjective (fun x ↦ x /ₒ (1 : ↥S) : X → OreLocalization S X) := by
+theorem oreDiv_one_surjective_of_finite_left [Finite S]
+    : Surjective (fun x ↦ x /ₒ (1 : ↥S) : X → OreLocalization S X) := by
   refine OreLocalization.ind fun x s ↦ ?_
   obtain ⟨i, j, hne, heq⟩ := Finite.exists_ne_map_eq_of_infinite (α := ℕ) (s ^ ·)
   wlog! hlt : j < i generalizing i j
@@ -47,8 +47,8 @@ theorem oreDiv_one_surjective_of_finite_left [Finite S] :
   · simp_rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, mul_one, pow_succ]
 
 @[to_additive]
-theorem oreDiv_one_surjective_of_finite_right [Finite X] :
-    Surjective (fun x ↦ x /ₒ (1 : ↥S) : X → OreLocalization S X) := by
+theorem oreDiv_one_surjective_of_finite_right [Finite X]
+    : Surjective (fun x ↦ x /ₒ (1 : ↥S) : X → OreLocalization S X) := by
   refine OreLocalization.ind fun x s ↦ ?_
   obtain ⟨i, j, hne, heq⟩ := Finite.exists_ne_map_eq_of_infinite (α := ℕ) (s ^ · • x)
   wlog! hlt : j < i generalizing i j
@@ -86,8 +86,8 @@ theorem cardinalMk_le : #(OreLocalization S R) ≤ #R := by
 
 -- TODO: remove the `Commute` assumption
 @[to_additive]
-theorem cardinalMk_le_lift_cardinalMk_of_commute (hc : ∀ s s' : S, Commute s s') :
-    #(OreLocalization S X) ≤ lift.{u} #X := by
+theorem cardinalMk_le_lift_cardinalMk_of_commute (hc : ∀ s s' : S, Commute s s')
+    : #(OreLocalization S X) ≤ lift.{u} #X := by
   rcases finite_or_infinite X with _ | _
   · have := lift_mk_le_lift_mk_of_surjective (oreDiv_one_surjective_of_finite_right S X)
     rwa [lift_umax.{v, u}, lift_id'] at this

@@ -53,11 +53,9 @@ scoped instance : MeasurableSpace α where
     simp_rw [compl_iUnion, subset_iInter_iff]
     exact fun i ↦ (iInter_subset g i).trans <| (hgf i).resolve_left (H i)
 
-theorem measurableSet_def : MeasurableSet s ↔ ∃ t, IsClub t ∧ (t ⊆ s ∨ t ⊆ sᶜ) :=
-  .rfl
+theorem measurableSet_def : MeasurableSet s ↔ ∃ t, IsClub t ∧ (t ⊆ s ∨ t ⊆ sᶜ) := .rfl
 
-theorem measurableSet_of_isClub (hs : IsClub s) : MeasurableSet s :=
-  ⟨s, hs, .inl subset_rfl⟩
+theorem measurableSet_of_isClub (hs : IsClub s) : MeasurableSet s := ⟨s, hs, .inl subset_rfl⟩
 
 theorem measurableSet_of_not_isStationary (hs : ¬ IsStationary s) : MeasurableSet s := by
   obtain ⟨t, ht, ht'⟩ := not_isStationary_iff.1 hs
@@ -110,7 +108,10 @@ noncomputable def measure : Measure α where
     · exact iInf_le_of_le ⟨s, subset_rfl, measurableSet_of_not_isStationary hs⟩ le_rfl
 
 instance : IsZeroOneMeasure (α := α) measure where
-  zero_one₀ s _ := by rw [or_comm]; classical exact ite_eq_or_eq ..
+  zero_one₀ s _ := by
+    rw [or_comm]
+    classical
+    exact ite_eq_or_eq ..
 
 theorem measure_eq_one_iff : measure s = 1 ↔ IsStationary s := by
   classical change ite .. = 1 ↔ _
@@ -120,8 +121,7 @@ theorem measure_eq_zero_iff : measure s = 0 ↔ ¬ IsStationary s := by
   classical change ite .. = 0 ↔ _
   simp
 
-theorem measure_ne_one_iff : measure s ≠ 1 ↔ ¬ IsStationary s := by
-  rw [← measure_eq_one_iff]
+theorem measure_ne_one_iff : measure s ≠ 1 ↔ ¬ IsStationary s := by rw [← measure_eq_one_iff]
 
 theorem measure_ne_zero_iff : measure s ≠ 0 ↔ IsStationary s := by
   rw [ne_eq, measure_eq_zero_iff, not_not]
@@ -152,8 +152,8 @@ instance [NoMaxOrder α] : NullSingletonClass (α := α) measure where
   measure_singleton x := measure_of_not_isStationary (by simp)
 
 @[simp]
-theorem support_measure [NoMaxOrder α] [TopologicalSpace α] [ClosedIciTopology α] :
-    (measure (α := α)).support = ∅ := by
+theorem support_measure [NoMaxOrder α] [TopologicalSpace α] [ClosedIciTopology α]
+    : (measure (α := α)).support = ∅ := by
   simp_rw [eq_empty_iff_forall_notMem, Measure.mem_support_iff,
     Filter.not_frequently, Filter.eventually_smallSets, not_lt]
   intro x

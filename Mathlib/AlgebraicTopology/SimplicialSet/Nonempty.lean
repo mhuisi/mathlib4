@@ -47,8 +47,7 @@ variable {X} in
 lemma nonempty_of_hom {Y : SSet.{u}} (f : Y ⟶ X) [Y.Nonempty] : X.Nonempty :=
   ⟨f.app _ (Classical.arbitrary _)⟩
 
-lemma notNonempty_iff_hasDimensionLT_zero :
-    ¬ X.Nonempty ↔ X.HasDimensionLT 0 := by
+lemma notNonempty_iff_hasDimensionLT_zero : ¬X.Nonempty ↔ X.HasDimensionLT 0 := by
   simp only [not_nonempty_iff]
   refine ⟨fun _ ↦ ⟨fun n hn ↦ ?_⟩, fun _ ↦ ⟨fun x ↦ ?_⟩⟩
   · have := Function.isEmpty (X.map (⦋0⦌.const ⦋n⦌ 0).op)
@@ -57,13 +56,12 @@ lemma notNonempty_iff_hasDimensionLT_zero :
 
 variable {X} in
 /-- If a simplicial set is not nonempty, it is an initial object. -/
-def isInitialOfNotNonempty (hX : ¬ X.Nonempty) : IsInitial X := by
+def isInitialOfNotNonempty (hX : ¬X.Nonempty) : IsInitial X := by
   simp only [not_nonempty_iff] at hX
   have (n : SimplexCategoryᵒᵖ) : IsEmpty (X.obj n) :=
     Function.isEmpty (X.map (⦋0⦌.const n.unop 0).op)
-  exact IsInitial.ofUniqueHom (fun _ ↦
-    { app _ := ↾fun x ↦ isEmptyElim x
-      naturality _ _ _  := by ext x; exact isEmptyElim x })
+  exact IsInitial.ofUniqueHom
+    (fun _ ↦ { app _ := ↾fun x ↦ isEmptyElim x, naturality _ _ _ := by ext x; exact isEmptyElim x })
     (fun _ _ ↦ by ext _ x; exact isEmptyElim x)
 
 end SSet

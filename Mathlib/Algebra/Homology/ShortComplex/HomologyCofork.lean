@@ -33,31 +33,31 @@ section
 
 variable [HasZeroMorphisms C] [HasKernels C] [HasCokernels C]
 
-/-- The limit kernel fork expressing `cyclesFunctor C : ShortComplex C ⥤ C`
-as the kernel of `π₂Toπ₃ : π₂ ⟶ π₃`. -/
+/--
+The limit kernel fork expressing `cyclesFunctor C : ShortComplex C ⥤ C`
+as the kernel of `π₂Toπ₃ : π₂ ⟶ π₃`.
+-/
 @[implicit_reducible]
-noncomputable def cyclesFunctorFork :
-    KernelFork (ShortComplex.π₂Toπ₃ (C := C)) :=
+noncomputable def cyclesFunctorFork : KernelFork (ShortComplex.π₂Toπ₃ (C := C)) :=
   KernelFork.ofι (iCyclesNatTrans C) (by cat_disch)
 
 /-- The functor `cyclesFunctor C : ShortComplex C ⥤ C` is the kernel of `π₂Toπ₃ : π₂ ⟶ π₃`. -/
 @[no_expose]
-noncomputable def isLimitCyclesFunctorFork :
-    IsLimit (cyclesFunctorFork C) :=
+noncomputable def isLimitCyclesFunctorFork : IsLimit (cyclesFunctorFork C) :=
   evaluationJointlyReflectsLimits _
     (fun S ↦ (KernelFork.isLimitMapConeEquiv _ _).symm S.cyclesIsKernel)
 
-/-- The colimit cokernel cofork expressing `opcyclesFunctor C : ShortComplex C ⥤ C`
-as the cokernel of `π₁Toπ₂ : π₁ ⟶ π₂`. -/
+/--
+The colimit cokernel cofork expressing `opcyclesFunctor C : ShortComplex C ⥤ C`
+as the cokernel of `π₁Toπ₂ : π₁ ⟶ π₂`.
+-/
 @[implicit_reducible]
-noncomputable def opcyclesFunctorCofork :
-    CokernelCofork (ShortComplex.π₁Toπ₂ (C := C)) :=
+noncomputable def opcyclesFunctorCofork : CokernelCofork (ShortComplex.π₁Toπ₂ (C := C)) :=
   CokernelCofork.ofπ (pOpcyclesNatTrans C) (by cat_disch)
 
 /-- The functor `opcyclesFunctor C : ShortComplex C ⥤ C` is the cokernel of `π₁Toπ₂ : π₁ ⟶ π₂`. -/
 @[no_expose]
-noncomputable def isColimitOpcyclesFunctorCofork :
-    IsColimit (opcyclesFunctorCofork C) :=
+noncomputable def isColimitOpcyclesFunctorCofork : IsColimit (opcyclesFunctorCofork C) :=
   evaluationJointlyReflectsColimits _
     (fun S ↦ (CokernelCofork.isColimitMapCoconeEquiv _ _).symm S.opcyclesIsCokernel)
 
@@ -67,31 +67,37 @@ section
 
 variable [HasZeroMorphisms C] [CategoryWithHomology C]
 
-/-- The colimit cokernel cofork expressing `homologyFunctor C : ShortComplex C ⥤ C`
-as the cokernel of `toCyclesNatTrans C : π₁ ⟶ cyclesFunctor C`. -/
+/--
+The colimit cokernel cofork expressing `homologyFunctor C : ShortComplex C ⥤ C`
+as the cokernel of `toCyclesNatTrans C : π₁ ⟶ cyclesFunctor C`.
+-/
 @[implicit_reducible]
 noncomputable def homologyFunctorCofork : CokernelCofork (toCyclesNatTrans C) :=
   CokernelCofork.ofπ (homologyπNatTrans C) (by cat_disch)
 
-/-- The functor `homologyFunctor C : ShortComplex C ⥤ C` is
-the cokernel of `toCyclesNatTrans C : π₁ ⟶ cyclesFunctor C`. -/
+/--
+The functor `homologyFunctor C : ShortComplex C ⥤ C` is
+the cokernel of `toCyclesNatTrans C : π₁ ⟶ cyclesFunctor C`.
+-/
 @[no_expose]
-noncomputable def isColimitHomologyFunctorCofork :
-    IsColimit (homologyFunctorCofork C) :=
+noncomputable def isColimitHomologyFunctorCofork : IsColimit (homologyFunctorCofork C) :=
   evaluationJointlyReflectsColimits _
     (fun S ↦ (CokernelCofork.isColimitMapCoconeEquiv _ _).symm S.homologyIsCokernel)
 
-/-- The limit kernel fork expressing `homologyFunctor C : ShortComplex C ⥤ C`
-as the kernel of `fromOpcyclesNatTrans C : opcyclesFunctor C ⟶ π₃`. -/
+/--
+The limit kernel fork expressing `homologyFunctor C : ShortComplex C ⥤ C`
+as the kernel of `fromOpcyclesNatTrans C : opcyclesFunctor C ⟶ π₃`.
+-/
 @[implicit_reducible]
 noncomputable def homologyFunctorFork : KernelFork (fromOpcyclesNatTrans C) :=
   KernelFork.ofι (homologyιNatTrans C) (by cat_disch)
 
-/-- The functor `homologyFunctor C : ShortComplex C ⥤ C` is
-the kernel of `fromOpcyclesNatTrans C : opcyclesFunctor C ⟶ π₃`. -/
+/--
+The functor `homologyFunctor C : ShortComplex C ⥤ C` is
+the kernel of `fromOpcyclesNatTrans C : opcyclesFunctor C ⟶ π₃`.
+-/
 @[no_expose]
-noncomputable def isLimitHomologyFunctorFork :
-    IsLimit (homologyFunctorFork C) :=
+noncomputable def isLimitHomologyFunctorFork : IsLimit (homologyFunctorFork C) :=
   evaluationJointlyReflectsLimits _
     (fun S ↦ (KernelFork.isLimitMapConeEquiv _ _).symm S.homologyIsKernel)
 

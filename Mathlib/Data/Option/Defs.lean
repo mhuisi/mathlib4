@@ -24,8 +24,9 @@ namespace Option
 
 /-- Traverse an object of `Option α` with a function `f : α → F β` for an applicative `F`. -/
 protected def traverse.{u, v}
-    {F : Type u → Type v} [Applicative F] {α : Type*} {β : Type u} (f : α → F β) :
-    Option α → F (Option β) := Option.mapA f
+    {F : Type u → Type v} [Applicative F] {α : Type*} {β : Type u} (f : α → F β)
+    : Option α → F (Option β) :=
+  Option.mapA f
 
 variable {α : Type*} {β : Type*}
 
@@ -44,8 +45,8 @@ theorem elim'_some {a : α} (b : β) (f : α → β) : Option.elim' b f (some a)
 theorem elim'_none_some (f : Option α → β) : (Option.elim' (f none) (f ∘ some)) = f :=
   funext fun o ↦ by cases o <;> rfl
 
-lemma elim'_eq_elim {α β : Type*} (b : β) (f : α → β) (a : Option α) :
-    Option.elim' b f a = Option.elim a b f := by
+lemma elim'_eq_elim {α β : Type*} (b : β) (f : α → β) (a : Option α)
+    : Option.elim' b f a = Option.elim a b f := by
   cases a <;> rfl
 
 end Option

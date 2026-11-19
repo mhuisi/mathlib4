@@ -33,20 +33,16 @@ section SMul
 variable [SMul M α] [SMul N α] (a : M) (b : α) (x : Option α)
 
 @[to_additive Option.VAdd]
-instance : SMul M (Option α) :=
-  ⟨fun a => Option.map (a • ·)⟩
+instance : SMul M (Option α) := ⟨fun a => Option.map (a • ·)⟩
 
 @[to_additive]
-theorem smul_def : a • x = x.map (a • ·) :=
-  rfl
+theorem smul_def : a • x = x.map (a • ·) := rfl
 
 @[to_additive (attr := simp)]
-theorem smul_none : a • (none : Option α) = none :=
-  rfl
+theorem smul_none : a • (none : Option α) = none := rfl
 
 @[to_additive (attr := simp)]
-theorem smul_some : a • some b = some (a • b) :=
-  rfl
+theorem smul_some : a • some b = some (a • b) := rfl
 
 @[to_additive]
 instance instIsScalarTowerOfSMul [SMul M N] [IsScalarTower M N α] : IsScalarTower M N (Option α) :=
@@ -70,8 +66,7 @@ instance [FaithfulSMul M α] : FaithfulSMul M (Option α) :=
 
 end SMul
 
-instance [Monoid M] [MulAction M α] :
-    MulAction M (Option α) where
+instance [Monoid M] [MulAction M α] : MulAction M (Option α) where
   one_smul b := by
     cases b
     exacts [rfl, congr_arg some (one_smul _ _)]

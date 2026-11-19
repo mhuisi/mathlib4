@@ -34,9 +34,9 @@ variable [w.LiesOver v]
   AbsoluteValue.Completion.continuous_map
 
 @[deprecated AbsoluteValue.Completion.map_coe +typeChanged (since := "2026-10-30")]
-theorem completionMap_coe (x : WithAbs v.val) :
-    AbsoluteValue.Completion.map v.val w.val (x : v.Completion) =
-      ((algebraMap (WithAbs v.val) (WithAbs w.val) x : WithAbs w.val) : w.Completion) :=
+theorem completionMap_coe (x : WithAbs v.val)
+    : AbsoluteValue.Completion.map v.val w.val (x : v.Completion)
+      = ((algebraMap (WithAbs v.val) (WithAbs w.val) x : WithAbs w.val) : w.Completion) :=
   AbsoluteValue.Completion.map_coe v.val w.val x
 
 /-- If `w` lies over `v`, then `w.Completion` is a `v.Completion`-algebra. -/
@@ -44,11 +44,13 @@ noncomputable scoped instance : Algebra v.Completion w.Completion :=
   AbsoluteValue.Completion.algebraOfLiesOver v.val w.val
 
 scoped instance : IsScalarTower K v.Completion w.Completion :=
-  inferInstanceAs <| letI := AbsoluteValue.Completion.algebraOfLiesOver v.val w.val
+  inferInstanceAs <|
+    letI := AbsoluteValue.Completion.algebraOfLiesOver v.val w.val
     IsScalarTower K v.Completion w.Completion
 
 scoped instance : ContinuousSMul v.Completion w.Completion :=
-  inferInstanceAs <| letI := AbsoluteValue.Completion.algebraOfLiesOver v.val w.val
+  inferInstanceAs <|
+    letI := AbsoluteValue.Completion.algebraOfLiesOver v.val w.val
     ContinuousSMul v.Completion w.Completion
 
 end NumberField.LiesOver

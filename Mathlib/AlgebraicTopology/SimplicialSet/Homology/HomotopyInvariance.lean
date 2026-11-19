@@ -46,8 +46,8 @@ universe v u w
 
 open CategoryTheory Limits
 
-variable {C : Type u} [Category.{v} C] [Preadditive C] [HasCoproducts.{w} C]
-  {X Y : SSet.{w}} {f g : X ⟶ Y}
+variable
+  {C : Type u} [Category.{v} C] [Preadditive C] [HasCoproducts.{w} C] {X Y : SSet.{w}} {f g : X ⟶ Y}
 
 namespace CategoryTheory.SimplicialObject.Homotopy
 
@@ -58,9 +58,8 @@ with coefficients in `R`. The assumption is in `SimplicialObject.Homotopy`,
 see also `SSet.Homotopy.chainComplexMap` for the
 variant using `SSet.Homotopy` as an assumption.
 -/
-noncomputable def sSetChainComplexMap
-    (H : SimplicialObject.Homotopy f g) (R : C) :
-    _root_.Homotopy (SSet.chainComplexMap f R) (SSet.chainComplexMap g R) :=
+noncomputable def sSetChainComplexMap (H : SimplicialObject.Homotopy f g) (R : C)
+    : _root_.Homotopy (SSet.chainComplexMap f R) (SSet.chainComplexMap g R) :=
   toChainHomotopy (H.whiskerRight _)
 
 open HomologicalComplex in
@@ -71,9 +70,9 @@ The assumption is in `SimplicialObject.Homotopy`,
 see also `SSet.Homotopy.congr_homologyMap` for the
 variant using `SSet.Homotopy` as an assumption.
 -/
-theorem congr_sSetHomologyMap [CategoryWithHomology C]
-    (H : SimplicialObject.Homotopy f g) (R : C) (n : ℕ) :
-    SSet.homologyMap f R n = SSet.homologyMap g R n :=
+theorem congr_sSetHomologyMap
+    [CategoryWithHomology C] (H : SimplicialObject.Homotopy f g) (R : C) (n : ℕ)
+    : SSet.homologyMap f R n = SSet.homologyMap g R n :=
   (H.sSetChainComplexMap R).homologyMap_eq n
 
 end CategoryTheory.SimplicialObject.Homotopy
@@ -84,9 +83,8 @@ namespace SSet.Homotopy
 If `f` and `g` are homotopic maps of simplicial sets, then they induce chain-homotopic
 maps on the singular chain complexes with coefficients in `R`.
 -/
-noncomputable def chainComplexMap
-    (H : SSet.Homotopy f g) (R : C) :
-    _root_.Homotopy (SSet.chainComplexMap f R) (SSet.chainComplexMap g R)  :=
+noncomputable def chainComplexMap (H : SSet.Homotopy f g) (R : C)
+    : _root_.Homotopy (SSet.chainComplexMap f R) (SSet.chainComplexMap g R) :=
   H.toSimplicialObjectHomotopy.sSetChainComplexMap R
 
 open HomologicalComplex in
@@ -94,9 +92,8 @@ open HomologicalComplex in
 Homotopic maps of simplicial sets induce the same map on homology of the singular
 chain complex (with coefficients in `R`).
 -/
-theorem congr_homologyMap [CategoryWithHomology C]
-    (H : SSet.Homotopy f g) (R : C) (n : ℕ) :
-    SSet.homologyMap f R n = SSet.homologyMap g R n :=
+theorem congr_homologyMap [CategoryWithHomology C] (H : SSet.Homotopy f g) (R : C) (n : ℕ)
+    : SSet.homologyMap f R n = SSet.homologyMap g R n :=
   (H.chainComplexMap R).homologyMap_eq n
 
 end SSet.Homotopy

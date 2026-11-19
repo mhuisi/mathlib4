@@ -42,8 +42,7 @@ def principalSegIio (j : α) : Iio j <i α where
   mem_range_iff_rel' := by aesop
 
 @[simp]
-lemma principalSegIio_apply (k : Iio j) : principalSegIio j k = k.val :=
-  rfl
+lemma principalSegIio_apply (k : Iio j) : principalSegIio j k = k.val := rfl
 
 /-- If `i ≤ j`, then `Iic i` is an initial segment of `Iic j`. -/
 @[simps]
@@ -64,14 +63,18 @@ def principalSegIioIicOfLE (h : i ≤ j) : Iio i <i Iic j where
   mem_range_iff_rel' := by aesop
 
 @[simp]
-lemma principalSegIioIicOfLE_apply (h : i ≤ j) (k : Iio i) :
-    principalSegIioIicOfLE h k = ⟨k, k.property.le.trans h⟩ := rfl
+lemma principalSegIioIicOfLE_apply (h : i ≤ j) (k : Iio i)
+    : principalSegIioIicOfLE h k = ⟨k, k.property.le.trans h⟩ :=
+  rfl
 
 end Set
 
-/-- If `f : α <i β` is a principal segment, this is the induced order
-isomorphism `α ≃o Iio f.top`. -/
+/--
+If `f : α <i β` is a principal segment, this is the induced order
+isomorphism `α ≃o Iio f.top`.
+-/
 @[simps! apply_coe]
-noncomputable def PrincipalSeg.orderIsoIio {α β : Type*} [PartialOrder α] [PartialOrder β]
-    (f : α <i β) : α ≃o Set.Iio f.top :=
+noncomputable def PrincipalSeg.orderIsoIio
+    {α β : Type*} [PartialOrder α] [PartialOrder β] (f : α <i β)
+    : α ≃o Set.Iio f.top :=
   .ofRelIsoLT f.subrelIso.symm

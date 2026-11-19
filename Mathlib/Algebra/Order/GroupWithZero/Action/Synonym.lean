@@ -52,11 +52,11 @@ instance [Monoid G₀] [AddMonoid M₀] [DistribMulAction G₀ M₀] : DistribMu
 instance [Monoid G₀] [AddMonoid M₀] [DistribMulAction G₀ M₀] : DistribMulAction G₀ M₀ᵒᵈ :=
   inferInstanceAs <| DistribMulAction G₀ M₀
 
-instance [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀] :
-    MulActionWithZero G₀ᵒᵈ M₀ := inferInstanceAs <| MulActionWithZero G₀ M₀
+instance [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀] : MulActionWithZero G₀ᵒᵈ M₀ :=
+  inferInstanceAs <| MulActionWithZero G₀ M₀
 
-instance [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀] :
-    MulActionWithZero G₀ M₀ᵒᵈ := inferInstanceAs <| MulActionWithZero G₀ M₀
+instance [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀] : MulActionWithZero G₀ M₀ᵒᵈ :=
+  inferInstanceAs <| MulActionWithZero G₀ M₀
 
 end OrderDual
 
@@ -74,16 +74,20 @@ instance instDistribSMul [AddZeroClass M₀] [DistribSMul G₀ M₀] : DistribSM
 instance instDistribSMul' [AddZeroClass M₀] [DistribSMul G₀ M₀] : DistribSMul G₀ (Lex M₀) :=
   inferInstanceAs <| DistribSMul G₀ M₀
 
-instance instDistribMulAction [Monoid G₀] [AddMonoid M₀] [DistribMulAction G₀ M₀] :
-    DistribMulAction (Lex G₀) M₀ := inferInstanceAs <| DistribMulAction G₀ M₀
+instance instDistribMulAction [Monoid G₀] [AddMonoid M₀] [DistribMulAction G₀ M₀]
+    : DistribMulAction (Lex G₀) M₀ :=
+  inferInstanceAs <| DistribMulAction G₀ M₀
 
-instance instDistribMulAction' [Monoid G₀] [AddMonoid M₀] [DistribMulAction G₀ M₀] :
-    DistribMulAction G₀ (Lex M₀) := inferInstanceAs <| DistribMulAction G₀ M₀
+instance instDistribMulAction' [Monoid G₀] [AddMonoid M₀] [DistribMulAction G₀ M₀]
+    : DistribMulAction G₀ (Lex M₀) :=
+  inferInstanceAs <| DistribMulAction G₀ M₀
 
-instance instMulActionWithZero [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀] :
-    MulActionWithZero (Lex G₀) M₀ := inferInstanceAs <| MulActionWithZero G₀ M₀
+instance instMulActionWithZero [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀]
+    : MulActionWithZero (Lex G₀) M₀ :=
+  inferInstanceAs <| MulActionWithZero G₀ M₀
 
-instance instMulActionWithZero' [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀] :
-    MulActionWithZero G₀ (Lex M₀) := inferInstanceAs <| MulActionWithZero G₀ M₀
+instance instMulActionWithZero' [MonoidWithZero G₀] [AddMonoid M₀] [MulActionWithZero G₀ M₀]
+    : MulActionWithZero G₀ (Lex M₀) :=
+  inferInstanceAs <| MulActionWithZero G₀ M₀
 
 end Lex

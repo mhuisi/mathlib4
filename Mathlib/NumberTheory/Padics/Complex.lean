@@ -62,8 +62,10 @@ instance : Coe ℚ_[p] (PadicAlgCl p) := ⟨algebraMap ℚ_[p] (PadicAlgCl p)⟩
 
 theorem coe_eq : (Coe.coe : ℚ_[p] → PadicAlgCl p) = algebraMap ℚ_[p] (PadicAlgCl p) := rfl
 
-/-- `PadicAlgCl p` is a normed field, where the norm is the `p`-adic norm, that is, the
-spectral norm induced by the `p`-adic norm on `ℚ_[p]`. -/
+/--
+`PadicAlgCl p` is a normed field, where the norm is the `p`-adic norm, that is, the
+spectral norm induced by the `p`-adic norm on `ℚ_[p]`.
+-/
 instance normedField : NormedField (PadicAlgCl p) := spectralNorm.normedField ℚ_[p] (PadicAlgCl p)
 
 /-- The norm on `PadicAlgCl p` is nonarchimedean. -/
@@ -78,8 +80,7 @@ instance normedAlgebra : NormedAlgebra ℚ_[p] (PadicAlgCl p) := spectralNorm.no
 theorem spectralNorm_eq (x : PadicAlgCl p) : spectralNorm ℚ_[p] (PadicAlgCl p) x = ‖x‖ := rfl
 
 /-- The norm on `PadicAlgCl p` extends the `p`-adic norm on `ℚ_[p]`. -/
-theorem norm_extends (x : ℚ_[p]) : ‖(x : PadicAlgCl p)‖ = ‖x‖ := by
-  simp
+theorem norm_extends (x : ℚ_[p]) : ‖(x : PadicAlgCl p)‖ = ‖x‖ := by simp
 
 /-- The underlying metric space of `PadicAlgCl p` is ultrametric. -/
 instance isUltrametricDist : IsUltrametricDist (PadicAlgCl p) :=
@@ -98,15 +99,14 @@ theorem valuation_coe (x : PadicAlgCl p) : ((Valued.v x : ℝ≥0) : ℝ) = ‖x
 theorem valuation_p (p : ℕ) [Fact p.Prime] : Valued.v (p : PadicAlgCl p) = 1 / (p : ℝ≥0) := by
   rw [← map_natCast (algebraMap ℚ_[p] (PadicAlgCl p))]
   ext
-  rw [valuation_coe, norm_extends, Padic.norm_p, one_div, NNReal.coe_inv,
-    NNReal.coe_natCast]
+  rw [valuation_coe, norm_extends, Padic.norm_p, one_div, NNReal.coe_inv, NNReal.coe_natCast]
 
 open MonoidWithZeroHom.ValueGroup₀
 
 set_option linter.style.whitespace false in -- manual alignment is not recognised
 /-- The valuation on `PadicAlgCl p` has rank one. -/
 instance : RankOne (PadicAlgCl.valued p).v where
-  hom'        := embedding
+  hom' := embedding
   strictMono' := embedding_strictMono
   exists_val_nontrivial := by
     use p
@@ -132,8 +132,10 @@ instance charZero : CharZero (PadicAlgCl p) :=
 
 end PadicAlgCl
 
-/-- `ℂ_[p]` is the field of `p`-adic complex numbers, that is, the completion of `PadicAlgCl p` with
-respect to the `p`-adic norm. -/
+/--
+`ℂ_[p]` is the field of `p`-adic complex numbers, that is, the completion of `PadicAlgCl p` with
+respect to the `p`-adic norm.
+-/
 abbrev PadicComplex := UniformSpace.Completion (PadicAlgCl p)
 
 /-- `ℂ_[p]` is the field of `p`-adic complex numbers. -/
@@ -150,7 +152,8 @@ theorem valuation_extends (x : PadicAlgCl p) : Valued.v (x : ℂ_[p]) = Valued.v
 
 theorem coe_eq (x : PadicAlgCl p) : (x : ℂ_[p]) = algebraMap (PadicAlgCl p) ℂ_[p] x := rfl
 
-@[simp] theorem coe_zero : ((0 : PadicAlgCl p) : ℂ_[p]) = 0 := rfl
+@[simp]
+theorem coe_zero : ((0 : PadicAlgCl p) : ℂ_[p]) = 0 := rfl
 
 instance : IsScalarTower ℚ_[p] (PadicAlgCl p) ℂ_[p] := IsScalarTower.of_algebraMap_eq (congrFun rfl)
 
@@ -168,7 +171,7 @@ open MonoidWithZeroHom.ValueGroup₀
 set_option linter.style.whitespace false in -- manual alignment is not recognised
 /-- The valuation on `ℂ_[p]` has rank one. -/
 instance : RankOne (PadicComplex.valued p).v where
-  hom'        := embedding
+  hom' := embedding
   strictMono' := embedding_strictMono
   exists_val_nontrivial := by
     use p
@@ -188,12 +191,10 @@ example : (‖·‖ : ℂ_[p] → ℝ) = (UniformSpace.Completion.instNorm (Padi
   with_reducible_and_instances rfl
 
 /-- The norm on `ℂ_[p]` extends the norm on `PadicAlgCl p`. -/
-theorem norm_extends (x : PadicAlgCl p) : ‖(x : ℂ_[p])‖ = ‖x‖ := by
-  simp
+theorem norm_extends (x : PadicAlgCl p) : ‖(x : ℂ_[p])‖ = ‖x‖ := by simp
 
 /-- The norm on `ℂ_[p]` extends the norm on `ℚ_[p]`. -/
-theorem norm_extends' (x : ℚ_[p]) : ‖(x : ℂ_[p])‖ = ‖x‖ := by
-  simp
+theorem norm_extends' (x : ℚ_[p]) : ‖(x : ℂ_[p])‖ = ‖x‖ := by simp
 
 /-- The underlying metric space of `ℂ_[p]` is ultrametric. -/
 instance isUltrametricDist : IsUltrametricDist ℂ_[p] := IsUltrametricDist.of_normedAlgebra ℚ_[p]
@@ -250,8 +251,10 @@ instance isAlgClosed : IsAlgClosed ℂ_[p] :=
 
 end PadicComplex
 
-/-- We define `𝓞_ℂ_[p]` as the valuation subring of `ℂ_[p]`, consisting of those elements with
-  valuation `≤ 1`. -/
+/--
+We define `𝓞_ℂ_[p]` as the valuation subring of `ℂ_[p]`, consisting of those elements with
+valuation `≤ 1`.
+-/
 def PadicComplexInt : ValuationSubring ℂ_[p] := (PadicComplex.valued p).v.valuationSubring
 
 /-- We define `𝓞_ℂ_[p]` as the subring of elements of `ℂ_[p]` with valuation `≤ 1`. -/

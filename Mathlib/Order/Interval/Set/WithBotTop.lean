@@ -36,20 +36,16 @@ theorem range_coe : range (some : α → WithTop α) = Iio ⊤ := by
   ext; simp [mem_range, WithTop.lt_top_iff_ne_top, ne_top_iff_exists]
 
 @[to_dual (attr := simp)]
-theorem preimage_coe_Ioi : (some : α → WithTop α) ⁻¹' Ioi a = Ioi a :=
-  ext fun _ => coe_lt_coe
+theorem preimage_coe_Ioi : (some : α → WithTop α) ⁻¹' Ioi a = Ioi a := ext fun _ => coe_lt_coe
 
 @[to_dual (attr := simp)]
-theorem preimage_coe_Ici : (some : α → WithTop α) ⁻¹' Ici a = Ici a :=
-  ext fun _ => coe_le_coe
+theorem preimage_coe_Ici : (some : α → WithTop α) ⁻¹' Ici a = Ici a := ext fun _ => coe_le_coe
 
 @[to_dual (attr := simp)]
-theorem preimage_coe_Iio : (some : α → WithTop α) ⁻¹' Iio a = Iio a :=
-  ext fun _ => coe_lt_coe
+theorem preimage_coe_Iio : (some : α → WithTop α) ⁻¹' Iio a = Iio a := ext fun _ => coe_lt_coe
 
 @[to_dual (attr := simp)]
-theorem preimage_coe_Iic : (some : α → WithTop α) ⁻¹' Iic a = Iic a :=
-  ext fun _ => coe_le_coe
+theorem preimage_coe_Iic : (some : α → WithTop α) ⁻¹' Iic a = Iic a := ext fun _ => coe_le_coe
 
 @[to_dual (attr := simp)]
 theorem preimage_coe_Icc : (some : α → WithTop α) ⁻¹' Icc a b = Icc a b := by simp [← Ici_inter_Iic]
@@ -96,8 +92,8 @@ theorem image_coe_Iic : (some : α → WithTop α) '' Iic a = Iic (a : WithTop �
 @[to_dual]
 theorem image_coe_Icc : (some : α → WithTop α) '' Icc a b = Icc (a : WithTop α) b := by
   rw [← preimage_coe_Icc, image_preimage_eq_inter_range, range_coe,
-    inter_eq_self_of_subset_left
-      (Subset.trans Icc_subset_Iic_self <| Iic_subset_Iio.2 <| coe_lt_top b)]
+    inter_eq_self_of_subset_left (Subset.trans Icc_subset_Iic_self <| Iic_subset_Iio.2 <|
+      coe_lt_top b)]
 
 @[to_dual]
 theorem image_coe_Ico : (some : α → WithTop α) '' Ico a b = Ico (a : WithTop α) b := by
@@ -107,8 +103,8 @@ theorem image_coe_Ico : (some : α → WithTop α) '' Ico a b = Ico (a : WithTop
 @[to_dual]
 theorem image_coe_Ioc : (some : α → WithTop α) '' Ioc a b = Ioc (a : WithTop α) b := by
   rw [← preimage_coe_Ioc, image_preimage_eq_inter_range, range_coe,
-    inter_eq_self_of_subset_left
-      (Subset.trans Ioc_subset_Iic_self <| Iic_subset_Iio.2 <| coe_lt_top b)]
+    inter_eq_self_of_subset_left (Subset.trans Ioc_subset_Iic_self <| Iic_subset_Iio.2 <|
+      coe_lt_top b)]
 
 @[to_dual]
 theorem image_coe_Ioo : (some : α → WithTop α) '' Ioo a b = Ioo (a : WithTop α) b := by
@@ -116,12 +112,10 @@ theorem image_coe_Ioo : (some : α → WithTop α) '' Ioo a b = Ioo (a : WithTop
     inter_eq_self_of_subset_left (Subset.trans Ioo_subset_Iio_self <| Iio_subset_Iio le_top)]
 
 @[to_dual]
-theorem Ioi_coe : Ioi (a : WithTop α) = (↑) '' (Ioi a) ∪ {⊤} := by
-  ext x; induction x <;> simp
+theorem Ioi_coe : Ioi (a : WithTop α) = (↑) '' (Ioi a) ∪ {⊤} := by ext x; induction x <;> simp
 
 @[to_dual]
-theorem Ici_coe : Ici (a : WithTop α) = (↑) '' (Ici a) ∪ {⊤} := by
-  ext x; induction x <;> simp
+theorem Ici_coe : Ici (a : WithTop α) = (↑) '' (Ici a) ∪ {⊤} := by ext x; induction x <;> simp
 
 @[to_dual]
 theorem Iio_coe : Iio (a : WithTop α) = (↑) '' (Iio a) := image_coe_Iio.symm

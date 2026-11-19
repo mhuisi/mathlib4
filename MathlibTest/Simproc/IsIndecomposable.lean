@@ -64,8 +64,9 @@ example (x : ℤ) : (!![x, 1; 1, 0] : Matrix (Fin 2) (Fin 2) ℤ).IsIndecomposab
 -- an index type other than `Fin n`
 /-- error: `simp` made no progress -/
 #guard_msgs in
-example : (fromBlocks !![1] !![1] !![1] !![1] :
-    Matrix (Fin 1 ⊕ Fin 1) (Fin 1 ⊕ Fin 1) ℤ).IsIndecomposable := by
+example
+    : (fromBlocks !![1] !![1] !![1] !![1]
+      : Matrix (Fin 1 ⊕ Fin 1) (Fin 1 ⊕ Fin 1) ℤ).IsIndecomposable := by
   simp only [reduceIsIndecomposable]
 
 -- a dimension that is not a numeral

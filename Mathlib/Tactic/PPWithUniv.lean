@@ -28,11 +28,11 @@ unless `pp.universes` is explicitly set to `false`.
 -/
 def delabWithUniv : Delab :=
   whenPPOption (·.get pp.universes.name true) do
-  let pos := (← getPos).pushNaryFn (← getExpr).getAppNumArgs
-  let enablePPUnivOnHead (ctx : Delaborator.Context) :=
-    let optionsPerPos := ctx.optionsPerPos.insertAt pos pp.universes.name true
-    { ctx with optionsPerPos }
-  withReader enablePPUnivOnHead delabApp
+    let pos := (← getPos).pushNaryFn (← getExpr).getAppNumArgs
+    let enablePPUnivOnHead (ctx : Delaborator.Context) :=
+      let optionsPerPos := ctx.optionsPerPos.insertAt pos pp.universes.name true
+      { ctx with optionsPerPos }
+    withReader enablePPUnivOnHead delabApp
 
 /--
 `attribute [pp_with_univ] Ordinal` instructs the pretty-printer to
@@ -41,16 +41,19 @@ print `Ordinal.{u}` with universe parameters by default
 -/
 syntax (name := ppWithUnivAttr) "pp_with_univ" : attr
 
-initialize registerBuiltinAttribute {
-  name := `ppWithUnivAttr
-  descr := ""
-  applicationTime := .afterCompilation
-  add := fun src ref kind => match ref with
-  | `(attr| pp_with_univ) => do
-    liftCommandElabM <| withRef ref do
-      let attr ← Elab.elabAttr <| ← `(Term.attrInstance| delab $(mkIdent <| `app ++ src))
-      liftTermElabM <| Term.applyAttributes ``delabWithUniv #[{attr with kind}]
-  | _ => throwUnsupportedSyntax }
+initialize
+  registerBuiltinAttribute {
+    name := `ppWithUnivAttr
+    descr := ""
+    applicationTime := .afterCompilation
+    add := fun src ref kind =>
+      match ref with
+      | `(attr| pp_with_univ) => do
+        liftCommandElabM <| withRef ref do
+          let attr ← Elab.elabAttr <| ← `(Term.attrInstance| delab $(mkIdent <| `app ++ src))
+          liftTermElabM <| Term.applyAttributes ``delabWithUniv #[{ attr with kind }]
+      | _ => throwUnsupportedSyntax
+  }
 
 end PPWithUniv
 

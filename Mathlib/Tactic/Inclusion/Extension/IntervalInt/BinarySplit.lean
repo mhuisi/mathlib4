@@ -20,24 +20,28 @@ namespace Inclusion.IntervalInt
 
 /-- Map `F` over the intervals produced by bisecting `I` to depth `n`, coarsening the results. -/
 @[specialize]
-def binarySplitMap {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β] :
-    ℕ → Interval ℤ → (Interval ℤ → Iβ) → Iβ
+def binarySplitMap {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β]
+    : ℕ → Interval ℤ → (Interval ℤ → Iβ) → Iβ
   | 0, I, F => F I
   | n + 1, I, F =>
-      match I with
-      | ⟨some l, some u⟩ =>
-          if l < u then
-            let m := (l + u) / 2
-            Coarsen.coarsen β (binarySplitMap n ⟨l, m⟩ F) (binarySplitMap n ⟨m + 1, u⟩ F)
-          else F I
-      | _ => F I
+    match I with
+    | ⟨some l, some u⟩ =>
+      if l < u then
+        let m := (l + u) / 2
+        Coarsen.coarsen β (binarySplitMap n ⟨l, m⟩ F) (binarySplitMap n ⟨m + 1, u⟩ F)
+      else
+        F I
+    | _ => F I
 
-theorem mem_binarySplitMap {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β]
-    (n : ℕ) {I : Interval ℤ} {F : Interval ℤ → Iβ} {y : β} {x : ℤ}
-    (hx : x ∈ I) (hy : ∀ J, x ∈ J → y ∈ F J) : y ∈ binarySplitMap n I F := by
+theorem mem_binarySplitMap
+    {Iβ β : Type*} [ToSet Iβ β] [Coarsen Iβ β]
+    (n : ℕ)
+    {I : Interval ℤ} {F : Interval ℤ → Iβ} {y : β} {x : ℤ} (hx : x ∈ I) (hy : ∀ J, x ∈ J → y ∈ F J)
+    : y ∈ binarySplitMap n I F := by
   induction n generalizing I with
   | zero => exact hy I hx
-  | succ n ih => match I with
+  | succ n ih =>
+    match I with
     | ⟨some l, some u⟩ =>
       rw [binarySplitMap]
       split

@@ -20,18 +20,22 @@ variable {α : Type*} [Preorder α] [OrderBot α] [AddMonoidWithOne α] [SuccAdd
 lemma succ_natCast (n : ℕ) : succ (n : WithBot α) = n + 1 := by
   rw [← WithBot.coe_natCast, succ_coe, Order.succ_eq_add_one]
 
-@[simp] lemma succ_zero : succ (0 : WithBot α) = 1 := by simpa using succ_natCast (α := α) 0
+@[simp]
+lemma succ_zero : succ (0 : WithBot α) = 1 := by simpa using succ_natCast (α := α) 0
 
 @[simp]
 lemma succ_one : succ (1 : WithBot α) = 2 := by
   simpa [one_add_one_eq_two] using succ_natCast (α := α) 1
 
 @[simp]
-lemma succ_ofNat (n : ℕ) [n.AtLeastTwo] :
-    succ (ofNat(n) : WithBot α) = ofNat(n) + 1 := succ_natCast n
+lemma succ_ofNat (n : ℕ) [n.AtLeastTwo] : succ (ofNat(n) : WithBot α) = ofNat(n) + 1 :=
+  succ_natCast n
 
-lemma one_le_iff_pos {α : Type*} [PartialOrder α] [AddMonoidWithOne α]
-    [ZeroLEOneClass α] [NeZero (1 : α)] [SuccAddOrder α] (a : WithBot α) : 1 ≤ a ↔ 0 < a := by
+lemma one_le_iff_pos
+    {α : Type*}
+    [PartialOrder α] [AddMonoidWithOne α] [ZeroLEOneClass α] [NeZero (1 : α)] [SuccAddOrder α]
+    (a : WithBot α)
+    : 1 ≤ a ↔ 0 < a := by
   cases a <;> simp [Order.one_le_iff_pos]
 
 end WithBot

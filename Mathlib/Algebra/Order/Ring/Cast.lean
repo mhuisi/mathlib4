@@ -42,29 +42,36 @@ lemma cast_mono : Monotone (Int.cast : ℤ → R) := by
   rw [← sub_nonneg, ← cast_sub, ← hk, cast_natCast]
   exact k.cast_nonneg'
 
-@[simp] lemma cast_nonneg : ∀ {n : ℤ}, 0 ≤ n → (0 : R) ≤ n | (n : ℕ), _ => by simp
+@[simp]
+lemma cast_nonneg : ∀ {n : ℤ}, 0 ≤ n → (0 : R) ≤ n
+  | (n : ℕ), _ => by simp
 
 variable [NeZero (1 : R)] {m n : ℤ}
 
-@[simp] lemma cast_nonneg_iff : ∀ {n : ℤ}, (0 : R) ≤ n ↔ 0 ≤ n
+@[simp]
+lemma cast_nonneg_iff : ∀ {n : ℤ}, (0 : R) ≤ n ↔ 0 ≤ n
   | (n : ℕ) => by simp
   | -[n+1] => by
     have : -(n : R) < 1 := lt_of_le_of_lt (by simp) zero_lt_one
     simpa [(negSucc_lt_zero n).not_ge, ← sub_eq_add_neg, le_neg] using this.not_ge
 
-@[simp, norm_cast] lemma cast_le : (m : R) ≤ n ↔ m ≤ n := by
-  rw [← sub_nonneg, ← cast_sub, cast_nonneg_iff, sub_nonneg]
+@[simp, norm_cast]
+lemma cast_le : (m : R) ≤ n ↔ m ≤ n := by rw [← sub_nonneg, ← cast_sub, cast_nonneg_iff, sub_nonneg]
 
 lemma cast_strictMono : StrictMono (fun x : ℤ => (x : R)) :=
   strictMono_of_le_iff_le fun _ _ => cast_le.symm
 
-@[simp, norm_cast, gcongr] lemma cast_lt : (m : R) < n ↔ m < n := cast_strictMono.lt_iff_lt
+@[simp, norm_cast, gcongr]
+lemma cast_lt : (m : R) < n ↔ m < n := cast_strictMono.lt_iff_lt
 
-@[simp] lemma cast_nonpos : (n : R) ≤ 0 ↔ n ≤ 0 := by rw [← cast_zero, cast_le]
+@[simp]
+lemma cast_nonpos : (n : R) ≤ 0 ↔ n ≤ 0 := by rw [← cast_zero, cast_le]
 
-@[simp] lemma cast_pos : (0 : R) < n ↔ 0 < n := by rw [← cast_zero, cast_lt]
+@[simp]
+lemma cast_pos : (0 : R) < n ↔ 0 < n := by rw [← cast_zero, cast_lt]
 
-@[simp] lemma cast_lt_zero : (n : R) < 0 ↔ n < 0 := by rw [← cast_zero, cast_lt]
+@[simp]
+lemma cast_lt_zero : (n : R) < 0 ↔ n < 0 := by rw [← cast_zero, cast_lt]
 
 end OrderedAddCommGroupWithOne
 
@@ -78,7 +85,7 @@ lemma cast_min : ↑(min a b) = (min a b : R) := Monotone.map_min cast_mono
 lemma cast_max : (↑(max a b) : R) = max (a : R) (b : R) := Monotone.map_max cast_mono
 
 @[simp, norm_cast]
-lemma cast_abs : (↑|a| : R) = |(a : R)| := by simp [abs_eq_max_neg]
+lemma cast_abs : (↑ |a| : R) = |(a : R)| := by simp [abs_eq_max_neg]
 
 lemma cast_one_le_of_pos (h : 0 < a) : (1 : R) ≤ a := mod_cast Int.add_one_le_of_lt h
 

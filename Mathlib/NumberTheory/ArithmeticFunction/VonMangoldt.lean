@@ -42,15 +42,15 @@ open Finset Nat
 
 open scoped ArithmeticFunction
 
-/-- `log` as an arithmetic function `ℕ → ℝ`. Note this is in the `ArithmeticFunction`
+/--
+`log` as an arithmetic function `ℕ → ℝ`. Note this is in the `ArithmeticFunction`
 namespace to indicate that it is bundled as an `ArithmeticFunction` rather than being the usual
-real logarithm. -/
-noncomputable def log : ArithmeticFunction ℝ :=
-  ⟨fun n => Real.log n, by simp⟩
+real logarithm.
+-/
+noncomputable def log : ArithmeticFunction ℝ := ⟨fun n => Real.log n, by simp⟩
 
 @[simp]
-theorem log_apply {n : ℕ} : log n = Real.log n :=
-  rfl
+theorem log_apply {n : ℕ} : log n = Real.log n := rfl
 
 /--
 The `vonMangoldt` function is the function on natural numbers that returns `log p` if the input can
@@ -70,8 +70,7 @@ noncomputable def vonMangoldt : ArithmeticFunction ℝ :=
 @[inherit_doc] scoped[ArithmeticFunction.vonMangoldt] notation "Λ" =>
   ArithmeticFunction.vonMangoldt
 
-theorem vonMangoldt_apply {n : ℕ} : Λ n = if IsPrimePow n then Real.log (minFac n) else 0 :=
-  rfl
+theorem vonMangoldt_apply {n : ℕ} : Λ n = if IsPrimePow n then Real.log (minFac n) else 0 := rfl
 
 @[simp]
 theorem vonMangoldt_apply_one : Λ 1 = 0 := by simp [vonMangoldt_apply]
@@ -90,13 +89,14 @@ theorem vonMangoldt_apply_prime {p : ℕ} (hp : p.Prime) : Λ p = Real.log p := 
   rw [vonMangoldt_apply, Prime.minFac_eq hp, ite_eq_left hp.prime.isPrimePow]
 
 theorem vonMangoldt_ne_zero_iff {n : ℕ} : Λ n ≠ 0 ↔ IsPrimePow n := by
-  rcases eq_or_ne n 1 with (rfl | hn); · simp [not_isPrimePow_one]
+  rcases eq_or_ne n 1 with (rfl | hn)
+  · simp [not_isPrimePow_one]
   exact (Real.log_pos (one_lt_cast.2 (minFac_prime hn).one_lt)).ne'.ite_ne_right_iff
 
 theorem vonMangoldt_pos_iff {n : ℕ} : 0 < Λ n ↔ IsPrimePow n :=
   vonMangoldt_nonneg.lt_iff_ne.trans (ne_comm.trans vonMangoldt_ne_zero_iff)
 
-theorem vonMangoldt_eq_zero_iff {n : ℕ} : Λ n = 0 ↔ ¬IsPrimePow n :=
+theorem vonMangoldt_eq_zero_iff {n : ℕ} : Λ n = 0 ↔ ¬ IsPrimePow n :=
   vonMangoldt_ne_zero_iff.not_right
 
 theorem vonMangoldt_sum {n : ℕ} : ∑ i ∈ n.divisors, Λ i = Real.log n := by
@@ -130,12 +130,12 @@ theorem log_mul_moebius_eq_vonMangoldt : log * μ = Λ := by
 theorem moebius_mul_log_eq_vonMangoldt : (μ : ArithmeticFunction ℝ) * log = Λ := by
   rw [mul_comm]; simp
 
-theorem sum_moebius_mul_log_eq {n : ℕ} : (∑ d ∈ n.divisors, (μ d : ℝ) * log d) = -Λ n := by
+theorem sum_moebius_mul_log_eq {n : ℕ} : (∑ d ∈ n.divisors, (μ d : ℝ) * log d) = - Λ n := by
   simp only [← log_mul_moebius_eq_vonMangoldt, mul_comm log, ArithmeticFunction.mul_apply,
     log_apply, intCoe_apply, ← Finset.sum_neg_distrib, neg_mul_eq_mul_neg]
-  rw [sum_divisorsAntidiagonal fun i j => (μ i : ℝ) * -Real.log j]
-  have : (∑ i ∈ n.divisors, (μ i : ℝ) * -Real.log (n / i : ℕ)) =
-      ∑ i ∈ n.divisors, ((μ i : ℝ) * Real.log i - μ i * Real.log n) := by
+  rw [sum_divisorsAntidiagonal fun i j => (μ i : ℝ) * - Real.log j]
+  have : (∑ i ∈ n.divisors, (μ i : ℝ) * -Real.log (n / i : ℕ))
+      = ∑ i ∈ n.divisors, ((μ i : ℝ) * Real.log i - μ i * Real.log n) := by
     apply sum_congr rfl
     simp only [and_imp, Ne, mem_divisors]
     intro m mn hn
@@ -163,12 +163,15 @@ open Lean Meta Qq
 
 /-- Extension for the `positivity` tactic: the von Mangoldt function is nonnegative. -/
 @[positivity ArithmeticFunction.vonMangoldt _]
-meta def evalVonMangoldt : PositivityExt where eval {u α} _zα pα? e :=
-  match pα? with | none => pure .none | some _ => do
-  match u, α, e with
-  | 0, ~q(ℝ), ~q(@ArithmeticFunction.vonMangoldt $a) =>
-    assertInstancesCommute
-    pure (.nonnegative q(ArithmeticFunction.vonMangoldt_nonneg))
-  | _, _, _ => throwError "not von Mangoldt"
+meta def evalVonMangoldt : PositivityExt where
+  eval {u α} _zα pα? e :=
+    match pα? with
+    | none => pure .none
+    | some _ => do
+      match u, α, e with
+      | 0, ~q(ℝ), ~q(@ArithmeticFunction.vonMangoldt $a) =>
+        assertInstancesCommute
+        pure (.nonnegative q(ArithmeticFunction.vonMangoldt_nonneg))
+      | _, _, _ => throwError "not von Mangoldt"
 
 end Mathlib.Meta.Positivity

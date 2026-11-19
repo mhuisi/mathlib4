@@ -27,9 +27,11 @@ variable {C : Type*} [Category* C]
 abbrev binaryProductsClosure (P : ObjectProperty C) : ObjectProperty C :=
   P.limitClosure (Discrete WalkingPair)
 
-lemma binaryProductsClosure_le_iff [HasTerminal C] {P Q : ObjectProperty C}
-    [Q.IsClosedUnderBinaryProducts] [Q.IsClosedUnderLimitsOfShape (Discrete.{0} PEmpty)] :
-    P.binaryProductsClosure ≤ Q ↔ P ≤ Q := by
+lemma binaryProductsClosure_le_iff
+    [HasTerminal C]
+    {P Q : ObjectProperty C}
+    [Q.IsClosedUnderBinaryProducts] [Q.IsClosedUnderLimitsOfShape (Discrete.{0} PEmpty)]
+    : P.binaryProductsClosure ≤ Q ↔ P ≤ Q := by
   refine ⟨fun h ↦ (P.le_limitsClosure _).trans h, fun h ↦ ?_⟩
   let : Q.IsClosedUnderIsomorphisms := IsClosedUnderBinaryProducts.closedUnderIsomorphisms Q
   exact limitsClosure_le h
@@ -38,9 +40,11 @@ lemma binaryProductsClosure_le_iff [HasTerminal C] {P Q : ObjectProperty C}
 abbrev binaryCoproductsClosure (P : ObjectProperty C) : ObjectProperty C :=
   P.colimitClosure (Discrete WalkingPair)
 
-lemma binaryCoproductsClosure_le_iff [HasInitial C] {P Q : ObjectProperty C}
-    [Q.IsClosedUnderBinaryCoproducts] [Q.IsClosedUnderColimitsOfShape (Discrete.{0} PEmpty)] :
-    P.binaryCoproductsClosure ≤ Q ↔ P ≤ Q := by
+lemma binaryCoproductsClosure_le_iff
+    [HasInitial C]
+    {P Q : ObjectProperty C}
+    [Q.IsClosedUnderBinaryCoproducts] [Q.IsClosedUnderColimitsOfShape (Discrete.{0} PEmpty)]
+    : P.binaryCoproductsClosure ≤ Q ↔ P ≤ Q := by
   refine ⟨fun h ↦ (P.le_colimitsClosure _).trans h, fun h ↦ ?_⟩
   let : Q.IsClosedUnderIsomorphisms := IsClosedUnderBinaryCoproducts.closedUnderIsomorphisms Q
   exact colimitsClosure_le h

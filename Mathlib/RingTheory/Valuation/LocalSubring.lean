@@ -36,13 +36,13 @@ def ValuationSubring.toLocalSubring (A : ValuationSubring K) : LocalSubring K wh
   toSubring := A.toSubring
   isLocalRing := A.isLocalRing
 
-lemma ValuationSubring.toLocalSubring_injective :
-    Function.Injective (ValuationSubring.toLocalSubring (K := K)) :=
-  fun _ _ h ↦ ValuationSubring.toSubring_injective congr(($h).toSubring)
+lemma ValuationSubring.toLocalSubring_injective
+    : Function.Injective (ValuationSubring.toLocalSubring (K := K)) := fun _ _ h ↦
+  ValuationSubring.toSubring_injective congr(($h).toSubring)
 
-lemma LocalSubring.map_maximalIdeal_eq_top_of_isMax {R : LocalSubring K}
-    (hR : IsMax R) {S : Subring K} (hS : R.toSubring < S) :
-    (maximalIdeal R.toSubring).map (Subring.inclusion hS.le) = ⊤ := by
+lemma LocalSubring.map_maximalIdeal_eq_top_of_isMax
+    {R : LocalSubring K} (hR : IsMax R) {S : Subring K} (hS : R.toSubring < S)
+    : (maximalIdeal R.toSubring).map (Subring.inclusion hS.le) = ⊤ := by
   set mR := (maximalIdeal R.toSubring).map (Subring.inclusion hS.le)
   by_contra h_is_not_top
   obtain ⟨M, h_is_max, h_incl⟩ := Ideal.exists_le_maximal _ h_is_not_top
@@ -51,32 +51,35 @@ lemma LocalSubring.map_maximalIdeal_eq_top_of_isMax {R : LocalSubring K}
     refine ⟨hS.le.trans (LocalSubring.le_ofPrime ..), ((local_hom_tfae _).out 3 1).mp ?_⟩
     conv_rhs => rw [← IsLocalization.AtPrime.map_eq_maximalIdeal M]
     refine .trans ?_ (Ideal.map_mono h_incl)
-    rw [Ideal.map_map]; rfl
+    rw [Ideal.map_map]
+    rfl
   exact (hR.eq_of_le h_RleSₘ ▸ hS).not_ge (LocalSubring.le_ofPrime ..)
 
 @[stacks 00IC]
 -- the conclusion could be `IsIntegrallyClosedIn R.toSubring K`, which has slightly worse defeq.
-lemma LocalSubring.mem_of_isMax_of_isIntegral {R : LocalSubring K}
-    (hR : IsMax R) {x : K} (hx : IsIntegral R.toSubring x) : x ∈ R.toSubring := by
+lemma LocalSubring.mem_of_isMax_of_isIntegral
+    {R : LocalSubring K} (hR : IsMax R) {x : K} (hx : IsIntegral R.toSubring x)
+    : x ∈ R.toSubring := by
   let S := R.toSubring[x]
   have : Algebra.IsIntegral R.toSubring S := Algebra.IsIntegral.adjoin (by simpa)
-  obtain ⟨Q : Ideal S.toSubring, hQ, e⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral
-    (S := S) (maximalIdeal R.toSubring) (le_maximalIdeal (by simp))
+  obtain ⟨Q : Ideal S.toSubring, hQ, e⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := S) (maximalIdeal R.toSubring)
+      (le_maximalIdeal (by simp))
   have : R = .ofPrime S.toSubring Q := by
     have hRS : R.toSubring ≤ S.toSubring := fun r hr ↦ algebraMap_mem S ⟨r, hr⟩
     refine hR.eq_of_le ⟨hRS.trans (LocalSubring.le_ofPrime _ _), ((local_hom_tfae _).out 3 1).mp ?_⟩
     conv_rhs => rw [← IsLocalization.AtPrime.map_eq_maximalIdeal Q]
     refine .trans ?_ (Ideal.map_mono <| Ideal.map_le_iff_le_comap.mpr e.ge)
-    rw [Ideal.map_map]; rfl
+    rw [Ideal.map_map]
+    rfl
   rw [this]
   exact LocalSubring.le_ofPrime _ _ (self_mem_adjoin_singleton _ _)
 
 @[stacks 052K]
-lemma ValuationSubring.isMax_toLocalSubring (R : ValuationSubring K) :
-    IsMax R.toLocalSubring := by
+lemma ValuationSubring.isMax_toLocalSubring (R : ValuationSubring K) : IsMax R.toLocalSubring := by
   intro S hS
-  refine (LocalSubring.toSubring_injective
-    (hS.1.antisymm fun x hx ↦ (R.mem_or_inv_mem' x).elim id fun h ↦ ?_)).ge
+  refine (LocalSubring.toSubring_injective (hS.1.antisymm fun x hx ↦
+    (R.mem_or_inv_mem' x).elim id fun h ↦ ?_)).ge
   by_contra h'
   have hx0 : x ≠ 0 := by rintro rfl; exact h' R.zero_mem
   have : IsUnit (Subring.inclusion hS.1 ⟨x⁻¹, h⟩) :=
@@ -86,31 +89,35 @@ lemma ValuationSubring.isMax_toLocalSubring (R : ValuationSubring K) :
   exact h' (this ▸ x'.property)
 
 @[stacks 00IB]
-lemma LocalSubring.exists_valuationRing_of_isMax {R : LocalSubring K} (hR : IsMax R) :
-    ∃ R' : ValuationSubring K, R'.toLocalSubring = R := by
+lemma LocalSubring.exists_valuationRing_of_isMax {R : LocalSubring K} (hR : IsMax R)
+    : ∃ R' : ValuationSubring K, R'.toLocalSubring = R := by
   suffices ∀ x ∉ R.toSubring, x⁻¹ ∈ R.toSubring from
     ⟨⟨R.toSubring, fun x ↦ or_iff_not_imp_left.mpr (this x)⟩, rfl⟩
   refine fun x hx ↦ mem_of_isMax_of_isIntegral hR ?_
   have hx0 : x ≠ 0 := fun e ↦ hx (e ▸ zero_mem _)
   let := invertibleOfNonzero hx0
   let S := R.toSubring[x]
-  have : R.toSubring < S.toSubring := IsConcreteLE.lt_iff_le_and_exists.mpr
-    ⟨fun r hr ↦ algebraMap_mem S ⟨r, hr⟩, ⟨x, self_mem_adjoin_singleton _ _, hx⟩⟩
-  have ⟨p, hp, hpx⟩ := exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top x _
-    (maximalIdeal.isMaximal R.toSubring).ne_top
-    (top_unique <| (map_maximalIdeal_eq_top_of_isMax hR this).ge.trans le_self_add)
+  have : R.toSubring < S.toSubring :=
+    IsConcreteLE.lt_iff_le_and_exists.mpr
+      ⟨fun r hr ↦ algebraMap_mem S ⟨r, hr⟩, ⟨x, self_mem_adjoin_singleton _ _, hx⟩⟩
+  have ⟨p, hp, hpx⟩ :=
+    exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top x _
+      (maximalIdeal.isMaximal R.toSubring).ne_top
+      (top_unique <| (map_maximalIdeal_eq_top_of_isMax hR this).ge.trans le_self_add)
   have H : IsUnit p.leadingCoeff := of_not_not fun h ↦ by simpa using sub_mem h hp
   exact ⟨.C H.unit⁻¹.val * p, by simp [Polynomial.Monic], by simpa using .inr hpx⟩
 
-/-- A local subring is maximal with respect to the domination order
-  if and only if it is a valuation ring. -/
-lemma LocalSubring.isMax_iff {A : LocalSubring K} :
-    IsMax A ↔ ∃ B : ValuationSubring K, B.toLocalSubring = A :=
+/--
+A local subring is maximal with respect to the domination order
+if and only if it is a valuation ring.
+-/
+lemma LocalSubring.isMax_iff {A : LocalSubring K}
+    : IsMax A ↔ ∃ B : ValuationSubring K, B.toLocalSubring = A :=
   ⟨exists_valuationRing_of_isMax, fun ⟨B, e⟩ ↦ e ▸ B.isMax_toLocalSubring⟩
 
 @[stacks 00IA]
-lemma LocalSubring.exists_le_valuationSubring (A : LocalSubring K) :
-    ∃ B : ValuationSubring K, A ≤ B.toLocalSubring := by
+lemma LocalSubring.exists_le_valuationSubring (A : LocalSubring K)
+    : ∃ B : ValuationSubring K, A ≤ B.toLocalSubring := by
   suffices ∃ B, A ≤ B ∧ IsMax B by
     obtain ⟨B, hB, hB'⟩ := this
     obtain ⟨B, rfl⟩ := B.exists_valuationRing_of_isMax hB'
@@ -137,8 +144,8 @@ lemma LocalSubring.exists_le_valuationSubring (A : LocalSubring K) :
     apply hCA.2.map_nonunit
     exact isUnit_iff_exists_inv.mpr ⟨⟨b, hCB.1 hbB⟩, Subtype.ext congr(($e).val)⟩
 
-lemma Ideal.image_subset_nonunits_valuationSubring {A : Subring K} (I : Ideal A) (hI : I ≠ ⊤) :
-    ∃ B : ValuationSubring K, A ≤ B.toSubring ∧ A.subtype '' I ⊆ B.nonunits := by
+lemma Ideal.image_subset_nonunits_valuationSubring {A : Subring K} (I : Ideal A) (hI : I ≠ ⊤)
+    : ∃ B : ValuationSubring K, A ≤ B.toSubring ∧ A.subtype '' I ⊆ B.nonunits := by
   have ⟨M, hM, le⟩ := I.exists_le_maximal hI
   have ⟨V, hV⟩ := (LocalSubring.ofPrime A M).exists_le_valuationSubring
   refine ⟨V, (LocalSubring.le_ofPrime ..).trans hV.1, ?_⟩
@@ -150,67 +157,87 @@ lemma Ideal.image_subset_nonunits_valuationSubring {A : Subring K} (I : Ideal A)
   exact ⟨_, mem_map_of_mem _ ha, rfl⟩
 
 open Polynomial Algebra in
-@[stacks 090P "part (1)"] lemma Subring.exists_le_valuationSubring_of_isIntegrallyClosedIn
-    {x : K} {R : Subring K} (hxR : x ∉ R) [IsIntegrallyClosedIn R K] :
-    ∃ V : ValuationSubring K, R ≤ V.toSubring ∧ x ∉ V := by
+@[stacks 090P "part (1)"]
+lemma Subring.exists_le_valuationSubring_of_isIntegrallyClosedIn
+    {x : K} {R : Subring K} (hxR : x ∉ R) [IsIntegrallyClosedIn R K]
+    : ∃ V : ValuationSubring K, R ≤ V.toSubring ∧ x ∉ V := by
   obtain rfl | hx0 := eq_or_ne x 0
   · exact (hxR R.zero_mem).elim
   let := invertibleOfNonzero hx0
   let B := R[x⁻¹]
   let xinv : B.toSubring := ⟨x⁻¹, subset_adjoin rfl⟩
-  have : Ideal.span {xinv} ≠ ⊤ := fun eq ↦ hxR <|
-    have ⟨p, hp, hpx⟩ := exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top _
-      (⊥ : Ideal R) bot_ne_top (top_unique <| eq.ge.trans le_add_self)
-    (Subring.isIntegrallyClosedIn_iff).mp ‹_› ⟨p, by simpa [Monic, sub_eq_zero] using hp, hpx⟩
+  have : Ideal.span {xinv} ≠ ⊤ := fun eq ↦
+    hxR <|
+      have ⟨p, hp, hpx⟩ :=
+        exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top _ (⊥ : Ideal R) bot_ne_top
+          (top_unique <| eq.ge.trans le_add_self)
+      (Subring.isIntegrallyClosedIn_iff).mp ‹_› ⟨p, by simpa [Monic, sub_eq_zero] using hp, hpx⟩
   have ⟨V, hV⟩ := Ideal.image_subset_nonunits_valuationSubring _ this
-  exact ⟨V, fun r hr ↦ hV.1 (B.algebraMap_mem ⟨r, hr⟩),
-    (V.inv_mem_nonunits_iff.mp <| hV.2 ⟨_, Ideal.subset_span rfl, rfl⟩).resolve_left hx0⟩
+  exact ⟨
+    V,
+    fun r hr ↦ hV.1 (B.algebraMap_mem ⟨r, hr⟩),
+    (V.inv_mem_nonunits_iff.mp <| hV.2 ⟨_, Ideal.subset_span rfl, rfl⟩).resolve_left hx0
+  ⟩
 
 open Polynomial Algebra in
-@[stacks 090P "part (2)"] lemma LocalSubring.exists_le_valuationSubring_of_isIntegrallyClosedIn
-    {x : K} {R : LocalSubring K} (hxR : x ∉ R.toSubring) [IsIntegrallyClosedIn R.toSubring K] :
-    ∃ V : ValuationSubring K, R ≤ V.toLocalSubring ∧ x ∉ V := by
+@[stacks 090P "part (2)"]
+lemma LocalSubring.exists_le_valuationSubring_of_isIntegrallyClosedIn
+    {x : K} {R : LocalSubring K} (hxR : x ∉ R.toSubring) [IsIntegrallyClosedIn R.toSubring K]
+    : ∃ V : ValuationSubring K, R ≤ V.toLocalSubring ∧ x ∉ V := by
   obtain rfl | hx0 := eq_or_ne x 0
   · exact (hxR R.toSubring.zero_mem).elim
   let := invertibleOfNonzero hx0
   let B := R.toSubring[x⁻¹]
   let xinv : B.toSubring := ⟨x⁻¹, subset_adjoin rfl⟩
-  have : (maximalIdeal R.toSubring).map (algebraMap _ B) + .span {xinv} ≠ ⊤ := fun eq ↦ hxR <|
-    have ⟨p, hp, hpx⟩ := exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top _ _
-      (maximalIdeal.isMaximal R.toSubring).ne_top eq
-    have H : IsUnit p.leadingCoeff := of_not_not fun h ↦ by simpa using sub_mem h hp
-    (Subring.isIntegrallyClosedIn_iff).mp ‹_›
-      ⟨.C H.unit⁻¹.val * p, by simp [Polynomial.Monic], by simpa using .inr hpx⟩
+  have : (maximalIdeal R.toSubring).map (algebraMap _ B) + .span {xinv} ≠ ⊤ := fun eq ↦
+    hxR <|
+      have ⟨p, hp, hpx⟩ :=
+        exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top _ _
+          (maximalIdeal.isMaximal R.toSubring).ne_top eq
+      have H : IsUnit p.leadingCoeff := of_not_not fun h ↦ by simpa using sub_mem h hp
+      (Subring.isIntegrallyClosedIn_iff).mp ‹_›
+        ⟨.C H.unit⁻¹.val * p, by simp [Polynomial.Monic], by simpa using .inr hpx⟩
   have ⟨V, hV⟩ := Ideal.image_subset_nonunits_valuationSubring (A := B.toSubring) _ this
-  refine ⟨V, ⟨fun r hr ↦ hV.1 (B.algebraMap_mem ⟨r, hr⟩),
-    ((local_hom_tfae _).out 4 1).mp fun r hr ↦ ?_⟩, (V.inv_mem_nonunits_iff.mp <|
-      hV.2 ⟨_, le_add_self (α := Ideal B) (Ideal.subset_span rfl), rfl⟩).resolve_left hx0⟩
+  refine ⟨
+    V,
+    ⟨fun r hr ↦ hV.1 (B.algebraMap_mem ⟨r, hr⟩), ((local_hom_tfae _).out 4 1).mp fun r hr ↦ ?_⟩,
+    (V.inv_mem_nonunits_iff.mp <|
+      hV.2 ⟨_, le_add_self (α := Ideal B) (Ideal.subset_span rfl), rfl⟩).resolve_left hx0
+  ⟩
   rw [← V.image_maximalIdeal] at hV
   obtain ⟨⟨r, _⟩, hr, rfl⟩ := hV.2 ⟨_, le_self_add (α := Ideal B) (Ideal.mem_map_of_mem _ hr), rfl⟩
   exact hr
 
-/-- A subring integrally closed in a field is the intersection of valuation subrings
-containing it. -/
-lemma Subring.eq_iInf_of_isIntegrallyClosedIn {R : Subring K} [IsIntegrallyClosedIn R K] :
-    R = ⨅ V : {V : ValuationSubring K // R ≤ V.toSubring}, V.val.toSubring :=
-  le_antisymm (le_iInf fun V ↦ V.property) fun _ h ↦ of_not_not fun hxR ↦
-    have ⟨V, hV⟩ := R.exists_le_valuationSubring_of_isIntegrallyClosedIn hxR
-    hV.2 (iInf_le_of_le (α := Subring K) ⟨V, hV.1⟩ le_rfl h)
+/--
+A subring integrally closed in a field is the intersection of valuation subrings
+containing it.
+-/
+lemma Subring.eq_iInf_of_isIntegrallyClosedIn {R : Subring K} [IsIntegrallyClosedIn R K]
+    : R = ⨅ V : {V : ValuationSubring K // R ≤ V.toSubring}, V.val.toSubring :=
+  le_antisymm (le_iInf fun V ↦ V.property) fun _ h ↦
+    of_not_not fun hxR ↦
+      have ⟨V, hV⟩ := R.exists_le_valuationSubring_of_isIntegrallyClosedIn hxR
+      hV.2 (iInf_le_of_le (α := Subring K) ⟨V, hV.1⟩ le_rfl h)
 
-/-- A local subring integrally closed in a field is the intersection of valuation subrings
-dominating it. -/
-lemma LocalSubring.eq_iInf_of_isIntegrallyClosedIn {R : LocalSubring K}
-    [IsIntegrallyClosedIn R.toSubring K] :
-    R.toSubring = ⨅ V : {V : ValuationSubring K // R ≤ V.toLocalSubring}, V.val.toSubring :=
-  le_antisymm (le_iInf fun V ↦ V.property.1) fun _ h ↦ of_not_not fun hxR ↦
-    have ⟨V, hV⟩ := R.exists_le_valuationSubring_of_isIntegrallyClosedIn hxR
-    hV.2 (iInf_le_of_le (α := Subring K) ⟨V, hV.1⟩ le_rfl h)
+/--
+A local subring integrally closed in a field is the intersection of valuation subrings
+dominating it.
+-/
+lemma LocalSubring.eq_iInf_of_isIntegrallyClosedIn
+    {R : LocalSubring K} [IsIntegrallyClosedIn R.toSubring K]
+    : R.toSubring = ⨅ V : {V : ValuationSubring K // R ≤ V.toLocalSubring}, V.val.toSubring :=
+  le_antisymm (le_iInf fun V ↦ V.property.1) fun _ h ↦
+    of_not_not fun hxR ↦
+      have ⟨V, hV⟩ := R.exists_le_valuationSubring_of_isIntegrallyClosedIn hxR
+      hV.2 (iInf_le_of_le (α := Subring K) ⟨V, hV.1⟩ le_rfl h)
 
-/-- The integral closure of a subset in a field is the intersection of all valuation subrings
-containing it. -/
-lemma iInf_valuationSubring_superset {s : Set K} :
-    (⨅ V : {V : ValuationSubring K // s ⊆ V.toSubring}, V.val.toSubring) =
-    (integralClosure (Subring.closure s) K).toSubring := by
+/--
+The integral closure of a subset in a field is the intersection of all valuation subrings
+containing it.
+-/
+lemma iInf_valuationSubring_superset {s : Set K}
+    : (⨅ V : {V : ValuationSubring K // s ⊆ V.toSubring}, V.val.toSubring)
+      = (integralClosure (Subring.closure s) K).toSubring := by
   refine .trans ?_ Subring.eq_iInf_of_isIntegrallyClosedIn.symm
   simp_rw [iInf_subtype]
   congr! with V
@@ -218,14 +245,14 @@ lemma iInf_valuationSubring_superset {s : Set K} :
   rw [Subring.integralClosure_subring_le_iff]
   exact Subring.closure_le.symm
 
-lemma bijective_rangeRestrict_comp_of_valuationRing [IsDomain R] [ValuationRing R]
-    [IsLocalRing S] [Algebra R K] [IsFractionRing R K]
-    (f : R →+* S) (g : S →+* K) (h : g.comp f = algebraMap R K) [IsLocalHom f] :
-    Function.Bijective (g.rangeRestrict.comp f) := by
+lemma bijective_rangeRestrict_comp_of_valuationRing
+    [IsDomain R] [ValuationRing R] [IsLocalRing S] [Algebra R K] [IsFractionRing R K]
+    (f : R →+* S) (g : S →+* K) (h : g.comp f = algebraMap R K)
+    [IsLocalHom f]
+    : Function.Bijective (g.rangeRestrict.comp f) := by
   refine ⟨?_, ?_⟩
   · exact .of_comp (f := Subtype.val) (by convert (IsFractionRing.injective R K); rw [← h]; rfl)
-  · let V : ValuationSubring K :=
-      ⟨(algebraMap R K).range, ValuationRing.isInteger_or_isInteger R⟩
+  · let V : ValuationSubring K := ⟨(algebraMap R K).range, ValuationRing.isInteger_or_isInteger R⟩
     suffices LocalSubring.range g ≤ V.toLocalSubring by
       rintro ⟨_, x, rfl⟩
       obtain ⟨y, hy⟩ := this.1 ⟨x, rfl⟩
@@ -242,8 +269,8 @@ lemma bijective_rangeRestrict_comp_of_valuationRing [IsDomain R] [ValuationRing 
     ext
     simp
 
-lemma IsLocalRing.exists_factor_valuationRing [IsLocalRing R] (f : R →+* K) :
-    ∃ (A : ValuationSubring K) (h : _), IsLocalHom (f.codRestrict A.toSubring h) := by
+lemma IsLocalRing.exists_factor_valuationRing [IsLocalRing R] (f : R →+* K)
+    : ∃ (A : ValuationSubring K) (h : _), IsLocalHom (f.codRestrict A.toSubring h) := by
   obtain ⟨B, hB⟩ := (LocalSubring.range f).exists_le_valuationSubring
   refine ⟨B, fun x ↦ hB.1 ⟨x, rfl⟩, ?_⟩
   exact @RingHom.isLocalHom_comp _ _ _ _ _ _ _ _ hB.2 (.of_surjective _ f.rangeRestrict_surjective)

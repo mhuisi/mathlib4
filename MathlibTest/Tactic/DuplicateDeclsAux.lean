@@ -16,8 +16,7 @@ theorem of_two_add_two_of_one_add_one : 2 + 2 = 4 → 1 + 1 = 2 → True := by s
 theorem nat_int_add_comm (n : Nat) (m : Int) : n + m = m + n := by rw [Int.add_comm]
 theorem int_nat_add_comm (m : Int) (n : Nat) : n + m = m + n := by rw [Int.add_comm]
 
-theorem Eq.trans_Type {α : Type u} {a b c : α} (h₁ : Eq a b) (h₂ : Eq b c) : Eq a c :=
-  h₂ ▸ h₁
+theorem Eq.trans_Type {α : Type u} {a b c : α} (h₁ : Eq a b) (h₂ : Eq b c) : Eq a c := h₂ ▸ h₁
 
 -- The following duplicates are not detected because of variables with the same type
 theorem nat_add_comm (n m : Nat) : n + m = m + n := Nat.add_comm n m
@@ -29,8 +28,10 @@ theorem nat_ge_trans (a b c : Nat) : b ≤ a → c ≤ b → c ≤ a := by lia
 /-! Instances -/
 -- The value is not looked at, because instances are meant to be canonical.
 -- We check whether a definition is an instance based on its type. We might want to change this.
-@[implicit_reducible] def instAddNat' : Add Nat := ⟨Nat.sub⟩
-@[implicit_reducible] def instAddNat'' : Add Nat := ⟨Nat.mul⟩
+@[implicit_reducible]
+def instAddNat' : Add Nat := ⟨Nat.sub⟩
+@[implicit_reducible]
+def instAddNat'' : Add Nat := ⟨Nat.mul⟩
 
 /-! Definitions -/
 

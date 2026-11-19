@@ -24,16 +24,18 @@ This file does not define composition but only introduces notation for
 
 public section
 
-/- This file is only for lemmas that are direct specializations of `Measure.bind` to kernels,
-anything more involved should go elsewhere (for example the `MeasureComp` file). -/
+/-
+This file is only for lemmas that are direct specializations of `Measure.bind` to kernels,
+anything more involved should go elsewhere (for example the `MeasureComp` file).
+-/
 assert_not_exists ProbabilityTheory.Kernel.compProd
 
 open ProbabilityTheory
 
 namespace MeasureTheory.Measure
 
-variable {α β : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β}
-  {μ : Measure α} {κ : Kernel α β}
+variable
+  {α β : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β} {μ : Measure α} {κ : Kernel α β}
 
 /-- Composition of a measure and a kernel.
 
@@ -44,8 +46,8 @@ scoped[ProbabilityTheory] notation:100 κ:101 " ∘ₘ " μ:100 => MeasureTheory
 lemma comp_apply_univ [IsMarkovKernel κ] : (κ ∘ₘ μ) Set.univ = μ Set.univ := by
   simp [bind_apply .univ κ.aemeasurable]
 
-lemma deterministic_comp_eq_map {f : α → β} (hf : Measurable f) :
-    Kernel.deterministic f hf ∘ₘ μ = μ.map f :=
+lemma deterministic_comp_eq_map {f : α → β} (hf : Measurable f)
+    : Kernel.deterministic f hf ∘ₘ μ = μ.map f :=
   Measure.bind_dirac_eq_map μ hf
 
 @[simp]

@@ -43,15 +43,13 @@ def range : AffineSubspace R P₂ where
     exact ⟨c • (x₁ -ᵥ x₂) +ᵥ x₃, by simp [map_vadd, ← h₁, ← h₂, ← h₃]⟩
 
 /-- The range of an affine map is nonempty. -/
-instance instNonemptyRange : Nonempty (range f) :=
-  Set.instNonemptyRange f
+instance instNonemptyRange : Nonempty (range f) := Set.instNonemptyRange f
 
 @[simp, norm_cast]
 theorem coe_range : f.range = Set.range f := rfl
 
 @[simp]
-theorem mem_range (x : P₂) : x ∈ f.range ↔ ∃ y, f y = x :=
-  Iff.rfl
+theorem mem_range (x : P₂) : x ∈ f.range ↔ ∃ y, f y = x := Iff.rfl
 
 @[simp]
 theorem map_top : map f ⊤ = f.range := by ext; simp
@@ -71,12 +69,12 @@ theorem range_eq_top_iff_surjective : f.range = ⊤ ↔ Surjective f := by
 @[simps! apply_coe linear_apply_coe]
 def rangeRestrict : P₁ →ᵃ[R] f.range where
   toFun p := ⟨f p, p, rfl⟩
-  linear := f.linear.codRestrict f.range.direction
-    (f.direction_range_eq_range_linear ▸ f.linear.mem_range_self)
+  linear :=
+    f.linear.codRestrict f.range.direction
+      (f.direction_range_eq_range_linear ▸ f.linear.mem_range_self)
   map_vadd' _ _ := by ext; simp
 
-theorem surjective_rangeRestrict : Surjective f.rangeRestrict :=
-  fun ⟨_, y, rfl⟩ => ⟨y, rfl⟩
+theorem surjective_rangeRestrict : Surjective f.rangeRestrict := fun ⟨_, y, rfl⟩ => ⟨y, rfl⟩
 
 @[simp]
 theorem range_rangeRestrict : f.rangeRestrict.range = ⊤ := by
@@ -86,7 +84,8 @@ theorem range_rangeRestrict : f.rangeRestrict.range = ⊤ := by
 @[simp]
 theorem injective_rangeRestrict_iff : Injective (rangeRestrict f) ↔ Injective f := by
   convert (Injective.of_comp_iff Subtype.val_injective f.rangeRestrict).symm
-  ext; simp [rangeRestrict]
+  ext
+  simp [rangeRestrict]
 
 end AffineMap
 

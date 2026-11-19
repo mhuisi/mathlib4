@@ -88,8 +88,7 @@ theorem op_top : (⊤ : Subalgebra R A).op = ⊤ := opEquiv.map_top
 @[simp]
 theorem unop_top : (⊤ : Subalgebra R Aᵐᵒᵖ).unop = ⊤ := opEquiv.symm.map_top
 
-theorem op_sup (S₁ S₂ : Subalgebra R A) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op :=
-  opEquiv.map_sup _ _
+theorem op_sup (S₁ S₂ : Subalgebra R A) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op := opEquiv.map_sup _ _
 
 theorem unop_sup (S₁ S₂ : Subalgebra R Aᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
   opEquiv.symm.map_sup _ _
@@ -121,8 +120,8 @@ theorem op_iInf (S : ι → Subalgebra R A) : (iInf S).op = ⨅ i, (S i).op := o
 theorem unop_iInf (S : ι → Subalgebra R Aᵐᵒᵖ) : (iInf S).unop = ⨅ i, (S i).unop :=
   opEquiv.symm.map_iInf _
 
-theorem op_adjoin (s : Set A) :
-    (Algebra.adjoin R s).op = Algebra.adjoin R (MulOpposite.unop ⁻¹' s) := by
+theorem op_adjoin (s : Set A)
+    : (Algebra.adjoin R s).op = Algebra.adjoin R (MulOpposite.unop ⁻¹' s) := by
   apply toSubsemiring_injective
   simp_rw [Algebra.adjoin, op_toSubsemiring, Subsemiring.op_closure, Set.preimage_union]
   congr with x
@@ -130,8 +129,8 @@ theorem op_adjoin (s : Set A) :
   congr!
   rw [← MulOpposite.op_injective.eq_iff (b := x.unop), MulOpposite.op_unop]
 
-theorem unop_adjoin (s : Set Aᵐᵒᵖ) :
-    (Algebra.adjoin R s).unop = Algebra.adjoin R (MulOpposite.op ⁻¹' s) := by
+theorem unop_adjoin (s : Set Aᵐᵒᵖ)
+    : (Algebra.adjoin R s).unop = Algebra.adjoin R (MulOpposite.op ⁻¹' s) := by
   apply toSubsemiring_injective
   simp_rw [Algebra.adjoin, unop_toSubsemiring, Subsemiring.unop_closure, Set.preimage_union]
   congr with x

@@ -21,10 +21,9 @@ defines the `StarAddMonoid` and `StarModule` instances for tensor products.
 public section
 
 namespace TensorProduct
-variable {R A B : Type*}
-  [CommSemiring R] [StarRing R]
-  [AddCommMonoid A] [StarAddMonoid A] [Module R A] [StarModule R A]
-  [AddCommMonoid B] [StarAddMonoid B] [Module R B] [StarModule R B]
+variable
+  {R A B : Type*} [CommSemiring R] [StarRing R] [AddCommMonoid A] [StarAddMonoid A] [Module R A]
+  [StarModule R A] [AddCommMonoid B] [StarAddMonoid B] [Module R B] [StarModule R B]
 
 open scoped TensorProduct
 
@@ -46,7 +45,8 @@ noncomputable instance : StarAddMonoid (A ⊗[R] B) where
 instance : StarModule R (A ⊗[R] B) where
   star_smul := map_smulₛₗ _
 
-theorem _root_.starLinearEquiv_tensor :
-    starLinearEquiv R (A := A ⊗[R] B) = congr (starLinearEquiv R) (starLinearEquiv R) := rfl
+theorem _root_.starLinearEquiv_tensor
+    : starLinearEquiv R (A := A ⊗[R] B) = congr (starLinearEquiv R) (starLinearEquiv R) :=
+  rfl
 
 end TensorProduct

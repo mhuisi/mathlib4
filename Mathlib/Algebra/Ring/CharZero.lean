@@ -54,13 +54,13 @@ variable [NonAssocSemiring R] [NonAssocSemiring S]
 namespace RingHom
 
 lemma charZero (ϕ : R →+* S) [CharZero S] : CharZero R where
-  cast_injective a b h := CharZero.cast_injective (R := S) <| by
-    rw [← map_natCast ϕ, ← map_natCast ϕ, h]
+  cast_injective a b h :=
+    CharZero.cast_injective (R := S) <| by rw [← map_natCast ϕ, ← map_natCast ϕ, h]
 
-lemma charZero_iff {ϕ : R →+* S} (hϕ : Injective ϕ) : CharZero R ↔ CharZero S :=
-  ⟨fun hR =>
-    ⟨by intro a b h; rwa [← @Nat.cast_inj R, ← hϕ.eq_iff, map_natCast ϕ, map_natCast ϕ]⟩,
-    fun _ => ϕ.charZero⟩
+lemma charZero_iff {ϕ : R →+* S} (hϕ : Injective ϕ) : CharZero R ↔ CharZero S := ⟨
+  fun hR => ⟨by intro a b h; rwa [← @Nat.cast_inj R, ← hϕ.eq_iff, map_natCast ϕ, map_natCast ϕ]⟩,
+  fun _ => ϕ.charZero
+⟩
 
 lemma injective_nat (f : ℕ →+* R) [CharZero R] : Injective f :=
   Subsingleton.elim (Nat.castRingHom _) f ▸ Nat.cast_injective
@@ -78,7 +78,8 @@ end NonAssocSemiring
 section Semiring
 variable [Semiring R] [CharZero R]
 
-@[simp] lemma Nat.cast_pow_eq_one {a : ℕ} (hn : n ≠ 0) : (a : R) ^ n = 1 ↔ a = 1 := by
+@[simp]
+lemma Nat.cast_pow_eq_one {a : ℕ} (hn : n ≠ 0) : (a : R) ^ n = 1 ↔ a = 1 := by
   simp [← cast_pow, cast_eq_one, hn]
 
 variable [IsCancelMulZero R]

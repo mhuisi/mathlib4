@@ -18,7 +18,6 @@ set_option doc.verso.suggestions false
 
 public section
 
-
 section
 
 variable {α : Type*} [Group α] [LinearOrder α] [MulLeftMono α]
@@ -40,8 +39,7 @@ section Inv
 
 variable {G₀ : Type*} [Inv G₀] [LinearOrder G₀] {x y : G₀}
 
-lemma min_inv_inv_le : min x⁻¹ y⁻¹ ≤ (max x y)⁻¹ := by
-  cases le_total x y <;> simp_all
+lemma min_inv_inv_le : min x⁻¹ y⁻¹ ≤ (max x y)⁻¹ := by cases le_total x y <;> simp_all
 
 end Inv
 
@@ -51,13 +49,11 @@ variable {α : Type*} [CommGroup α] [LinearOrder α] [IsOrderedMonoid α]
 
 @[to_additive min_neg_neg]
 theorem min_inv_inv' (a b : α) : min a⁻¹ b⁻¹ = (max a b)⁻¹ :=
-  Eq.symm <| (@Monotone.map_max α αᵒᵈ _ _ Inv.inv a b) fun _ _ =>
-    inv_le_inv_iff.mpr
+  Eq.symm <| (@Monotone.map_max α αᵒᵈ _ _ Inv.inv a b) fun _ _ => inv_le_inv_iff.mpr
 
 @[to_additive max_neg_neg]
 theorem max_inv_inv' (a b : α) : max a⁻¹ b⁻¹ = (min a b)⁻¹ :=
-  Eq.symm <| (@Monotone.map_min α αᵒᵈ _ _ Inv.inv a b) fun _ _ =>
-    inv_le_inv_iff.mpr
+  Eq.symm <| (@Monotone.map_min α αᵒᵈ _ _ Inv.inv a b) fun _ _ => inv_le_inv_iff.mpr
 
 @[to_additive min_sub_sub_right]
 theorem min_div_div_right' (a b c : α) : min (a / c) (b / c) = min a b / c := by
@@ -81,8 +77,7 @@ section LinearOrderedAddCommGroup
 
 variable {α : Type*} [AddCommGroup α] [LinearOrder α] [IsOrderedAddMonoid α]
 
-theorem max_sub_max_le_max (a b c d : α) : max a b - max c d ≤ max (a - c) (b - d) := by
-  grind
+theorem max_sub_max_le_max (a b c d : α) : max a b - max c d ≤ max (a - c) (b - d) := by grind
 
 theorem abs_max_sub_max_le_max (a b c d : α) : |max a b - max c d| ≤ max |a - c| |b - d| := by
   refine abs_sub_le_iff.2 ⟨?_, ?_⟩
@@ -95,7 +90,7 @@ theorem abs_min_sub_min_le_max (a b c d : α) : |min a b - min c d| ≤ max |a -
     abs_max_sub_max_le_max (-a) (-b) (-c) (-d)
 
 theorem abs_max_sub_max_le_abs (a b c : α) : |max a c - max b c| ≤ |a - b| := by
-  simpa only [sub_self, abs_zero, max_eq_left (abs_nonneg (a - b))]
-    using abs_max_sub_max_le_max a c b c
+  simpa only [sub_self, abs_zero, max_eq_left (abs_nonneg (a - b))] using
+    abs_max_sub_max_le_max a c b c
 
 end LinearOrderedAddCommGroup

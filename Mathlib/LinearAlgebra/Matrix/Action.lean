@@ -35,7 +35,8 @@ instance : Module (Matrix n n R) (n → R) where
   smul_zero := mulVec_zero
   smul_add := mulVec_add
 
-@[simp] lemma smul_eq_mulVec (A : Matrix n n R) (v : n → R) : A • v = A *ᵥ v := rfl
+@[simp]
+lemma smul_eq_mulVec (A : Matrix n n R) (v : n → R) : A • v = A *ᵥ v := rfl
 
 instance [DistribSMul S R] [SMulCommClass R S R] : SMulCommClass (Matrix n n R) S (n → R) where
   smul_comm := letI := SMulCommClass.symm; mulVec_smul
@@ -46,8 +47,8 @@ instance [DistribSMul S R] [SMulCommClass S R R] : SMulCommClass S (Matrix n n R
 instance [DistribSMul S R] [IsScalarTower S R R] : IsScalarTower S (Matrix n n R) (n → R) where
   smul_assoc := smul_mulVec
 
-lemma ext_iff_smul {A B : Matrix n n R} :
-    A = B ↔ ∀ v : n → R, A • v = B • v := Matrix.ext_iff_mulVec
+lemma ext_iff_smul {A B : Matrix n n R} : A = B ↔ ∀ v : n → R, A • v = B • v :=
+  Matrix.ext_iff_mulVec
 
 end mulVec
 
@@ -64,7 +65,8 @@ instance : Module (Matrix n n R)ᵐᵒᵖ (n → R) where
   smul_zero _ := zero_vecMul _
   smul_add _ := add_vecMul _
 
-@[simp] lemma op_smul_eq_vecMul (A : (Matrix n n R)ᵐᵒᵖ) (v : n → R) : A • v = v ᵥ* A.unop := rfl
+@[simp]
+lemma op_smul_eq_vecMul (A : (Matrix n n R)ᵐᵒᵖ) (v : n → R) : A • v = v ᵥ* A.unop := rfl
 
 instance [DistribSMul S R] [IsScalarTower S R R] : SMulCommClass (Matrix n n R)ᵐᵒᵖ S (n → R) where
   smul_comm A s v := smul_vecMul s v A.unop

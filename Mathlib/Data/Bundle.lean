@@ -50,18 +50,20 @@ namespace Bundle
 
 variable {B F : Type*} (E : B → Type*)
 
-/-- `Bundle.TotalSpace F E` is the total space of the bundle. It consists of pairs
+/--
+`Bundle.TotalSpace F E` is the total space of the bundle. It consists of pairs
 `(proj : B, snd : E proj)`.
 -/
 @[ext]
 structure TotalSpace (F : Type*) (E : B → Type*) where
-  /-- `Bundle.TotalSpace.proj` is the canonical projection `Bundle.TotalSpace F E → B` from the
-  total space to the base space. -/
+  /--
+  `Bundle.TotalSpace.proj` is the canonical projection `Bundle.TotalSpace F E → B` from the
+  total space to the base space.
+  -/
   proj : B
   snd : E proj
 
-instance [Inhabited B] [Inhabited (E default)] : Inhabited (TotalSpace F E) :=
-  ⟨⟨default, default⟩⟩
+instance [Inhabited B] [Inhabited (E default)] : Inhabited (TotalSpace F E) := ⟨⟨default, default⟩⟩
 
 variable {E}
 
@@ -70,8 +72,9 @@ scoped notation:max "π " F':max E':max => Bundle.TotalSpace.proj (F := F') (E :
 
 abbrev TotalSpace.mk' (F : Type*) (x : B) (y : E x) : TotalSpace F E := ⟨x, y⟩
 
-theorem TotalSpace.mk_cast {x x' : B} (h : x = x') (b : E x) :
-    .mk' F x' (cast (congr_arg E h) b) = TotalSpace.mk x b := by subst h; rfl
+theorem TotalSpace.mk_cast {x x' : B} (h : x = x') (b : E x)
+    : .mk' F x' (cast (congr_arg E h) b) = TotalSpace.mk x b := by
+  subst h; rfl
 
 @[simp 1001, mfld_simps 1001]
 theorem TotalSpace.mk_inj {b : B} {y y' : E b} : mk' F b y = mk' F b y' ↔ y = y' := by
@@ -80,8 +83,7 @@ theorem TotalSpace.mk_inj {b : B} {y y' : E b} : mk' F b y = mk' F b y' ↔ y = 
 theorem TotalSpace.mk_injective (b : B) : Injective (mk b : E b → TotalSpace F E) := fun _ _ ↦
   mk_inj.1
 
-instance {x : B} : CoeTC (E x) (TotalSpace F E) :=
-  ⟨TotalSpace.mk x⟩
+instance {x : B} : CoeTC (E x) (TotalSpace F E) := ⟨TotalSpace.mk x⟩
 
 theorem TotalSpace.eta (z : TotalSpace F E) : TotalSpace.mk z.proj z.snd = z := rfl
 
@@ -118,15 +120,16 @@ section Pullback
 
 variable {B' : Type*}
 
-/-- The pullback of a bundle `E` over a base `B` under a map `f : B' → B`, denoted by
-`Bundle.Pullback f E` or `f *ᵖ E`, is the bundle over `B'` whose fiber over `b'` is `E (f b')`. -/
+/--
+The pullback of a bundle `E` over a base `B` under a map `f : B' → B`, denoted by
+`Bundle.Pullback f E` or `f *ᵖ E`, is the bundle over `B'` whose fiber over `b'` is `E (f b')`.
+-/
 def Pullback (f : B' → B) (E : B → Type*) : B' → Type _ := fun x => E (f x)
 
 @[inherit_doc]
 notation f " *ᵖ " E:arg => Pullback f E
 
-instance {f : B' → B} {x : B'} [Nonempty (E (f x))] : Nonempty ((f *ᵖ E) x) :=
-  ‹Nonempty (E (f x))›
+instance {f : B' → B} {x : B'} [Nonempty (E (f x))] : Nonempty ((f *ᵖ E) x) := ‹Nonempty (E (f x))›
 
 /-- Natural embedding of the total space of `f *ᵖ E` into `B' × TotalSpace F E`. -/
 @[simp]
@@ -135,12 +138,12 @@ def pullbackTotalSpaceEmbedding (f : B' → B) : TotalSpace F (f *ᵖ E) → B' 
 
 /-- The base map `f : B' → B` lifts to a canonical map on the total spaces. -/
 @[simps (attr := mfld_simps)]
-def Pullback.lift (f : B' → B) : TotalSpace F (f *ᵖ E) → TotalSpace F E :=
-  fun z => ⟨f z.proj, z.snd⟩
+def Pullback.lift (f : B' → B) : TotalSpace F (f *ᵖ E) → TotalSpace F E := fun z =>
+  ⟨f z.proj, z.snd⟩
 
 @[simp, mfld_simps]
-theorem Pullback.lift_mk (f : B' → B) (x : B') (y : E (f x)) :
-    Pullback.lift f (.mk' F x y) = ⟨f x, y⟩ :=
+theorem Pullback.lift_mk (f : B' → B) (x : B') (y : E (f x))
+    : Pullback.lift f (.mk' F x y) = ⟨f x, y⟩ :=
   rfl
 
 end Pullback

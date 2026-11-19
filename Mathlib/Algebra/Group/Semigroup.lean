@@ -33,11 +33,13 @@ section Mul
 variable [Mul G]
 
 /-- A mixin for left cancellative multiplication. -/
-@[mk_iff] class IsLeftCancelMul (G : Type*) [Mul G] : Prop where
+@[mk_iff]
+class IsLeftCancelMul (G : Type*) [Mul G] : Prop where
   /-- Multiplication is left cancellative (i.e. left regular). -/
   protected mul_left_cancel (a : G) : IsLeftRegular a
 /-- A mixin for right cancellative multiplication. -/
-@[mk_iff] class IsRightCancelMul (G : Type*) [Mul G] : Prop where
+@[mk_iff]
+class IsRightCancelMul (G : Type*) [Mul G] : Prop where
   /-- Multiplication is right cancellative (i.e. right regular). -/
   protected mul_right_cancel (a : G) : IsRightRegular a
 /-- A mixin for cancellative multiplication. -/
@@ -71,8 +73,8 @@ section Regular
 
 variable {R : Type*}
 
-@[to_additive] theorem isCancelMul_iff_forall_isRegular [Mul R] :
-    IsCancelMul R ↔ ∀ r : R, IsRegular r := by
+@[to_additive]
+theorem isCancelMul_iff_forall_isRegular [Mul R] : IsCancelMul R ↔ ∀ r : R, IsRegular r := by
   rw [isCancelMul_iff, isLeftCancelMul_iff, isRightCancelMul_iff, ← forall_and]
   exact forall_congr' fun _ ↦ isRegular_iff.symm
 
@@ -97,23 +99,19 @@ section IsLeftCancelMul
 variable [IsLeftCancelMul G] {a b c : G}
 
 @[to_additive]
-theorem mul_left_cancel : a * b = a * c → b = c :=
-  (IsLeftCancelMul.mul_left_cancel a ·)
+theorem mul_left_cancel : a * b = a * c → b = c := (IsLeftCancelMul.mul_left_cancel a ·)
 
 @[to_additive]
-theorem mul_left_cancel_iff : a * b = a * c ↔ b = c :=
-  ⟨mul_left_cancel, congrArg _⟩
+theorem mul_left_cancel_iff : a * b = a * c ↔ b = c := ⟨mul_left_cancel, congrArg _⟩
 
 @[to_additive]
 theorem mul_right_injective (a : G) : Injective (a * ·) := fun _ _ ↦ mul_left_cancel
 
 @[to_additive (attr := simp)]
-theorem mul_right_inj (a : G) {b c : G} : a * b = a * c ↔ b = c :=
-  (mul_right_injective a).eq_iff
+theorem mul_right_inj (a : G) {b c : G} : a * b = a * c ↔ b = c := (mul_right_injective a).eq_iff
 
 @[to_additive]
-theorem mul_ne_mul_right (a : G) {b c : G} : a * b ≠ a * c ↔ b ≠ c :=
-  (mul_right_injective a).ne_iff
+theorem mul_ne_mul_right (a : G) {b c : G} : a * b ≠ a * c ↔ b ≠ c := (mul_right_injective a).ne_iff
 
 end IsLeftCancelMul
 
@@ -122,23 +120,19 @@ section IsRightCancelMul
 variable [IsRightCancelMul G] {a b c : G}
 
 @[to_additive]
-theorem mul_right_cancel : a * b = c * b → a = c :=
-  (IsRightCancelMul.mul_right_cancel b ·)
+theorem mul_right_cancel : a * b = c * b → a = c := (IsRightCancelMul.mul_right_cancel b ·)
 
 @[to_additive]
-theorem mul_right_cancel_iff : b * a = c * a ↔ b = c :=
-  ⟨mul_right_cancel, congrArg (· * a)⟩
+theorem mul_right_cancel_iff : b * a = c * a ↔ b = c := ⟨mul_right_cancel, congrArg (· * a)⟩
 
 @[to_additive]
 theorem mul_left_injective (a : G) : Function.Injective (· * a) := fun _ _ ↦ mul_right_cancel
 
 @[to_additive (attr := simp)]
-theorem mul_left_inj (a : G) {b c : G} : b * a = c * a ↔ b = c :=
-  (mul_left_injective a).eq_iff
+theorem mul_left_inj (a : G) {b c : G} : b * a = c * a ↔ b = c := (mul_left_injective a).eq_iff
 
 @[to_additive]
-theorem mul_ne_mul_left (a : G) {b c : G} : b * a ≠ c * a ↔ b ≠ c :=
-  (mul_left_injective a).ne_iff
+theorem mul_ne_mul_left (a : G) {b c : G} : b * a ≠ c * a ↔ b ≠ c := (mul_left_injective a).ne_iff
 
 end IsRightCancelMul
 
@@ -163,8 +157,7 @@ section Semigroup
 variable [Semigroup G]
 
 @[to_additive]
-theorem mul_assoc : ∀ a b c : G, a * b * c = a * (b * c) :=
-  Semigroup.mul_assoc
+theorem mul_assoc : ∀ a b c : G, a * b * c = a * (b * c) := Semigroup.mul_assoc
 
 @[to_additive]
 instance : Semigroup PEmpty.{u + 1} where
@@ -194,13 +187,15 @@ lemma isMulCommutative_iff {M : Type*} [Mul M] : IsMulCommutative M ↔ ∀ a b 
 @[to_additive]
 alias ⟨_, IsMulCommutative.of_comm⟩ := isMulCommutative_iff
 
-/-- An alternative to `mul_comm` which uses the mixin `IsMulCommutative` instead of bundled
+/--
+An alternative to `mul_comm` which uses the mixin `IsMulCommutative` instead of bundled
 commutative algebraic structures. In general, you should prefer `mul_comm` unless you are working
-with commutative subobjects in a noncommutative algebraic structure. -/
+with commutative subobjects in a noncommutative algebraic structure.
+-/
 @[to_additive
-/-- An alternative to `add_comm` which uses the mixin `IsAddCommutative` instead of bundled
+  /-- An alternative to `add_comm` which uses the mixin `IsAddCommutative` instead of bundled
 commutative algebraic structures. In general, you should prefer `add_comm` unless you are working
-with commutative subobjects in a noncommutative algebraic structure. -/ ]
+with commutative subobjects in a noncommutative algebraic structure. -/]
 lemma mul_comm' {M : Type*} [Mul M] [IsMulCommutative M] (a b : M) : a * b = b * a :=
   IsMulCommutative.is_comm.comm ..
 
@@ -210,18 +205,15 @@ variable {M : Type*} [Mul M]
 
 /-- `x` is semiconjugate to `y` by `a`, if `a * x = y * a`. -/
 @[to_additive /-- `x` is additive semiconjugate to `y` by `a` if `a + x = y + a` -/, expose]
-def SemiconjBy (a x y : M) : Prop :=
-  a * x = y * a
+def SemiconjBy (a x y : M) : Prop := a * x = y * a
 
 /-- Equality behind `SemiconjBy a x y`; useful for rewriting. -/
 @[to_additive /-- Equality behind `AddSemiconjBy a x y`; useful for rewriting. -/]
-protected theorem SemiconjBy.eq {a x y : M} (h : SemiconjBy a x y) : a * x = y * a :=
-  h
+protected theorem SemiconjBy.eq {a x y : M} (h : SemiconjBy a x y) : a * x = y * a := h
 
 /-- Two elements commute if `a * b = b * a`. -/
 @[to_additive /-- Two elements additively commute if `a + b = b + a` -/, expose]
-def Commute (a b : M) : Prop :=
-  SemiconjBy a b b
+def Commute (a b : M) : Prop := SemiconjBy a b b
 
 /-- Two elements `a` and `b` commute if `a * b = b * a`. -/
 @[to_additive /-- Two elements `a` and `b` additively commute if `a + b = b + a`. -/]
@@ -229,8 +221,7 @@ theorem commute_iff_eq (a b : M) : Commute a b ↔ a * b = b * a := Iff.rfl
 
 /-- Equality behind `Commute a b`; useful for rewriting. -/
 @[to_additive (attr := grind →) /-- Equality behind `AddCommute a b`; useful for rewriting. -/]
-protected theorem Commute.eq {a b : M} (h : Commute a b) : a * b = b * a :=
-  h
+protected theorem Commute.eq {a b : M} (h : Commute a b) : a * b = b * a := h
 
 end commute
 
@@ -281,28 +272,32 @@ lemma isRightRegular_iff_isRegular : IsRightRegular a ↔ IsRegular a := by
 /-- Any `CommMagma G` that satisfies `IsRightCancelMul G` also satisfies `IsLeftCancelMul G`. -/
 @[to_additive AddCommMagma.IsRightCancelAdd.toIsLeftCancelAdd /-- Any `AddCommMagma G` that
 satisfies `IsRightCancelAdd G` also satisfies `IsLeftCancelAdd G`. -/]
-lemma CommMagma.IsRightCancelMul.toIsLeftCancelMul (G : Type*) [CommMagma G] [IsRightCancelMul G] :
-    IsLeftCancelMul G :=
+lemma CommMagma.IsRightCancelMul.toIsLeftCancelMul (G : Type*) [CommMagma G] [IsRightCancelMul G]
+    : IsLeftCancelMul G :=
   ⟨fun _ _ _ h => mul_right_cancel <| (mul_comm _ _).trans (h.trans (mul_comm _ _))⟩
 
 /-- Any `CommMagma G` that satisfies `IsLeftCancelMul G` also satisfies `IsRightCancelMul G`. -/
 @[to_additive AddCommMagma.IsLeftCancelAdd.toIsRightCancelAdd /-- Any `AddCommMagma G` that
 satisfies `IsLeftCancelAdd G` also satisfies `IsRightCancelAdd G`. -/]
-lemma CommMagma.IsLeftCancelMul.toIsRightCancelMul (G : Type*) [CommMagma G] [IsLeftCancelMul G] :
-    IsRightCancelMul G :=
+lemma CommMagma.IsLeftCancelMul.toIsRightCancelMul (G : Type*) [CommMagma G] [IsLeftCancelMul G]
+    : IsRightCancelMul G :=
   ⟨fun _ _ _ h => mul_left_cancel <| (mul_comm _ _).trans (h.trans (mul_comm _ _))⟩
 
 /-- Any `CommMagma G` that satisfies `IsLeftCancelMul G` also satisfies `IsCancelMul G`. -/
 @[to_additive AddCommMagma.IsLeftCancelAdd.toIsCancelAdd /-- Any `AddCommMagma G` that satisfies
 `IsLeftCancelAdd G` also satisfies `IsCancelAdd G`. -/]
-lemma CommMagma.IsLeftCancelMul.toIsCancelMul (G : Type*) [CommMagma G] [IsLeftCancelMul G] :
-    IsCancelMul G := { CommMagma.IsLeftCancelMul.toIsRightCancelMul G with }
+lemma CommMagma.IsLeftCancelMul.toIsCancelMul (G : Type*) [CommMagma G] [IsLeftCancelMul G]
+    : IsCancelMul G := {
+  CommMagma.IsLeftCancelMul.toIsRightCancelMul G with
+}
 
 /-- Any `CommMagma G` that satisfies `IsRightCancelMul G` also satisfies `IsCancelMul G`. -/
 @[to_additive AddCommMagma.IsRightCancelAdd.toIsCancelAdd /-- Any `AddCommMagma G` that satisfies
 `IsRightCancelAdd G` also satisfies `IsCancelAdd G`. -/]
-lemma CommMagma.IsRightCancelMul.toIsCancelMul (G : Type*) [CommMagma G] [IsRightCancelMul G] :
-    IsCancelMul G := { CommMagma.IsRightCancelMul.toIsLeftCancelMul G with }
+lemma CommMagma.IsRightCancelMul.toIsCancelMul (G : Type*) [CommMagma G] [IsRightCancelMul G]
+    : IsCancelMul G := {
+  CommMagma.IsRightCancelMul.toIsLeftCancelMul G with
+}
 
 end CommMagma
 
@@ -318,8 +313,10 @@ Zulip discussion: https://leanprover.zulipchat.com/#narrow/stream/113488-general
 -/
 attribute [instance 75] LeftCancelSemigroup.toSemigroup -- See note [lower cancel priority]
 
-/-- An `AddLeftCancelSemigroup` is an additive semigroup such that
-`a + b = a + c` implies `b = c`. -/
+/--
+An `AddLeftCancelSemigroup` is an additive semigroup such that
+`a + b = a + c` implies `b = c`.
+-/
 @[ext]
 class AddLeftCancelSemigroup (G : Type*) extends AddSemigroup G, IsLeftCancelAdd G
 
@@ -339,8 +336,10 @@ class RightCancelSemigroup (G : Type*) extends Semigroup G, IsRightCancelMul G
 
 attribute [instance 75] RightCancelSemigroup.toSemigroup -- See note [lower cancel priority]
 
-/-- An `AddRightCancelSemigroup` is an additive semigroup such that
-`a + b = c + b` implies `a = c`. -/
+/--
+An `AddRightCancelSemigroup` is an additive semigroup such that
+`a + b = c + b` implies `a = c`.
+-/
 @[ext]
 class AddRightCancelSemigroup (G : Type*) extends AddSemigroup G, IsRightCancelAdd G
 

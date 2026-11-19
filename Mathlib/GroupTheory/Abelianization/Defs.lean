@@ -41,36 +41,31 @@ namespace Group
 /-- The abelianization of the group `G` is the quotient of `G` by its commutator subgroup. -/
 @[to_additive /-- The abelianization of the additive group `G` is the quotient of `G` by its
 commutator subgroup. -/]
-def Abelianization : Type u :=
-  G ⧸ commutator G
+def Abelianization : Type u := G ⧸ commutator G
 
 -- Instantiating the abelianization as a commutative group
 open scoped IsMulCommutative in
 @[to_additive]
-instance : CommGroup (Abelianization G) :=
-  inferInstanceAs (CommGroup (G ⧸ commutator G))
+instance : CommGroup (Abelianization G) := inferInstanceAs (CommGroup (G ⧸ commutator G))
 
 namespace Abelianization
 
 @[to_additive]
-instance : Inhabited (Abelianization G) :=
-  ⟨1⟩
+instance : Inhabited (Abelianization G) := ⟨1⟩
 
 variable {G}
 
 /-- `of` is the canonical projection from the group `G` to its abelianization. -/
 @[to_additive
-/-- `of` is the canonical projection from the additive group `G` to its abelianization. -/]
+  /-- `of` is the canonical projection from the additive group `G` to its abelianization. -/]
 def of : G →* Abelianization G := QuotientGroup.mk' (commutator G)
 
 @[to_additive (attr := simp)]
-theorem mk_eq_of (a : G) : Quot.mk _ a = of a :=
-  rfl
+theorem mk_eq_of (a : G) : Quot.mk _ a = of a := rfl
 
 variable (G) in
 @[to_additive (attr := simp)]
-theorem ker_of : of.ker = commutator G :=
-  QuotientGroup.ker_mk' (commutator G)
+theorem ker_of : of.ker = commutator G := QuotientGroup.ker_mk' (commutator G)
 
 variable (G) in
 @[to_additive]
@@ -90,10 +85,12 @@ theorem commutator_le_ker : commutator G ≤ f.ker := by
   rintro x ⟨p, q, rfl⟩
   simp [MonoidHom.mem_ker, mul_comm' (f p) (f q), commutatorElement_def]
 
-/-- If `f : G → A` is a group homomorphism to an abelian group, then `lift f` is the unique map
-from the abelianization of `G` to `A` that factors through `f`. -/
+/--
+If `f : G → A` is a group homomorphism to an abelian group, then `lift f` is the unique map
+from the abelianization of `G` to `A` that factors through `f`.
+-/
 @[to_additive
-/-- If `f : G → A` is an additive group homomorphism to an abelian group, then `lift f` is the
+  /-- If `f : G → A` is an additive group homomorphism to an abelian group, then `lift f` is the
 unique map from the abelianization of `G` to `A` that factors through `f`. -/]
 def lift : (G →* A) ≃ (Abelianization G →* A) where
   toFun f := QuotientGroup.lift _ f fun _ h => MonoidHom.mem_ker.2 <| commutator_le_ker _ h
@@ -101,8 +98,7 @@ def lift : (G →* A) ≃ (Abelianization G →* A) where
   right_inv _ := MonoidHom.ext fun x => QuotientGroup.induction_on x fun _ => rfl
 
 @[to_additive (attr := simp)]
-theorem lift_apply_of (x : G) : lift f (of x) = f x :=
-  rfl
+theorem lift_apply_of (x : G) : lift f (of x) = f x := rfl
 @[to_additive]
 theorem coe_lift_symm : (lift.symm : (Abelianization G →* A) → (G →* A)) = (·.comp of) := rfl
 
@@ -110,10 +106,12 @@ theorem coe_lift_symm : (lift.symm : (Abelianization G →* A) → (G →* A)) =
 theorem lift_symm_apply (f : Abelianization G →* A) : lift.symm f = f.comp of := rfl
 
 @[to_additive]
-theorem lift_unique (φ : Abelianization G →* A)
+theorem lift_unique
+    (φ : Abelianization G →* A)
     -- `hφ : φ` agrees with `f` on the image of `G` in `Gᵃᵇ`
     (hφ : ∀ x : G, φ (Abelianization.of x) = f x)
-    {x : Abelianization G} : φ x = lift f x :=
+    {x : Abelianization G}
+    : φ x = lift f x :=
   QuotientGroup.induction_on x hφ
 
 @[to_additive (attr := simp)]
@@ -135,22 +133,17 @@ variable {H : Type v} [Group H] (f : G →* H)
 
 /-- The map operation of the `Abelianization` functor. -/
 @[to_additive /-- The map operation of the `Abelianization` functor. -/]
-def map : Abelianization G →* Abelianization H :=
-  lift (of.comp f)
+def map : Abelianization G →* Abelianization H := lift (of.comp f)
 
 /-- Use `map` as the preferred simp normal form. -/
 @[to_additive (attr := simp) /-- Use `map` as the preferred simp normal form. -/]
-theorem lift_of_comp :
-    Abelianization.lift (Abelianization.of.comp f) = Abelianization.map f :=
-  rfl
+theorem lift_of_comp : Abelianization.lift (Abelianization.of.comp f) = Abelianization.map f := rfl
 
 @[to_additive (attr := simp)]
-theorem map_of (x : G) : map f (of x) = of (f x) :=
-  rfl
+theorem map_of (x : G) : map f (of x) = of (f x) := rfl
 
 @[to_additive (attr := simp)]
-theorem map_comp_of : (map f).comp of = of.comp f :=
-  rfl
+theorem map_comp_of : (map f).comp of = of.comp f := rfl
 
 @[to_additive]
 lemma ker_map (f : G →* H) : (map f).ker = ((commutator H).comap f).map of := by
@@ -162,22 +155,21 @@ lemma map_ker_le_ker_map (f : G →* H) : f.ker.map of ≤ (Abelianization.map f
   grw [ker_map, Subgroup.ker_le_comap]
 
 @[to_additive]
-lemma map_ker_eq_ker_map (f : G →* H) (hf : Function.Surjective f) :
-    f.ker.map of = (map f).ker := by
-  rw [ker_map, ← map_commutator_of_surjective hf, Subgroup.comap_map_eq, Subgroup.map_sup,
-    ← ker_of, Subgroup.map_ker_self, bot_sup_eq]
+lemma map_ker_eq_ker_map (f : G →* H) (hf : Function.Surjective f)
+    : f.ker.map of = (map f).ker := by
+  rw [ker_map, ← map_commutator_of_surjective hf, Subgroup.comap_map_eq, Subgroup.map_sup, ← ker_of,
+    Subgroup.map_ker_self, bot_sup_eq]
 
 @[to_additive (attr := simp)]
-theorem map_id : map (MonoidHom.id G) = MonoidHom.id (Abelianization G) :=
-  hom_ext _ _ rfl
+theorem map_id : map (MonoidHom.id G) = MonoidHom.id (Abelianization G) := hom_ext _ _ rfl
 
 @[to_additive (attr := simp)]
 theorem map_comp {I : Type w} [Group I] (g : H →* I) : (map g).comp (map f) = map (g.comp f) :=
   hom_ext _ _ rfl
 
 @[to_additive (attr := simp)]
-theorem map_map_apply {I : Type w} [Group I] {g : H →* I} {x : Abelianization G} :
-    map g (map f x) = map (g.comp f) x :=
+theorem map_map_apply {I : Type w} [Group I] {g : H →* I} {x : Abelianization G}
+    : map g (map f x) = map (g.comp f) x :=
   congr($(map_comp _ _) x)
 
 end Map
@@ -186,28 +178,29 @@ section Quotient
 
 variable (N : Subgroup G) [N.Normal]
 
-/-- Abelianizing a quotient `G ⧸ N` is the same as abelianizing `G`
-and then quotienting by the image of `N`. -/
+/--
+Abelianizing a quotient `G ⧸ N` is the same as abelianizing `G`
+and then quotienting by the image of `N`.
+-/
 @[to_additive
-/-- Abelianizing a quotient `G ⧸ N` is the same as abelianizing `G`
+  /-- Abelianizing a quotient `G ⧸ N` is the same as abelianizing `G`
 and then quotienting by the image of `N`. -/]
 def quotientMulEquiv : Abelianization (G ⧸ N) ≃* Abelianization G ⧸ N.map of :=
- MonoidHom.toMulEquiv
-    (lift <| QuotientGroup.lift N ((QuotientGroup.mk' _).comp of) <|
-      by simp [← MonoidHom.comap_ker, Subgroup.le_comap_map])
-    (QuotientGroup.lift _ (map (QuotientGroup.mk' N)) <|
-      by simpa using map_ker_le_ker_map (QuotientGroup.mk' N))
-    (by ext; simp)
-    (by ext; simp)
+  MonoidHom.toMulEquiv
+    (lift <| QuotientGroup.lift N ((QuotientGroup.mk' _).comp of) <| by
+      simp [← MonoidHom.comap_ker, Subgroup.le_comap_map])
+    (QuotientGroup.lift _ (map (QuotientGroup.mk' N)) <| by
+      simpa using map_ker_le_ker_map (QuotientGroup.mk' N))
+    (by ext; simp) (by ext; simp)
 
 @[to_additive (attr := simp)]
-theorem quotientMulEquiv_of_mk (x : G) :
-    quotientMulEquiv N (of (x : G ⧸ N)) = (of x : Abelianization G ⧸ N.map of) :=
+theorem quotientMulEquiv_of_mk (x : G)
+    : quotientMulEquiv N (of (x : G ⧸ N)) = (of x : Abelianization G ⧸ N.map of) :=
   rfl
 
 @[to_additive (attr := simp)]
-theorem quotientMulEquiv_symm_mk (x : Abelianization G) :
-    (quotientMulEquiv N).symm x = map (QuotientGroup.mk' N) x :=
+theorem quotientMulEquiv_symm_mk (x : Abelianization G)
+    : (quotientMulEquiv N).symm x = map (QuotientGroup.mk' N) x :=
   rfl
 
 end Quotient
@@ -232,85 +225,85 @@ def _root_.MulEquiv.abelianizationCongr (e : G ≃* H) : Abelianization G ≃* A
   map_mul' := map_mul _
 
 @[to_additive (attr := simp)]
-theorem abelianizationCongr_of (e : G ≃* H) (x : G) :
-    e.abelianizationCongr (Abelianization.of x) = Abelianization.of (e x) :=
+theorem abelianizationCongr_of (e : G ≃* H) (x : G)
+    : e.abelianizationCongr (Abelianization.of x) = Abelianization.of (e x) :=
   rfl
 
 @[to_additive (attr := simp)]
-theorem abelianizationCongr_refl :
-    (MulEquiv.refl G).abelianizationCongr = MulEquiv.refl (Abelianization G) :=
+theorem abelianizationCongr_refl
+    : (MulEquiv.refl G).abelianizationCongr = MulEquiv.refl (Abelianization G) :=
   MulEquiv.toMonoidHom_injective Abelianization.lift_of
 
 @[to_additive (attr := simp)]
-theorem abelianizationCongr_symm (e : G ≃* H) :
-    e.abelianizationCongr.symm = e.symm.abelianizationCongr :=
+theorem abelianizationCongr_symm (e : G ≃* H)
+    : e.abelianizationCongr.symm = e.symm.abelianizationCongr :=
   rfl
 
 @[to_additive (attr := simp)]
-theorem abelianizationCongr_trans {I : Type v} [Group I] (e : G ≃* H) (e₂ : H ≃* I) :
-    e.abelianizationCongr.trans e₂.abelianizationCongr = (e.trans e₂).abelianizationCongr :=
+theorem abelianizationCongr_trans {I : Type v} [Group I] (e : G ≃* H) (e₂ : H ≃* I)
+    : e.abelianizationCongr.trans e₂.abelianizationCongr = (e.trans e₂).abelianizationCongr :=
   MulEquiv.toMonoidHom_injective (Abelianization.hom_ext _ _ rfl)
 
 end AbelianizationCongr
 
 /-- An Abelian group is equivalent to its own abelianization. -/
 @[to_additive (attr := simps)
-/-- An additive Abelian group is equivalent to its own abelianization. -/]
-def Abelianization.equivOfComm {H : Type*} [CommGroup H] : H ≃* Abelianization H :=
-  { Abelianization.of with
-    toFun := Abelianization.of
-    invFun := Abelianization.lift (MonoidHom.id H)
-    right_inv := by
-      rintro ⟨a⟩
-      rfl }
+  /-- An additive Abelian group is equivalent to its own abelianization. -/]
+def Abelianization.equivOfComm {H : Type*} [CommGroup H] : H ≃* Abelianization H := {
+  Abelianization.of with
+  toFun := Abelianization.of
+  invFun := Abelianization.lift (MonoidHom.id H)
+  right_inv := by
+    rintro ⟨a⟩
+    rfl
+}
 
 @[to_additive]
-instance [Unique G] :
-  Unique (Abelianization G) := Quotient.instUniqueQuotient _
+instance [Unique G] : Unique (Abelianization G) := Quotient.instUniqueQuotient _
 
 end Group
 
 section AdditiveMultiplicativeEquiv
 
-/-- The abelianization of `Multiplicative A` is `Multiplicative` of the additive
-abelianization of `A`. -/
-def Group.Abelianization.abelianizationEquivMultiplicative (A : Type*) [AddGroup A] :
-    Group.Abelianization (Multiplicative A) ≃* Multiplicative (AddGroup.Abelianization A) :=
+/--
+The abelianization of `Multiplicative A` is `Multiplicative` of the additive
+abelianization of `A`.
+-/
+def Group.Abelianization.abelianizationEquivMultiplicative (A : Type*) [AddGroup A]
+    : Group.Abelianization (Multiplicative A) ≃* Multiplicative (AddGroup.Abelianization A) :=
   (lift AddGroup.Abelianization.of.toMultiplicative).toMulEquiv
-    (AddGroup.Abelianization.lift of.toAdditiveRight).toMultiplicativeLeft
-    (by ext; simp)
+    (AddGroup.Abelianization.lift of.toAdditiveRight).toMultiplicativeLeft (by ext; simp)
     (by ext; simp)
 
 /-- The additive abelianization of `Additive G` is `Additive` of the abelianization of `G` -/
-def AddGroup.Abelianization.abelianizationEquivAdditive (G : Type*) [Group G] :
-    AddGroup.Abelianization (Additive G) ≃+ Additive (Group.Abelianization G) :=
+def AddGroup.Abelianization.abelianizationEquivAdditive (G : Type*) [Group G]
+    : AddGroup.Abelianization (Additive G) ≃+ Additive (Group.Abelianization G) :=
   (lift Group.Abelianization.of.toAdditive).toAddEquiv
-    (Group.Abelianization.lift of.toMultiplicativeRight).toAdditiveLeft
-    (by ext; simp)
+    (Group.Abelianization.lift of.toMultiplicativeRight).toAdditiveLeft (by ext; simp)
     (by ext; simp)
 
 @[simp]
 theorem Group.Abelianization.abelianizationEquivMultiplicative_of
-    {A : Type*} [AddGroup A] (x : Multiplicative A) :
-    abelianizationEquivMultiplicative A (of x) = .ofAdd (.of x.toAdd) :=
+    {A : Type*} [AddGroup A] (x : Multiplicative A)
+    : abelianizationEquivMultiplicative A (of x) = .ofAdd (.of x.toAdd) :=
   rfl
 
 @[simp]
 theorem Group.Abelianization.abelianizationEquivMultiplicative_symm_ofAdd_of
-    {A : Type*} [AddGroup A] (a : A) :
-    (abelianizationEquivMultiplicative A).symm (.ofAdd (.of a)) = of (.ofAdd a) :=
+    {A : Type*} [AddGroup A] (a : A)
+    : (abelianizationEquivMultiplicative A).symm (.ofAdd (.of a)) = of (.ofAdd a) :=
   rfl
 
 @[simp]
 theorem AddGroup.Abelianization.abelianizationEquivAdditive_of
-    {G : Type*} [Group G] (a : Additive G) :
-    abelianizationEquivAdditive G (of a) = .ofMul (.of a.toMul) :=
+    {G : Type*} [Group G] (a : Additive G)
+    : abelianizationEquivAdditive G (of a) = .ofMul (.of a.toMul) :=
   rfl
 
 @[simp]
 theorem AddGroup.Abelianization.abelianizationEquivAdditive_symm_ofMul_of
-    {G : Type*} [Group G] (x : G) :
-    (abelianizationEquivAdditive G).symm (.ofMul (.of x)) = of (.ofMul x) :=
+    {G : Type*} [Group G] (x : G)
+    : (abelianizationEquivAdditive G).symm (.ofMul (.of x)) = of (.ofMul x) :=
   rfl
 
 end AdditiveMultiplicativeEquiv

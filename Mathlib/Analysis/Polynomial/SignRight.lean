@@ -48,13 +48,14 @@ namespace Polynomial
 
 variable {R : Type*} [CommRing R] [LinearOrder R]
 
-/-- The sign of `p` immediately to the right of `x`: the sign of the trailing coefficient of
-the Taylor polynomial of `p` centered at `x`. -/
-def signRight (x : R) (p : R[X]) : SignType :=
-  SignType.sign (taylor x p).trailingCoeff
+/--
+The sign of `p` immediately to the right of `x`: the sign of the trailing coefficient of
+the Taylor polynomial of `p` centered at `x`.
+-/
+def signRight (x : R) (p : R[X]) : SignType := SignType.sign (taylor x p).trailingCoeff
 
-@[simp] theorem signRight_zero (x : R) : signRight x (0 : R[X]) = 0 := by
-  simp [signRight]
+@[simp]
+theorem signRight_zero (x : R) : signRight x (0 : R[X]) = 0 := by simp [signRight]
 
 /-- `signRight x p` can only be `0` if `p` is `0`. -/
 @[simp]
@@ -71,38 +72,38 @@ theorem signRight_C (x c : R) : signRight x (C c) = sign c := by
   rw [signRight, trailingCoeff, taylor_C, natTrailingDegree_C, coeff_C_zero]
 
 /-- `signRight` commutes with negation. -/
-theorem signRight_neg [IsOrderedRing R] (x : R) (p : R[X]) : signRight x (-p) = -signRight x p := by
+theorem signRight_neg [IsOrderedRing R] (x : R) (p : R[X])
+    : signRight x (-p) = - signRight x p := by
   rw [signRight, signRight, map_neg, trailingCoeff_neg, Left.sign_neg]
 
-theorem signRight_X_sub_C_pow [IsOrderedRing R] [Nontrivial R] (a : R) (n : ℕ) :
-    signRight a ((X - C a) ^ n) = 1 := by
+theorem signRight_X_sub_C_pow [IsOrderedRing R] [Nontrivial R] (a : R) (n : ℕ)
+    : signRight a ((X - C a) ^ n) = 1 := by
   rw [signRight, taylor_pow, taylor_X_sub_C, trailingCoeff_X_pow, sign_one]
 
-theorem signRight_X_sub_C [IsOrderedRing R] [Nontrivial R] (a : R) :
-    signRight a (X - C a) = 1 := by
+theorem signRight_X_sub_C [IsOrderedRing R] [Nontrivial R] (a : R) : signRight a (X - C a) = 1 := by
   rw [← pow_one (X - C a), signRight_X_sub_C_pow]
 
 /-- `signRight` is a multiplicative function. -/
-theorem signRight_mul [IsStrictOrderedRing R] (x : R) (p q : R[X]) :
-    signRight x (p * q) = signRight x p * signRight x q := by
+theorem signRight_mul [IsStrictOrderedRing R] (x : R) (p q : R[X])
+    : signRight x (p * q) = signRight x p * signRight x q := by
   rw [signRight, signRight, signRight, taylor_mul, trailingCoeff_mul, sign_mul]
 
-theorem signRight_C_mul [IsStrictOrderedRing R] (x c : R) (p : R[X]) :
-    signRight x (C c * p) = sign c * signRight x p := by
+theorem signRight_C_mul [IsStrictOrderedRing R] (x c : R) (p : R[X])
+    : signRight x (C c * p) = sign c * signRight x p := by
   rw [signRight_mul, signRight_C]
 
-theorem signRight_mul_self [IsStrictOrderedRing R] {x : R} {p : R[X]} (hp : p ≠ 0) :
-    signRight x (p * p) = 1 := by
+theorem signRight_mul_self [IsStrictOrderedRing R] {x : R} {p : R[X]} (hp : p ≠ 0)
+    : signRight x (p * p) = 1 := by
   rw [signRight_mul, SignType.mul_self_eq_one_iff.mpr (fun h => hp (signRight_eq_zero_iff.mp h))]
 
 /-- Away from its roots, the sign of `p` to the right of `x` is the sign of `p x`. -/
-theorem signRight_of_eval_ne_zero {x : R} {p : R[X]} (h : eval x p ≠ 0) :
-    signRight x p = sign (eval x p) := by
+theorem signRight_of_eval_ne_zero {x : R} {p : R[X]} (h : eval x p ≠ 0)
+    : signRight x p = sign (eval x p) := by
   rw [signRight, trailingCoeff_eq_coeff_zero (by rwa [taylor_coeff_zero]), taylor_coeff_zero]
 
 /-- At a root of `p`, the sign of `p` to the right of `x` is that of `derivative p`. -/
-theorem signRight_of_eval_eq_zero [IsStrictOrderedRing R] {x : R} {p : R[X]} (h : p.eval x = 0) :
-    signRight x p = signRight x (derivative p) := by
+theorem signRight_of_eval_eq_zero [IsStrictOrderedRing R] {x : R} {p : R[X]} (h : p.eval x = 0)
+    : signRight x p = signRight x (derivative p) := by
   rcases eq_or_ne p 0 with rfl | hp
   · simp
   have ht : 0 < (taylor x p).natTrailingDegree := by
@@ -111,32 +112,38 @@ theorem signRight_of_eval_eq_zero [IsStrictOrderedRing R] {x : R} {p : R[X]} (h 
   rw [signRight, signRight, taylor_derivative, trailingCoeff_derivative ht.ne', sign_mul,
     sign_pos (Nat.cast_pos.mpr ht), mul_one]
 
-theorem signRight_derivative_mul [IsStrictOrderedRing R] {x : R} {p : R[X]} (hp : p ≠ 0)
-    (hev : eval x p = 0) : signRight x (derivative p * p) = 1 := by
+theorem signRight_derivative_mul
+    [IsStrictOrderedRing R] {x : R} {p : R[X]} (hp : p ≠ 0) (hev : eval x p = 0)
+    : signRight x (derivative p * p) = 1 := by
   rw [signRight_mul, ← signRight_of_eval_eq_zero hev, ← signRight_mul, signRight_mul_self hp]
 
 /-- Away from the roots, `signRight x` only depends on the value at `x`. -/
-theorem signRight_eq_of_eval_eq {x : R} {p q : R[X]} (h : p.eval x = q.eval x)
-    (hq : q.eval x ≠ 0) : signRight x p = signRight x q := by
+theorem signRight_eq_of_eval_eq {x : R} {p q : R[X]} (h : p.eval x = q.eval x) (hq : q.eval x ≠ 0)
+    : signRight x p = signRight x q := by
   rw [signRight_of_eval_ne_zero (h.trans_ne hq), signRight_of_eval_ne_zero hq, h]
 
-theorem signRight_add {x : R} {p q : R[X]} (hp : eval x p = 0) (hq : eval x q ≠ 0) :
-    signRight x (p + q) = signRight x q :=
+theorem signRight_add {x : R} {p q : R[X]} (hp : eval x p = 0) (hq : eval x q ≠ 0)
+    : signRight x (p + q) = signRight x q :=
   signRight_eq_of_eval_eq (by simp [hp]) hq
 
-theorem signRight_mod {K : Type*} [Field K] [LinearOrder K] {x : K} {p q : K[X]}
-    (hp : p.eval x = 0) (hq : q.eval x ≠ 0) : signRight x (q % p) = signRight x q :=
+theorem signRight_mod
+    {K : Type*} [Field K] [LinearOrder K]
+    {x : K} {p q : K[X]} (hp : p.eval x = 0) (hq : q.eval x ≠ 0)
+    : signRight x (q % p) = signRight x q :=
   signRight_eq_of_eval_eq (eval_mod_eq_self_of_root hp) hq
 
 section OrderedField
 
-variable {K : Type*} [Field K] [LinearOrder K] [IsStrictOrderedRing K] [TopologicalSpace K]
-  [OrderTopology K]
+variable
+  {K : Type*}
+  [Field K] [LinearOrder K] [IsStrictOrderedRing K] [TopologicalSpace K] [OrderTopology K]
 
-/-- The equation `sign (eval y p) = signRight x p` holds for all `y` in some interval
-`(x, x + ε)`. -/
-theorem eventually_sign_eq_signRight (x : K) (p : K[X]) :
-    ∀ᶠ y in 𝓝[>] x, sign (eval y p) = signRight x p := by
+/--
+The equation `sign (eval y p) = signRight x p` holds for all `y` in some interval
+`(x, x + ε)`.
+-/
+theorem eventually_sign_eq_signRight (x : K) (p : K[X])
+    : ∀ᶠ y in 𝓝[>] x, sign (eval y p) = signRight x p := by
   rcases eq_or_ne p 0 with rfl | hp
   · simp [signRight]
   -- write `p = (X - C x) ^ m * g` with `g` not vanishing at `x`
@@ -156,19 +163,22 @@ theorem eventually_sign_eq_signRight (x : K) (p : K[X]) :
     sign_pos (pow_pos (sub_pos.mpr hxy) m), one_mul]
 
 /-- Immediately to the right of `x`, a polynomial has a constant sign. -/
-theorem exists_eventually_sign_eq (x : K) (p : K[X]) :
-    ∃ s : SignType, ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s :=
+theorem exists_eventually_sign_eq (x : K) (p : K[X])
+    : ∃ s : SignType, ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s :=
   ⟨_, eventually_sign_eq_signRight x p⟩
 
-theorem signRight_eq_of_eventually {x : K} {p : K[X]} {s : SignType}
-    (h : ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s) : signRight x p = s := by
+theorem signRight_eq_of_eventually
+    {x : K} {p : K[X]} {s : SignType} (h : ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s)
+    : signRight x p = s := by
   obtain ⟨y, hy1, hy2⟩ := ((eventually_sign_eq_signRight x p).and h).exists
   rw [← hy1, hy2]
 
-/-- `signRight x p` is the unique sign `s` such that `sign (eval y p) = s` for all `y` in some
-interval `(x, x + ε)`. -/
-theorem signRight_eq_iff {x : K} {p : K[X]} {s : SignType} :
-    signRight x p = s ↔ ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s :=
+/--
+`signRight x p` is the unique sign `s` such that `sign (eval y p) = s` for all `y` in some
+interval `(x, x + ε)`.
+-/
+theorem signRight_eq_iff {x : K} {p : K[X]} {s : SignType}
+    : signRight x p = s ↔ ∀ᶠ y in 𝓝[>] x, sign (eval y p) = s :=
   ⟨fun h => h ▸ eventually_sign_eq_signRight x p, signRight_eq_of_eventually⟩
 
 end OrderedField

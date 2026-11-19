@@ -37,15 +37,15 @@ def Equiv.ofFreeAddCommGroupEquiv (e : FreeAddCommGroup α ≃+ FreeAddCommGroup
 @[to_additive existing]
 def Equiv.ofFreeCommGroupEquiv (e : FreeCommGroup α ≃* FreeCommGroup β) : α ≃ β :=
   .ofFreeAddCommGroupEquiv <| FreeAddCommGroup.freeAddCommGroupEquivAdditive.trans <|
-      (MulEquiv.toAdditive e).trans FreeAddCommGroup.freeAddCommGroupEquivAdditive.symm
+    (MulEquiv.toAdditive e).trans FreeAddCommGroup.freeAddCommGroupEquivAdditive.symm
 
 /-- Isomorphic free groups have equivalent bases. -/
 def Equiv.ofFreeGroupEquiv (e : FreeGroup α ≃* FreeGroup β) : α ≃ β :=
   .ofFreeCommGroupEquiv e.abelianizationCongr
 
 /-- Isomorphic free groups have equivalent bases (`IsFreeGroup` variant). -/
-def Equiv.ofIsFreeGroupEquiv [Group G] [Group H] [IsFreeGroup G] [IsFreeGroup H] (e : G ≃* H) :
-    Generators G ≃ Generators H :=
+def Equiv.ofIsFreeGroupEquiv [Group G] [Group H] [IsFreeGroup G] [IsFreeGroup H] (e : G ≃* H)
+    : Generators G ≃ Generators H :=
   .ofFreeGroupEquiv <| (toFreeGroup G).symm.trans <| e.trans <| toFreeGroup H
 
 @[deprecated (since := "2026-11-11")] alias FreeAbelianGroup.basis := FreeAddCommGroup.basis

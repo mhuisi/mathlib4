@@ -31,8 +31,8 @@ namespace Pairing
 
 variable (P : A.Pairing)
 
-instance (y : P.II) : Finite { x // P.AncestralRel x y } := by
-  let T := { x : P.II // P.AncestralRel x y }
+instance (y : P.II) : Finite {x // P.AncestralRel x y} := by
+  let T := {x : P.II // P.AncestralRel x y}
   let U := Σ (d : Fin (P.p y).val.dim), ⦋d⦌ ⟶ ⦋(P.p y).val.toN.toS.dim⦌
   let ψ : U → X.S := fun ⟨d, f⟩ ↦ S.mk (X.map f.op (P.p y).val.simplex)
   have h (t : T) : ∃ u, ψ u = t.val.val.toS := by
@@ -53,13 +53,12 @@ variable {y : P.II} (hy : Acc P.AncestralRel y)
 noncomputable def rank' : ℕ :=
   Acc.recOn hy (fun y _ r ↦ ⨆ (x : { x // P.AncestralRel x y }), r x x.property + 1)
 
-lemma rank'_eq :
-    P.rank' hy = ⨆ (x : { x // P.AncestralRel x y }), P.rank' (hy.inv x.property) + 1 := by
+lemma rank'_eq
+    : P.rank' hy = ⨆ (x : { x // P.AncestralRel x y }), P.rank' (hy.inv x.property) + 1 := by
   change P.rank' (Acc.intro y fun _ => hy.inv) = _
   rfl
 
-lemma rank'_lt {x : P.II} (r : P.AncestralRel x y) :
-    P.rank' (hy.inv r) < P.rank' hy := by
+lemma rank'_lt {x : P.II} (r : P.AncestralRel x y) : P.rank' (hy.inv r) < P.rank' hy := by
   rw [P.rank'_eq hy, ← Nat.add_one_le_iff]
   exact le_csSup (Finite.bddAbove_range _) ⟨⟨x, r⟩, rfl⟩
 
@@ -69,15 +68,14 @@ section IsRegular
 
 variable [P.IsRegular]
 
-/-- The rank function with values in `ℕ` relative to the well founded
-ancestrality relation of a regular pairing. -/
-noncomputable def rank (x : P.II) : ℕ :=
-  P.rank' (P.wf.apply x)
+/--
+The rank function with values in `ℕ` relative to the well founded
+ancestrality relation of a regular pairing.
+-/
+noncomputable def rank (x : P.II) : ℕ := P.rank' (P.wf.apply x)
 
 variable {P} in
-lemma rank_lt {x y : P.II} (h : P.AncestralRel x y) :
-    P.rank x < P.rank y :=
-  P.rank'_lt _ h
+lemma rank_lt {x y : P.II} (h : P.AncestralRel x y) : P.rank x < P.rank y := P.rank'_lt _ h
 
 /-- The canonical rank function with values in `ℕ` of a regular pairing. -/
 noncomputable def rankFunction : P.RankFunction ℕ where
@@ -90,12 +88,12 @@ instance : Nonempty (P.WeakRankFunction ℕ) := ⟨P.rankFunction.toWeakRankFunc
 
 end IsRegular
 
-lemma isRegular_iff_nonempty_rankFunction [P.IsProper] :
-    P.IsRegular ↔ Nonempty (P.RankFunction ℕ) :=
+lemma isRegular_iff_nonempty_rankFunction [P.IsProper]
+    : P.IsRegular ↔ Nonempty (P.RankFunction ℕ) :=
   ⟨fun _ ↦ inferInstance, fun ⟨h⟩ ↦ h.isRegular⟩
 
-lemma isRegular_iff_nonempty_weakRankFunction [P.IsProper] :
-    P.IsRegular ↔ Nonempty (P.WeakRankFunction ℕ) :=
+lemma isRegular_iff_nonempty_weakRankFunction [P.IsProper]
+    : P.IsRegular ↔ Nonempty (P.WeakRankFunction ℕ) :=
   ⟨fun _ ↦ inferInstance, fun ⟨h⟩ ↦ h.isRegular⟩
 
 end Pairing
@@ -104,13 +102,13 @@ namespace PairingCore
 
 variable (P : A.PairingCore)
 
-lemma isRegular_iff_nonempty_rankFunction [P.IsProper] :
-    P.IsRegular ↔ Nonempty (P.RankFunction ℕ) := by
+lemma isRegular_iff_nonempty_rankFunction [P.IsProper]
+    : P.IsRegular ↔ Nonempty (P.RankFunction ℕ) := by
   rw [← isRegular_pairing_iff, Pairing.isRegular_iff_nonempty_rankFunction]
   exact (P.rankFunctionEquiv ℕ).symm.nonempty_congr
 
-lemma isRegular_iff_nonempty_weakRankFunction [P.IsProper] :
-    P.IsRegular ↔ Nonempty (P.WeakRankFunction ℕ) := by
+lemma isRegular_iff_nonempty_weakRankFunction [P.IsProper]
+    : P.IsRegular ↔ Nonempty (P.WeakRankFunction ℕ) := by
   rw [← isRegular_pairing_iff, Pairing.isRegular_iff_nonempty_weakRankFunction]
   exact (P.weakRankFunctionEquiv ℕ).symm.nonempty_congr
 

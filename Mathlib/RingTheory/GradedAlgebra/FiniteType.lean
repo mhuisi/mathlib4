@@ -25,30 +25,30 @@ variable [Algebra.FiniteType (𝒜 0) S]
 
 namespace GradedAlgebra
 
-theorem exists_finset_adjoin_eq_top_and_homogeneous :
-    ∃ s : Finset S, Algebra.adjoin (A := S) (𝒜 0) s = ⊤ ∧
-      ∀ i ∈ s, SetLike.IsHomogeneousElem 𝒜 i := by
+theorem exists_finset_adjoin_eq_top_and_homogeneous
+    : ∃ s : Finset S,
+      Algebra.adjoin (A := S) (𝒜 0) s = ⊤ ∧ ∀ i ∈ s, SetLike.IsHomogeneousElem 𝒜 i := by
   classical
   obtain ⟨F, hF⟩ := Algebra.FiniteType.out (R := 𝒜 0) (A := S)
   let ι₀ := Σ (x : F), (DirectSum.decompose 𝒜 x.val).support
   let x (i : ι₀) : S := ((DirectSum.decompose 𝒜) i.1 i.2).val
-  refine ⟨Finset.univ.image x, ?_,
-    by simpa using fun f ↦ ⟨_, (DirectSum.decompose 𝒜 f.1 f.2).property⟩⟩
+  refine
+    ⟨Finset.univ.image x, ?_, by simpa using fun f ↦ ⟨_, (DirectSum.decompose 𝒜 f.1 f.2).property⟩⟩
   rw [← top_le_iff, ← hF, Algebra.adjoin_le_iff]
   intro s hs
   rw [← DirectSum.sum_support_decompose 𝒜 s]
   exact sum_mem fun n hn ↦ Algebra.subset_adjoin (by simpa using ⟨⟨⟨s, hs⟩, n, hn⟩, rfl⟩)
 
-theorem exists_finset_adjoin_eq_top_and_homogeneous_ne_zero :
-    ∃ s : Finset S, Algebra.adjoin (A := S) (𝒜 0) s = ⊤ ∧ ∀ i ∈ s, ∃ n ≠ 0, i ∈ 𝒜 n := by
+theorem exists_finset_adjoin_eq_top_and_homogeneous_ne_zero
+    : ∃ s : Finset S, Algebra.adjoin (A := S) (𝒜 0) s = ⊤ ∧ ∀ i ∈ s, ∃ n ≠ 0, i ∈ 𝒜 n := by
   obtain ⟨s, h₁, h₂⟩ := exists_finset_adjoin_eq_top_and_homogeneous 𝒜
   choose! n hn using h₂
   refine ⟨s.filter (n · ≠ 0), ?_, by simpa using fun i hi hin ↦ ⟨n i, hin, hn i hi⟩⟩
   rw [← top_le_iff, ← h₁, Algebra.adjoin_le_iff]
   rintro i hi
   by_cases hi0 : n i = 0
-  · exact Subalgebra.algebraMap_mem
-      (Algebra.adjoin (𝒜 0) (s.filter (n · ≠ 0) : Set S)) ⟨i, hi0 ▸ hn i hi⟩
+  · exact Subalgebra.algebraMap_mem (Algebra.adjoin (𝒜 0) (s.filter (n · ≠ 0) : Set S))
+      ⟨i, hi0 ▸ hn i hi⟩
   · exact Algebra.subset_adjoin (by simpa [hi0] using hi)
 
 end GradedAlgebra

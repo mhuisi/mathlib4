@@ -38,8 +38,7 @@ variable (M) in
 /-- An arbitrary embedding of an affine monoid `M` into `ℤ ^ dim M`. -/
 noncomputable def embedding : M →+ FreeAddCommGroup (Fin (dim M)) :=
   .comp (FreeAddCommGroup.equivFinsupp _).symm.toAddMonoidHom <|
-    .comp (Module.finBasis ℤ _).repr.toAddMonoidHom
-      (addMonoidOf ⊤).toAddMonoidHom
+    .comp (Module.finBasis ℤ _).repr.toAddMonoidHom (addMonoidOf ⊤).toAddMonoidHom
 
 lemma embedding_injective : Injective (embedding M) := by
   simpa [embedding] using! mk_left_injective 0

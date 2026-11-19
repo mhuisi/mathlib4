@@ -19,7 +19,6 @@ This file defines `CompleteLat`, the category of complete lattices.
 
 @[expose] public section
 
-
 universe u
 
 open CategoryTheory
@@ -43,16 +42,13 @@ open Lean.PrettyPrinter.Delaborator in
 @[app_delab CompleteLat.of]
 meta def delabOf : Delab := CategoryTheory.delabOf
 
-instance : CoeSort CompleteLat (Type _) :=
-  ⟨CompleteLat.carrier⟩
+instance : CoeSort CompleteLat (Type _) := ⟨CompleteLat.carrier⟩
 
 attribute [coe] CompleteLat.carrier
 
-theorem coe_of (α : Type*) [CompleteLattice α] : ↥(of α) = α :=
-  rfl
+theorem coe_of (α : Type*) [CompleteLattice α] : ↥(of α) = α := rfl
 
-instance : Inhabited CompleteLat :=
-  ⟨of PUnit⟩
+instance : Inhabited CompleteLat := ⟨of PUnit⟩
 
 instance : LargeCategory.{u} CompleteLat where
   Hom X Y := CompleteLatticeHom X Y
@@ -91,7 +87,6 @@ def dualEquiv : CompleteLat ≌ CompleteLat where
 
 end CompleteLat
 
-theorem completeLat_dual_comp_forget_to_bddLat :
-    CompleteLat.dual ⋙ forget₂ CompleteLat BddLat =
-    forget₂ CompleteLat BddLat ⋙ BddLat.dual :=
+theorem completeLat_dual_comp_forget_to_bddLat
+    : CompleteLat.dual ⋙ forget₂ CompleteLat BddLat = forget₂ CompleteLat BddLat ⋙ BddLat.dual :=
   rfl

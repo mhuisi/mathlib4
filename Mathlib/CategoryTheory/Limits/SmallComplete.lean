@@ -29,7 +29,6 @@ small complete, preorder, Freyd
 
 public section
 
-
 namespace CategoryTheory
 
 open Category Limits
@@ -40,7 +39,8 @@ universe u
 
 variable {C : Type u} [SmallCategory C] [HasProducts.{u} C]
 
-/-- A small category with products is a thin category.
+/--
+A small category with products is a thin category.
 
 in Lean, a preorder category is one where the morphisms are in Prop, which is weaker than the usual
 notion of a preorder/thin category which says that each homset is subsingleton; we show the latter

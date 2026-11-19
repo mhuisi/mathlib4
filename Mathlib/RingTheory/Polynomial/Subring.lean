@@ -35,8 +35,10 @@ namespace Polynomial
 
 variable {R : Type*} [Ring R] (p : R[X]) (T : Subring R)
 
-/-- Given a polynomial `p` and a subring `T` that contains the coefficients of `p`,
-return the corresponding polynomial whose coefficients are in `T`. -/
+/--
+Given a polynomial `p` and a subring `T` that contains the coefficients of `p`,
+return the corresponding polynomial whose coefficients are in `T`.
+-/
 noncomputable def toSubring (hp : (↑p.coeffs : Set R) ⊆ T) : T[X] :=
   ∑ i ∈ p.support,
     monomial i
@@ -49,16 +51,15 @@ variable (hp : (↑p.coeffs : Set R) ⊆ T)
 @[simp]
 theorem coeff_toSubring {n : ℕ} : ↑(coeff (toSubring p T hp) n) = coeff p n := by
   classical
-  simp only [toSubring, coeff_monomial, Finsupp.single_apply, finsetSum_coeff,
-    mem_support_iff, Finset.sum_ite_eq', Ne, ite_not]
+  simp only [toSubring, coeff_monomial, Finsupp.single_apply, finsetSum_coeff, mem_support_iff,
+    Finset.sum_ite_eq', Ne, ite_not]
   split_ifs with h
   · rw [h]
     rfl
   · rfl
 
 @[deprecated coeff_toSubring (since := "2026-11-16")]
-theorem coeff_toSubring' {n : ℕ} : (coeff (toSubring p T hp) n).val = coeff p n := by
-  simp
+theorem coeff_toSubring' {n : ℕ} : (coeff (toSubring p T hp) n).val = coeff p n := by simp
 
 @[simp]
 theorem support_toSubring : support (toSubring p T hp) = support p := by
@@ -84,10 +85,10 @@ theorem toSubring_zero : toSubring (0 : R[X]) T (by simp [coeffs]) = 0 := by
   simp
 
 @[simp]
-theorem toSubring_one :
-    toSubring (1 : R[X]) T
-        (Set.Subset.trans coeffs_one <| Finset.singleton_subset_set_iff.2 T.one_mem) =
-      1 := by
+theorem toSubring_one
+    : toSubring (1 : R[X]) T
+        (Set.Subset.trans coeffs_one <| Finset.singleton_subset_set_iff.2 T.one_mem)
+      = 1 := by
   ext i
   rw [coeff_toSubring, coeff_one, coeff_one, apply_ite Subtype.val, ZeroMemClass.coe_zero,
     OneMemClass.coe_one]
@@ -99,22 +100,22 @@ theorem map_toSubring : (p.toSubring T hp).map (Subring.subtype T) = p := by
 
 variable (T : Subring R)
 
-/-- Given a polynomial whose coefficients are in some subring, return
-the corresponding polynomial whose coefficients are in the ambient ring. -/
-noncomputable def ofSubring (p : T[X]) : R[X] :=
-  ∑ i ∈ p.support, monomial i (p.coeff i : R)
+/--
+Given a polynomial whose coefficients are in some subring, return
+the corresponding polynomial whose coefficients are in the ambient ring.
+-/
+noncomputable def ofSubring (p : T[X]) : R[X] := ∑ i ∈ p.support, monomial i (p.coeff i : R)
 
 theorem coeff_ofSubring (p : T[X]) (n : ℕ) : coeff (ofSubring T p) n = (coeff p n : T) := by
-  simp only [ofSubring, coeff_monomial, Finsupp.single_apply, finsetSum_coeff,
-    mem_support_iff, Finset.sum_ite_eq', Ne, Classical.not_not, ite_eq_left_iff]
+  simp only [ofSubring, coeff_monomial, Finsupp.single_apply, finsetSum_coeff, mem_support_iff,
+    Finset.sum_ite_eq', Ne, Classical.not_not, ite_eq_left_iff]
   intro h
   rw [h, ZeroMemClass.coe_zero]
 
 @[simp]
 theorem coeffs_ofSubring {p : T[X]} : (↑(p.ofSubring T).coeffs : Set R) ⊆ T := by
   intro i hi
-  simp only [coeffs, Set.mem_image, mem_support_iff, Ne, Finset.mem_coe,
-    (Finset.coe_image)] at hi
+  simp only [coeffs, Set.mem_image, mem_support_iff, Ne, Finset.mem_coe, (Finset.coe_image)] at hi
   rcases hi with ⟨n, _, h'n⟩
   rw [← h'n, coeff_ofSubring]
   exact Subtype.mem (coeff p n : T)

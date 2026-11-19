@@ -34,8 +34,11 @@ variable {R : Type*} [CommRing R]
 namespace Submodule
 
 /-- A lattice that spans `V` over `A`. -/
-class IsFullLattice (A : Type*) [CommRing A] [Algebra R A] {V : Type*} [AddCommGroup V]
-    [Module R V] [Module A V] [IsScalarTower R A V] (M : Submodule R V) extends IsLattice A M where
+class IsFullLattice
+    (A : Type*) [CommRing A] [Algebra R A]
+    {V : Type*} [AddCommGroup V] [Module R V] [Module A V] [IsScalarTower R A V]
+    (M : Submodule R V)
+    extends IsLattice A M where
   span_eq_top : span A (M : Set V) = ⊤
 
 namespace IsFullLattice
@@ -46,27 +49,29 @@ variable (A : Type*) [CommRing A] [Algebra R A]
 variable {V : Type*} [AddCommGroup V] [Module R V] [Module A V] [IsScalarTower R A V]
 
 /-- Any basis of a full `R`-lattice in `V` defines a `A`-basis of `V`. -/
-noncomputable def _root_.Module.Basis.extendOfIsFullLattice {M : Submodule R V}
-    [IsFullLattice A M] {ι : Type*} (b : Basis ι R M) : Basis ι A V :=
+noncomputable def _root_.Module.Basis.extendOfIsFullLattice
+    {M : Submodule R V} [IsFullLattice A M] {ι : Type*} (b : Basis ι R M)
+    : Basis ι A V :=
   haveI hsp : ⊤ ≤ span A (Set.range fun i ↦ (b i : V)) := by
     rw [← Submodule.span_span_of_tower R, Set.range_comp', ← M.coe_subtype, ← Submodule.map_span]
     simp [span_eq_top]
   Basis.mk (IsLattice.basis_linearIndependent A M b) hsp
 
 @[simp]
-lemma _root_.Module.Basis.extendOfIsFullLattice_apply {M : Submodule R V} [IsFullLattice A M]
-    {ι : Type*} (b : Basis ι R M) (k : ι) : b.extendOfIsFullLattice A k = (b k).val := by
+lemma _root_.Module.Basis.extendOfIsFullLattice_apply
+    {M : Submodule R V} [IsFullLattice A M] {ι : Type*} (b : Basis ι R M) (k : ι)
+    : b.extendOfIsFullLattice A k = (b k).val := by
   simp [Basis.extendOfIsFullLattice]
 
 /-- A lattice containing a full lattice is itself full. -/
-theorem of_le {M N : Submodule R V} (hle : M ≤ N) [IsFullLattice A M] [IsLattice A N] :
-    IsFullLattice A N where
+theorem of_le {M N : Submodule R V} (hle : M ≤ N) [IsFullLattice A M] [IsLattice A N]
+    : IsFullLattice A N where
   span_eq_top := by grw [eq_top_iff, ← span_mono hle, span_eq_top]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The action of `Aˣ` on `R`-submodules of `V` preserves `IsFullLattice`. -/
-instance smul (M : Submodule R V) [IsFullLattice A M] (a : Aˣ) :
-    IsFullLattice A (a • M : Submodule R V) where
+instance smul (M : Submodule R V) [IsFullLattice A M] (a : Aˣ)
+    : IsFullLattice A (a • M : Submodule R V) where
   span_eq_top := by rw [Submodule.coe_pointwise_smul, span_smul, span_eq_top, smul_top]
 
 end CommRing
@@ -85,17 +90,21 @@ theorem rank_eq [IsFullLattice K M] : Module.rank R M = Module.rank K V := by
 theorem finrank_eq [IsFullLattice K M] : finrank R M = finrank K V :=
   congr(Cardinal.toNat $(rank_eq K M))
 
-/-- A lattice whose `R`-finrank is at least the `K`-finrank of a finite-dimensional ambient module
-is full. -/
-theorem of_finrank_le [Module.Finite K V] [IsLattice K M]
-    (hr : Module.finrank K V ≤ Module.finrank R M) : IsFullLattice K M where
-  span_eq_top := eq_of_le_of_finrank_le le_top <| by
-    rwa [finrank_top, IsLattice.finrank_span_eq_finrank]
+/--
+A lattice whose `R`-finrank is at least the `K`-finrank of a finite-dimensional ambient module
+is full.
+-/
+theorem of_finrank_le
+    [Module.Finite K V] [IsLattice K M] (hr : Module.finrank K V ≤ Module.finrank R M)
+    : IsFullLattice K M where
+  span_eq_top :=
+    eq_of_le_of_finrank_le le_top <| by rwa [finrank_top, IsLattice.finrank_span_eq_finrank]
 
-/-- A lattice whose `R`-rank is at least the `K`-rank of a finite-dimensional ambient module
-is full. -/
-theorem of_rank_le [IsLattice K M] (hr : Module.rank K V ≤ Module.rank R M) :
-    IsFullLattice K M :=
+/--
+A lattice whose `R`-rank is at least the `K`-rank of a finite-dimensional ambient module
+is full.
+-/
+theorem of_rank_le [IsLattice K M] (hr : Module.rank K V ≤ Module.rank R M) : IsFullLattice K M :=
   have : Nontrivial R := (algebraMap R K).domain_nontrivial
   have : Module.Finite R M := IsLattice.finite K M
   have hM : Module.rank R M < Cardinal.aleph0 := Module.rank_lt_aleph0 R M
@@ -108,21 +117,26 @@ variable (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
 variable {V : Type*} [AddCommGroup V] [Module R V] [Module K V] [IsScalarTower R K V]
 
 /-- If `K` is the field of fractions of `R`, the supremum of two full lattices is a full lattice. -/
-instance sup (M N : Submodule R V) [IsFullLattice K M] [IsFullLattice K N] :
-    IsFullLattice K (M ⊔ N) :=
+instance sup (M N : Submodule R V) [IsFullLattice K M] [IsFullLattice K N]
+    : IsFullLattice K (M ⊔ N) :=
   of_le K le_sup_left
 
-/-- If `K` is the field of fractions of `R`, any finitely generated `R`-submodule of `V`
-containing a full lattice is a full lattice. -/
-theorem of_le_of_fg {M N : Submodule R V} (hle : M ≤ N) [IsFullLattice K M] (hfg : N.FG) :
-    IsFullLattice K N :=
+/--
+If `K` is the field of fractions of `R`, any finitely generated `R`-submodule of `V`
+containing a full lattice is a full lattice.
+-/
+theorem of_le_of_fg {M N : Submodule R V} (hle : M ≤ N) [IsFullLattice K M] (hfg : N.FG)
+    : IsFullLattice K N :=
   have := IsLattice.of_fg K hfg
   of_le K hle
 
-/-- If `K` is the field of fractions of `R`, the intersection of two full lattices is a full
-lattice. -/
-instance inf [IsDomain R] [IsNoetherianRing R] (M N : Submodule R V)
-    [IsFullLattice K M] [IsFullLattice K N] : IsFullLattice K (M ⊓ N) := by
+/--
+If `K` is the field of fractions of `R`, the intersection of two full lattices is a full
+lattice.
+-/
+instance inf
+    [IsDomain R] [IsNoetherianRing R] (M N : Submodule R V) [IsFullLattice K M] [IsFullLattice K N]
+    : IsFullLattice K (M ⊓ N) := by
   apply of_rank_le
   have := IsLattice.finite K M
   have h := Submodule.rank_sup_add_rank_inf_eq M N
@@ -147,16 +161,20 @@ alias IsLattice.of_rank_le := IsFullLattice.of_rank_le
 alias IsLattice.rank' := IsFullLattice.rank_eq
 
 @[deprecated "Use `IsFullLattice.rank` and `rank_fun'`." (since := "2026-10-27")]
-theorem IsLattice.rank_of_pi (K : Type*) [Field K] [Algebra R K] [FaithfulSMul R K] {ι : Type*}
-    [Fintype ι] (M : Submodule R (ι → K)) [IsFullLattice K M] :
-    Module.rank R M = Fintype.card ι := by
+theorem IsLattice.rank_of_pi
+    (K : Type*) [Field K] [Algebra R K] [FaithfulSMul R K]
+    {ι : Type*} [Fintype ι]
+    (M : Submodule R (ι → K)) [IsFullLattice K M]
+    : Module.rank R M = Fintype.card ι := by
   rw [IsFullLattice.rank_eq K M, rank_fun']
 
 @[deprecated "Use `IsFullLattice.finrank` and `Module.finrank_fintype_fun_eq_card`."
   (since := "2026-10-27")]
-theorem IsLattice.finrank_of_pi (K : Type*) [Field K] [Algebra R K] [FaithfulSMul R K]
-    {ι : Type*} [Fintype ι] (M : Submodule R (ι → K)) [IsFullLattice K M] :
-    finrank R M = Fintype.card ι := by
+theorem IsLattice.finrank_of_pi
+    (K : Type*) [Field K] [Algebra R K] [FaithfulSMul R K]
+    {ι : Type*} [Fintype ι]
+    (M : Submodule R (ι → K)) [IsFullLattice K M]
+    : finrank R M = Fintype.card ι := by
   rw [IsFullLattice.finrank_eq K M, finrank_fintype_fun_eq_card]
 
 @[deprecated (since := "2026-10-27")]

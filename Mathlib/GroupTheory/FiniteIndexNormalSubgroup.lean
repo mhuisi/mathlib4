@@ -39,9 +39,9 @@ namespace FiniteIndexNormalSubgroup
 variable {G : Type*} [Group G]
 
 @[to_additive]
-theorem toSubgroup_injective : Function.Injective
-    (fun H ↦ H.toSubgroup : FiniteIndexNormalSubgroup G → Subgroup G) :=
-  fun A B h ↦ by
+theorem toSubgroup_injective
+    : Function.Injective
+      (fun H ↦ H.toSubgroup : FiniteIndexNormalSubgroup G → Subgroup G) := fun A B h ↦ by
   ext
   dsimp at h
   rw [h]
@@ -82,8 +82,8 @@ instance instInfFiniteIndexNormalSubgroup : Min (FiniteIndexNormalSubgroup G) :=
   }⟩
 
 @[to_additive]
-instance instSemilatticeInfFiniteIndexNormalSubgroup :
-    SemilatticeInf (FiniteIndexNormalSubgroup G) :=
+instance instSemilatticeInfFiniteIndexNormalSubgroup
+    : SemilatticeInf (FiniteIndexNormalSubgroup G) :=
   SetLike.coe_injective.semilatticeInf _ .rfl .rfl fun _ _ ↦ rfl
 
 @[to_additive]
@@ -91,13 +91,13 @@ instance : Max (FiniteIndexNormalSubgroup G) :=
   ⟨fun U V ↦ {
     toSubgroup := U.toSubgroup ⊔ V.toSubgroup
     isNormal' := Subgroup.sup_normal U.toSubgroup V.toSubgroup
-    isFiniteIndex' := Subgroup.finiteIndex_of_le
-      (H := U.toSubgroup) (K := U.toSubgroup ⊔ V.toSubgroup) le_sup_left
+    isFiniteIndex' :=
+      Subgroup.finiteIndex_of_le (H := U.toSubgroup) (K := U.toSubgroup ⊔ V.toSubgroup) le_sup_left
   }⟩
 
 @[to_additive]
-instance instSemilatticeSupFiniteIndexNormalSubgroup :
-    SemilatticeSup (FiniteIndexNormalSubgroup G) :=
+instance instSemilatticeSupFiniteIndexNormalSubgroup
+    : SemilatticeSup (FiniteIndexNormalSubgroup G) :=
   toSubgroup_injective.semilatticeSup _ .rfl .rfl fun _ _ ↦ rfl
 
 @[to_additive]
@@ -110,12 +110,13 @@ theorem mem_toSubgroup_iff {H : FiniteIndexNormalSubgroup G} {g : G} : g ∈ H.t
 /-- Bundle a subgroup with typeclass assumptions of normality and finite index. -/
 @[to_additive
   /-- Bundle an additive subgroup with typeclass assumptions of normality and finite index. -/]
-def ofSubgroup (H : Subgroup G) [H.Normal] [H.FiniteIndex] : FiniteIndexNormalSubgroup G :=
-  { toSubgroup := H }
+def ofSubgroup (H : Subgroup G) [H.Normal] [H.FiniteIndex] : FiniteIndexNormalSubgroup G := {
+  toSubgroup := H
+}
 
 @[to_additive (attr := simp)]
-theorem toSubgroup_ofSubgroup (H : Subgroup G) [H.Normal] [H.FiniteIndex] :
-    ((ofSubgroup H : FiniteIndexNormalSubgroup G) : Subgroup G) = H :=
+theorem toSubgroup_ofSubgroup (H : Subgroup G) [H.Normal] [H.FiniteIndex]
+    : ((ofSubgroup H : FiniteIndexNormalSubgroup G) : Subgroup G) = H :=
   rfl
 
 section Comap
@@ -134,22 +135,21 @@ def comap (f : G →* H) (K : FiniteIndexNormalSubgroup H) : FiniteIndexNormalSu
     simpa [hker] using (inferInstance : g.ker.FiniteIndex)
 
 @[to_additive (attr := simp)]
-theorem toSubgroup_comap (f : G →* H) (K : FiniteIndexNormalSubgroup H) :
-    ((comap f K : FiniteIndexNormalSubgroup G) : Subgroup G) = (K : Subgroup H).comap f :=
+theorem toSubgroup_comap (f : G →* H) (K : FiniteIndexNormalSubgroup H)
+    : ((comap f K : FiniteIndexNormalSubgroup G) : Subgroup G) = (K : Subgroup H).comap f :=
   rfl
 
 @[to_additive (attr := gcongr)]
-theorem comap_mono (f : G →* H) {K L : FiniteIndexNormalSubgroup H} (h : K ≤ L) :
-    comap f K ≤ comap f L :=
-  fun _ hx ↦ h hx
+theorem comap_mono (f : G →* H) {K L : FiniteIndexNormalSubgroup H} (h : K ≤ L)
+    : comap f K ≤ comap f L := fun _ hx ↦
+  h hx
 
 @[to_additive (attr := simp)]
-theorem comap_id (K : FiniteIndexNormalSubgroup G) : comap (MonoidHom.id G) K = K := by
-  rfl
+theorem comap_id (K : FiniteIndexNormalSubgroup G) : comap (MonoidHom.id G) K = K := by rfl
 
 @[to_additive (attr := simp)]
-theorem comap_comp (f : G →* H) (g : H →* N) (K : FiniteIndexNormalSubgroup N) :
-    comap (g.comp f) K = comap f (comap g K) := by
+theorem comap_comp (f : G →* H) (g : H →* N) (K : FiniteIndexNormalSubgroup N)
+    : comap (g.comp f) K = comap f (comap g K) := by
   rfl
 
 end Comap

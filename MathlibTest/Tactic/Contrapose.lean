@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jireh Loreaux
 -/
 module
+
 import Mathlib.Tactic.Basic
 import Mathlib.Tactic.Contrapose
 
@@ -75,9 +76,10 @@ example (p q : Prop) (h : ¬p) (hpq : q → p) : ¬q := by
 
 end
 
-example (p q r : Prop) (h : ¬ q ∧ ¬ r → ¬ p) : p → q ∨ r := by
+example (p q r : Prop) (h : ¬q ∧ ¬r → ¬p) : p → q ∨ r := by
   fail_if_success (contrapose; exact h)
-  contrapose!; exact h
+  contrapose!
+  exact h
 
 /--
 error: Tactic `contrapose` failed: the goal `p` is not of the form `_ → _` or `_ ↔ _`
@@ -111,8 +113,7 @@ q : p → Prop
 ⊢ ∀ (h : p), q h
 -/
 #guard_msgs in
-example (p : Prop) (q : p → Prop) : (h : p) → q h := by
-  contrapose
+example (p : Prop) (q : p → Prop) : (h : p) → q h := by contrapose
 
 /-! test contraposing `↔` -/
 
@@ -151,8 +152,7 @@ h : p ↔ q
 ⊢ ¬p ↔ ¬q
 -/
 #guard_msgs in
-example (p q : Prop) (h : p ↔ q) : ¬p ↔ ¬q := by
-  contrapose
+example (p q : Prop) (h : p ↔ q) : ¬p ↔ ¬q := by contrapose
 
 /-! Test that we unfold reducible, but not semireducible definitions -/
 
@@ -175,7 +175,8 @@ example (p q : Prop) (h : ¬q → ¬p) : MyImp p q := by
 example (p q : Prop) (h : q → ¬p) : p → MyNot q := by
   fail_if_success (contrapose; exact h)
   unfold MyNot
-  contrapose; exact h
+  contrapose
+  exact h
 
 example (p q r : Prop) (h' : ¬p ∨ ¬q) (h : p ∧ q) : r := by
   fail_if_success contrapose! +fdsewfjdsk h

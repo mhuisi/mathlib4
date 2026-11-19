@@ -36,31 +36,37 @@ independent of the theory of quadratic fields.
 
 namespace Int
 
-/-- `D` is a fundamental discriminant: it is a discriminant (`D ≡ 0, 1 mod 4`) and primitive,
-i.e. `D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`, and no odd prime square divides `D`. -/
+/--
+`D` is a fundamental discriminant: it is a discriminant (`D ≡ 0, 1 mod 4`) and primitive,
+i.e. `D / 4 ≢ 0, 1 mod 4` when `4 ∣ D`, and no odd prime square divides `D`.
+-/
 def IsFundamentalDiscr (D : ℤ) : Prop :=
-  (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧
-    ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D
+  (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1)
+    ∧ ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D
 
 variable {D : ℤ}
 
-theorem isFundamentalDiscr_def :
-    IsFundamentalDiscr D ↔
-      (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1) ∧
-        ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D := Iff.rfl
+theorem isFundamentalDiscr_def
+    : IsFundamentalDiscr D
+      ↔ (D % 4 = 0 ∨ D % 4 = 1) ∧ (∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1)
+        ∧ ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D :=
+  Iff.rfl
 
 theorem IsFundamentalDiscr.ne_zero (h : IsFundamentalDiscr D) : D ≠ 0 := by
   grind [isFundamentalDiscr_def]
 
-theorem IsFundamentalDiscr.emod_four_eq_zero_or_one (h : IsFundamentalDiscr D) :
-    D % 4 = 0 ∨ D % 4 = 1 := h.1
+theorem IsFundamentalDiscr.emod_four_eq_zero_or_one (h : IsFundamentalDiscr D)
+    : D % 4 = 0 ∨ D % 4 = 1 :=
+  h.1
 
-/-- `D` is a fundamental discriminant if and only if either `D ≡ 1 mod 4` and `D` is squarefree,
-or `D = 4 * d` with `d` squarefree and `d ≡ 2, 3 mod 4`. -/
-theorem isFundamentalDiscr_iff_squarefree :
-    IsFundamentalDiscr D ↔
-      (D % 4 = 1 ∧ Squarefree D) ∨
-        (D % 4 = 0 ∧ Squarefree (D / 4) ∧ (D / 4 % 4 = 2 ∨ D / 4 % 4 = 3)) := by
+/--
+`D` is a fundamental discriminant if and only if either `D ≡ 1 mod 4` and `D` is squarefree,
+or `D = 4 * d` with `d` squarefree and `d ≡ 2, 3 mod 4`.
+-/
+theorem isFundamentalDiscr_iff_squarefree
+    : IsFundamentalDiscr D
+      ↔ (D % 4 = 1 ∧ Squarefree D)
+        ∨ (D % 4 = 0 ∧ Squarefree (D / 4) ∧ (D / 4 % 4 = 2 ∨ D / 4 % 4 = 3)) := by
   -- The two `have`s below are picked up from the context by the `grind` calls at the end.
   have {m} : Squarefree m ↔ ¬ 4 ∣ m ∧ ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ m := by
     rw [squarefree_iff_prime_sq_not_dvd, Nat.forall_prime_iff_two_and_odd]
@@ -73,24 +79,30 @@ theorem isFundamentalDiscr_iff_squarefree :
     grind [isFundamentalDiscr_def]
   · grind [isFundamentalDiscr_def]
 
-/-- Prime-by-prime characterisation of fundamental discriminants, uniform in `p`. Unlike the
-definition, which singles out `p = 2`, the second clause is the same for every prime. -/
-theorem isFundamentalDiscr_iff_forall_prime :
-    IsFundamentalDiscr D ↔ (D % 4 = 0 ∨ D % 4 = 1) ∧
-      ∀ p : ℕ, p.Prime → ¬ ∃ e : ℤ, D = (p : ℤ) ^ 2 * e ∧ (e % 4 = 0 ∨ e % 4 = 1) := by
+/--
+Prime-by-prime characterisation of fundamental discriminants, uniform in `p`. Unlike the
+definition, which singles out `p = 2`, the second clause is the same for every prime.
+-/
+theorem isFundamentalDiscr_iff_forall_prime
+    : IsFundamentalDiscr D
+      ↔ (D % 4 = 0 ∨ D % 4 = 1)
+        ∧ ∀ p : ℕ, p.Prime → ¬ ∃ e : ℤ, D = (p : ℤ) ^ 2 * e ∧ (e % 4 = 0 ∨ e % 4 = 1) := by
   rw [Nat.forall_prime_iff_two_and_odd, isFundamentalDiscr_def]
-  simp only [Int.dvd_iff_emod_eq_zero, not_exists, ne_eq, Nat.cast_ofNat, reducePow,
-    not_and, not_or, and_congr_right_iff]
+  simp only [Int.dvd_iff_emod_eq_zero, not_exists, ne_eq, Nat.cast_ofNat, reducePow, not_and,
+    not_or, and_congr_right_iff]
   refine fun h₁ _ ↦ forall_congr' fun p ↦ imp_congr_right fun _ ↦ imp_congr_right fun hp ↦ ?_
   rw [← Int.dvd_iff_emod_eq_zero, dvd_def, not_exists]
   refine forall_congr' fun x ↦ imp_congr_right fun hD ↦ (iff_false_left not_false).mpr ?_
   rw [hD, Int.mul_emod, Int.sq_emod_four, Int.odd_iff.mp hp.natCast, one_mul, Int.emod_emod] at h₁
   rwa [not_and_or, not_not, not_not]
 
-/-- If a fundamental discriminant is `m ^ 2` times an integer congruent to `0` or `1` modulo `4`,
-then `m = 1`. -/
-theorem IsFundamentalDiscr.eq_one_of_eq_sq_mul (h : IsFundamentalDiscr D) {m : ℕ} {e : ℤ}
-    (he : D = m ^ 2 * e) (he' : e % 4 = 0 ∨ e % 4 = 1) : m = 1 := by
+/--
+If a fundamental discriminant is `m ^ 2` times an integer congruent to `0` or `1` modulo `4`,
+then `m = 1`.
+-/
+theorem IsFundamentalDiscr.eq_one_of_eq_sq_mul
+    (h : IsFundamentalDiscr D) {m : ℕ} {e : ℤ} (he : D = m ^ 2 * e) (he' : e % 4 = 0 ∨ e % 4 = 1)
+    : m = 1 := by
   obtain ⟨k, hk⟩ := m.minFac_dvd
   by_contra! hm
   refine (isFundamentalDiscr_iff_forall_prime.mp h).2 _ (Nat.minFac_prime hm) ⟨k ^ 2 * e, ?_, ?_⟩
@@ -98,12 +110,12 @@ theorem IsFundamentalDiscr.eq_one_of_eq_sq_mul (h : IsFundamentalDiscr D) {m : �
   · rw [Int.mul_emod, Int.sq_emod_four]
     grind
 
-theorem isFundamentalDiscr_four_mul_add_one {m : ℤ} :
-    IsFundamentalDiscr (4 * m + 1) ↔ Squarefree (4 * m + 1) := by
+theorem isFundamentalDiscr_four_mul_add_one {m : ℤ}
+    : IsFundamentalDiscr (4 * m + 1) ↔ Squarefree (4 * m + 1) := by
   simp [isFundamentalDiscr_iff_squarefree]
 
-theorem isFundamentalDiscr_four_mul {m : ℤ} :
-    IsFundamentalDiscr (4 * m) ↔ Squarefree m ∧ (m % 4 = 2 ∨ m % 4 = 3) := by
+theorem isFundamentalDiscr_four_mul {m : ℤ}
+    : IsFundamentalDiscr (4 * m) ↔ Squarefree m ∧ (m % 4 = 2 ∨ m % 4 = 3) := by
   simp [isFundamentalDiscr_iff_squarefree]
 
 end Int

@@ -20,17 +20,18 @@ public section
 
 variable {R : Type*} [Zero R]
 
-theorem not_neZero {n : R} : ¬NeZero n ↔ n = 0 := by simp [neZero_iff]
+theorem not_neZero {n : R} : ¬ NeZero n ↔ n = 0 := by simp [neZero_iff]
 
-theorem eq_zero_or_neZero (a : R) : a = 0 ∨ NeZero a :=
-  (eq_or_ne a 0).imp_right NeZero.mk
+theorem eq_zero_or_neZero (a : R) : a = 0 ∨ NeZero a := (eq_or_ne a 0).imp_right NeZero.mk
 
 section
 variable {α : Type*} [Zero α]
 
-@[simp] lemma zero_ne_one [One α] [NeZero (1 : α)] : (0 : α) ≠ 1 := NeZero.ne' (1 : α)
+@[simp]
+lemma zero_ne_one [One α] [NeZero (1 : α)] : (0 : α) ≠ 1 := NeZero.ne' (1 : α)
 
-@[simp, basify_simp] lemma one_ne_zero [One α] [NeZero (1 : α)] : (1 : α) ≠ 0 := NeZero.ne (1 : α)
+@[simp, basify_simp]
+lemma one_ne_zero [One α] [NeZero (1 : α)] : (1 : α) ≠ 0 := NeZero.ne (1 : α)
 
 lemma ne_zero_of_eq_one [One α] [NeZero (1 : α)] {a : α} (h : a = 1) : a ≠ 0 := h ▸ one_ne_zero
 

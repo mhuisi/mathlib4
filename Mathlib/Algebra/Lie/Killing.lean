@@ -42,10 +42,12 @@ variable (R K L : Type*) [CommRing R] [Field K] [LieRing L] [LieAlgebra R L] [Li
 
 namespace LieAlgebra
 
-/-- We say a Lie algebra is Killing if its Killing form is non-singular.
+/--
+We say a Lie algebra is Killing if its Killing form is non-singular.
 
 NB: This is not standard terminology (the literature does not seem to name Lie algebras with this
-property). -/
+property).
+-/
 class IsKilling : Prop where
   /-- We say a Lie algebra is Killing if its Killing form is non-singular. -/
   killingCompl_top_eq_bot : LieIdeal.killingCompl R L ⊤ = ⊥
@@ -56,19 +58,19 @@ namespace IsKilling
 
 variable [IsKilling R L]
 
-@[simp] lemma ker_killingForm_eq_bot :
-    LinearMap.ker (killingForm R L) = ⊥ := by
+@[simp]
+lemma ker_killingForm_eq_bot : LinearMap.ker (killingForm R L) = ⊥ := by
   simp [← LieIdeal.coe_killingCompl_top, killingCompl_top_eq_bot]
 
-lemma killingForm_nondegenerate :
-    (killingForm R L).Nondegenerate := by
+lemma killingForm_nondegenerate : (killingForm R L).Nondegenerate := by
   refine (LieModule.traceForm_isSymm R L L).isRefl.nondegenerate_iff_separatingLeft.mpr ?_
   simp [LinearMap.separatingLeft_iff_ker_eq_bot]
 
 variable {R L} in
 lemma ideal_eq_bot_of_isLieAbelian
     [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R]
-    (I : LieIdeal R L) [IsLieAbelian I] : I = ⊥ := by
+    (I : LieIdeal R L) [IsLieAbelian I]
+    : I = ⊥ := by
   rw [eq_bot_iff, ← killingCompl_top_eq_bot]
   exact I.le_killingCompl_top_of_isLieAbelian
 
@@ -80,20 +82,22 @@ instance instSemisimple [IsKilling K L] [Module.Finite K L] : IsSemisimple K L :
   · intro I h₁ h₂
     exact h₁.1 <| IsKilling.ideal_eq_bot_of_isLieAbelian I
 
-/-- The converse of this is true in characteristic zero; it is
+/--
+The converse of this is true in characteristic zero; it is
 `LieAlgebra.HasTrivialRadical.instIsKilling`. There are counterexamples
 over fields with positive characteristic.
 
 Note that when the coefficients are a field this instance is redundant since we have
-`LieAlgebra.IsKilling.instSemisimple` and `LieAlgebra.IsSemisimple.instHasTrivialRadical`. -/
+`LieAlgebra.IsKilling.instSemisimple` and `LieAlgebra.IsSemisimple.instHasTrivialRadical`.
+-/
 instance instHasTrivialRadical
-    [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R] :
-    HasTrivialRadical R L :=
+    [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R]
+    : HasTrivialRadical R L :=
   (hasTrivialRadical_iff_no_abelian_ideals R L).mpr IsKilling.ideal_eq_bot_of_isLieAbelian
 
 theorem isLieAbelian_iff_subsingleton
-    [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R] :
-    IsLieAbelian L ↔ Subsingleton L := by
+    [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R]
+    : IsLieAbelian L ↔ Subsingleton L := by
   constructor
   · intro h
     rw [isLieAbelian_iff_center_eq_top R] at h
@@ -108,10 +112,13 @@ section LieEquiv
 variable {R L}
 variable {L' : Type*} [LieRing L'] [LieAlgebra R L']
 
-/-- Given an equivalence `e` of Lie algebras from `L` to `L'`, and elements `x y : L`, the
-respective Killing forms of `L` and `L'` satisfy `κ'(e x, e y) = κ(x, y)`. -/
-@[simp] lemma killingForm_of_equiv_apply (e : L ≃ₗ⁅R⁆ L') (x y : L) :
-    killingForm R L' (e x) (e y) = killingForm R L x y := by
+/--
+Given an equivalence `e` of Lie algebras from `L` to `L'`, and elements `x y : L`, the
+respective Killing forms of `L` and `L'` satisfy `κ'(e x, e y) = κ(x, y)`.
+-/
+@[simp]
+lemma killingForm_of_equiv_apply (e : L ≃ₗ⁅R⁆ L') (x y : L)
+    : killingForm R L' (e x) (e y) = killingForm R L x y := by
   simp_rw [killingForm_apply_apply, ← LieAlgebra.conj_ad_apply, ← LinearEquiv.conj_comp,
     LinearMap.trace_conj']
 
@@ -137,8 +144,8 @@ end LieAlgebra
 
 open LieAlgebra in
 variable {K L} in
-lemma LieIdeal.isCompl_killingCompl [IsKilling K L] [Module.Finite K L] (I : LieIdeal K L) :
-    IsCompl I I.killingCompl := by
+lemma LieIdeal.isCompl_killingCompl [IsKilling K L] [Module.Finite K L] (I : LieIdeal K L)
+    : IsCompl I I.killingCompl := by
   suffices Disjoint I I.killingCompl by
     rwa [← LieSubmodule.isCompl_toSubmodule, I.toSubmodule_killingCompl,
       LinearMap.BilinForm.isCompl_orthogonal_iff_disjoint (LieModule.traceForm_isSymm K L L).isRefl,

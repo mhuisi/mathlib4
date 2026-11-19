@@ -46,13 +46,14 @@ instance : AddCommGroup (L ⧸ s) := Submodule.Quotient.addCommGroup _
 instance : Module A (L ⧸ s) := Submodule.Quotient.module _
 
 variable (s) in
-/-- Map associating to an element in a Lie-Rinehart algebra `L`, an element in the quotient
-`L ⧸ s`, where `s` is a strict Lie-Rinehart ideal. -/
+/--
+Map associating to an element in a Lie-Rinehart algebra `L`, an element in the quotient
+`L ⧸ s`, where `s` is a strict Lie-Rinehart ideal.
+-/
 abbrev mkQ : L → L ⧸ s := Submodule.Quotient.mk
 
 @[simp]
-theorem mkQ_eq_zero {l : L} : mkQ s l = 0 ↔ l ∈ s :=
-  Submodule.Quotient.mk_eq_zero s.toSubmodule
+theorem mkQ_eq_zero {l : L} : mkQ s l = 0 ↔ l ∈ s := Submodule.Quotient.mk_eq_zero s.toSubmodule
 
 theorem mk''_eq_mkQ (l : L) : Quotient.mk'' l = mkQ s l := rfl
 
@@ -72,10 +73,13 @@ instance : LieRing (L ⧸ s) where
 theorem mkQ_bracket (x y : L) : mkQ s ⁅x, y⁆ = ⁅mkQ s x, mkQ s y⁆ := rfl
 
 instance : Bracket (L ⧸ s) A where
-  bracket x a := Quotient.liftOn' x (fun x' => ⁅x', a⁆) fun l l' h => by
-    rw [Submodule.quotientRel_def] at h
-    rw [← sub_eq_zero, ← sub_lie]
-    exact isotropic h a
+  bracket x a :=
+    Quotient.liftOn' x
+      (fun x' => ⁅x', a⁆)
+      fun l l' h => by
+        rw [Submodule.quotientRel_def] at h
+        rw [← sub_eq_zero, ← sub_lie]
+        exact isotropic h a
 
 theorem mkQ_bracket' (x : L) (a : A) : ⁅mkQ s x, a⁆ = ⁅x, a⁆ := rfl
 
@@ -91,8 +95,9 @@ instance [LieRinehartRing A L] : LieRinehartRing A (L ⧸ s) where
     rintro ⟨x⟩ ⟨y⟩ a
     exact congrArg (mkQ s) (LieRinehartRing.leibniz_smul_right x y a)
 
-variable {R : Type*} [CommRing R] [Algebra R A] [LieAlgebra R L] [LieRinehartRing A L]
-  [LieRinehartAlgebra R A L]
+variable
+  {R : Type*}
+  [CommRing R] [Algebra R A] [LieAlgebra R L] [LieRinehartRing A L] [LieRinehartAlgebra R A L]
 
 instance : Module R (L ⧸ s) := Submodule.Quotient.module' _
 

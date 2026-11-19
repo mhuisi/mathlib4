@@ -26,7 +26,8 @@ open Lean.Parser.Tactic
 
 namespace Inclusion
 
-/-- `dyadic_interval` proves real number equalities, inequalities and interval memberships by
+/--
+`dyadic_interval` proves real number equalities, inequalities and interval memberships by
 approximating as an interval of dyadic rational numbers.
 
 This tactic is implemented as a family for the `inclusion` tactic: `dyadic_interval` is the same as
@@ -42,23 +43,23 @@ This tactic is implemented as a family for the `inclusion` tactic: `dyadic_inter
 * `dyadic_interval (config := cfg)` uses `cfg` as a configuration for the `inclusion` tactic.
   (See there for further details.)
 -/
-syntax (name := dyadicInterval) "dyadic_interval" optConfig
-  (" [" inclusionArg,* "]")? : tactic
+syntax (name := dyadicInterval) "dyadic_interval" optConfig (" [" inclusionArg,* "]")? : tactic
 
 macro_rules
   | `(tactic| dyadic_interval $cfg:optConfig) =>
-      `(tactic| inclusion $cfg [core, interval_int, interval_dyadic_real])
+    `(tactic| inclusion $cfg [core, interval_int, interval_dyadic_real])
   | `(tactic| dyadic_interval $cfg:optConfig [$args,*]) =>
-      `(tactic| inclusion $cfg [core, interval_int, interval_dyadic_real, $args,*])
+    `(tactic| inclusion $cfg [core, interval_int, interval_dyadic_real, $args,*])
 
-/-- `dyadic_interval?` is a proof writing aid that quickly checks if `dyadic_interval` would close
-the goal, without doing the expensive kernel computation that actually closes the goal. -/
+/--
+`dyadic_interval?` is a proof writing aid that quickly checks if `dyadic_interval` would close
+the goal, without doing the expensive kernel computation that actually closes the goal.
+-/
 syntax (name := dyadicInterval?) "dyadic_interval?" (" [" inclusionArg,* "]")? : tactic
 
 macro_rules
-  | `(tactic| dyadic_interval?) =>
-      `(tactic| inclusion? [core, interval_int, interval_dyadic_real])
+  | `(tactic| dyadic_interval?) => `(tactic| inclusion? [core, interval_int, interval_dyadic_real])
   | `(tactic| dyadic_interval? [$args,*]) =>
-      `(tactic| inclusion? [core, interval_int, interval_dyadic_real, $args,*])
+    `(tactic| inclusion? [core, interval_int, interval_dyadic_real, $args,*])
 
 end Inclusion

@@ -41,8 +41,7 @@ instance : Unique Cardinal.{u}ˣ where
   uniq := by
     intro ⟨a, b, h, _⟩
     rw [← Units.val_eq_one]
-    apply ((mul_eq_one_iff_of_one_le _ _).1 h).1 <;>
-      grind [Cardinal.one_le_iff_ne_zero]
+    apply ((mul_eq_one_iff_of_one_le _ _).1 h).1 <;> grind [Cardinal.one_le_iff_ne_zero]
 
 @[deprecated (since := "2026-09-20")] alias isUnit_iff := isUnit_iff_eq_one
 
@@ -56,7 +55,7 @@ theorem prime_of_aleph0_le (ha : ℵ₀ ≤ a) : Prime a := by
   rw [mul_eq_max' (ha.trans (le_of_dvd hz hbc)), max_def] at hbc
   split_ifs at hbc <;> tauto
 
-theorem not_irreducible_of_aleph0_le (ha : ℵ₀ ≤ a) : ¬Irreducible a := by
+theorem not_irreducible_of_aleph0_le (ha : ℵ₀ ≤ a) : ¬ Irreducible a := by
   rw [irreducible_iff, not_and_or]
   refine .inr fun h => ?_
   simpa [mul_aleph0_eq ha, (one_lt_aleph0.trans_le ha).ne'] using @h a ℵ₀
@@ -101,8 +100,11 @@ theorem isPrimePow_iff {a : Cardinal} : IsPrimePow a ↔ ℵ₀ ≤ a ∨ ∃ n 
   simp only [h, false_or, isPrimePow_nat_iff]
   lift a to ℕ using not_le.mp h
   rw [isPrimePow_def]
-  refine ⟨?_, fun ⟨n, han, p, k, hp, hk, h⟩ =>
-    ⟨p, k, prime_natCast_iff.2 hp, hk, by rw [han]; exact mod_cast h⟩⟩
+  refine ⟨
+    ?_,
+    fun ⟨n, han, p, k, hp, hk, h⟩ =>
+      ⟨p, k, prime_natCast_iff.2 hp, hk, by rw [han]; exact mod_cast h⟩
+  ⟩
   rintro ⟨p, k, hp, hk, hpk⟩
   have key : p ^ (1 : Cardinal) ≤ ↑a := by
     rw [← hpk]; apply power_le_power_left hp.ne_zero; exact mod_cast hk

@@ -18,7 +18,6 @@ category `C` is.
 
 public section
 
-
 namespace CategoryTheory
 
 namespace Idempotents

@@ -36,15 +36,13 @@ variable {α β : Type*}
 namespace Nat
 
 /-- `Nat.cast : ℕ → α` as an `AddMonoidHom`. -/
-def castAddMonoidHom (α : Type*) [AddMonoidWithOne α] :
-    ℕ →+ α where
+def castAddMonoidHom (α : Type*) [AddMonoidWithOne α] : ℕ →+ α where
   toFun := Nat.cast
   map_add' := cast_add
   map_zero' := cast_zero
 
 @[simp]
-theorem coe_castAddMonoidHom [AddMonoidWithOne α] : (castAddMonoidHom α : ℕ → α) = Nat.cast :=
-  rfl
+theorem coe_castAddMonoidHom [AddMonoidWithOne α] : (castAddMonoidHom α : ℕ → α) = Nat.cast := rfl
 
 lemma _root_.Even.natCast [AddMonoidWithOne α] {n : ℕ} (hn : Even n) : Even (n : α) :=
   hn.map <| Nat.castAddMonoidHom α
@@ -52,16 +50,21 @@ lemma _root_.Even.natCast [AddMonoidWithOne α] {n : ℕ} (hn : Even n) : Even (
 section NonAssocSemiring
 variable [NonAssocSemiring α]
 
-@[simp, norm_cast] lemma cast_mul (m n : ℕ) : ((m * n : ℕ) : α) = m * n := by
-  induction n <;> simp [mul_add, *]
+@[simp, norm_cast]
+lemma cast_mul (m n : ℕ) : ((m * n : ℕ) : α) = m * n := by induction n <;> simp [mul_add, *]
 
 variable (α) in
 /-- `Nat.cast : ℕ → α` as a `RingHom` -/
 @[instance_reducible]
-def castRingHom : ℕ →+* α :=
-  { castAddMonoidHom α with toFun := Nat.cast, map_one' := cast_one, map_mul' := cast_mul }
+def castRingHom : ℕ →+* α := {
+  castAddMonoidHom α with
+  toFun := Nat.cast
+  map_one' := cast_one
+  map_mul' := cast_mul
+}
 
-@[simp, norm_cast] lemma coe_castRingHom : (castRingHom α : ℕ → α) = Nat.cast := rfl
+@[simp, norm_cast]
+lemma coe_castRingHom : (castRingHom α : ℕ → α) = Nat.cast := rfl
 
 lemma _root_.nsmul_eq_mul' (a : α) (n : ℕ) : n • a = a * n := by
   induction n with
@@ -98,13 +101,16 @@ theorem eq_natCast' [AddMonoidHomClass F ℕ A] (f : F) (h1 : f 1 = 1) : ∀ n :
   | 0 => by simp
   | n + 1 => by rw [map_add, h1, eq_natCast' f h1 n, Nat.cast_add_one]
 
-theorem map_natCast' {A} [AddMonoidWithOne A] [FunLike F A B] [AddMonoidHomClass F A B]
-    (f : F) (h : f 1 = 1) :
-    ∀ n : ℕ, f n = n :=
+theorem map_natCast'
+    {A} [AddMonoidWithOne A] [FunLike F A B] [AddMonoidHomClass F A B] (f : F) (h : f 1 = 1)
+    : ∀ n : ℕ, f n = n :=
   eq_natCast' ((f : A →+ B).comp <| Nat.castAddMonoidHom _) (by simpa)
 
-theorem map_ofNat' {A} [AddMonoidWithOne A] [FunLike F A B] [AddMonoidHomClass F A B]
-    (f : F) (h : f 1 = 1) (n : ℕ) [n.AtLeastTwo] : f (OfNat.ofNat n) = OfNat.ofNat n :=
+theorem map_ofNat'
+    {A} [AddMonoidWithOne A] [FunLike F A B] [AddMonoidHomClass F A B]
+    (f : F) (h : f 1 = 1)
+    (n : ℕ) [n.AtLeastTwo]
+    : f (OfNat.ofNat n) = OfNat.ofNat n :=
   map_natCast' f h n
 
 end AddMonoidHomClass
@@ -114,8 +120,8 @@ section MonoidWithZeroHomClass
 variable {A F : Type*} [MulZeroOneClass A] [FunLike F ℕ A]
 
 /-- If two `MonoidWithZeroHom`s agree on the positive naturals they are equal. -/
-theorem ext_nat'' [ZeroHomClass F ℕ A] (f g : F) (h_pos : ∀ {n : ℕ}, 0 < n → f n = g n) :
-    f = g := by
+theorem ext_nat'' [ZeroHomClass F ℕ A] (f g : F) (h_pos : ∀ {n : ℕ}, 0 < n → f n = g n)
+    : f = g := by
   apply DFunLike.ext
   rintro (_ | n)
   · simp
@@ -139,21 +145,25 @@ theorem eq_natCast [FunLike F ℕ R] [RingHomClass F ℕ R] (f : F) : ∀ n, f n
 theorem map_natCast [FunLike F R S] [RingHomClass F R S] (f : F) : ∀ n : ℕ, f (n : R) = n :=
   map_natCast' f <| map_one f
 
-/-- This lemma is not marked `@[simp]` lemma because its `#discr_tree_key` (for the LHS) would just
+/--
+This lemma is not marked `@[simp]` lemma because its `#discr_tree_key` (for the LHS) would just
 be `DFunLike.coe _ _`, due to the `ofNat` that https://github.com/leanprover/lean4/issues/2867
 forces us to include, and therefore it would negatively impact performance.
 
-If that issue is resolved, this can be marked `@[simp]`. -/
-theorem map_ofNat [FunLike F R S] [RingHomClass F R S] (f : F) (n : ℕ) [Nat.AtLeastTwo n] :
-    (f ofNat(n) : S) = OfNat.ofNat n :=
+If that issue is resolved, this can be marked `@[simp]`.
+-/
+theorem map_ofNat [FunLike F R S] [RingHomClass F R S] (f : F) (n : ℕ) [Nat.AtLeastTwo n]
+    : (f ofNat(n) : S) = OfNat.ofNat n :=
   map_natCast f n
 
-theorem ext_nat [FunLike F ℕ R] [RingHomClass F ℕ R] (f g : F) : f = g :=
-  ext_nat' f g <| by simp
+theorem ext_nat [FunLike F ℕ R] [RingHomClass F ℕ R] (f g : F) : f = g := ext_nat' f g <| by simp
 
-theorem NeZero.nat_of_neZero {R S} [NonAssocSemiring R] [NonAssocSemiring S]
-    {F} [FunLike F R S] [RingHomClass F R S] (f : F)
-    {n : ℕ} [hn : NeZero (n : S)] : NeZero (n : R) :=
+theorem NeZero.nat_of_neZero
+    {R S} [NonAssocSemiring R] [NonAssocSemiring S]
+    {F} [FunLike F R S] [RingHomClass F R S]
+    (f : F)
+    {n : ℕ} [hn : NeZero (n : S)]
+    : NeZero (n : R) :=
   .of_map (f := f) (neZero := by simp only [map_natCast, hn])
 
 end RingHomClass
@@ -167,15 +177,15 @@ theorem eq_natCast' {R} [NonAssocSemiring R] (f : ℕ →+* R) : f = Nat.castRin
 end RingHom
 
 @[simp, norm_cast]
-theorem Nat.cast_id (n : ℕ) : n.cast = n :=
-  rfl
+theorem Nat.cast_id (n : ℕ) : n.cast = n := rfl
 
 @[simp]
-theorem Nat.castRingHom_nat : Nat.castRingHom ℕ = RingHom.id ℕ :=
-  rfl
+theorem Nat.castRingHom_nat : Nat.castRingHom ℕ = RingHom.id ℕ := rfl
 
-/-- We don't use `RingHomClass` here, since that might cause type-class slowdown for
-`Subsingleton`. -/
+/--
+We don't use `RingHomClass` here, since that might cause type-class slowdown for
+`Subsingleton`.
+-/
 instance Nat.uniqueRingHom {R : Type*} [NonAssocSemiring R] : Unique (ℕ →+* R) where
   default := Nat.castRingHom R
   uniq := RingHom.eq_natCast'

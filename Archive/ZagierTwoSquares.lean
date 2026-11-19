@@ -32,8 +32,10 @@ namespace Zagier
 
 open Finset
 
-/-- A structure holding a triple of natural numbers `(x, y, z)` satisfying
-`x * x + 4 * y * z = 4 * k + 1`. -/
+/--
+A structure holding a triple of natural numbers `(x, y, z)` satisfying
+`x * x + 4 * y * z = 4 * k + 1`.
+-/
 @[ext]
 structure Triple (k : ℕ) where
   /-- First number -/
@@ -93,17 +95,39 @@ lemma y_mem_Icc_one_succ : T.y ∈ Icc 1 k := by
 lemma z_mem_Icc_one_succ : T.z ∈ Icc 1 k := T.swap.y_mem_Icc_one_succ
 
 instance : Fintype (Triple k) :=
-  .ofSurjective (fun (t : {t : Icc 1 (k + 1) × Icc 1 k × Icc 1 k //
-    t.1.val * t.1.val + 4 * t.2.1 * t.2.2 = 4 * k + 1}) ↦ ⟨_, _, _, t.property⟩) <| fun T ↦ by
-    use ⟨(⟨_, T.x_mem_Icc_one_succ⟩, ⟨_, T.y_mem_Icc_one_succ⟩, ⟨_, T.z_mem_Icc_one_succ⟩), T.eqn⟩
+  .ofSurjective (fun (t
+        : {t : Icc 1 (k + 1) × Icc 1 k × Icc 1 k
+          // t.1.val * t.1.val + 4 * t.2.1 * t.2.2 = 4 * k + 1}) ↦
+      ⟨_, _, _, t.property⟩) <|
+    fun T ↦ by
+      use ⟨(⟨_, T.x_mem_Icc_one_succ⟩, ⟨_, T.y_mem_Icc_one_succ⟩, ⟨_, T.z_mem_Icc_one_succ⟩), T.eqn⟩
 
-/-- The complicated involution, defined piecewise according to how `x` compares with
-`y - z` and `2 * y`. -/
+/--
+The complicated involution, defined piecewise according to how `x` compares with
+`y - z` and `2 * y`.
+-/
 def piecewise : Triple k where
-  x := if T.x + T.z < T.y then T.x + 2 * T.z else
-    if 2 * T.y < T.x then T.x - 2 * T.y else 2 * T.y - T.x
-  y := if T.x + T.z < T.y then T.z else if 2 * T.y < T.x then T.x + T.z - T.y else T.y
-  z := if T.x + T.z < T.y then T.y - T.x - T.z else if 2 * T.y < T.x then T.y else T.x + T.z - T.y
+  x :=
+    if T.x + T.z < T.y then
+      T.x + 2 * T.z
+    else if 2 * T.y < T.x then
+      T.x - 2 * T.y
+    else
+      2 * T.y - T.x
+  y :=
+    if T.x + T.z < T.y then
+      T.z
+    else if 2 * T.y < T.x then
+      T.x + T.z - T.y
+    else
+      T.y
+  z :=
+    if T.x + T.z < T.y then
+      T.y - T.x - T.z
+    else if 2 * T.y < T.x then
+      T.y
+    else
+      T.x + T.z - T.y
   eqn := by
     rw [← T.eqn]
     split_ifs with less more
@@ -124,8 +148,10 @@ lemma eq_of_piecewise_eq_self (mT : T.piecewise = T) : T = ⟨1, 1, k, by lia⟩
 
 lemma card_fixedPoints_piecewise_eq_one : Fintype.card (@piecewise k).fixedPoints = 1 := by
   rw [Fintype.card_eq_one_iff]
-  exact ⟨⟨⟨1, 1, k, by lia⟩, (by grind [piecewise] : piecewise _ = _)⟩,
-    fun ⟨T, mT⟩ ↦ Subtype.ext (eq_of_piecewise_eq_self _ mT)⟩
+  exact ⟨
+    ⟨⟨1, 1, k, by lia⟩, (by grind [piecewise] : piecewise _ = _)⟩,
+    fun ⟨T, mT⟩ ↦ Subtype.ext (eq_of_piecewise_eq_self _ mT)
+  ⟩
 
 end Triple
 
@@ -133,10 +159,12 @@ end Zagier
 
 open Zagier.Triple
 
-/-- **Fermat's theorem on sums of two squares** (Wiedijk #20).
-Every prime congruent to 1 mod 4 is the sum of two squares, proved using Zagier's involutions. -/
-theorem Nat.Prime.sq_add_sq' {p : ℕ} [h : Fact p.Prime] (hp : p % 4 = 1) :
-    ∃ a b, a ^ 2 + b ^ 2 = p := by
+/--
+**Fermat's theorem on sums of two squares** (Wiedijk #20).
+Every prime congruent to 1 mod 4 is the sum of two squares, proved using Zagier's involutions.
+-/
+theorem Nat.Prime.sq_add_sq' {p : ℕ} [h : Fact p.Prime] (hp : p % 4 = 1)
+    : ∃ a b, a ^ 2 + b ^ 2 = p := by
   rw [← div_add_mod p 4, hp] at h ⊢
   set k := p / 4
   have s2 : swap (k := k)^[2 ^ 1] = id := funext involutive_swap

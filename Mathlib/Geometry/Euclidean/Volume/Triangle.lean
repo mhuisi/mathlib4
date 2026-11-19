@@ -41,22 +41,25 @@ theorem volume_eq_height_mul : t.volume = 2⁻¹ * t.height i₁ * dist (t.point
   simp [s.volume_eq 0, volume_eq_dist, faceOpposite_point_eq_point_succAbove]
 
 include h₁₂ h₁₃ h₂₃ in
-theorem volume_eq_mul_sin :
-    t.volume = 2⁻¹ * dist (t.points i₁) (t.points i₂) * dist (t.points i₂) (t.points i₃) *
-      Real.sin (∠ (t.points i₁) (t.points i₂) (t.points i₃)) := by
+theorem volume_eq_mul_sin
+    : t.volume
+      = 2⁻¹ * dist (t.points i₁) (t.points i₂) * dist (t.points i₂) (t.points i₃)
+        * Real.sin (∠ (t.points i₁) (t.points i₂) (t.points i₃)) := by
   rw [t.volume_eq_height_mul h₁₂ h₁₃ h₂₃, t.height_eq_sin_mul_dist h₁₂ h₁₃ h₂₃]
   ring
 
-/-- **Heron's formula** for possibly degenerate triangle. The area of a triangle with side lengths
+/--
+**Heron's formula** for possibly degenerate triangle. The area of a triangle with side lengths
 `a`, `b`, and `c` is `√(s * (s - a) * (s - b) * (s - c))` where `s = (a + b + c) / 2` is the
 semiperimeter. We show this by equating this formula to `2⁻¹ * a * c * sin γ`, where `γ` is the
-angle opposite the side `b`. -/
-theorem _root_.EuclideanGeometry.mul_sin_eq_sqrt_mul_sub_mul_sub_mul_sub (p₁ p₂ p₃ : P) :
-    letI a := dist p₁ p₂
-    letI b := dist p₁ p₃
-    letI c := dist p₂ p₃
-    letI s := (a + b + c) / 2
-    2⁻¹ * a * c * sin (∠ p₁ p₂ p₃) = √(s * (s - a) * (s - b) * (s - c)) := by
+angle opposite the side `b`.
+-/
+theorem _root_.EuclideanGeometry.mul_sin_eq_sqrt_mul_sub_mul_sub_mul_sub (p₁ p₂ p₃ : P)
+    : letI a := dist p₁ p₂
+      letI b := dist p₁ p₃
+      letI c := dist p₂ p₃
+      letI s := (a + b + c) / 2
+      2⁻¹ * a * c * sin (∠ p₁ p₂ p₃) = √(s * (s - a) * (s - b) * (s - c)) := by
   set a := dist p₁ p₂
   set b := dist p₁ p₃
   set c := dist p₂ p₃
@@ -70,24 +73,26 @@ theorem _root_.EuclideanGeometry.mul_sin_eq_sqrt_mul_sub_mul_sub_mul_sub (p₁ p
     a ^ 2 * c ^ 2 / 4 * sin_sq_add_cos_sq (∠ p₁ p₂ p₃)
 
 include h₁₂ h₁₃ h₂₃ in
-/-- **Heron's formula** for triangle. The area of a triangle with side lengths
+/--
+**Heron's formula** for triangle. The area of a triangle with side lengths
 `a`, `b`, and `c` is `√(s * (s - a) * (s - b) * (s - c))` where `s = (a + b + c) / 2` is the
-semiperimeter. -/
-theorem volume_eq_sqrt_mul_sub_mul_sub_mul_sub :
-    letI a := dist (t.points i₁) (t.points i₂)
-    letI b := dist (t.points i₁) (t.points i₃)
-    letI c := dist (t.points i₂) (t.points i₃)
-    letI s := (a + b + c) / 2
-    t.volume = √(s * (s - a) * (s - b) * (s - c)) := by
+semiperimeter.
+-/
+theorem volume_eq_sqrt_mul_sub_mul_sub_mul_sub
+    : letI a := dist (t.points i₁) (t.points i₂)
+      letI b := dist (t.points i₁) (t.points i₃)
+      letI c := dist (t.points i₂) (t.points i₃)
+      letI s := (a + b + c) / 2
+      t.volume = √(s * (s - a) * (s - b) * (s - c)) := by
   rw [t.volume_eq_mul_sin h₁₂ h₁₃ h₂₃, mul_sin_eq_sqrt_mul_sub_mul_sub_mul_sub]
 
 include h₁₂ h₁₃ h₂₃ in
-theorem volume_sq_eq_mul_sub_mul_sub_mul_sub :
-    letI a := dist (t.points i₁) (t.points i₂)
-    letI b := dist (t.points i₁) (t.points i₃)
-    letI c := dist (t.points i₂) (t.points i₃)
-    letI s := (a + b + c) / 2
-    t.volume ^ 2 = s * (s - a) * (s - b) * (s - c) := by
+theorem volume_sq_eq_mul_sub_mul_sub_mul_sub
+    : letI a := dist (t.points i₁) (t.points i₂)
+      letI b := dist (t.points i₁) (t.points i₃)
+      letI c := dist (t.points i₂) (t.points i₃)
+      letI s := (a + b + c) / 2
+      t.volume ^ 2 = s * (s - a) * (s - b) * (s - c) := by
   rw [t.volume_eq_sqrt_mul_sub_mul_sub_mul_sub h₁₂ h₁₃ h₂₃, sq_sqrt]
   by_contra! h
   have := sqrt_eq_zero_of_nonpos h.le

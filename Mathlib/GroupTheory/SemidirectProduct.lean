@@ -39,16 +39,18 @@ variable (N : Type*) (G : Type*) {H : Type*} [Group N] [Group G] [Group H]
 -- Don't generate sizeOf and injectivity lemmas, which the `simpNF` linter will complain about.
 set_option genSizeOfSpec false in
 set_option genInjectivity false in
-/-- The semidirect product of groups `N` and `G`, given a map `φ` from `G` to the automorphism
-  group of `N`. It is the product of sets with the group operation
-  `⟨n₁, g₁⟩ * ⟨n₂, g₂⟩ = ⟨n₁ * φ g₁ n₂, g₁ * g₂⟩` -/
+/--
+The semidirect product of groups `N` and `G`, given a map `φ` from `G` to the automorphism
+group of `N`. It is the product of sets with the group operation
+`⟨n₁, g₁⟩ * ⟨n₂, g₂⟩ = ⟨n₁ * φ g₁ n₂, g₁ * g₂⟩`
+-/
 @[ext]
 structure SemidirectProduct (φ : G →* MulAut N) where
   /-- The element of N -/
   left : N
   /-- The element of G -/
   right : G
-  deriving DecidableEq
+deriving DecidableEq
 
 attribute [pp_using_anonymous_constructor] SemidirectProduct
 
@@ -63,8 +65,9 @@ variable {φ : G →* MulAut N}
 instance : Mul (SemidirectProduct N G φ) where
   mul a b := ⟨a.left * φ a.right b.left, a.right * b.right⟩
 
-lemma mul_def (a b : SemidirectProduct N G φ) :
-    a * b = ⟨a.left * φ a.right b.left, a.right * b.right⟩ := rfl
+lemma mul_def (a b : SemidirectProduct N G φ)
+    : a * b = ⟨a.left * φ a.right b.left, a.right * b.right⟩ :=
+  rfl
 
 @[simp]
 theorem mul_left (a b : N ⋊[φ] G) : (a * b).left = a.left * φ a.right b.left := rfl
@@ -72,7 +75,8 @@ theorem mul_left (a b : N ⋊[φ] G) : (a * b).left = a.left * φ a.right b.left
 @[simp]
 theorem mul_right (a b : N ⋊[φ] G) : (a * b).right = a.right * b.right := rfl
 
-instance : One (SemidirectProduct N G φ) where one := ⟨1, 1⟩
+instance : One (SemidirectProduct N G φ) where
+  one := ⟨1, 1⟩
 
 @[simp]
 theorem one_left : (1 : N ⋊[φ] G).left = 1 := rfl
@@ -101,8 +105,7 @@ instance : Inhabited (N ⋊[φ] G) := ⟨1⟩
 def inl : N →* N ⋊[φ] G where
   toFun n := ⟨n, 1⟩
   map_one' := rfl
-  map_mul' := by intros; ext <;>
-    simp only [mul_left, map_one, MulAut.one_apply, mul_right, mul_one]
+  map_mul' := by intros; ext <;> simp only [mul_left, map_one, MulAut.one_apply, mul_right, mul_one]
 
 @[simp]
 theorem left_inl (n : N) : (inl n : N ⋊[φ] G).left = n := rfl
@@ -114,8 +117,7 @@ theorem inl_injective : Function.Injective (inl : N → N ⋊[φ] G) :=
   Function.injective_iff_hasLeftInverse.2 ⟨left, left_inl⟩
 
 @[simp]
-theorem inl_inj {n₁ n₂ : N} : (inl n₁ : N ⋊[φ] G) = inl n₂ ↔ n₁ = n₂ :=
-  inl_injective.eq_iff
+theorem inl_inj {n₁ n₂ : N} : (inl n₁ : N ⋊[φ] G) = inl n₂ ↔ n₁ = n₂ := inl_injective.eq_iff
 
 /-- The canonical map `G →* N ⋊[φ] G` sending `g` to `⟨1, g⟩` -/
 def inr : G →* N ⋊[φ] G where
@@ -133,8 +135,7 @@ theorem inr_injective : Function.Injective (inr : G → N ⋊[φ] G) :=
   Function.injective_iff_hasLeftInverse.2 ⟨right, right_inr⟩
 
 @[simp]
-theorem inr_inj {g₁ g₂ : G} : (inr g₁ : N ⋊[φ] G) = inr g₂ ↔ g₁ = g₂ :=
-  inr_injective.eq_iff
+theorem inr_inj {g₁ g₂ : G} : (inr g₁ : N ⋊[φ] G) = inr g₂ ↔ g₁ = g₂ := inr_injective.eq_iff
 
 theorem inl_aut (g : G) (n : N) : (inl (φ g n) : N ⋊[φ] G) = inr g * inl n * inr g⁻¹ := by
   ext <;> simp
@@ -174,7 +175,8 @@ theorem rightHom_surjective : Function.Surjective (rightHom : N ⋊[φ] G → G)
   Function.surjective_iff_hasRightInverse.2 ⟨inr, rightHom_inr⟩
 
 theorem range_inl_eq_ker_rightHom : (inl : N →* N ⋊[φ] G).range = rightHom.ker :=
-  le_antisymm (fun _ ↦ by simp +contextual [MonoidHom.mem_ker, eq_comm])
+  le_antisymm
+    (fun _ ↦ by simp +contextual [MonoidHom.mem_ker, eq_comm])
     fun x hx ↦ ⟨x.left, by ext <;> simp_all [MonoidHom.mem_ker]⟩
 
 /-- The bijection between the semidirect product and the product. -/
@@ -183,15 +185,17 @@ def equivProd : N ⋊[φ] G ≃ N × G where
   toFun x := ⟨x.left, x.right⟩
   invFun x := ⟨x.1, x.2⟩
 
-/-- The group isomorphism between a semidirect product with respect to the trivial map
-  and the product. -/
+/--
+The group isomorphism between a semidirect product with respect to the trivial map
+and the product.
+-/
 @[simps (rhsMd := .default)]
-def mulEquivProd : N ⋊[1] G ≃* N × G :=
-  { equivProd with map_mul' _ _ := rfl }
+def mulEquivProd : N ⋊[1] G ≃* N × G := { equivProd with map_mul' _ _ := rfl }
 
 section lift
 
-variable (fn : N →* H) (fg : G →* H)
+variable
+  (fn : N →* H) (fg : G →* H)
   (h : ∀ g, fn.comp (φ g).toMonoidHom = (MulAut.conj (fg g)).toMonoidHom.comp fn)
 
 /-- Define a group hom `N ⋊[φ] G →* H`, by defining maps `N →* H` and `G →* H` -/
@@ -215,42 +219,47 @@ theorem lift_inr (g : G) : lift fn fg h (inr g) = fg g := by simp [lift]
 @[simp]
 theorem lift_comp_inr : (lift fn fg h).comp inr = fg := by ext; simp
 
-theorem lift_unique (F : N ⋊[φ] G →* H) :
-    F = lift (F.comp inl) (F.comp inr) fun _ ↦ by ext; simp [inl_aut] := by
+theorem lift_unique (F : N ⋊[φ] G →* H)
+    : F = lift (F.comp inl) (F.comp inr) fun _ ↦ by ext; simp [inl_aut] := by
   rw [DFunLike.ext_iff]
   simp only [lift, MonoidHom.comp_apply, MonoidHom.coe_mk, OneHom.coe_mk, ← map_mul,
     inl_left_mul_inr_right, forall_const]
 
-/-- Two maps out of the semidirect product are equal if they're equal after composition
-  with both `inl` and `inr` -/
-theorem hom_ext {f g : N ⋊[φ] G →* H} (hl : f.comp inl = g.comp inl)
-    (hr : f.comp inr = g.comp inr) : f = g := by
+/--
+Two maps out of the semidirect product are equal if they're equal after composition
+with both `inl` and `inr`
+-/
+theorem hom_ext {f g : N ⋊[φ] G →* H} (hl : f.comp inl = g.comp inl) (hr : f.comp inr = g.comp inr)
+    : f = g := by
   rw [lift_unique f, lift_unique g]
   simp only [*]
 
 /-- The homomorphism from a semidirect product of subgroups to the ambient group. -/
 @[simps!]
-def monoidHomSubgroup {H K : Subgroup G} (h : K ≤ normalizer H) :
-    H ⋊[(H.normalizerMonoidHom).comp (inclusion h)] K →* G :=
+def monoidHomSubgroup {H K : Subgroup G} (h : K ≤ normalizer H)
+    : H ⋊[(H.normalizerMonoidHom).comp (inclusion h)] K →* G :=
   lift H.subtype K.subtype (by simp [DFunLike.ext_iff])
 
 /-- The isomorphism from a semidirect product of complementary subgroups to the ambient group. -/
 @[simps!]
-noncomputable def mulEquivSubgroup {H K : Subgroup G} [H.Normal] (h : H.IsComplement' K) :
-    H ⋊[(H.normalizerMonoidHom).comp (inclusion (H.normalizer_eq_top ▸ le_top))] K ≃* G :=
+noncomputable def mulEquivSubgroup {H K : Subgroup G} [H.Normal] (h : H.IsComplement' K)
+    : H ⋊[(H.normalizerMonoidHom).comp (inclusion (H.normalizer_eq_top ▸ le_top))] K ≃* G :=
   MulEquiv.ofBijective (monoidHomSubgroup _) ((equivProd.bijective_comp _).mpr h)
 
 end lift
 
 section Map
 
-variable {N₁ G₁ N₂ G₂ : Type*} [Group N₁] [Group G₁] [Group N₂] [Group G₂]
+variable
+  {N₁ G₁ N₂ G₂ : Type*} [Group N₁] [Group G₁] [Group N₂] [Group G₂]
   {φ₁ : G₁ →* MulAut N₁} {φ₂ : G₂ →* MulAut N₂}
   (fn : N₁ →* N₂) (fg : G₁ →* G₂)
   (h : ∀ g : G₁, fn.comp (φ₁ g).toMonoidHom = (φ₂ (fg g)).toMonoidHom.comp fn)
 
-/-- Define a map from `N₁ ⋊[φ₁] G₁` to `N₂ ⋊[φ₂] G₂` given maps `N₁ →* N₂` and `G₁ →* G₂` that
-  satisfy a commutativity condition `∀ n g, fn (φ₁ g n) = φ₂ (fg g) (fn n)`. -/
+/--
+Define a map from `N₁ ⋊[φ₁] G₁` to `N₂ ⋊[φ₂] G₂` given maps `N₁ →* N₂` and `G₁ →* G₂` that
+satisfy a commutativity condition `∀ n g, fn (φ₁ g n) = φ₂ (fg g) (fn n)`.
+-/
 def map : N₁ ⋊[φ₁] G₁ →* N₂ ⋊[φ₂] G₂ where
   toFun x := ⟨fn x.left, fg x.right⟩
   map_one' := by simp
@@ -283,13 +292,15 @@ end Map
 
 section Congr
 
-variable {N₁ G₁ N₂ G₂ : Type*} [Group N₁] [Group G₁] [Group N₂] [Group G₂]
+variable
+  {N₁ G₁ N₂ G₂ : Type*} [Group N₁] [Group G₁] [Group N₂] [Group G₂]
   {φ₁ : G₁ →* MulAut N₁} {φ₂ : G₂ →* MulAut N₂}
-  (fn : N₁ ≃* N₂) (fg : G₁ ≃* G₂)
-  (h : ∀ g : G₁, (φ₁ g).trans fn = fn.trans (φ₂ (fg g)))
+  (fn : N₁ ≃* N₂) (fg : G₁ ≃* G₂) (h : ∀ g : G₁, (φ₁ g).trans fn = fn.trans (φ₂ (fg g)))
 
-/-- Define an isomorphism from `N₁ ⋊[φ₁] G₁` to `N₂ ⋊[φ₂] G₂` given isomorphisms `N₁ ≃* N₂` and
-  `G₁ ≃* G₂` that satisfy a commutativity condition `∀ n g, fn (φ₁ g n) = φ₂ (fg g) (fn n)`. -/
+/--
+Define an isomorphism from `N₁ ⋊[φ₁] G₁` to `N₂ ⋊[φ₂] G₂` given isomorphisms `N₁ ≃* N₂` and
+`G₁ ≃* G₂` that satisfy a commutativity condition `∀ n g, fn (φ₁ g n) = φ₂ (fg g) (fn n)`.
+-/
 @[simps]
 def congr : N₁ ⋊[φ₁] G₁ ≃* N₂ ⋊[φ₂] G₂ where
   toFun x := ⟨fn x.left, fg x.right⟩
@@ -302,8 +313,7 @@ def congr : N₁ ⋊[φ₁] G₁ ≃* N₂ ⋊[φ₂] G₂ where
 
 /-- Define an isomorphism from `N₁ ⋊[φ₁] G₁` to `N₂ ⋊[φ₂] G₂` without specifying `φ₂`. -/
 @[simps!]
-def congr' :
-    N₁ ⋊[φ₁] G₁ ≃* N₂ ⋊[MonoidHom.comp (MulAut.congr fn) (φ₁.comp fg.symm)] G₂ :=
+def congr' : N₁ ⋊[φ₁] G₁ ≃* N₂ ⋊[MonoidHom.comp (MulAut.congr fn) (φ₁.comp fg.symm)] G₂ :=
   congr fn fg (fun _ ↦ by ext; simp)
 
 end Congr

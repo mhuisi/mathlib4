@@ -38,33 +38,31 @@ namespace CategoryTheory
 
 open Category Localization
 
-variable {C₁ D₁ C₂ D₂ : Type*}
-  [Category* C₁] [Category* C₂] [Category* D₁] [Category* D₂]
-  {W₁ : MorphismProperty C₁} {W₁' : MorphismProperty D₁}
-  {W₂ : MorphismProperty C₂} {W₂' : MorphismProperty D₂}
+variable
+  {C₁ D₁ C₂ D₂ : Type*} [Category* C₁] [Category* C₂] [Category* D₁] [Category* D₂]
+  {W₁ : MorphismProperty C₁} {W₁' : MorphismProperty D₁} {W₂ : MorphismProperty C₂}
+  {W₂' : MorphismProperty D₂}
 
 namespace LocalizerMorphism
 
-variable (Φ₁ : LocalizerMorphism W₁ W₁') (Φ₂ : LocalizerMorphism W₂ W₂')
-  [W₁.ContainsIdentities] [W₂.ContainsIdentities]
-  [W₁'.ContainsIdentities] [W₂'.ContainsIdentities]
+variable
+  (Φ₁ : LocalizerMorphism W₁ W₁') (Φ₂ : LocalizerMorphism W₂ W₂')
+  [W₁.ContainsIdentities] [W₂.ContainsIdentities] [W₁'.ContainsIdentities] [W₂'.ContainsIdentities]
 
-instance [Φ₁.IsRightDerivabilityStructure] [Φ₂.IsRightDerivabilityStructure] :
-    (Φ₁.prod Φ₂).IsRightDerivabilityStructure := by
+instance [Φ₁.IsRightDerivabilityStructure] [Φ₂.IsRightDerivabilityStructure]
+    : (Φ₁.prod Φ₂).IsRightDerivabilityStructure := by
   let e₁ := (Φ₁.catCommSq W₁.Q W₁'.Q).iso
   let e₂ := (Φ₂.catCommSq W₂.Q W₂'.Q).iso
   rw [(Φ₁.prod Φ₂).isRightDerivabilityStructure_iff (W₁.Q.prod W₂.Q) (W₁'.Q.prod W₂'.Q)
-    ((Φ₁.localizedFunctor W₁.Q W₁'.Q).prod (Φ₂.localizedFunctor W₂.Q W₂'.Q))
-    (NatIso.prod e₁ e₂)]
+    ((Φ₁.localizedFunctor W₁.Q W₁'.Q).prod (Φ₂.localizedFunctor W₂.Q W₂'.Q)) (NatIso.prod e₁ e₂)]
   exact inferInstanceAs <| TwoSquare.GuitartExact (TwoSquare.prod e₁.hom e₂.hom)
 
-instance [Φ₁.IsLeftDerivabilityStructure] [Φ₂.IsLeftDerivabilityStructure] :
-    (Φ₁.prod Φ₂).IsLeftDerivabilityStructure := by
+instance [Φ₁.IsLeftDerivabilityStructure] [Φ₂.IsLeftDerivabilityStructure]
+    : (Φ₁.prod Φ₂).IsLeftDerivabilityStructure := by
   let e₁ := (Φ₁.catCommSq W₁.Q W₁'.Q).iso
   let e₂ := (Φ₂.catCommSq W₂.Q W₂'.Q).iso
   rw [(Φ₁.prod Φ₂).isLeftDerivabilityStructure_iff (W₁.Q.prod W₂.Q) (W₁'.Q.prod W₂'.Q)
-    ((Φ₁.localizedFunctor W₁.Q W₁'.Q).prod (Φ₂.localizedFunctor W₂.Q W₂'.Q))
-    (NatIso.prod e₁ e₂)]
+    ((Φ₁.localizedFunctor W₁.Q W₁'.Q).prod (Φ₂.localizedFunctor W₂.Q W₂'.Q)) (NatIso.prod e₁ e₂)]
   exact inferInstanceAs <| TwoSquare.GuitartExact (TwoSquare.prod e₁.inv e₂.inv)
 
 end LocalizerMorphism

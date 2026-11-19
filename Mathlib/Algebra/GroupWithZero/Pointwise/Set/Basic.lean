@@ -60,7 +60,8 @@ lemma Nonempty.div_zero (hs : s.Nonempty) : s / 0 = 0 :=
 lemma Nonempty.zero_div (hs : s.Nonempty) : 0 / s = 0 :=
   s.zero_div_subset.antisymm <| by simpa [mem_div] using! hs
 
-@[simp] protected lemma inv_zero : (0 : Set α)⁻¹ = 0 := by ext; simp
+@[simp]
+protected lemma inv_zero : (0 : Set α)⁻¹ = 0 := by ext; simp
 
 end GroupWithZero
 end Set

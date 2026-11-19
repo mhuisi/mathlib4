@@ -29,7 +29,6 @@ the algebra and non-algebra parts).
 
 public section
 
-
 universe u v
 
 namespace Equiv
@@ -41,11 +40,13 @@ section Swap
 variable [DecidableEq α]
 
 @[simp]
-theorem swap_smul_self_smul [MulAction (Perm α) β] (i j : α) (x : β) :
-    swap i j • swap i j • x = x := by simp [smul_smul]
+theorem swap_smul_self_smul [MulAction (Perm α) β] (i j : α) (x : β)
+    : swap i j • swap i j • x = x := by
+  simp [smul_smul]
 
-theorem swap_smul_involutive [MulAction (Perm α) β] (i j : α) :
-    Function.Involutive (swap i j • · : β → β) := swap_smul_self_smul i j
+theorem swap_smul_involutive [MulAction (Perm α) β] (i j : α)
+    : Function.Involutive (swap i j • · : β → β) :=
+  swap_smul_self_smul i j
 
 end Swap
 end Equiv

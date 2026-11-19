@@ -128,8 +128,7 @@ example (p : Bool) : 0 = 0 := by
 
 -- `assumption'` is allowed, as it is useful precisely when there are multiple active goals.
 example (p : Bool) (f : False) {h : 0 = 0} : 0 = 0 ∧ 0 = 1 := by
-  cases p <;>
-  constructor
+  cases p <;> constructor
   assumption'
   all_goals cases f
 
@@ -142,14 +141,17 @@ example : True ∧ True := by
 -- `focus` is ignored.
 example : True ∧ True := by
   constructor
-  focus
-    exact .intro
-  focus
-    exact .intro
+  focus exact .intro
+  focus exact .intro
 
 -- parentheses are allowed
 example : True ∧ True ∧ True := by
-  refine ⟨?_, ?_, ?_⟩; (· simp); { simp }; simp
+  refine ⟨?_, ?_, ?_⟩
+  (· simp)
+  {
+    simp
+  }
+  simp
 
 example : 1 = 1 := by
   sleep_heartbeats 1000
@@ -180,7 +182,7 @@ example : True := by
 
 -- Test the linter applies within have statements
 /--
-  warning: The following tactic starts with 2 goals and ends with 1 goal, 1 of which is not operated on.
+warning: The following tactic starts with 2 goals and ends with 1 goal, 1 of which is not operated on.
   trivial
 Please focus on the current goal, for instance using `·` (typed as "\.").
 
@@ -239,7 +241,7 @@ example (hx : x = 0 ∨ x = 1) (hy : y = 0 ∨ y = 1) : x ≤ 1 := by
 
 -- Test the linter applies within have statements
 /--
-  warning: The following tactic starts with 2 goals and ends with 1 goal, 1 of which is not operated on.
+warning: The following tactic starts with 2 goals and ends with 1 goal, 1 of which is not operated on.
   trivial
 Please focus on the current goal, for instance using `·` (typed as "\.").
 

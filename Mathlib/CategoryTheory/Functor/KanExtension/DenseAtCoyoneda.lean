@@ -33,12 +33,13 @@ namespace Functor.Elements
 
 variable [LocallySmall.{w} C] (P : C ⥤ Type w)
 
-/-- The (colimit) cocone which expresses a functor `P : C ⥤ Type w` as
+/--
+The (colimit) cocone which expresses a functor `P : C ⥤ Type w` as
 as a colimit (indexed by `P.Elementsᵒᵖ`) of corepresentable presheaves
-(defined using `shrinkCoyoneda`). -/
+(defined using `shrinkCoyoneda`).
+-/
 @[implicit_reducible, simps]
-noncomputable def shrinkCoyonedaCocone :
-    Cocone ((π P).op ⋙ shrinkCoyoneda.{w}) where
+noncomputable def shrinkCoyonedaCocone : Cocone ((π P).op ⋙ shrinkCoyoneda.{w}) where
   pt := P
   ι.app x := shrinkCoyonedaEquiv.symm x.unop.val
   ι.naturality x y f := by
@@ -46,27 +47,30 @@ noncomputable def shrinkCoyonedaCocone :
     simp only [← f.unop.map_val, shrinkCoyonedaEquiv_symm_map.{w}, Category.comp_id]
 
 @[reassoc]
-lemma shrinkYoneda_map_app_shrinkCoyonedaCocone_ι_app_app
-    {X Y : C} (f : X ⟶ Y) (u : P.Elementsᵒᵖ) :
-    (shrinkYoneda.{w}.map f).app _ ≫ ((shrinkCoyonedaCocone P).ι.app u).app Y =
-    ((shrinkCoyonedaCocone P).ι.app u).app X ≫ P.map f := by
+lemma shrinkYoneda_map_app_shrinkCoyonedaCocone_ι_app_app {X Y : C} (f : X ⟶ Y) (u : P.Elementsᵒᵖ)
+    : (shrinkYoneda.{w}.map f).app _ ≫ ((shrinkCoyonedaCocone P).ι.app u).app Y
+      = ((shrinkCoyonedaCocone P).ι.app u).app X ≫ P.map f := by
   ext x
   obtain ⟨x, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective x
   simp [shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm.{w},
     shrinkCoyonedaEquiv_symm_app_shrinkYonedaObjObjEquiv_symm_comp.{w}]
 
-/-- For any functor `P : C ⥤ Type w`, the cocone `shrinkCoyonedaCocone P`
-becomes a colimit after applying the evaluation functor at any `X : C`. -/
+/--
+For any functor `P : C ⥤ Type w`, the cocone `shrinkCoyonedaCocone P`
+becomes a colimit after applying the evaluation functor at any `X : C`.
+-/
 @[no_expose]
-noncomputable def isColimitShrinkCoyonedaCoconeObj (X : C) :
-    IsColimit (((evaluation _ _).obj X).mapCocone (shrinkCoyonedaCocone.{w} P)) := by
+noncomputable def isColimitShrinkCoyonedaCoconeObj (X : C)
+    : IsColimit (((evaluation _ _).obj X).mapCocone (shrinkCoyonedaCocone.{w} P)) := by
   refine (IsColimit.equivOfNatIsoOfIso ?_ _ _ ?_).toFun
     (IsColimit.whiskerEquivalence
       (isColimitShrinkYonedaCoconeObj ((opOpEquivalence C).functor ⋙ P) (op (op X)))
       ((opOpEquivalence C).congrElements P).op)
-  · refine NatIso.ofComponents (fun x ↦
-      (shrinkYonedaObjObjEquiv.trans (.trans Quiver.Hom.opEquiv.symm
-        shrinkYonedaObjObjEquiv.symm)).toIso) (fun f ↦ ?_)
+  · refine NatIso.ofComponents
+      (fun x ↦
+        (shrinkYonedaObjObjEquiv.trans (.trans Quiver.Hom.opEquiv.symm
+          shrinkYonedaObjObjEquiv.symm)).toIso)
+      (fun f ↦ ?_)
     ext g
     obtain ⟨g, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective g
     simp [shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm.{w},
@@ -77,31 +81,33 @@ noncomputable def isColimitShrinkCoyonedaCoconeObj (X : C) :
     simp [shrinkYonedaEquiv_symm_app_shrinkYonedaObjObjEquiv_symm.{w},
       shrinkCoyonedaEquiv_symm_app_shrinkCoyonedaObjObjEquiv_symm.{w}]
 
-/-- Any functor `P : C ⥤ Type w` is a colimit of corepresentable functors
+/--
+Any functor `P : C ⥤ Type w` is a colimit of corepresentable functors
 (defined using `shrinkCoyoneda`) indexed by the opposite category of the category
-of elements in `P`. -/
+of elements in `P`.
+-/
 @[no_expose]
-noncomputable def isColimitShrinkCoyonedaCocone :
-    IsColimit (shrinkCoyonedaCocone P) :=
+noncomputable def isColimitShrinkCoyonedaCocone : IsColimit (shrinkCoyonedaCocone P) :=
   evaluationJointlyReflectsColimits _ (isColimitShrinkCoyonedaCoconeObj _)
 
 variable [HasColimitsOfShape P.Elementsᵒᵖ (Type w)]
 
-/-- If `F : C ⥤ Type w` and `C` is locally `w`-small, then `F` identifies to the composition
-`shrinkYoneda ⋙ (Functor.whiskeringLeft _ _ _).obj (CategoryOfElements.π F).op ⋙ colim`. -/
+/--
+If `F : C ⥤ Type w` and `C` is locally `w`-small, then `F` identifies to the composition
+`shrinkYoneda ⋙ (Functor.whiskeringLeft _ _ _).obj (CategoryOfElements.π F).op ⋙ colim`.
+-/
 @[no_expose]
-noncomputable def shrinkYonedaCompWhiskeringLeftObjπCompColimIso :
-    shrinkYoneda.{w} ⋙ (Functor.whiskeringLeft _ _ _).obj (π P).op ⋙
-      colim ≅ P :=
-  (colim.isColimitCoconeCompFlip _ _).coconePointUniqueUpToIso
-    (isColimitShrinkCoyonedaCocone P)
+noncomputable def shrinkYonedaCompWhiskeringLeftObjπCompColimIso
+    : shrinkYoneda.{w} ⋙ (Functor.whiskeringLeft _ _ _).obj (π P).op ⋙ colim ≅ P :=
+  (colim.isColimitCoconeCompFlip _ _).coconePointUniqueUpToIso (isColimitShrinkCoyonedaCocone P)
 
-lemma shrinkYonedaCompWhiskeringLeftObjπCompColimIso_inv_app_apply (u : P.Elements) :
-      (shrinkYonedaCompWhiskeringLeftObjπCompColimIso P).inv.app _ u.val =
-      (colimit.ι ((π P).op ⋙ shrinkYoneda.{w}.obj u.obj) (op u)
+lemma shrinkYonedaCompWhiskeringLeftObjπCompColimIso_inv_app_apply (u : P.Elements)
+    : (shrinkYonedaCompWhiskeringLeftObjπCompColimIso P).inv.app _ u.val
+      = (colimit.ι ((π P).op ⋙ shrinkYoneda.{w}.obj u.obj) (op u)
         (shrinkYonedaObjObjEquiv.symm (𝟙 _))) := by
-  have := congr($((colim.isColimitCoconeCompFlip _ _).comp_coconePointUniqueUpToIso_inv
-    (isColimitShrinkCoyonedaCocone P) (op u)).app u.obj (shrinkYonedaObjObjEquiv.symm (𝟙 _)))
+  have :=
+    congr($((colim.isColimitCoconeCompFlip _ _).comp_coconePointUniqueUpToIso_inv
+      (isColimitShrinkCoyonedaCocone P) (op u)).app u.obj (shrinkYonedaObjObjEquiv.symm (𝟙 _)))
   simp [shrinkYonedaCompWhiskeringLeftObjπCompColimIso, ← dsimp% this,
     shrinkCoyonedaEquiv_symm_app_shrinkCoyonedaObjObjEquiv_symm.{w}]
 
@@ -109,28 +115,28 @@ end Functor.Elements
 
 instance [LocallySmall.{w} C] : (shrinkCoyoneda.{w} (C := C)).IsDense where
   isDenseAt P :=
-    ⟨(IsColimit.whiskerEquivalenceEquiv
-      (Functor.Elements.costructuredArrowShrinkCoyonedaEquivalence P)).symm
-        (Functor.Elements.isColimitShrinkCoyonedaCocone.{w} P)⟩
+    ⟨(IsColimit.whiskerEquivalenceEquiv (Functor.Elements.costructuredArrowShrinkCoyonedaEquivalence
+      P)).symm (Functor.Elements.isColimitShrinkCoyonedaCocone.{w} P)⟩
 
-instance : (coyoneda (C := C)).IsDense :=
-  .of_iso shrinkCoyonedaIsoCoyoneda
+instance : (coyoneda (C := C)).IsDense := .of_iso shrinkCoyonedaIsoCoyoneda
 
-/-- When `C` is a locally `w`-small category, the functor `shrinkCoyoneda : Cᵒᵖ ⥤ C ⥤ Type w`
+/--
+When `C` is a locally `w`-small category, the functor `shrinkCoyoneda : Cᵒᵖ ⥤ C ⥤ Type w`
 is dense at any `P : C ⥤ Type w`: the functor `P` identifies to the colimit
 of the canonical cocone of corepresentable functors indexed by the
-category `CostructuredArrow shrinkCoyoneda P`. -/
+category `CostructuredArrow shrinkCoyoneda P`.
+-/
 @[no_expose]
-noncomputable def denseAtShrinkCoyoneda [LocallySmall.{w} C] (P : C ⥤ Type w) :
-    shrinkCoyoneda.DenseAt P :=
+noncomputable def denseAtShrinkCoyoneda [LocallySmall.{w} C] (P : C ⥤ Type w)
+    : shrinkCoyoneda.DenseAt P :=
   Functor.denseAt _ _
 
-/-- The functor `coyoneda : Cᵒᵖ ⥤ C ⥤ Type v` is dense at any `P : C ⥤ Type v`:
+/--
+The functor `coyoneda : Cᵒᵖ ⥤ C ⥤ Type v` is dense at any `P : C ⥤ Type v`:
 the functor `P` identifies to the colimit of the canonical cocone of corepresentable
-functors indexed by the category `CostructuredArrow coyoneda P`. -/
+functors indexed by the category `CostructuredArrow coyoneda P`.
+-/
 @[no_expose]
-noncomputable def denseAtCoyoneda (P : C ⥤ Type v) :
-    coyoneda.DenseAt P :=
-  Functor.denseAt _ _
+noncomputable def denseAtCoyoneda (P : C ⥤ Type v) : coyoneda.DenseAt P := Functor.denseAt _ _
 
 end CategoryTheory

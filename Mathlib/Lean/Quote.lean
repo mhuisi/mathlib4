@@ -30,13 +30,15 @@ open Lean
 /-- Quote an integer as a numeral, e.g. `-7`. -/
 instance instQuoteInt : Quote Int where
   quote
-  | .ofNat n => quote n
-  | .negSucc n => Unhygienic.run `(-$(quote (n + 1)))
+    | .ofNat n => quote n
+    | .negSucc n => Unhygienic.run `(-$(quote (n + 1)))
 
 /-- Quote a rational number as a numeral or a quotient of numerals, e.g. `-7 / 2`. -/
 instance instQuoteRat : Quote Rat where
   quote q :=
-    if q.den = 1 then quote q.num
-    else Unhygienic.run `($(quote q.num) / $(quote q.den))
+    if q.den = 1 then
+      quote q.num
+    else
+      Unhygienic.run `($(quote q.num) / $(quote q.den))
 
 end Mathlib

@@ -49,11 +49,12 @@ theorem inv_eq : I⁻¹ = 1 / I := rfl
 
 theorem inv_zero' : (0 : FractionalIdeal R₁⁰ K)⁻¹ = 0 := div_zero
 
-theorem inv_of_ne_zero {J : FractionalIdeal R₁⁰ K} (h : J ≠ 0) :
-    J⁻¹ = ⟨(1 : FractionalIdeal R₁⁰ K) / J, isFractional_div_of_ne_zero h⟩ := div_of_ne_zero h
+theorem inv_of_ne_zero {J : FractionalIdeal R₁⁰ K} (h : J ≠ 0)
+    : J⁻¹ = ⟨(1 : FractionalIdeal R₁⁰ K) / J, isFractional_div_of_ne_zero h⟩ :=
+  div_of_ne_zero h
 
-theorem coeToSubmodule_inv_of_ne_zero {J : FractionalIdeal R₁⁰ K} (h : J ≠ 0) :
-    (↑J⁻¹ : Submodule R₁ K) = IsLocalization.coeSubmodule K ⊤ / (J : Submodule R₁ K) := by
+theorem coeToSubmodule_inv_of_ne_zero {J : FractionalIdeal R₁⁰ K} (h : J ≠ 0)
+    : (↑J⁻¹ : Submodule R₁ K) = IsLocalization.coeSubmodule K ⊤ / (J : Submodule R₁ K) := by
   simp_rw [inv_of_ne_zero _ h, coeToSubmodule_one, coeToSubmodule_mk,
     IsLocalization.coeSubmodule_top]
 
@@ -71,14 +72,14 @@ theorem inv_anti_mono (hI : I ≠ 0) (hIJ : I ≤ J) : J⁻¹ ≤ I⁻¹ := by
   simp only [mem_inv_iff hJ, mem_inv_iff hI]
   exact fun h y hy => h y (hIJ hy)
 
-theorem le_self_mul_inv {I : FractionalIdeal R₁⁰ K} (hI : I ≤ (1 : FractionalIdeal R₁⁰ K)) :
-    I ≤ I * I⁻¹ :=
+theorem le_self_mul_inv {I : FractionalIdeal R₁⁰ K} (hI : I ≤ (1 : FractionalIdeal R₁⁰ K))
+    : I ≤ I * I⁻¹ :=
   le_self_mul_one_div hI
 
 variable (K)
 
-theorem coeIdeal_le_self_mul_inv (I : Ideal R₁) :
-    (I : FractionalIdeal R₁⁰ K) ≤ I * (I : FractionalIdeal R₁⁰ K)⁻¹ :=
+theorem coeIdeal_le_self_mul_inv (I : Ideal R₁)
+    : (I : FractionalIdeal R₁⁰ K) ≤ I * (I : FractionalIdeal R₁⁰ K)⁻¹ :=
   le_self_mul_inv coeIdeal_le_one
 
 @[deprecated (since := "2026-11-09")] alias coe_ideal_le_self_mul_inv := coeIdeal_le_self_mul_inv
@@ -96,8 +97,8 @@ theorem mul_inv_cancel_iff_isUnit {I : FractionalIdeal R₁⁰ K} : I * I⁻¹ =
 variable {K' : Type*} [Field K'] [Algebra R₁ K'] [IsFractionRing R₁ K']
 
 @[simp]
-protected theorem map_inv (I : FractionalIdeal R₁⁰ K) (h : K ≃ₐ[R₁] K') :
-    I⁻¹.map (h : K →ₐ[R₁] K') = (I.map h)⁻¹ := by
+protected theorem map_inv (I : FractionalIdeal R₁⁰ K) (h : K ≃ₐ[R₁] K')
+    : I⁻¹.map (h : K →ₐ[R₁] K') = (I.map h)⁻¹ := by
   rw [inv_eq, FractionalIdeal.map_div, FractionalIdeal.map_one, inv_eq]
 
 open Submodule Submodule.IsPrincipal
@@ -105,49 +106,51 @@ open Submodule Submodule.IsPrincipal
 theorem spanSingleton_inv (x : K) : (spanSingleton R₁⁰ x)⁻¹ = spanSingleton _ x⁻¹ :=
   one_div_spanSingleton x
 
-theorem spanSingleton_div_spanSingleton (x y : K) :
-    spanSingleton R₁⁰ x / spanSingleton R₁⁰ y = spanSingleton R₁⁰ (x / y) := by
+theorem spanSingleton_div_spanSingleton (x y : K)
+    : spanSingleton R₁⁰ x / spanSingleton R₁⁰ y = spanSingleton R₁⁰ (x / y) := by
   rw [div_spanSingleton, mul_comm, ← map_mul, div_eq_mul_inv]
 
-theorem spanSingleton_div_self {x : K} (hx : x ≠ 0) :
-    spanSingleton R₁⁰ x / spanSingleton R₁⁰ x = 1 := by
+theorem spanSingleton_div_self {x : K} (hx : x ≠ 0)
+    : spanSingleton R₁⁰ x / spanSingleton R₁⁰ x = 1 := by
   rw [spanSingleton_div_spanSingleton, div_self hx, map_one]
 
-theorem coeIdeal_span_singleton_div_self {x : R₁} (hx : x ≠ 0) :
-    (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K) / Ideal.span ({x} : Set R₁) = 1 := by
+theorem coeIdeal_span_singleton_div_self {x : R₁} (hx : x ≠ 0)
+    : (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K) / Ideal.span ({x} : Set R₁) = 1 := by
   rw [coeIdeal_span_singleton,
     spanSingleton_div_self K <|
       (map_ne_zero_iff _ <| FaithfulSMul.algebraMap_injective R₁ K).mpr hx]
 @[deprecated (since := "2026-11-09")]
 alias coe_ideal_span_singleton_div_self := coeIdeal_span_singleton_div_self
 
-theorem spanSingleton_mul_inv {x : K} (hx : x ≠ 0) :
-    spanSingleton R₁⁰ x * (spanSingleton R₁⁰ x)⁻¹ = 1 := by
+theorem spanSingleton_mul_inv {x : K} (hx : x ≠ 0)
+    : spanSingleton R₁⁰ x * (spanSingleton R₁⁰ x)⁻¹ = 1 := by
   rw [spanSingleton_inv, ← map_mul, mul_inv_cancel₀ hx, map_one]
 
-theorem coeIdeal_span_singleton_mul_inv {x : R₁} (hx : x ≠ 0) :
-    (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K) *
-    (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K)⁻¹ = 1 := by
+theorem coeIdeal_span_singleton_mul_inv {x : R₁} (hx : x ≠ 0)
+    : (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K)
+        * (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K)⁻¹
+      = 1 := by
   rw [coeIdeal_span_singleton,
-    spanSingleton_mul_inv K <|
-      (map_ne_zero_iff _ <| FaithfulSMul.algebraMap_injective R₁ K).mpr hx]
+    spanSingleton_mul_inv K <| (map_ne_zero_iff _ <| FaithfulSMul.algebraMap_injective R₁ K).mpr hx]
 @[deprecated (since := "2026-11-09")]
 alias coe_ideal_span_singleton_mul_inv := coeIdeal_span_singleton_mul_inv
 
-theorem spanSingleton_inv_mul {x : K} (hx : x ≠ 0) :
-    (spanSingleton R₁⁰ x)⁻¹ * spanSingleton R₁⁰ x = 1 := by
+theorem spanSingleton_inv_mul {x : K} (hx : x ≠ 0)
+    : (spanSingleton R₁⁰ x)⁻¹ * spanSingleton R₁⁰ x = 1 := by
   rw [mul_comm, spanSingleton_mul_inv K hx]
 
-theorem coeIdeal_span_singleton_inv_mul {x : R₁} (hx : x ≠ 0) :
-    (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K)⁻¹ * Ideal.span ({x} : Set R₁) = 1 := by
+theorem coeIdeal_span_singleton_inv_mul {x : R₁} (hx : x ≠ 0)
+    : (Ideal.span ({x} : Set R₁) : FractionalIdeal R₁⁰ K)⁻¹ * Ideal.span ({x} : Set R₁) = 1 := by
   rw [mul_comm, coeIdeal_span_singleton_mul_inv K hx]
 
 @[deprecated (since := "2026-11-09")]
 alias coe_ideal_span_singleton_inv_mul := coeIdeal_span_singleton_inv_mul
 
-theorem mul_generator_self_inv {R₁ : Type*} [CommRing R₁] [Algebra R₁ K] [IsLocalization R₁⁰ K]
-    (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (I : Submodule R₁ K)] (h : I ≠ 0) :
-    I * spanSingleton _ (generator (I : Submodule R₁ K))⁻¹ = 1 := by
+theorem mul_generator_self_inv
+    {R₁ : Type*} [CommRing R₁] [Algebra R₁ K] [IsLocalization R₁⁰ K]
+    (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (I : Submodule R₁ K)]
+    (h : I ≠ 0)
+    : I * spanSingleton _ (generator (I : Submodule R₁ K))⁻¹ = 1 := by
   -- Rewrite only the `I` that appears alone.
   conv_lhs => enter [1]; rw [eq_spanSingleton_of_principal I]
   rw [← map_mul, mul_inv_cancel₀, map_one]
@@ -155,14 +158,15 @@ theorem mul_generator_self_inv {R₁ : Type*} [CommRing R₁] [Algebra R₁ K] [
   apply h
   rw [eq_spanSingleton_of_principal I, generator_I_eq_zero, map_zero]
 
-theorem invertible_of_principal (I : FractionalIdeal R₁⁰ K)
-    [Submodule.IsPrincipal (I : Submodule R₁ K)] (h : I ≠ 0) : I * I⁻¹ = 1 :=
+theorem invertible_of_principal
+    (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (I : Submodule R₁ K)] (h : I ≠ 0)
+    : I * I⁻¹ = 1 :=
   mul_div_self_cancel_iff.mpr
     ⟨spanSingleton _ (generator (I : Submodule R₁ K))⁻¹, mul_generator_self_inv _ I h⟩
 
-theorem invertible_iff_generator_ne_zero (I : FractionalIdeal R₁⁰ K)
-    [Submodule.IsPrincipal (I : Submodule R₁ K)] :
-    I * I⁻¹ = 1 ↔ generator (I : Submodule R₁ K) ≠ 0 := by
+theorem invertible_iff_generator_ne_zero
+    (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (I : Submodule R₁ K)]
+    : I * I⁻¹ = 1 ↔ generator (I : Submodule R₁ K) ≠ 0 := by
   constructor
   · intro hI hg
     apply ne_zero_of_mul_eq_one _ _ hI
@@ -178,8 +182,9 @@ theorem invertible_iff_generator_ne_zero (I : FractionalIdeal R₁⁰ K)
 @[deprecated (since := "2026-10-13")]
 alias invertible_iff_generator_nonzero := invertible_iff_generator_ne_zero
 
-theorem isPrincipal_inv (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (I : Submodule R₁ K)]
-    (h : I ≠ 0) : Submodule.IsPrincipal I⁻¹.val := by
+theorem isPrincipal_inv
+    (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (I : Submodule R₁ K)] (h : I ≠ 0)
+    : Submodule.IsPrincipal I⁻¹.val := by
   rw [val_eq_coe, isPrincipal_iff]
   use (generator (I : Submodule R₁ K))⁻¹
   have hI : I * spanSingleton _ (generator (I : Submodule R₁ K))⁻¹ = 1 :=
@@ -188,8 +193,8 @@ theorem isPrincipal_inv (I : FractionalIdeal R₁⁰ K) [Submodule.IsPrincipal (
 
 variable {K}
 
-lemma den_mem_inv {I : FractionalIdeal R₁⁰ K} (hI : I ≠ ⊥) :
-    algebraMap R₁ K (I.den : R₁) ∈ I⁻¹ := by
+lemma den_mem_inv {I : FractionalIdeal R₁⁰ K} (hI : I ≠ ⊥)
+    : algebraMap R₁ K (I.den : R₁) ∈ I⁻¹ := by
   rw [mem_inv_iff hI]
   intro i hi
   rw [← Algebra.smul_def (I.den : R₁) i, ← mem_coeToSubmodule, coeToSubmodule_one]

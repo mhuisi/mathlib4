@@ -26,8 +26,10 @@ open scoped Pointwise
 
 variable {α β γ : Type*}
 
-/-- `SetSemiring α` is a one-field structure around `Set α` with a semiring structure given by
-`∪` as addition and pointwise multiplication `*` as multiplication. -/
+/--
+`SetSemiring α` is a one-field structure around `Set α` with a semiring structure given by
+`∪` as addition and pointwise multiplication `*` as multiplication.
+-/
 @[ext]
 structure SetSemiring (α : Type*) where
   /-- Convert a `Set α` to a `SetSemiring α`. -/
@@ -44,38 +46,60 @@ def toSetEquiv : SetSemiring α ≃ Set α where
   toFun := toSet
   invFun := ofSet
 
-instance : CompleteAtomicBooleanAlgebra (SetSemiring α) := fast_instance%
-  toSetEquiv.completeAtomicBooleanAlgebra
+instance : CompleteAtomicBooleanAlgebra (SetSemiring α) :=
+  fast_instance%
+    toSetEquiv.completeAtomicBooleanAlgebra
 
-@[simp] lemma toSet_ofSet (s : Set α) : (ofSet s).toSet = s := rfl
-@[simp] lemma ofSet_toSet (s : SetSemiring α) : ofSet s.toSet = s := rfl
-@[simp] lemma ofSet_le_ofSet {s t : Set α} : ofSet s ≤ ofSet t ↔ s ⊆ t := Iff.rfl
-@[simp] lemma ofSet_lt_ofSet {s t : Set α} : ofSet s < ofSet t ↔ s ⊂ t := Iff.rfl
-@[simp] lemma toSet_subset_toSet {s t : SetSemiring α} : s.toSet ⊆ t.toSet ↔ s ≤ t := Iff.rfl
-@[simp] lemma toSet_ssubset_toSet {s t : SetSemiring α} : s.toSet ⊂ t.toSet ↔ s < t := Iff.rfl
+@[simp]
+lemma toSet_ofSet (s : Set α) : (ofSet s).toSet = s := rfl
+@[simp]
+lemma ofSet_toSet (s : SetSemiring α) : ofSet s.toSet = s := rfl
+@[simp]
+lemma ofSet_le_ofSet {s t : Set α} : ofSet s ≤ ofSet t ↔ s ⊆ t := Iff.rfl
+@[simp]
+lemma ofSet_lt_ofSet {s t : Set α} : ofSet s < ofSet t ↔ s ⊂ t := Iff.rfl
+@[simp]
+lemma toSet_subset_toSet {s t : SetSemiring α} : s.toSet ⊆ t.toSet ↔ s ≤ t := Iff.rfl
+@[simp]
+lemma toSet_ssubset_toSet {s t : SetSemiring α} : s.toSet ⊂ t.toSet ↔ s < t := Iff.rfl
 
-instance : Membership α (SetSemiring α) where mem s a := a ∈ s.toSet
-instance : Singleton α (SetSemiring α) where singleton a := ofSet {a}
-instance : Insert α (SetSemiring α) where insert a s := ofSet (insert a s.toSet)
+instance : Membership α (SetSemiring α) where
+  mem s a := a ∈ s.toSet
+instance : Singleton α (SetSemiring α) where
+  singleton a := ofSet {a}
+instance : Insert α (SetSemiring α) where
+  insert a s := ofSet (insert a s.toSet)
 
-@[simp] lemma mem_toSet {s : SetSemiring α} {a : α} : a ∈ s.toSet ↔ a ∈ s := Iff.rfl
-@[simp] lemma mem_ofSet {s : Set α} {a : α} : a ∈ ofSet s ↔ a ∈ s := Iff.rfl
-@[simp] lemma mem_singleton_iff {a b : α} : a ∈ ({b} : SetSemiring α) ↔ a = b := Iff.rfl
-@[simp] lemma toSet_singleton {a : α} : toSet {a} = {a} := rfl
-@[simp] lemma ofSet_singleton {a : α} : ofSet {a} = {a} := rfl
-@[simp] lemma toSet_insert {s : SetSemiring α} {a : α} : (insert a s).toSet = insert a s.toSet :=
-  rfl
-@[simp] lemma ofSet_insert {s : Set α} {a : α} : ofSet (insert a s) = insert a (ofSet s) := rfl
+@[simp]
+lemma mem_toSet {s : SetSemiring α} {a : α} : a ∈ s.toSet ↔ a ∈ s := Iff.rfl
+@[simp]
+lemma mem_ofSet {s : Set α} {a : α} : a ∈ ofSet s ↔ a ∈ s := Iff.rfl
+@[simp]
+lemma mem_singleton_iff {a b : α} : a ∈ ({b} : SetSemiring α) ↔ a = b := Iff.rfl
+@[simp]
+lemma toSet_singleton {a : α} : toSet {a} = {a} := rfl
+@[simp]
+lemma ofSet_singleton {a : α} : ofSet {a} = {a} := rfl
+@[simp]
+lemma toSet_insert {s : SetSemiring α} {a : α} : (insert a s).toSet = insert a s.toSet := rfl
+@[simp]
+lemma ofSet_insert {s : Set α} {a : α} : ofSet (insert a s) = insert a (ofSet s) := rfl
 
-instance : Zero (SetSemiring α) where zero := ofSet ∅
-instance : Add (SetSemiring α) where add s t := ofSet (s.toSet ∪ t.toSet)
+instance : Zero (SetSemiring α) where
+  zero := ofSet ∅
+instance : Add (SetSemiring α) where
+  add s t := ofSet (s.toSet ∪ t.toSet)
 
 lemma zero_def : (0 : SetSemiring α) = ofSet ∅ := rfl
-@[simp] lemma toSet_zero : (0 : SetSemiring α).toSet = ∅ := rfl
-@[simp] lemma ofSet_empty : ofSet (∅ : Set α) = 0 := rfl
+@[simp]
+lemma toSet_zero : (0 : SetSemiring α).toSet = ∅ := rfl
+@[simp]
+lemma ofSet_empty : ofSet (∅ : Set α) = 0 := rfl
 lemma add_def (s t : SetSemiring α) : s + t = ofSet (s.toSet ∪ t.toSet) := rfl
-@[simp] lemma toSet_add (s t : SetSemiring α) : (s + t).toSet = s.toSet ∪ t.toSet := rfl
-@[simp] lemma ofSet_union (s t : Set α) : ofSet (s ∪ t) = ofSet s + ofSet t := rfl
+@[simp]
+lemma toSet_add (s t : SetSemiring α) : (s + t).toSet = s.toSet ∪ t.toSet := rfl
+@[simp]
+lemma ofSet_union (s t : Set α) : ofSet (s ∪ t) = ofSet s + ofSet t := rfl
 
 instance : AddCommMonoid (SetSemiring α) where
   add_assoc _ _ _ := SetSemiring.ext (union_assoc ..)
@@ -96,11 +120,14 @@ section One
 
 variable [One α]
 
-instance : One (SetSemiring α) where one := ofSet 1
+instance : One (SetSemiring α) where
+  one := ofSet 1
 
 lemma one_def : (1 : SetSemiring α) = ofSet 1 := rfl
-@[simp] lemma toSet_one : (1 : SetSemiring α).toSet = 1 := rfl
-@[simp] lemma ofSet_one : ofSet (1 : Set α) = 1 := rfl
+@[simp]
+lemma toSet_one : (1 : SetSemiring α).toSet = 1 := rfl
+@[simp]
+lemma ofSet_one : ofSet (1 : Set α) = 1 := rfl
 
 end One
 
@@ -108,11 +135,14 @@ section Mul
 
 variable [Mul α]
 
-instance : Mul (SetSemiring α) where mul s t := ofSet (s.toSet * t.toSet)
+instance : Mul (SetSemiring α) where
+  mul s t := ofSet (s.toSet * t.toSet)
 
 lemma mul_def (s t : SetSemiring α) : s * t = ofSet (s.toSet * t.toSet) := rfl
-@[simp] lemma toSet_mul (s t : SetSemiring α) : (s * t).toSet = s.toSet * t.toSet := rfl
-@[simp] lemma ofSet_mul (s t : Set α) : ofSet (s * t) = ofSet s * ofSet t := rfl
+@[simp]
+lemma toSet_mul (s t : SetSemiring α) : (s * t).toSet = s.toSet * t.toSet := rfl
+@[simp]
+lemma ofSet_mul (s t : Set α) : ofSet (s * t) = ofSet s * ofSet t := rfl
 
 instance : NoZeroDivisors (SetSemiring α) where
   eq_zero_or_eq_zero_of_mul_eq_zero := by simp [SetSemiring.ext_iff]
@@ -125,11 +155,14 @@ instance : MulRightMono (SetSemiring α) where
 
 variable [One α]
 
-instance : Pow (SetSemiring α) ℕ where pow s n := ofSet (s.toSet ^ n)
+instance : Pow (SetSemiring α) ℕ where
+  pow s n := ofSet (s.toSet ^ n)
 
 lemma pow_def (s : SetSemiring α) (n : ℕ) : s ^ n = ofSet (s.toSet ^ n) := rfl
-@[simp] lemma toSet_pow (s : SetSemiring α) (n : ℕ) : (s ^ n).toSet = s.toSet ^ n := rfl
-@[simp] lemma ofSet_pow (s : Set α) (n : ℕ) : ofSet (s ^ n) = ofSet s ^ n := rfl
+@[simp]
+lemma toSet_pow (s : SetSemiring α) (n : ℕ) : (s ^ n).toSet = s.toSet ^ n := rfl
+@[simp]
+lemma ofSet_pow (s : Set α) (n : ℕ) : ofSet (s ^ n) = ofSet s ^ n := rfl
 
 end Mul
 
@@ -172,8 +205,10 @@ section ImageHom
 
 variable [MulOneClass α] [MulOneClass β] [MulOneClass γ] (f : α →* β)
 
-/-- The image of a set under a multiplicative homomorphism is a ring homomorphism
-with respect to the pointwise operations on sets. -/
+/--
+The image of a set under a multiplicative homomorphism is a ring homomorphism
+with respect to the pointwise operations on sets.
+-/
 def imageHom : SetSemiring α →+* SetSemiring β where
   toFun s := ofSet (f '' s.toSet)
   map_zero' := SetSemiring.ext (image_empty _)
@@ -181,9 +216,11 @@ def imageHom : SetSemiring α →+* SetSemiring β where
   map_add' _ _ := SetSemiring.ext (image_union ..)
   map_mul' _ _ := SetSemiring.ext (image_mul f)
 
-@[simp] lemma imageHom_apply (s : SetSemiring α) : imageHom f s = ofSet (f '' s.toSet) := rfl
+@[simp]
+lemma imageHom_apply (s : SetSemiring α) : imageHom f s = ofSet (f '' s.toSet) := rfl
 
-@[simp] lemma imageHom_id : imageHom (MonoidHom.id α) = RingHom.id (SetSemiring α) := by
+@[simp]
+lemma imageHom_id : imageHom (MonoidHom.id α) = RingHom.id (SetSemiring α) := by
   simp [imageHom, RingHom.id]
 
 lemma imageHom_comp (g : β →* γ) : imageHom (g.comp f) = (imageHom g).comp (imageHom f) := by

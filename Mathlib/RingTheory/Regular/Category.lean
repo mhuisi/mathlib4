@@ -22,8 +22,8 @@ variable {R : Type u} [CommRing R] (M : ModuleCat.{v} R)
 
 open CategoryTheory Abelian Pointwise
 
-lemma LinearMap.exact_lsmul_mkQ_smul_top (M : Type v) [AddCommGroup M] [Module R M] (r : R) :
-    Function.Exact (LinearMap.lsmul _ M r) (r • (⊤ : Submodule R M)).mkQ := by
+lemma LinearMap.exact_lsmul_mkQ_smul_top (M : Type v) [AddCommGroup M] [Module R M] (r : R)
+    : Function.Exact (LinearMap.lsmul _ M r) (r • (⊤ : Submodule R M)).mkQ := by
   intro x
   simp [Submodule.mem_smul_pointwise_iff_exists, Submodule.mem_smul_pointwise_iff_exists]
 
@@ -47,7 +47,7 @@ instance smulShortComplex_g_epi (r : R) : Epi (smulShortComplex M r).g := by
 end ModuleCat
 
 variable {M} in
-lemma IsSMulRegular.smulShortComplex_shortExact {r : R} (reg : IsSMulRegular M r) :
-    (ModuleCat.smulShortComplex M r).ShortExact where
+lemma IsSMulRegular.smulShortComplex_shortExact {r : R} (reg : IsSMulRegular M r)
+    : (ModuleCat.smulShortComplex M r).ShortExact where
   exact := ModuleCat.smulShortComplex_exact M r
   mono_f := by simpa [ModuleCat.smulShortComplex, ModuleCat.mono_iff_injective] using! reg

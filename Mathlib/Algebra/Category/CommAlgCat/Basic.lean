@@ -35,8 +35,9 @@ structure CommAlgCat where
   [algebra : Algebra R carrier]
 
 namespace CommAlgCat
-variable {A B C : CommAlgCat.{v} R} {X Y Z : Type v} [CommRing X] [Algebra R X]
-  [CommRing Y] [Algebra R Y] [CommRing Z] [Algebra R Z]
+variable
+  {A B C : CommAlgCat.{v} R} {X Y Z : Type v}
+  [CommRing X] [Algebra R X] [CommRing Y] [Algebra R Y] [CommRing Z] [Algebra R Z]
 
 attribute [instance] commRing algebra
 
@@ -47,8 +48,10 @@ instance : CoeSort (CommAlgCat R) (Type v) := ⟨carrier⟩
 attribute [coe] carrier
 
 variable (R) in
-/-- The object in the category of R-algebras associated to a type equipped with the appropriate
-typeclasses. This is the preferred way to construct a term of `CommAlgCat R`. -/
+/--
+The object in the category of R-algebras associated to a type equipped with the appropriate
+typeclasses. This is the preferred way to construct a term of `CommAlgCat R`.
+-/
 abbrev of (X : Type v) [CommRing X] [Algebra R X] : CommAlgCat.{v} R := ⟨X⟩
 
 open Lean.PrettyPrinter.Delaborator in
@@ -90,22 +93,28 @@ initialize_simps_projections Hom (hom' → hom)
 The results below duplicate the `ConcreteCategory` simp lemmas, but we can keep them for `dsimp`.
 -/
 
-@[simp] lemma hom_id : (𝟙 A : A ⟶ A).hom = AlgHom.id R A := rfl
+@[simp]
+lemma hom_id : (𝟙 A : A ⟶ A).hom = AlgHom.id R A := rfl
 
 /- Provided for rewriting. -/
 lemma id_apply (A : CommAlgCat.{v} R) (a : A) : (𝟙 A : A ⟶ A) a = a := by simp
 
-@[simp] lemma hom_comp (f : A ⟶ B) (g : B ⟶ C) : (f ≫ g).hom = g.hom.comp f.hom := rfl
+@[simp]
+lemma hom_comp (f : A ⟶ B) (g : B ⟶ C) : (f ≫ g).hom = g.hom.comp f.hom := rfl
 
 /- Provided for rewriting. -/
 lemma comp_apply (f : A ⟶ B) (g : B ⟶ C) (a : A) : (f ≫ g) a = g (f a) := by simp
 
-@[ext] lemma hom_ext {f g : A ⟶ B} (hf : f.hom = g.hom) : f = g := Hom.ext hf
+@[ext]
+lemma hom_ext {f g : A ⟶ B} (hf : f.hom = g.hom) : f = g := Hom.ext hf
 
-@[simp] lemma hom_ofHom (f : X →ₐ[R] Y) : (ofHom f).hom = f := rfl
-@[simp] lemma ofHom_hom (f : A ⟶ B) : ofHom f.hom = f := rfl
+@[simp]
+lemma hom_ofHom (f : X →ₐ[R] Y) : (ofHom f).hom = f := rfl
+@[simp]
+lemma ofHom_hom (f : A ⟶ B) : ofHom f.hom = f := rfl
 
-@[simp] lemma ofHom_id : ofHom (.id R X) = 𝟙 (of R X) := rfl
+@[simp]
+lemma ofHom_id : ofHom (.id R X) = 𝟙 (of R X) := rfl
 
 @[simp]
 lemma ofHom_comp (f : X →ₐ[R] Y) (g : Y →ₐ[R] Z) : ofHom (g.comp f) = ofHom f ≫ ofHom g := rfl
@@ -131,34 +140,48 @@ instance hasForgetToAlgCat : HasForget₂ (CommAlgCat.{v} R) (AlgCat.{v} R) wher
   forget₂.obj A := ↧A
   forget₂.map f := AlgCat.ofHom f.hom
 
-@[simp] lemma forget₂_commRingCat_obj (A : CommAlgCat.{v} R) :
-    (forget₂ (CommAlgCat.{v} R) CommRingCat.{v}).obj A = ↧A := rfl
+@[simp]
+lemma forget₂_commRingCat_obj (A : CommAlgCat.{v} R)
+    : (forget₂ (CommAlgCat.{v} R) CommRingCat.{v}).obj A = ↧A :=
+  rfl
 
-@[simp] lemma forget₂_commRingCat_map (f : A ⟶ B) :
-    (forget₂ (CommAlgCat.{v} R) CommRingCat.{v}).map f = CommRingCat.ofHom f.hom := rfl
+@[simp]
+lemma forget₂_commRingCat_map (f : A ⟶ B)
+    : (forget₂ (CommAlgCat.{v} R) CommRingCat.{v}).map f = CommRingCat.ofHom f.hom :=
+  rfl
 
-@[simp] lemma forget₂_algCat_obj (A : CommAlgCat.{v} R) :
-    (forget₂ (CommAlgCat.{v} R) (AlgCat.{v} R)).obj A = ↧A := rfl
+@[simp]
+lemma forget₂_algCat_obj (A : CommAlgCat.{v} R)
+    : (forget₂ (CommAlgCat.{v} R) (AlgCat.{v} R)).obj A = ↧A :=
+  rfl
 
-@[simp] lemma forget₂_algCat_map (f : A ⟶ B) :
-    (forget₂ (CommAlgCat.{v} R) (AlgCat.{v} R)).map f = AlgCat.ofHom f.hom := rfl
+@[simp]
+lemma forget₂_algCat_map (f : A ⟶ B)
+    : (forget₂ (CommAlgCat.{v} R) (AlgCat.{v} R)).map f = AlgCat.ofHom f.hom :=
+  rfl
 
 variable (A B) in
-/-- The bijection between the set of morphisms `A ⟶ B` in `CommAlgCat` and the set of morphisms
-`A ⟶ B` in `CommRingCat` commuting with the corresponding algebra maps `R → A` and `R → B`. -/
+/--
+The bijection between the set of morphisms `A ⟶ B` in `CommAlgCat` and the set of morphisms
+`A ⟶ B` in `CommRingCat` commuting with the corresponding algebra maps `R → A` and `R → B`.
+-/
 @[simps]
-def homEquivCommRingCat :
-    (A ⟶ B) ≃ {f : CommRingCat.of A ⟶ ↧B // f.hom.comp (algebraMap R A) = algebraMap R B} where
+def homEquivCommRingCat
+    : (A ⟶ B) ≃ {f : CommRingCat.of A ⟶ ↧B // f.hom.comp (algebraMap R A) = algebraMap R B} where
   toFun f := ⟨CommRingCat.ofHom f.hom, congr($f.hom.comp_algebraMap)⟩
   invFun f := CommAlgCat.ofHom ⟨f.val.hom, fun r ↦ congr($f.prop r)⟩
   left_inv _ := rfl
   right_inv _ := rfl
 
-/-- Build an isomorphism in the category `CommAlgCat R` from an `AlgEquiv` between commutative
-`Algebra`s. -/
+/--
+Build an isomorphism in the category `CommAlgCat R` from an `AlgEquiv` between commutative
+`Algebra`s.
+-/
 @[simps]
-def isoMk {X Y : Type v} {_ : CommRing X} {_ : CommRing Y} {_ : Algebra R X} {_ : Algebra R Y}
-    (e : X ≃ₐ[R] Y) : of R X ≅ of R Y where
+def isoMk
+    {X Y : Type v} {_ : CommRing X} {_ : CommRing Y} {_ : Algebra R X} {_ : Algebra R Y}
+    (e : X ≃ₐ[R] Y)
+    : of R X ≅ of R Y where
   hom := ofHom (e : X →ₐ[R] Y)
   inv := ofHom (e.symm : Y →ₐ[R] X)
 
@@ -188,32 +211,32 @@ variable (R)
 /-- Universe lift functor for commutative algebras. -/
 def uliftFunctor : CommAlgCat.{v} R ⥤ CommAlgCat.{max v w} R where
   obj A := .of R <| ULift A
-  map {A B} f := CommAlgCat.ofHom <|
-    ULift.algEquiv.symm.toAlgHom.comp <| f.hom.comp ULift.algEquiv.toAlgHom
+  map {A B} f :=
+    CommAlgCat.ofHom <| ULift.algEquiv.symm.toAlgHom.comp <| f.hom.comp ULift.algEquiv.toAlgHom
 
 /-- The universe lift functor for commutative algebras is fully faithful. -/
 def fullyFaithfulUliftFunctor : (uliftFunctor R).FullyFaithful where
   preimage {A B} f :=
     CommAlgCat.ofHom <| ULift.algEquiv.toAlgHom.comp <| f.hom.comp ULift.algEquiv.symm.toAlgHom
 
-instance : (uliftFunctor R).Full :=
-  (fullyFaithfulUliftFunctor R).full
+instance : (uliftFunctor R).Full := (fullyFaithfulUliftFunctor R).full
 
-instance : (uliftFunctor R).Faithful :=
-  (fullyFaithfulUliftFunctor R).faithful
+instance : (uliftFunctor R).Faithful := (fullyFaithfulUliftFunctor R).faithful
 
 end CommAlgCat
 
-/-- The category of commutative algebras over a commutative ring `R` is the same as commutative
-rings under `R`. -/
+/--
+The category of commutative algebras over a commutative ring `R` is the same as commutative
+rings under `R`.
+-/
 @[simps]
 def commAlgCatEquivUnder (R : CommRingCat) : CommAlgCat R ≌ Under R where
   functor.obj A := R.mkUnder A
   functor.map {A B} f := f.hom.toUnder
   inverse.obj A := ↧A
   inverse.map {A B} f := CommAlgCat.ofHom <| CommRingCat.toAlgHom f
-  unitIso := NatIso.ofComponents fun A ↦
-    CommAlgCat.isoMk { toRingEquiv := .refl A, commutes' _ := rfl }
+  unitIso :=
+    NatIso.ofComponents fun A ↦ CommAlgCat.isoMk { toRingEquiv := .refl A, commutes' _ := rfl }
   counitIso := .refl _
 
 -- TODO: Generalize to `UnivLE.{u, v}` once `commAlgCatEquivUnder` is generalized.

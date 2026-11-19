@@ -21,8 +21,11 @@ info: -123456789012345678901234567891
 -/
 #guard_msgs in
 run_meta
-  for n in [(0 : Int), 5, -1, -7, 123456789012345678901234567890,
-      -123456789012345678901234567891] do
+  for n
+      in [
+        (0 : Int), 5, -1, -7, 123456789012345678901234567890,
+        -123456789012345678901234567891
+      ] do
     logInfo m!"{(quote n : Term)}"
 
 /--
@@ -47,14 +50,18 @@ run_meta
 
 /-! ### Quoted numbers elaborate back to the same value -/
 
-/-- `quoteRat% q` evaluates the rational number `q`, quotes it,
-and elaborates the result at the expected type. -/
+/--
+`quoteRat% q` evaluates the rational number `q`, quotes it,
+and elaborates the result at the expected type.
+-/
 elab "quoteRat% " t:term : term <= ty => do
   let q ← unsafe evalTerm Rat (mkConst ``Rat) t
   elabTerm (quote q : Term) ty
 
-/-- `quoteInt% n` evaluates the integer `n`, quotes it,
-and elaborates the result at the expected type. -/
+/--
+`quoteInt% n` evaluates the integer `n`, quotes it,
+and elaborates the result at the expected type.
+-/
 elab "quoteInt% " t:term : term <= ty => do
   let n ← unsafe evalTerm Int (mkConst ``Int) t
   elabTerm (quote n : Term) ty
@@ -63,8 +70,7 @@ example : (quoteInt% 0 : ℤ) = 0 := rfl
 example : (quoteInt% 5 : ℤ) = 5 := rfl
 example : (quoteInt% -1 : ℤ) = -1 := rfl
 example : (quoteInt% -7 : ℤ) = -7 := rfl
-example : (quoteInt% -123456789012345678901234567891 : ℤ) =
-    -123456789012345678901234567891 := rfl
+example : (quoteInt% -123456789012345678901234567891 : ℤ) = -123456789012345678901234567891 := rfl
 
 -- `Int.negSucc n` is `-(n + 1)`, not `-n`.
 example : (quoteInt% Int.negSucc 6 : ℤ) = -7 := rfl
@@ -82,8 +88,10 @@ example : (quoteRat% 6 / 4 : ℚ) = 3 / 2 := by norm_num
 example : (quoteInt% -7 : ℝ) = -7 := by with_reducible rfl
 example : (quoteRat% -7 / 2 : ℝ) = -7 / 2 := by with_reducible rfl
 example : (quoteRat% -1 / 3 : ℝ) = -1 / 3 := by with_reducible rfl
-example : (quoteRat% -123456789012345678901234567891 / 7 : ℝ) =
-    -123456789012345678901234567891 / 7 := by with_reducible rfl
+example
+    : (quoteRat% -123456789012345678901234567891 / 7 : ℝ)
+      = -123456789012345678901234567891 / 7 := by
+  with_reducible rfl
 example : (quoteRat% 6 / 4 : ℝ) = 3 / 2 := by with_reducible rfl
 
 /-! ### Documented behaviour at other types -/

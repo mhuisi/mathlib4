@@ -50,12 +50,10 @@ section NormOneClass
 
 variable {R : Type*} [SeminormedRing R] [NormOneClass R] [IsUltrametricDist R]
 
-lemma norm_add_one_le_max_norm_one (x : R) :
-    ‖x + 1‖ ≤ max ‖x‖ 1 := by
+lemma norm_add_one_le_max_norm_one (x : R) : ‖x + 1‖ ≤ max ‖x‖ 1 := by
   simpa only [le_max_iff, norm_one] using norm_add_le_max x 1
 
-lemma nnNorm_add_one_le_max_nnNorm_one (x : R) :
-    ‖x + 1‖₊ ≤ max ‖x‖₊ 1 :=
+lemma nnNorm_add_one_le_max_nnNorm_one (x : R) : ‖x + 1‖₊ ≤ max ‖x‖₊ 1 :=
   norm_add_one_le_max_norm_one _
 
 @[deprecated (since := "2026-10-31")]
@@ -63,30 +61,25 @@ alias nnnorm_add_one_le_max_nnnorm_one := nnNorm_add_one_le_max_nnNorm_one
 
 variable (R)
 
-lemma nnNorm_natCast_le_one (n : ℕ) :
-    ‖(n : R)‖₊ ≤ 1 := by
+lemma nnNorm_natCast_le_one (n : ℕ) : ‖(n : R)‖₊ ≤ 1 := by
   induction n with
   | zero => simp only [Nat.cast_zero, nnNorm_zero, zero_le]
-  | succ n hn => simpa only [Nat.cast_add, Nat.cast_one, hn, max_eq_right] using
-    nnNorm_add_one_le_max_nnNorm_one (n : R)
+  | succ n hn =>
+    simpa only [Nat.cast_add, Nat.cast_one, hn, max_eq_right] using
+      nnNorm_add_one_le_max_nnNorm_one (n : R)
 
 @[deprecated (since := "2026-10-31")] alias nnnorm_natCast_le_one := nnNorm_natCast_le_one
 
-lemma norm_natCast_le_one (n : ℕ) :
-    ‖(n : R)‖ ≤ 1 :=
-  nnNorm_natCast_le_one R n
+lemma norm_natCast_le_one (n : ℕ) : ‖(n : R)‖ ≤ 1 := nnNorm_natCast_le_one R n
 
-lemma nnNorm_intCast_le_one (z : ℤ) :
-    ‖(z : R)‖₊ ≤ 1 := by
-  cases z <;>
-  simpa only [Int.ofNat_eq_natCast, Int.cast_natCast, Int.cast_negSucc, Nat.cast_one, nnNorm_neg]
+lemma nnNorm_intCast_le_one (z : ℤ) : ‖(z : R)‖₊ ≤ 1 := by
+  cases z <;> simpa only [Int.ofNat_eq_natCast, Int.cast_natCast, Int.cast_negSucc, Nat.cast_one,
+      nnNorm_neg]
     using nnNorm_natCast_le_one _ _
 
 @[deprecated (since := "2026-10-31")] alias nnnorm_intCast_le_one := nnNorm_intCast_le_one
 
-lemma norm_intCast_le_one (z : ℤ) :
-    ‖(z : R)‖ ≤ 1 :=
-  nnNorm_intCast_le_one _ z
+lemma norm_intCast_le_one (z : ℤ) : ‖(z : R)‖ ≤ 1 := nnNorm_intCast_le_one _ z
 
 end NormOneClass
 

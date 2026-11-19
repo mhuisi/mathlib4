@@ -46,11 +46,11 @@ theorem isOpen_Ioc : IsOpen (Ioc a b) := by
 
 /-- In a successor order, limit points correspond to limit successors. -/
 @[to_dual
-/-- In a predecessor order, limit points correspond to limit predecessors. -/]
+  /-- In a predecessor order, limit points correspond to limit predecessors. -/]
 theorem isOpen_singleton_iff : IsOpen {a} ↔ ¬ IsSuccLimit a := by
   refine ⟨fun h ha ↦ ?_, fun ha ↦ ?_⟩
-  · obtain ⟨l, h₁, h₂⟩ := exists_Ioc_subset_of_mem_nhds (h.mem_nhds (mem_singleton a))
-      (not_isMin_iff.1 ha.not_isMin)
+  · obtain ⟨l, h₁, h₂⟩ :=
+      exists_Ioc_subset_of_mem_nhds (h.mem_nhds (mem_singleton a)) (not_isMin_iff.1 ha.not_isMin)
     exact ha.isSuccPrelimit l ⟨h₁, fun b hlb hba ↦ hba.ne <| h₂ ⟨hlb, hba.le⟩⟩
   · rw [not_isSuccLimit_iff, not_isSuccPrelimit_iff] at ha
     obtain (ha | ⟨b, hb⟩) := ha
@@ -62,7 +62,7 @@ theorem isOpen_singleton_iff : IsOpen {a} ↔ ¬ IsSuccLimit a := by
 @[to_dual] alias ⟨_, isOpen_singleton_of_not_isSuccLimit⟩ := isOpen_singleton_iff
 
 @[to_dual (attr := deprecated isOpen_singleton_of_not_isSuccLimit +typeChanged
-(since := "2026-11-03"))]
+  (since := "2026-11-03"))]
 theorem isOpen_singleton_of_not_isSuccPrelimit (ha : ¬ IsSuccPrelimit a) : IsOpen {a} :=
   isOpen_singleton_of_not_isSuccLimit (mt IsSuccLimit.isSuccPrelimit ha)
 
@@ -71,8 +71,7 @@ theorem isOpen_singleton_of_isMin (ha : IsMin a) : IsOpen {a} :=
   isOpen_singleton_of_not_isSuccLimit ha.not_isSuccLimit
 
 @[to_dual (attr := simp)]
-theorem isOpen_singleton_bot [OrderBot α] : IsOpen {(⊥ : α)} :=
-  isOpen_singleton_of_isMin isMin_bot
+theorem isOpen_singleton_bot [OrderBot α] : IsOpen {(⊥ : α)} := isOpen_singleton_of_isMin isMin_bot
 
 @[to_dual]
 theorem nhds_eq_pure {a : α} : 𝓝 a = pure a ↔ ¬ IsSuccLimit a :=
@@ -83,12 +82,10 @@ theorem nhds_of_isMin {a : α} (h : IsMin a) : 𝓝 a = pure a :=
   (isOpen_singleton_iff_nhds_eq_pure _).1 (isOpen_singleton_of_isMin h)
 
 @[to_dual (attr := simp)]
-theorem nhds_bot [OrderBot α] : 𝓝 (⊥ : α) = pure ⊥ :=
-  nhds_of_isMin isMin_bot
+theorem nhds_bot [OrderBot α] : 𝓝 (⊥ : α) = pure ⊥ := nhds_of_isMin isMin_bot
 
 @[to_dual]
-theorem isOpen_iff {s : Set α} : IsOpen s ↔
-    ∀ o ∈ s, IsSuccLimit o → ∃ a < o, Ioo a o ⊆ s := by
+theorem isOpen_iff {s : Set α} : IsOpen s ↔ ∀ o ∈ s, IsSuccLimit o → ∃ a < o, Ioo a o ⊆ s := by
   refine isOpen_iff_mem_nhds.trans <| forall₂_congr fun o ho ↦ ?_
   by_cases ho' : IsSuccLimit o
   · rw [(hasBasis_nhds_Ioc_of_exists_lt (not_isMin_iff.1 ho'.not_isMin)).mem_iff]
@@ -96,8 +93,8 @@ theorem isOpen_iff {s : Set α} : IsOpen s ↔
   · simp [nhds_eq_pure.2 ho', ho, ho']
 
 @[to_dual]
-theorem accPt_principal {a : α} {s : Set α} :
-    AccPt a (𝓟 s) ↔ ¬ IsMin a ∧ ∀ b < a, (s ∩ Ioo b a).Nonempty := by
+theorem accPt_principal {a : α} {s : Set α}
+    : AccPt a (𝓟 s) ↔ ¬ IsMin a ∧ ∀ b < a, (s ∩ Ioo b a).Nonempty := by
   rw [accPt_iff_frequently]
   by_cases ha : IsMin a
   · simp [nhds_of_isMin, ha]

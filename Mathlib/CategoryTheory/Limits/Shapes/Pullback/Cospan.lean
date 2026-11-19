@@ -33,67 +33,58 @@ namespace CategoryTheory.Limits
 -- Porting note: `aesop cases` does not work on type synonyms like `WidePullbackShape`
 -- attribute [local aesop safe cases] WidePullbackShape WalkingPair
 
-/-- The type of objects for the diagram indexing a pullback, defined as a special case of
-`WidePullbackShape`. -/
-abbrev WalkingCospan : Type :=
-  WidePullbackShape WalkingPair
+/--
+The type of objects for the diagram indexing a pullback, defined as a special case of
+`WidePullbackShape`.
+-/
+abbrev WalkingCospan : Type := WidePullbackShape WalkingPair
 
 /-- The left point of the walking cospan. -/
 @[match_pattern]
-abbrev WalkingCospan.left : WalkingCospan :=
-  some WalkingPair.left
+abbrev WalkingCospan.left : WalkingCospan := some WalkingPair.left
 
 /-- The right point of the walking cospan. -/
 @[match_pattern]
-abbrev WalkingCospan.right : WalkingCospan :=
-  some WalkingPair.right
+abbrev WalkingCospan.right : WalkingCospan := some WalkingPair.right
 
 /-- The central point of the walking cospan. -/
 @[match_pattern]
-abbrev WalkingCospan.one : WalkingCospan :=
-  none
+abbrev WalkingCospan.one : WalkingCospan := none
 
-/-- The type of objects for the diagram indexing a pushout, defined as a special case of
+/--
+The type of objects for the diagram indexing a pushout, defined as a special case of
 `WidePushoutShape`.
 -/
-abbrev WalkingSpan : Type :=
-  WidePushoutShape WalkingPair
+abbrev WalkingSpan : Type := WidePushoutShape WalkingPair
 
 /-- The left point of the walking span. -/
 @[match_pattern]
-abbrev WalkingSpan.left : WalkingSpan :=
-  some WalkingPair.left
+abbrev WalkingSpan.left : WalkingSpan := some WalkingPair.left
 
 /-- The right point of the walking span. -/
 @[match_pattern]
-abbrev WalkingSpan.right : WalkingSpan :=
-  some WalkingPair.right
+abbrev WalkingSpan.right : WalkingSpan := some WalkingPair.right
 
 /-- The central point of the walking span. -/
 @[match_pattern]
-abbrev WalkingSpan.zero : WalkingSpan :=
-  none
+abbrev WalkingSpan.zero : WalkingSpan := none
 
 namespace WalkingCospan
 
 /-- The type of arrows for the diagram indexing a pullback. -/
-abbrev Hom : WalkingCospan → WalkingCospan → Type :=
-  WidePullbackShape.Hom
+abbrev Hom : WalkingCospan → WalkingCospan → Type := WidePullbackShape.Hom
 
 /-- The left arrow of the walking cospan. -/
 @[match_pattern]
-abbrev Hom.inl : left ⟶ one :=
-  WidePullbackShape.Hom.term _
+abbrev Hom.inl : left ⟶ one := WidePullbackShape.Hom.term _
 
 /-- The right arrow of the walking cospan. -/
 @[match_pattern]
-abbrev Hom.inr : right ⟶ one :=
-  WidePullbackShape.Hom.term _
+abbrev Hom.inr : right ⟶ one := WidePullbackShape.Hom.term _
 
 /-- The identity arrows of the walking cospan. -/
 @[match_pattern]
-abbrev Hom.id (X : WalkingCospan) : X ⟶ X :=
-  WidePullbackShape.Hom.id X
+abbrev Hom.id (X : WalkingCospan) : X ⟶ X := WidePullbackShape.Hom.id X
 
 instance (X Y : WalkingCospan) : Subsingleton (X ⟶ Y) := by
   constructor; intros; simp [eq_iff_true_of_subsingleton]
@@ -103,23 +94,19 @@ end WalkingCospan
 namespace WalkingSpan
 
 /-- The type of arrows for the diagram indexing a pushout. -/
-abbrev Hom : WalkingSpan → WalkingSpan → Type :=
-  WidePushoutShape.Hom
+abbrev Hom : WalkingSpan → WalkingSpan → Type := WidePushoutShape.Hom
 
 /-- The left arrow of the walking span. -/
 @[match_pattern]
-abbrev Hom.fst : zero ⟶ left :=
-  WidePushoutShape.Hom.init _
+abbrev Hom.fst : zero ⟶ left := WidePushoutShape.Hom.init _
 
 /-- The right arrow of the walking span. -/
 @[match_pattern]
-abbrev Hom.snd : zero ⟶ right :=
-  WidePushoutShape.Hom.init _
+abbrev Hom.snd : zero ⟶ right := WidePushoutShape.Hom.init _
 
 /-- The identity arrows of the walking span. -/
 @[match_pattern]
-abbrev Hom.id (X : WalkingSpan) : X ⟶ X :=
-  WidePushoutShape.Hom.id X
+abbrev Hom.id (X : WalkingSpan) : X ⟶ X := WidePushoutShape.Hom.id X
 
 instance (X Y : WalkingSpan) : Subsingleton (X ⟶ Y) := by
   constructor; intro a b; simp [eq_iff_true_of_subsingleton]
@@ -130,12 +117,16 @@ open WalkingSpan.Hom WalkingCospan.Hom WidePullbackShape.Hom WidePushoutShape.Ho
 
 variable {C : Type u} [Category.{v} C]
 
-/-- To construct an isomorphism of cones over the walking cospan,
+/--
+To construct an isomorphism of cones over the walking cospan,
 it suffices to construct an isomorphism
-of the cone points and check it commutes with the legs to `left` and `right`. -/
-def WalkingCospan.ext {F : WalkingCospan ⥤ C} {s t : Cone F} (i : s.pt ≅ t.pt)
-    (w₁ : s.π.app WalkingCospan.left = i.hom ≫ t.π.app WalkingCospan.left)
-    (w₂ : s.π.app WalkingCospan.right = i.hom ≫ t.π.app WalkingCospan.right) : s ≅ t := by
+of the cone points and check it commutes with the legs to `left` and `right`.
+-/
+def WalkingCospan.ext
+    {F : WalkingCospan ⥤ C} {s t : Cone F}
+    (i : s.pt ≅ t.pt) (w₁ : s.π.app WalkingCospan.left = i.hom ≫ t.π.app WalkingCospan.left)
+    (w₂ : s.π.app WalkingCospan.right = i.hom ≫ t.π.app WalkingCospan.right)
+    : s ≅ t := by
   apply Cone.ext i _
   rintro (⟨⟩ | ⟨⟨⟩⟩)
   · have h₁ := s.π.naturality WalkingCospan.Hom.inl
@@ -148,12 +139,16 @@ def WalkingCospan.ext {F : WalkingCospan ⥤ C} {s t : Cone F} (i : s.pt ≅ t.p
   · exact w₁
   · exact w₂
 
-/-- To construct an isomorphism of cocones over the walking span,
+/--
+To construct an isomorphism of cocones over the walking span,
 it suffices to construct an isomorphism
-of the cocone points and check it commutes with the legs from `left` and `right`. -/
-def WalkingSpan.ext {F : WalkingSpan ⥤ C} {s t : Cocone F} (i : s.pt ≅ t.pt)
-    (w₁ : s.ι.app WalkingCospan.left ≫ i.hom = t.ι.app WalkingCospan.left)
-    (w₂ : s.ι.app WalkingCospan.right ≫ i.hom = t.ι.app WalkingCospan.right) : s ≅ t := by
+of the cocone points and check it commutes with the legs from `left` and `right`.
+-/
+def WalkingSpan.ext
+    {F : WalkingSpan ⥤ C} {s t : Cocone F}
+    (i : s.pt ≅ t.pt) (w₁ : s.ι.app WalkingCospan.left ≫ i.hom = t.ι.app WalkingCospan.left)
+    (w₂ : s.ι.app WalkingCospan.right ≫ i.hom = t.ι.app WalkingCospan.right)
+    : s ≅ t := by
   apply Cocone.ext i _
   rintro (⟨⟩ | ⟨⟨⟩⟩)
   · have h₁ := s.ι.naturality WalkingSpan.Hom.fst
@@ -169,80 +164,82 @@ def WalkingSpan.ext {F : WalkingSpan ⥤ C} {s t : Cocone F} (i : s.pt ≅ t.pt)
 /-- `cospan f g` is the functor from the walking cospan hitting `f` and `g`. -/
 @[implicit_reducible]
 def cospan {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) : WalkingCospan ⥤ C :=
-  WidePullbackShape.wideCospan Z (fun j => WalkingPair.casesOn j X Y) fun j =>
-    WalkingPair.casesOn j f g
+  WidePullbackShape.wideCospan Z
+    (fun j => WalkingPair.casesOn j X Y)
+    fun j => WalkingPair.casesOn j f g
 
 /-- `span f g` is the functor from the walking span hitting `f` and `g`. -/
 @[implicit_reducible]
 def span {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : WalkingSpan ⥤ C :=
-  WidePushoutShape.wideSpan X (fun j => WalkingPair.casesOn j Y Z) fun j =>
-    WalkingPair.casesOn j f g
+  WidePushoutShape.wideSpan X
+    (fun j => WalkingPair.casesOn j Y Z)
+    fun j => WalkingPair.casesOn j f g
 
 @[simp]
 theorem cospan_left {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) : (cospan f g).obj WalkingCospan.left = X :=
   rfl
 
 @[simp]
-theorem span_left {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).obj WalkingSpan.left = Y :=
+theorem span_left {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).obj WalkingSpan.left = Y := rfl
+
+@[simp]
+theorem cospan_right {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z)
+    : (cospan f g).obj WalkingCospan.right = Y :=
   rfl
 
 @[simp]
-theorem cospan_right {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) :
-    (cospan f g).obj WalkingCospan.right = Y := rfl
-
-@[simp]
-theorem span_right {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).obj WalkingSpan.right = Z :=
-  rfl
+theorem span_right {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).obj WalkingSpan.right = Z := rfl
 
 @[simp]
 theorem cospan_one {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) : (cospan f g).obj WalkingCospan.one = Z :=
   rfl
 
 @[simp]
-theorem span_zero {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).obj WalkingSpan.zero = X :=
-  rfl
+theorem span_zero {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).obj WalkingSpan.zero = X := rfl
 
 @[simp]
-theorem cospan_map_inl {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) :
-    (cospan f g).map WalkingCospan.Hom.inl = f := rfl
+theorem cospan_map_inl {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z)
+    : (cospan f g).map WalkingCospan.Hom.inl = f :=
+  rfl
 
 @[simp]
 theorem span_map_fst {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).map WalkingSpan.Hom.fst = f :=
   rfl
 
 @[simp]
-theorem cospan_map_inr {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) :
-    (cospan f g).map WalkingCospan.Hom.inr = g := rfl
+theorem cospan_map_inr {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z)
+    : (cospan f g).map WalkingCospan.Hom.inr = g :=
+  rfl
 
 @[simp]
 theorem span_map_snd {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) : (span f g).map WalkingSpan.Hom.snd = g :=
   rfl
 
-theorem cospan_map_id {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) (w : WalkingCospan) :
-    (cospan f g).map (WalkingCospan.Hom.id w) = 𝟙 _ := rfl
+theorem cospan_map_id {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) (w : WalkingCospan)
+    : (cospan f g).map (WalkingCospan.Hom.id w) = 𝟙 _ :=
+  rfl
 
-theorem span_map_id {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) (w : WalkingSpan) :
-    (span f g).map (WalkingSpan.Hom.id w) = 𝟙 _ := rfl
+theorem span_map_id {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) (w : WalkingSpan)
+    : (span f g).map (WalkingSpan.Hom.id w) = 𝟙 _ :=
+  rfl
 
 /-- Every diagram indexing a pullback is naturally isomorphic (actually, equal) to a `cospan` -/
 @[simps (rhsMd := default)]
 def diagramIsoCospan (F : WalkingCospan ⥤ C) : F ≅ cospan (F.map inl) (F.map inr) :=
-  NatIso.ofComponents
-  (fun j => eqToIso (by rcases j with (⟨⟩ | ⟨⟨⟩⟩) <;> rfl))
-  (by rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) f <;> cases f <;> simp)
+  NatIso.ofComponents (fun j => eqToIso (by rcases j with (⟨⟩ | ⟨⟨⟩⟩) <;> rfl)) (by
+    rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) f <;> cases f <;> simp)
 
 /-- Every diagram indexing a pushout is naturally isomorphic (actually, equal) to a `span` -/
 @[simps (rhsMd := default)]
 def diagramIsoSpan (F : WalkingSpan ⥤ C) : F ≅ span (F.map fst) (F.map snd) :=
-  NatIso.ofComponents
-  (fun j => eqToIso (by rcases j with (⟨⟩ | ⟨⟨⟩⟩) <;> rfl))
-  (by rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) f <;> cases f <;> simp)
+  NatIso.ofComponents (fun j => eqToIso (by rcases j with (⟨⟩ | ⟨⟨⟩⟩) <;> rfl)) (by
+    rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) f <;> cases f <;> simp)
 
 variable {D : Type u₂} [Category.{v₂} D]
 
 /-- A functor applied to a cospan is a cospan. -/
-def cospanCompIso (F : C ⥤ D) {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) :
-    cospan f g ⋙ F ≅ cospan (F.map f) (F.map g) :=
+def cospanCompIso (F : C ⥤ D) {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z)
+    : cospan f g ⋙ F ≅ cospan (F.map f) (F.map g) :=
   NatIso.ofComponents (by rintro (⟨⟩ | ⟨⟨⟩⟩) <;> exact Iso.refl _)
     (by rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) f <;> cases f <;> simp)
 
@@ -254,30 +251,25 @@ variable (F : C ⥤ D) {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z)
 theorem cospanCompIso_app_left : (cospanCompIso F f g).app WalkingCospan.left = Iso.refl _ := rfl
 
 @[simp]
-theorem cospanCompIso_app_right : (cospanCompIso F f g).app WalkingCospan.right = Iso.refl _ :=
-  rfl
+theorem cospanCompIso_app_right : (cospanCompIso F f g).app WalkingCospan.right = Iso.refl _ := rfl
 
 @[simp]
 theorem cospanCompIso_app_one : (cospanCompIso F f g).app WalkingCospan.one = Iso.refl _ := rfl
 
 @[simp]
-theorem cospanCompIso_hom_app_left : (cospanCompIso F f g).hom.app WalkingCospan.left = 𝟙 _ :=
-  rfl
+theorem cospanCompIso_hom_app_left : (cospanCompIso F f g).hom.app WalkingCospan.left = 𝟙 _ := rfl
 
 @[simp]
-theorem cospanCompIso_hom_app_right : (cospanCompIso F f g).hom.app WalkingCospan.right = 𝟙 _ :=
-  rfl
+theorem cospanCompIso_hom_app_right : (cospanCompIso F f g).hom.app WalkingCospan.right = 𝟙 _ := rfl
 
 @[simp]
 theorem cospanCompIso_hom_app_one : (cospanCompIso F f g).hom.app WalkingCospan.one = 𝟙 _ := rfl
 
 @[simp]
-theorem cospanCompIso_inv_app_left : (cospanCompIso F f g).inv.app WalkingCospan.left = 𝟙 _ :=
-  rfl
+theorem cospanCompIso_inv_app_left : (cospanCompIso F f g).inv.app WalkingCospan.left = 𝟙 _ := rfl
 
 @[simp]
-theorem cospanCompIso_inv_app_right : (cospanCompIso F f g).inv.app WalkingCospan.right = 𝟙 _ :=
-  rfl
+theorem cospanCompIso_inv_app_right : (cospanCompIso F f g).inv.app WalkingCospan.right = 𝟙 _ := rfl
 
 @[simp]
 theorem cospanCompIso_inv_app_one : (cospanCompIso F f g).inv.app WalkingCospan.one = 𝟙 _ := rfl
@@ -285,8 +277,8 @@ theorem cospanCompIso_inv_app_one : (cospanCompIso F f g).inv.app WalkingCospan.
 end
 
 /-- A functor applied to a span is a span. -/
-def spanCompIso (F : C ⥤ D) {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) :
-    span f g ⋙ F ≅ span (F.map f) (F.map g) :=
+def spanCompIso (F : C ⥤ D) {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z)
+    : span f g ⋙ F ≅ span (F.map f) (F.map g) :=
   NatIso.ofComponents (by rintro (⟨⟩ | ⟨⟨⟩⟩) <;> exact Iso.refl _)
     (by rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) f <;> cases f <;> simp)
 
@@ -331,29 +323,29 @@ section
 
 /-- Constructor for natural transformations between cospans. -/
 @[simps]
-def cospanHomMk {F G : WalkingCospan ⥤ C}
-    (z : F.obj .one ⟶ G.obj .one) (l : F.obj .left ⟶ G.obj .left)
-    (r : F.obj .right ⟶ G.obj .right)
-    (hl : F.map inl ≫ z = l ≫ G.map inl := by cat_disch)
-    (hr : F.map inr ≫ z = r ≫ G.map inr := by cat_disch) : F ⟶ G where
+def cospanHomMk
+    {F G : WalkingCospan ⥤ C} (z : F.obj .one ⟶ G.obj .one) (l : F.obj .left ⟶ G.obj .left)
+    (r : F.obj .right ⟶ G.obj .right) (hl : F.map inl ≫ z = l ≫ G.map inl := by cat_disch)
+    (hr : F.map inr ≫ z = r ≫ G.map inr := by cat_disch)
+    : F ⟶ G where
   app := by rintro (_ | _ | _); exacts [z, l, r]
   naturality := by rintro (_ | _ | _) (_ | _ | _) (_ | _); all_goals cat_disch
 
 /-- Constructor for natural isomorphisms between cospans. -/
 @[simps!]
-def cospanIsoMk {F G : WalkingCospan ⥤ C}
-    (z : F.obj .one ≅ G.obj .one) (l : F.obj .left ≅ G.obj .left)
-    (r : F.obj .right ≅ G.obj .right)
-    (hl : F.map inl ≫ z.hom = l.hom ≫ G.map inl := by cat_disch)
-    (hr : F.map inr ≫ z.hom = r.hom ≫ G.map inr := by cat_disch) : F ≅ G :=
+def cospanIsoMk
+    {F G : WalkingCospan ⥤ C} (z : F.obj .one ≅ G.obj .one) (l : F.obj .left ≅ G.obj .left)
+    (r : F.obj .right ≅ G.obj .right) (hl : F.map inl ≫ z.hom = l.hom ≫ G.map inl := by cat_disch)
+    (hr : F.map inr ≫ z.hom = r.hom ≫ G.map inr := by cat_disch)
+    : F ≅ G :=
   NatIso.ofComponents (by rintro (_ | _ | _); exacts [z, l, r])
     (by rintro (_ | _ | _) (_ | _ | _) (_ | _); all_goals cat_disch)
 
 variable {f : X ⟶ Z} {g : Y ⟶ Z} {f' : X' ⟶ Z'} {g' : Y' ⟶ Z'}
 
 /-- Construct an isomorphism of cospans from components. -/
-def cospanExt (wf : iX.hom ≫ f' = f ≫ iZ.hom) (wg : iY.hom ≫ g' = g ≫ iZ.hom) :
-    cospan f g ≅ cospan f' g' :=
+def cospanExt (wf : iX.hom ≫ f' = f ≫ iZ.hom) (wg : iY.hom ≫ g' = g ≫ iZ.hom)
+    : cospan f g ≅ cospan f' g' :=
   cospanIsoMk iZ iX iY
 
 variable (wf : iX.hom ≫ f' = f ≫ iZ.hom) (wg : iY.hom ≫ g' = g ≫ iZ.hom)
@@ -368,23 +360,22 @@ theorem cospanExt_app_right : (cospanExt iX iY iZ wf wg).app WalkingCospan.right
 theorem cospanExt_app_one : (cospanExt iX iY iZ wf wg).app WalkingCospan.one = iZ := rfl
 
 @[simp]
-theorem cospanExt_hom_app_left :
-    (cospanExt iX iY iZ wf wg).hom.app WalkingCospan.left = iX.hom := rfl
+theorem cospanExt_hom_app_left : (cospanExt iX iY iZ wf wg).hom.app WalkingCospan.left = iX.hom :=
+  rfl
 
 @[simp]
-theorem cospanExt_hom_app_right :
-    (cospanExt iX iY iZ wf wg).hom.app WalkingCospan.right = iY.hom := rfl
+theorem cospanExt_hom_app_right : (cospanExt iX iY iZ wf wg).hom.app WalkingCospan.right = iY.hom :=
+  rfl
 
 @[simp]
 theorem cospanExt_hom_app_one : (cospanExt iX iY iZ wf wg).hom.app WalkingCospan.one = iZ.hom := rfl
 
 @[simp]
-theorem cospanExt_inv_app_left :
-    (cospanExt iX iY iZ wf wg).inv.app WalkingCospan.left = iX.inv := rfl
+theorem cospanExt_inv_app_left : (cospanExt iX iY iZ wf wg).inv.app WalkingCospan.left = iX.inv :=
+  rfl
 
 @[simp]
-theorem cospanExt_inv_app_right :
-    (cospanExt iX iY iZ wf wg).inv.app WalkingCospan.right = iY.inv :=
+theorem cospanExt_inv_app_right : (cospanExt iX iY iZ wf wg).inv.app WalkingCospan.right = iY.inv :=
   rfl
 
 @[simp]
@@ -397,29 +388,29 @@ section
 
 /-- Constructor for natural transformations between spans. -/
 @[simps]
-def spanHomMk {F G : WalkingSpan ⥤ C}
-    (z : F.obj .zero ⟶ G.obj .zero) (l : F.obj .left ⟶ G.obj .left)
-    (r : F.obj .right ⟶ G.obj .right)
-    (hl : F.map fst ≫ l = z ≫ G.map fst := by cat_disch)
-    (hr : F.map snd ≫ r = z ≫ G.map snd := by cat_disch) : F ⟶ G where
+def spanHomMk
+    {F G : WalkingSpan ⥤ C} (z : F.obj .zero ⟶ G.obj .zero) (l : F.obj .left ⟶ G.obj .left)
+    (r : F.obj .right ⟶ G.obj .right) (hl : F.map fst ≫ l = z ≫ G.map fst := by cat_disch)
+    (hr : F.map snd ≫ r = z ≫ G.map snd := by cat_disch)
+    : F ⟶ G where
   app := by rintro (_ | _ | _); exacts [z, l, r]
   naturality := by rintro (_ | _ | _) (_ | _ | _) (_ | _); all_goals cat_disch
 
 /-- Constructor for natural isomorphisms between spans. -/
 @[simps!]
-def spanIsoMk {F G : WalkingSpan ⥤ C}
-    (z : F.obj .zero ≅ G.obj .zero) (l : F.obj .left ≅ G.obj .left)
-    (r : F.obj .right ≅ G.obj .right)
-    (hl : F.map fst ≫ l.hom = z.hom ≫ G.map fst := by cat_disch)
-    (hr : F.map snd ≫ r.hom = z.hom ≫ G.map snd := by cat_disch) : F ≅ G :=
+def spanIsoMk
+    {F G : WalkingSpan ⥤ C} (z : F.obj .zero ≅ G.obj .zero) (l : F.obj .left ≅ G.obj .left)
+    (r : F.obj .right ≅ G.obj .right) (hl : F.map fst ≫ l.hom = z.hom ≫ G.map fst := by cat_disch)
+    (hr : F.map snd ≫ r.hom = z.hom ≫ G.map snd := by cat_disch)
+    : F ≅ G :=
   NatIso.ofComponents (by rintro (_ | _ | _); exacts [z, l, r])
     (by rintro (_ | _ | _) (_ | _ | _) (_ | _); all_goals cat_disch)
 
 variable {f : X ⟶ Y} {g : X ⟶ Z} {f' : X' ⟶ Y'} {g' : X' ⟶ Z'}
 
 /-- Construct an isomorphism of spans from components. -/
-def spanExt (wf : iX.hom ≫ f' = f ≫ iY.hom) (wg : iX.hom ≫ g' = g ≫ iZ.hom) :
-    span f g ≅ span f' g' :=
+def spanExt (wf : iX.hom ≫ f' = f ≫ iY.hom) (wg : iX.hom ≫ g' = g ≫ iZ.hom)
+    : span f g ≅ span f' g' :=
   spanIsoMk iX iY iZ
 
 variable (wf : iX.hom ≫ f' = f ≫ iY.hom) (wg : iX.hom ≫ g' = g ≫ iZ.hom)

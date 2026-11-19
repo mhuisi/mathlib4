@@ -46,10 +46,12 @@ section Seminormed
 
 variable {E : Type*} [SeminormedAddCommGroup E] [NormedSpace ℝ E] {v : ι → E}
 
-/-- If the summands pairwise lie on a common closed ray, the norm of their sum is the sum of
-their norms. -/
-lemma norm_sum_eq_of_pairwise_sameRay (hp : (s : Set ι).Pairwise (SameRay ℝ on v)) :
-    ‖∑ i ∈ s, v i‖ = ∑ i ∈ s, ‖v i‖ := by
+/--
+If the summands pairwise lie on a common closed ray, the norm of their sum is the sum of
+their norms.
+-/
+lemma norm_sum_eq_of_pairwise_sameRay (hp : (s : Set ι).Pairwise (SameRay ℝ on v))
+    : ‖∑ i ∈ s, v i‖ = ∑ i ∈ s, ‖v i‖ := by
   induction s using Finset.cons_induction with
   | empty => simp
   | cons a t ha ih =>
@@ -63,15 +65,18 @@ section Normed
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [StrictConvexSpace ℝ E] {v : ι → E}
 
 omit [StrictConvexSpace ℝ E] in
-lemma sum_ne_zero_of_pairwise_sameRay (hp : (s : Set ι).Pairwise (SameRay ℝ on v)) (hi : i ∈ s)
-    (hvi : v i ≠ 0) : ∑ j ∈ s, v j ≠ 0 := by
+lemma sum_ne_zero_of_pairwise_sameRay
+    (hp : (s : Set ι).Pairwise (SameRay ℝ on v)) (hi : i ∈ s) (hvi : v i ≠ 0)
+    : ∑ j ∈ s, v j ≠ 0 := by
   rw [← norm_pos_iff, norm_sum_eq_of_pairwise_sameRay hp]
   exact (norm_pos_iff.2 hvi).trans_le (single_le_sum (fun j _ ↦ norm_nonneg (v j)) hi)
 
-/-- **Triangle equality** for a finite sum: the norm of the sum equals the sum of the norms
-exactly when the summands pairwise lie on a common closed ray. -/
-theorem norm_sum_eq_iff_pairwise_sameRay :
-    ‖∑ i ∈ s, v i‖ = ∑ i ∈ s, ‖v i‖ ↔ (s : Set ι).Pairwise (SameRay ℝ on v) := by
+/--
+**Triangle equality** for a finite sum: the norm of the sum equals the sum of the norms
+exactly when the summands pairwise lie on a common closed ray.
+-/
+theorem norm_sum_eq_iff_pairwise_sameRay
+    : ‖∑ i ∈ s, v i‖ = ∑ i ∈ s, ‖v i‖ ↔ (s : Set ι).Pairwise (SameRay ℝ on v) := by
   refine ⟨fun h i hi j hj hij ↦ ?_, norm_sum_eq_of_pairwise_sameRay⟩
   classical
   have : {i, j} ⊆ s := by grind
@@ -79,17 +84,21 @@ theorem norm_sum_eq_iff_pairwise_sameRay :
   grind [sameRay_iff_norm_add, norm_sum_le, norm_add_le]
 
 omit [StrictConvexSpace ℝ E] in
-/-- If the summands pairwise lie on a common closed ray and one of them is nonzero, then it has
-the same normalization as the sum. -/
-lemma normalize_eq_of_pairwise_sameRay (hp : (s : Set ι).Pairwise (SameRay ℝ on v)) (hi : i ∈ s)
-    (hvi : v i ≠ 0) :
-    NormedSpace.normalize (v i) = NormedSpace.normalize (∑ j ∈ s, v j) :=
+/--
+If the summands pairwise lie on a common closed ray and one of them is nonzero, then it has
+the same normalization as the sum.
+-/
+lemma normalize_eq_of_pairwise_sameRay
+    (hp : (s : Set ι).Pairwise (SameRay ℝ on v)) (hi : i ∈ s) (hvi : v i ≠ 0)
+    : NormedSpace.normalize (v i) = NormedSpace.normalize (∑ j ∈ s, v j) :=
   (sameRay_sum_right_of_pairwise hp hi).normalize_eq hvi (sum_ne_zero_of_pairwise_sameRay hp hi hvi)
 
-/-- **Triangle equality**: the norm of a finite sum equals the sum of the norms exactly when every
-summand is a nonnegative real multiple of a single vector. -/
-theorem norm_sum_eq_iff_exists_smul :
-    ‖∑ i ∈ s, v i‖ = ∑ i ∈ s, ‖v i‖ ↔ ∃ c : E, ∀ i ∈ s, v i = ‖v i‖ • c := by
+/--
+**Triangle equality**: the norm of a finite sum equals the sum of the norms exactly when every
+summand is a nonnegative real multiple of a single vector.
+-/
+theorem norm_sum_eq_iff_exists_smul
+    : ‖∑ i ∈ s, v i‖ = ∑ i ∈ s, ‖v i‖ ↔ ∃ c : E, ∀ i ∈ s, v i = ‖v i‖ • c := by
   rw [norm_sum_eq_iff_pairwise_sameRay]
   refine ⟨fun h ↦ ⟨NormedSpace.normalize (∑ i ∈ s, v i), fun i hi ↦ ?_⟩, ?_⟩
   · rcases eq_or_ne (v i) 0 with hv | hv

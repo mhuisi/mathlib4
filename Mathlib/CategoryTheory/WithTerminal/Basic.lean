@@ -39,7 +39,6 @@ from `Cat` to `Cat`.
 
 @[expose] public section
 
-
 namespace CategoryTheory
 
 universe v u
@@ -50,7 +49,7 @@ variable (C : Type u) [Category.{v} C]
 inductive WithTerminal : Type u
   | of : C → WithTerminal
   | star : WithTerminal
-  deriving Inhabited
+deriving Inhabited
 
 attribute [local aesop safe cases (rule_sets := [CategoryTheory])] WithTerminal
 
@@ -59,7 +58,7 @@ attribute [local aesop safe cases (rule_sets := [CategoryTheory])] WithTerminal
 inductive WithInitial : Type u
   | of : C → WithInitial
   | star : WithInitial
-  deriving Inhabited
+deriving Inhabited
 
 namespace WithTerminal
 
@@ -81,7 +80,7 @@ def id : ∀ X : WithTerminal C, Hom X X
 set_option linter.translate.warnInvalid false in
 /-- Composition of morphisms for `WithTerminal C`. -/
 @[to_dual (attr := simp) (reorder := X Z, 6 7)
-/-- Composition of morphisms for `WithInitial C`. -/]
+  /-- Composition of morphisms for `WithInitial C`. -/]
 def comp : ∀ {X Y Z : WithTerminal C}, Hom X Y → Hom Y Z → Hom X Z
   | of _X, of _Y, of _Z => fun f g => f ≫ g
   | of _X, _, star => fun _f _g => PUnit.unit
@@ -102,9 +101,10 @@ instance : Category.{v} (WithTerminal C) where
 @[to_dual /-- Helper function for typechecking. -/]
 def down {X Y : C} (f : of X ⟶ of Y) : X ⟶ Y := f
 
-@[to_dual (attr := simp)] lemma down_id {X : C} : down (𝟙 (of X)) = 𝟙 X := rfl
-@[to_dual (attr := simp)] lemma down_comp {X Y Z : C} (f : of X ⟶ of Y) (g : of Y ⟶ of Z) :
-    down (f ≫ g) = down f ≫ down g :=
+@[to_dual (attr := simp)]
+lemma down_id {X : C} : down (𝟙 (of X)) = 𝟙 X := rfl
+@[to_dual (attr := simp)]
+lemma down_comp {X Y Z : C} (f : of X ⟶ of Y) (g : of Y ⟶ of Z) : down (f ≫ g) = down f ≫ down g :=
   rfl
 
 @[to_dual (attr := aesop safe destruct (rule_sets := [CategoryTheory])) false_of_to_star]
@@ -125,7 +125,7 @@ instance : (incl : C ⥤ _).Faithful where
 
 /-- Map `WithTerminal` with respect to a functor `F : C ⥤ D`. -/
 @[to_dual (attr := implicit_reducible, simps)
-/-- Map `WithInitial` with respect to a functor `F : C ⥤ D`. -/]
+  /-- Map `WithInitial` with respect to a functor `F : C ⥤ D`. -/]
 def map {D : Type*} [Category* D] (F : C ⥤ D) : WithTerminal C ⥤ WithTerminal D where
   obj X :=
     match X with
@@ -139,28 +139,37 @@ def map {D : Type*} [Category* D] (F : C ⥤ D) : WithTerminal C ⥤ WithTermina
 
 /-- A natural isomorphism between the functor `map (𝟭 C)` and `𝟭 (WithTerminal C)`. -/
 @[to_dual (attr := simps!)
-/-- A natural isomorphism between the functor `map (𝟭 C)` and `𝟭 (WithInitial C)`. -/]
+  /-- A natural isomorphism between the functor `map (𝟭 C)` and `𝟭 (WithInitial C)`. -/]
 def mapId (C : Type*) [Category* C] : map (𝟭 C) ≅ 𝟭 (WithTerminal C) :=
-  NatIso.ofComponents (fun X => match X with
-    | of _ => Iso.refl _
-    | star => Iso.refl _) (by cat_disch)
+  NatIso.ofComponents
+    (fun X =>
+      match X with
+      | of _ => Iso.refl _
+      | star => Iso.refl _)
+    (by cat_disch)
 
 /-- A natural isomorphism between the functor `map (F ⋙ G) ` and `map F ⋙ map G `. -/
 @[to_dual (attr := simps!)
-/-- A natural isomorphism between the functor `map (F ⋙ G) ` and `map F ⋙ map G `. -/]
-def mapComp {D E : Type*} [Category* D] [Category* E] (F : C ⥤ D) (G : D ⥤ E) :
-    map (F ⋙ G) ≅ map F ⋙ map G :=
-  NatIso.ofComponents (fun X => match X with
-    | of _ => Iso.refl _
-    | star => Iso.refl _) (by cat_disch)
+  /-- A natural isomorphism between the functor `map (F ⋙ G) ` and `map F ⋙ map G `. -/]
+def mapComp {D E : Type*} [Category* D] [Category* E] (F : C ⥤ D) (G : D ⥤ E)
+    : map (F ⋙ G) ≅ map F ⋙ map G :=
+  NatIso.ofComponents
+    (fun X =>
+      match X with
+      | of _ => Iso.refl _
+      | star => Iso.refl _)
+    (by cat_disch)
 
-/-- From a natural transformation of functors `C ⥤ D`, the induced natural transformation
-of functors `WithTerminal C ⥤ WithTerminal D`. -/
+/--
+From a natural transformation of functors `C ⥤ D`, the induced natural transformation
+of functors `WithTerminal C ⥤ WithTerminal D`.
+-/
 @[to_dual (attr := simps)
-/-- From a natural transformation of functors `C ⥤ D`, the induced natural transformation
+  /-- From a natural transformation of functors `C ⥤ D`, the induced natural transformation
 of functors `WithInitial C ⥤ WithInitial D`. -/]
 def map₂ {D : Type*} [Category* D] {F G : C ⥤ D} (η : F ⟶ G) : map F ⟶ map G where
-  app := fun X => match X with
+  app := fun X =>
+    match X with
     | of x => η.app x
     | star => 𝟙 star
   naturality := by
@@ -172,7 +181,7 @@ def map₂ {D : Type*} [Category* D] {F G : C ⥤ D} (η : F ⟶ G) : map F ⟶ 
 
 /-- The prelax functor from `Cat` to `Cat` defined with `WithTerminal`. -/
 @[to_dual (attr := simps, implicit_reducible)
-/-- The prelax functor from `Cat` to `Cat` defined with `WithInitial`. -/]
+  /-- The prelax functor from `Cat` to `Cat` defined with `WithInitial`. -/]
 def prelaxfunctor : PrelaxFunctor Cat Cat where
   obj C := ↧(WithTerminal C)
   map F := (map F.toFunctor).toCatHom
@@ -189,7 +198,7 @@ def prelaxfunctor : PrelaxFunctor Cat Cat where
 set_option backward.isDefEq.respectTransparency false in
 /-- The pseudofunctor from `Cat` to `Cat` defined with `WithTerminal`. -/
 @[to_dual (attr := simps)
-/-- The pseudofunctor from `Cat` to `Cat` defined with `WithInitial`. -/]
+  /-- The pseudofunctor from `Cat` to `Cat` defined with `WithInitial`. -/]
 def pseudofunctor : Pseudofunctor Cat Cat where
   toPrelaxFunctor := prelaxfunctor
   mapId C := Cat.Hom.isoMk (mapId C)
@@ -237,23 +246,25 @@ instance {X : WithTerminal C} : Unique (X ⟶ star) where
 
 /-- `WithTerminal.star` is terminal. -/
 @[to_dual /-- `WithInitial.star` is initial. -/]
-def starTerminal : Limits.IsTerminal (star : WithTerminal C) :=
-  Limits.IsTerminal.ofUnique _
+def starTerminal : Limits.IsTerminal (star : WithTerminal C) := Limits.IsTerminal.ofUnique _
 
 @[to_dual]
 instance : Limits.HasTerminal (WithTerminal C) := Limits.hasTerminal_of_unique star
 
 /-- The isomorphism between star and an abstract terminal object of `WithTerminal C` -/
 @[to_dual (attr := simps!)
-/-- The isomorphism between star and an abstract initial object of `WithInitial C` -/]
+  /-- The isomorphism between star and an abstract initial object of `WithInitial C` -/]
 noncomputable def starIsoTerminal : star ≅ ⊤_ (WithTerminal C) :=
   starTerminal.uniqueUpToIso (Limits.terminalIsTerminal)
 
 /-- Lift a functor `F : C ⥤ D` to `WithTerminal C ⥤ D`. -/
 @[to_dual (attr := implicit_reducible, simps)
-/-- Lift a functor `F : C ⥤ D` to `WithInitial C ⥤ D`. -/]
-def lift {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z)
-    (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x) : WithTerminal C ⥤ D where
+  /-- Lift a functor `F : C ⥤ D` to `WithInitial C ⥤ D`. -/]
+def lift
+    {D : Type*} [Category* D]
+    {Z : D}
+    (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z) (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x)
+    : WithTerminal C ⥤ D where
   obj X :=
     match X with
     | of x => F.obj x
@@ -266,34 +277,44 @@ def lift {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F.obj x
 
 /-- The isomorphism between `incl ⋙ lift F _ _` with `F`. -/
 @[to_dual (attr := simps!) /-- The isomorphism between `incl ⋙ lift F _ _` with `F`. -/]
-def inclLift {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z)
-    (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x) : incl ⋙ lift F M hM ≅ F where
+def inclLift
+    {D : Type*} [Category* D]
+    {Z : D}
+    (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z) (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x)
+    : incl ⋙ lift F M hM ≅ F where
   hom := { app := fun _ => 𝟙 _ }
   inv := { app := fun _ => 𝟙 _ }
 
 /-- The isomorphism between `(lift F _ _).obj WithTerminal.star` with `Z`. -/
 @[to_dual (attr := simps!)
-/-- The isomorphism between `(lift F _ _).obj WithInitial.star` with `Z`. -/]
-def liftStar {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z)
-    (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x) : (lift F M hM).obj star ≅ Z :=
+  /-- The isomorphism between `(lift F _ _).obj WithInitial.star` with `Z`. -/]
+def liftStar
+    {D : Type*} [Category* D]
+    {Z : D}
+    (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z) (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x)
+    : (lift F M hM).obj star ≅ Z :=
   eqToIso rfl
 
 @[to_dual liftStar_lift_map]
-theorem lift_map_liftStar {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z)
-    (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x) (x : C) :
-    (lift F M hM).map (starTerminal.from (incl.obj x)) ≫ (liftStar F M hM).hom =
-      (inclLift F M hM).hom.app x ≫ M x := by
+theorem lift_map_liftStar
+    {D : Type*} [Category* D]
+    {Z : D}
+    (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z) (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x)
+    (x : C)
+    : (lift F M hM).map (starTerminal.from (incl.obj x)) ≫ (liftStar F M hM).hom
+      = (inclLift F M hM).hom.app x ≫ M x := by
   simp
   rfl
 
 /-- The uniqueness of `lift`. -/
 @[to_dual (attr := simp) /-- The uniqueness of `lift`. -/]
-def liftUnique {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z)
-    (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x)
-    (G : WithTerminal C ⥤ D) (h : incl ⋙ G ≅ F)
-    (hG : G.obj star ≅ Z)
-    (hh : ∀ x : C, G.map (starTerminal.from (incl.obj x)) ≫ hG.hom = h.hom.app x ≫ M x) :
-    G ≅ lift F M hM :=
+def liftUnique
+    {D : Type*} [Category* D]
+    {Z : D}
+    (F : C ⥤ D) (M : ∀ x : C, F.obj x ⟶ Z) (hM : ∀ (x y : C) (f : x ⟶ y), F.map f ≫ M y = M x)
+    (G : WithTerminal C ⥤ D) (h : incl ⋙ G ≅ F) (hG : G.obj star ≅ Z)
+    (hh : ∀ x : C, G.map (starTerminal.from (incl.obj x)) ≫ hG.hom = h.hom.app x ≫ M x)
+    : G ≅ lift F M hM :=
   NatIso.ofComponents
     (fun X =>
       match X with
@@ -311,27 +332,34 @@ def liftUnique {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (M : ∀ x : C, F
 
 /-- A variant of `lift` with `Z` a terminal object. -/
 @[to_dual (attr := simps!) /-- A variant of `lift` with `Z` an initial object. -/]
-def liftToTerminal {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (hZ : Limits.IsTerminal Z) :
-    WithTerminal C ⥤ D :=
+def liftToTerminal {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (hZ : Limits.IsTerminal Z)
+    : WithTerminal C ⥤ D :=
   lift F (fun _x => hZ.from _) fun _x _y _f => hZ.hom_ext _ _
 
 /-- A variant of `incl_lift` with `Z` a terminal object. -/
 @[to_dual (attr := simps!) /-- A variant of `incl_lift` with `Z` an initial object. -/]
-def inclLiftToTerminal {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (hZ : Limits.IsTerminal Z) :
-    incl ⋙ liftToTerminal F hZ ≅ F :=
+def inclLiftToTerminal {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (hZ : Limits.IsTerminal Z)
+    : incl ⋙ liftToTerminal F hZ ≅ F :=
   inclLift _ _ _
 
 /-- A variant of `lift_unique` with `Z` a terminal object. -/
 @[to_dual (attr := simps!) /-- A variant of `lift_unique` with `Z` an initial object. -/]
-def liftToTerminalUnique {D : Type*} [Category* D] {Z : D} (F : C ⥤ D) (hZ : Limits.IsTerminal Z)
-    (G : WithTerminal C ⥤ D) (h : incl ⋙ G ≅ F) (hG : G.obj star ≅ Z) : G ≅ liftToTerminal F hZ :=
-  liftUnique F (fun _z => hZ.from _) (fun _x _y _f => hZ.hom_ext _ _) G h hG fun _x =>
-    hZ.hom_ext _ _
+def liftToTerminalUnique
+    {D : Type*} [Category* D]
+    {Z : D}
+    (F : C ⥤ D)
+    (hZ : Limits.IsTerminal Z)
+    (G : WithTerminal C ⥤ D) (h : incl ⋙ G ≅ F) (hG : G.obj star ≅ Z)
+    : G ≅ liftToTerminal F hZ :=
+  liftUnique F
+    (fun _z => hZ.from _)
+    (fun _x _y _f => hZ.hom_ext _ _)
+    G h hG
+    fun _x => hZ.hom_ext _ _
 
 /-- Constructs a morphism to `star` from `of X`. -/
 @[to_dual (attr := simp) homTo /-- Constructs a morphism from `star` to `of X`. -/]
-def homFrom (X : C) : incl.obj X ⟶ star :=
-  starTerminal.from _
+def homFrom (X : C) : incl.obj X ⟶ star := starTerminal.from _
 
 @[to_dual isIso_of_to_star]
 instance isIso_of_from_star {X : WithTerminal C} (f : star ⟶ X) : IsIso f :=
@@ -343,48 +371,57 @@ section
 
 variable {D : Type*} [Category* D]
 
-/-- A functor `WithTerminal C ⥤ D` can be seen as an element of the comma category
-`Comma (𝟭 (C ⥤ D)) (const C)`. -/
+/--
+A functor `WithTerminal C ⥤ D` can be seen as an element of the comma category
+`Comma (𝟭 (C ⥤ D)) (const C)`.
+-/
 @[to_dual (attr := simps!)
-/-- A functor `WithInitial C ⥤ D` can be seen as an element of the comma category
+  /-- A functor `WithInitial C ⥤ D` can be seen as an element of the comma category
 `Comma (const C) (𝟭 (C ⥤ D))`. -/]
 def mkCommaObject (F : WithTerminal C ⥤ D) : Comma (𝟭 (C ⥤ D)) (Functor.const C) where
   right := F.obj .star
   left := (incl ⋙ F)
-  hom :=
-    { app x := F.map (starTerminal.from ↧x)
-      naturality x y f := by
-        dsimp
-        rw [Category.comp_id, ← F.map_comp]
-        congr 1 }
+  hom := {
+    app x := F.map (starTerminal.from ↧x)
+    naturality x y f := by
+      dsimp
+      rw [Category.comp_id, ← F.map_comp]
+      congr 1
+  }
 
 set_option backward.isDefEq.respectTransparency.types false in
 set_option backward.defeqAttrib.useBackward true in
-/-- A morphism of functors `WithTerminal C ⥤ D` gives a morphism between the associated comma
-objects. -/
+/--
+A morphism of functors `WithTerminal C ⥤ D` gives a morphism between the associated comma
+objects.
+-/
 @[to_dual (attr := simps!)
-/-- A morphism of functors `WithInitial C ⥤ D` gives a morphism between the associated comma
+  /-- A morphism of functors `WithInitial C ⥤ D` gives a morphism between the associated comma
 objects. -/]
 def mkCommaMorphism {F G : WithTerminal C ⥤ D} (η : F ⟶ G) : mkCommaObject F ⟶ mkCommaObject G where
   right := η.app .star
   left := Functor.whiskerLeft incl η
 
-/-- An element of the comma category `Comma (𝟭 (C ⥤ D)) (Functor.const C)` can be seen as a
-functor `WithTerminal C ⥤ D`. -/
+/--
+An element of the comma category `Comma (𝟭 (C ⥤ D)) (Functor.const C)` can be seen as a
+functor `WithTerminal C ⥤ D`.
+-/
 @[to_dual (attr := simps!)
-/-- An element of the comma category `Comma (Functor.const C) (𝟭 (C ⥤ D))` can be seen as a
+  /-- An element of the comma category `Comma (Functor.const C) (𝟭 (C ⥤ D))` can be seen as a
 functor `WithInitial C ⥤ D`. -/]
 def ofCommaObject (c : Comma (𝟭 (C ⥤ D)) (Functor.const C)) : WithTerminal C ⥤ D :=
   lift (Z := c.right) c.left (fun x ↦ c.hom.app x) (fun x y f ↦ by simp)
 
 set_option backward.defeqAttrib.useBackward true in
-/-- A morphism in `Comma (𝟭 (C ⥤ D)) (Functor.const C)` gives a morphism between the associated
-functors `WithTerminal C ⥤ D`. -/
+/--
+A morphism in `Comma (𝟭 (C ⥤ D)) (Functor.const C)` gives a morphism between the associated
+functors `WithTerminal C ⥤ D`.
+-/
 @[to_dual (attr := simps!)
-/-- A morphism in `Comma (Functor.const C) (𝟭 (C ⥤ D))` gives a morphism between the associated
+  /-- A morphism in `Comma (Functor.const C) (𝟭 (C ⥤ D))` gives a morphism between the associated
 functors `WithInitial C ⥤ D`. -/]
-def ofCommaMorphism {c c' : Comma (𝟭 (C ⥤ D)) (Functor.const C)} (φ : c ⟶ c') :
-    ofCommaObject c ⟶ ofCommaObject c' where
+def ofCommaMorphism {c c' : Comma (𝟭 (C ⥤ D)) (Functor.const C)} (φ : c ⟶ c')
+    : ofCommaObject c ⟶ ofCommaObject c' where
   app x :=
     match x with
     | of x => φ.left.app x
@@ -396,31 +433,30 @@ def ofCommaMorphism {c c' : Comma (𝟭 (C ⥤ D)) (Functor.const C)} (φ : c �
     | star, star, _ => by simp
 
 set_option backward.isDefEq.respectTransparency false in
-/-- The category of functors `WithTerminal C ⥤ D` is equivalent to the category
-`Comma (𝟭 (C ⥤ D)) (const C) `. -/
+/--
+The category of functors `WithTerminal C ⥤ D` is equivalent to the category
+`Comma (𝟭 (C ⥤ D)) (const C) `.
+-/
 @[to_dual (attr := simps!)
-/-- The category of functors `WithInitial C ⥤ D` is equivalent to the category
+  /-- The category of functors `WithInitial C ⥤ D` is equivalent to the category
 `Comma (const C) (𝟭 (C ⥤ D))`. -/]
 def equivComma : (WithTerminal C ⥤ D) ≌ Comma (𝟭 (C ⥤ D)) (Functor.const C) where
-  functor :=
-    { obj := mkCommaObject
-      map := mkCommaMorphism }
-  inverse :=
-    { obj := ofCommaObject
-      map := ofCommaMorphism }
+  functor := { obj := mkCommaObject, map := mkCommaMorphism }
+  inverse := { obj := ofCommaObject, map := ofCommaMorphism }
   unitIso :=
     NatIso.ofComponents
-      (fun F ↦ liftUnique
-        (incl ⋙ F)
-        (fun x ↦ F.map (starTerminal.from (of x)))
-        (fun x y f ↦ by
-          simp only [Functor.comp_obj, Functor.comp_map]
-          rw [← F.map_comp]
-          congr 1)
-        F (Iso.refl _) (Iso.refl _)
-        (fun x ↦ by
-          simp only [Iso.refl_hom, Category.id_comp, Functor.comp_obj,
-            NatTrans.id_app, Category.comp_id]; rfl))
+      (fun F ↦
+        liftUnique (incl ⋙ F)
+          (fun x ↦ F.map (starTerminal.from (of x)))
+          (fun x y f ↦ by
+            simp only [Functor.comp_obj, Functor.comp_map]
+            rw [← F.map_comp]
+            congr 1)
+          F (Iso.refl _) (Iso.refl _)
+          (fun x ↦ by
+            simp only [Iso.refl_hom, Category.id_comp, Functor.comp_obj, NatTrans.id_app,
+              Category.comp_id]
+            rfl))
       (fun {x y} f ↦ by ext t; cases t <;> simp [incl])
   counitIso := NatIso.ofComponents (fun F ↦ Iso.refl _)
   functor_unitIso_comp x := by
@@ -444,48 +480,55 @@ instance subsingleton_hom {J : Type*} : Quiver.IsThin (WithTerminal (Discrete J)
 set_option backward.privateInPublic true in
 /-- Implementation detail for `widePullbackShapeEquiv`. -/
 @[to_dual (attr := simps apply)]
-private def widePullbackShapeEquivObj {J : Type*} :
-    WidePullbackShape J ≃ WithTerminal (Discrete J) where
+private def widePullbackShapeEquivObj {J : Type*}
+    : WidePullbackShape J ≃ WithTerminal (Discrete J) where
   toFun
-  | .some x => ↧(.mk x)
-  | .none => .star
+    | .some x => ↧(.mk x)
+    | .none => .star
   invFun
-  | .of x => .some <| Discrete.as x
-  | .star => .none
+    | .of x => .some <| Discrete.as x
+    | .star => .none
   left_inv x := by cases x <;> simp
   right_inv x := by cases x <;> simp
 
 set_option backward.privateInPublic true in
 /-- Implementation detail for `widePullbackShapeEquiv`. -/
 @[to_dual]
-private def widePullbackShapeEquivMap {J : Type*} (x y : WidePullbackShape J) :
-    (x ⟶ y) ≃ (widePullbackShapeEquivObj x ⟶ widePullbackShapeEquivObj y) where
+private def widePullbackShapeEquivMap {J : Type*} (x y : WidePullbackShape J)
+    : (x ⟶ y) ≃ (widePullbackShapeEquivObj x ⟶ widePullbackShapeEquivObj y) where
   toFun
-  | .term _ => PUnit.unit
-  | .id _ => 𝟙 _
-  invFun f := match x, y with
-  | some x, some y =>
-    cast (by
-        have eq : x = y := f.eq
-        rw [eq]
-        rfl) (Hom.id (some y))
-  | none, some y => by cases f
-  | some x, none => .term x
-  | none, none => .id none
+    | .term _ => PUnit.unit
+    | .id _ => 𝟙 _
+  invFun f :=
+    match x, y with
+    | some x, some y =>
+      cast
+        (by
+          have eq : x = y := f.eq
+          rw [eq]
+          rfl)
+        (Hom.id (some y))
+    | none, some y => by cases f
+    | some x, none => .term x
+    | none, none => .id none
   left_inv f := by apply Subsingleton.allEq
-  right_inv f := match x, y with
-  | some x, some y => Subsingleton.allEq _ _
-  | none, some y => by cases f
-  | some x, none
-  | none, none => rfl
+  right_inv f :=
+    match x, y with
+    | some x, some y => Subsingleton.allEq _ _
+    | none, some y => by cases f
+    | some x, none
+    | none, none =>
+      rfl
 
 set_option backward.privateInPublic true in
 set_option backward.privateInPublic.warn false in
-/-- For a discrete category, `WithTerminal` is the same category as `WidePullbackShape`.
+/--
+For a discrete category, `WithTerminal` is the same category as `WidePullbackShape`.
 
-TODO: Should we simply replace `WidePullbackShape J` with `WithTerminal (Discrete J)` everywhere? -/
+TODO: Should we simply replace `WidePullbackShape J` with `WithTerminal (Discrete J)` everywhere?
+-/
 @[to_dual (attr := simps! functor_obj inverse_obj)
-/-- For a discrete category, `WithInitial` is the same category as `WidePushoutShape` -/]
+  /-- For a discrete category, `WithInitial` is the same category as `WidePushoutShape` -/]
 def widePullbackShapeEquiv {J : Type*} : WidePullbackShape J ≌ WithTerminal (Discrete J) where
   functor.obj := widePullbackShapeEquivObj
   functor.map := widePullbackShapeEquivMap _ _
@@ -499,64 +542,69 @@ end WithTerminal
 open Opposite in
 /-- The opposite category of `WithTerminal C` is equivalent to `WithInitial Cᵒᵖ`. -/
 @[to_dual (attr := simps!)
-/-- The opposite category of `WithInitial C` is equivalent to `WithTerminal Cᵒᵖ`. -/]
+  /-- The opposite category of `WithInitial C` is equivalent to `WithTerminal Cᵒᵖ`. -/]
 def WithTerminal.opEquiv : (WithTerminal C)ᵒᵖ ≌ WithInitial Cᵒᵖ where
-  functor :=
-    { obj := fun ⟨x⟩ ↦ match x with
+  functor := {
+    obj := fun ⟨x⟩ ↦
+      match x with
       | of x => ↧(op x)
       | star => .star
-      map := fun {x y} ⟨f⟩ ↦
-        match x, y, f with
-        | op (of x), op (of y), f => (WithTerminal.down f).op
-        | op star, op (of _), _ => WithInitial.starInitial.to _
-        | op star, op star, _ => 𝟙 _
-      map_id := fun ⟨x⟩ ↦ by cases x <;> rfl
-      map_comp := fun {x y z} ⟨f⟩ ⟨g⟩ ↦
-        match x, y, z, f, g with
-        | op (of x), op (of y), op (of z), f, g => rfl
-        | _, op (of y), op star, f, g => (g : PEmpty).elim
-        | op (of x), op star, _, f, _ => (f : PEmpty).elim
-        | op star, _, _, f, g => by subsingleton }
-  inverse :=
-    { obj := fun x ↦
+    map := fun {x y} ⟨f⟩ ↦
+      match x, y, f with
+      | op (of x), op (of y), f => (WithTerminal.down f).op
+      | op star, op (of _), _ => WithInitial.starInitial.to _
+      | op star, op star, _ => 𝟙 _
+    map_id := fun ⟨x⟩ ↦ by cases x <;> rfl
+    map_comp := fun {x y z} ⟨f⟩ ⟨g⟩ ↦
+      match x, y, z, f, g with
+      | op (of x), op (of y), op (of z), f, g => rfl
+      | _, op (of y), op star, f, g => (g : PEmpty).elim
+      | op (of x), op star, _, f, _ => (f : PEmpty).elim
+      | op star, _, _, f, g => by subsingleton
+  }
+  inverse := {
+    obj := fun x ↦
       match x with
-        | .of x => op <| .of x.unop
-        | .star => op .star
-      map := fun {x y} f ↦
-        match x, y, f with
-        | .of (op x), .of (op y), f => WithInitial.down f
-        | .star, .of (op _), _ => op <| WithTerminal.starTerminal.from _
-        | .star, .star, _ => 𝟙 _
-      map_id := fun x ↦ by cases x <;> rfl
-      map_comp := fun {x y z} f g ↦
-        match x, y, z, f, g with
-        | .of (op x), .of (op y), .of (op z), f, g => rfl
-        | _, .of (op y), .star, f, g => (g : PEmpty).elim
-        | .of (op x), .star, _, f, _ => (f : PEmpty).elim
-        | .star, _, _, f, g => by subsingleton }
+      | .of x => op <| .of x.unop
+      | .star => op .star
+    map := fun {x y} f ↦
+      match x, y, f with
+      | .of (op x), .of (op y), f => WithInitial.down f
+      | .star, .of (op _), _ => op <| WithTerminal.starTerminal.from _
+      | .star, .star, _ => 𝟙 _
+    map_id := fun x ↦ by cases x <;> rfl
+    map_comp := fun {x y z} f g ↦
+      match x, y, z, f, g with
+      | .of (op x), .of (op y), .of (op z), f, g => rfl
+      | _, .of (op y), .star, f, g => (g : PEmpty).elim
+      | .of (op x), .star, _, f, _ => (f : PEmpty).elim
+      | .star, _, _, f, g => by subsingleton
+  }
   unitIso :=
     NatIso.ofComponents
-      (fun ⟨x⟩ ↦ match x with
+      (fun ⟨x⟩ ↦
+        match x with
         | .of x => Iso.refl _
         | .star => Iso.refl _)
-      (fun {x y} ⟨f⟩ ↦ match x, y, f with
+      (fun {x y} ⟨f⟩ ↦
+        match x, y, f with
         | op (of x), op (of y), f => by
-            simp only [Functor.id_obj, Functor.comp_obj,
-              Functor.id_map, Iso.refl_hom, Category.comp_id, Functor.comp_map, Category.id_comp]
-            rfl
+          simp only [Functor.id_obj, Functor.comp_obj, Functor.id_map, Iso.refl_hom,
+            Category.comp_id, Functor.comp_map, Category.id_comp]
+          rfl
         | op star, op (of _), _ => rfl
         | op star, op star, _ => rfl)
   counitIso :=
-    NatIso.ofComponents
-      (fun x ↦ match x with
-        | .of x => Iso.refl _
-        | .star => Iso.refl _)
+    NatIso.ofComponents (fun x ↦
+      match x with
+      | .of x => Iso.refl _
+      | .star => Iso.refl _)
   functor_unitIso_comp := fun ⟨x⟩ ↦
     match x with
     | .of x => by
-        simp only [op_unop, Functor.id_obj, Functor.comp_obj, NatIso.ofComponents_hom_app,
-          Iso.refl_hom, Category.comp_id]
-        rfl
+      simp only [op_unop, Functor.id_obj, Functor.comp_obj, NatIso.ofComponents_hom_app,
+        Iso.refl_hom, Category.comp_id]
+      rfl
     | .star => rfl
 
 end CategoryTheory

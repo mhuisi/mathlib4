@@ -215,8 +215,8 @@ end
 
 /-- `variable?` alias for a representation of an algebra over a field. -/
 @[variable_alias]
-structure Rep (k A V : Type _)
-  [Field k] [AddCommGroup A] [Ring A] [Algebra k A] [AddCommGroup V] [Module k V]
+structure Rep
+  (k A V : Type _) [Field k] [AddCommGroup A] [Ring A] [Algebra k A] [AddCommGroup V] [Module k V]
   [DistribMulAction A V] [SMulCommClass k A V]
 
 section
@@ -245,8 +245,8 @@ section
 end
 
 @[variable_alias]
-structure UniqueFactorizationDomain (R : Type _)
-  [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R]
+structure UniqueFactorizationDomain
+  (R : Type _) [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R]
 
 section
 /--

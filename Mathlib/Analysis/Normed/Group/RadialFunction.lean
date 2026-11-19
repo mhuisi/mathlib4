@@ -35,8 +35,7 @@ namespace Function
 @[fun_prop]
 def IsRadial [Norm E] (f : E → F) : Prop := f.FactorsThrough (‖·‖ : E → ℝ)
 
-lemma isRadial_def [Norm E] (f : E → F) :
-    f.IsRadial ↔ ∀ {x y : E}, ‖x‖ = ‖y‖ → f x = f y := by
+lemma isRadial_def [Norm E] (f : E → F) : f.IsRadial ↔ ∀ {x y : E}, ‖x‖ = ‖y‖ → f x = f y := by
   simp [IsRadial, Function.FactorsThrough]
 
 /-- The radial part of a function. If `f` is radial, then `f = f.radialPart ∘ (‖·‖)`. -/
@@ -46,17 +45,21 @@ noncomputable def radialPart [Norm E] [hF : Nonempty F] (f : E → F) : ℝ → 
 namespace IsRadial
 
 @[simp]
-lemma radialPart_norm [Norm E] [Nonempty F] {f : E → F} (hf : f.IsRadial) {x : E} :
-    f.radialPart ‖x‖ = f x := hf.extend_apply _ _
+lemma radialPart_norm [Norm E] [Nonempty F] {f : E → F} (hf : f.IsRadial) {x : E}
+    : f.radialPart ‖x‖ = f x :=
+  hf.extend_apply _ _
 
 lemma even [SeminormedAddGroup E] {f : E → F} (hf : f.IsRadial) : f.Even := fun x ↦ hf (norm_neg x)
 
 @[fun_prop]
-lemma comp_right [Norm D] {f : D → E} {g : E → F} (hf : f.IsRadial) :
-    (g ∘ f).IsRadial := by grind [isRadial_def]
+lemma comp_right [Norm D] {f : D → E} {g : E → F} (hf : f.IsRadial) : (g ∘ f).IsRadial := by
+  grind [isRadial_def]
 
-lemma comp_isometry [SeminormedAddGroup E] {f : E → F} (hf : f.IsRadial) {g : E → E}
-    (hg : Isometry g) (hg₀ : g 0 = 0) : f ∘ g = f :=
+lemma comp_isometry
+    [SeminormedAddGroup E]
+    {f : E → F} (hf : f.IsRadial)
+    {g : E → E} (hg : Isometry g) (hg₀ : g 0 = 0)
+    : f ∘ g = f :=
   funext fun x ↦ hf <| hg.norm_map_of_map_zero hg₀ x
 
 end IsRadial

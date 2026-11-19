@@ -21,28 +21,30 @@ public section
 open Set Filter Bornology
 open scoped Pointwise Topology
 
-variable {G₀ E : Type*} [GroupWithZero G₀] [Bornology G₀] [TopologicalSpace E]
-  [MulAction G₀ E] [ContinuousConstSMul G₀ E]
+variable
+  {G₀ E : Type*}
+  [GroupWithZero G₀] [Bornology G₀] [TopologicalSpace E] [MulAction G₀ E] [ContinuousConstSMul G₀ E]
 
-/-- In a (nonempty) Baire space, a closed absorbent set has nonempty interior, provided the
+/--
+In a (nonempty) Baire space, a closed absorbent set has nonempty interior, provided the
 `cobounded` filter of the acting group with zero is countably generated and nontrivial (`NeBot`).
 
 The dilations `a n • s` along a sequence `a n` drawn from a countable basis of `cobounded G₀` cover
 the space, so by Baire one of them — and hence `s` itself, via the homeomorphism `a n • ·` — has
-nonempty interior. -/
-theorem Absorbent.interior_nonempty [BaireSpace E] [Nonempty E]
-    [(cobounded G₀).IsCountablyGenerated] [NeBot (cobounded G₀)]
-    {s : Set E} (hs : Absorbent G₀ s) (hc : IsClosed s) : (interior s).Nonempty := by
+nonempty interior.
+-/
+theorem Absorbent.interior_nonempty
+    [BaireSpace E] [Nonempty E] [(cobounded G₀).IsCountablyGenerated] [NeBot (cobounded G₀)]
+    {s : Set E} (hs : Absorbent G₀ s) (hc : IsClosed s)
+    : (interior s).Nonempty := by
   obtain ⟨B, hB⟩ := (cobounded G₀).exists_antitone_basis
   -- Choose nonzero representatives `a n ∈ B n`.
   have hmem (n : ℕ) : (B n ∩ {a : G₀ | a ≠ 0}).Nonempty :=
-    Filter.nonempty_of_mem (inter_mem (hB.mem_of_mem trivial)
-      (eventually_ne_cobounded 0))
+    Filter.nonempty_of_mem (inter_mem (hB.mem_of_mem trivial) (eventually_ne_cobounded 0))
   choose a ha using hmem
   -- The dilations `a n • s` cover the whole space.
   have key : ∀ x : E, ∃ n, x ∈ a n • s := fun x => by
-    have hx : ∀ᶠ c in cobounded G₀, x ∈ c • s := by
-      simpa [Absorbs, singleton_subset_iff] using hs x
+    have hx : ∀ᶠ c in cobounded G₀, x ∈ c • s := by simpa [Absorbs, singleton_subset_iff] using hs x
     grind [hB.mem_iff.mp hx]
   have hcover : ⋃ n, closure (a n • s) = univ :=
     eq_univ_of_forall fun x ↦ mem_iUnion.mpr <| (key x).imp fun n hn ↦ subset_closure hn

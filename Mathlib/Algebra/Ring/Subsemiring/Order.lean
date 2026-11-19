@@ -19,15 +19,18 @@ namespace SubsemiringClass
 variable {R S : Type*} [SetLike S R] (s : S)
 
 /-- A subsemiring of an ordered semiring is an ordered semiring. -/
-instance toIsOrderedRing [Semiring R] [PartialOrder R] [IsOrderedRing R] [SubsemiringClass S R] :
-    IsOrderedRing s :=
+instance toIsOrderedRing [Semiring R] [PartialOrder R] [IsOrderedRing R] [SubsemiringClass S R]
+    : IsOrderedRing s :=
   Function.Injective.isOrderedRing Subtype.val rfl rfl (fun _ _ => rfl) (fun _ _ => rfl) .rfl
 
 /-- A subsemiring of a strict ordered semiring is a strict ordered semiring. -/
-instance toIsStrictOrderedRing [Semiring R] [PartialOrder R] [IsStrictOrderedRing R]
-    [SubsemiringClass S R] : IsStrictOrderedRing s :=
-  Function.Injective.isStrictOrderedRing Subtype.val
-    rfl rfl (fun _ _ => rfl) (fun _ _ => rfl) .rfl .rfl
+instance toIsStrictOrderedRing
+    [Semiring R] [PartialOrder R] [IsStrictOrderedRing R] [SubsemiringClass S R]
+    : IsStrictOrderedRing s :=
+  Function.Injective.isStrictOrderedRing Subtype.val rfl rfl
+    (fun _ _ => rfl)
+    (fun _ _ => rfl)
+    .rfl .rfl
 
 end SubsemiringClass
 
@@ -36,13 +39,14 @@ namespace Subsemiring
 variable {R : Type*}
 
 /-- A subsemiring of an ordered semiring is an ordered semiring. -/
-instance toIsOrderedRing [Semiring R] [PartialOrder R] [IsOrderedRing R] (s : Subsemiring R) :
-    IsOrderedRing s :=
+instance toIsOrderedRing [Semiring R] [PartialOrder R] [IsOrderedRing R] (s : Subsemiring R)
+    : IsOrderedRing s :=
   SubsemiringClass.toIsOrderedRing _
 
 /-- A subsemiring of a strict ordered semiring is a strict ordered semiring. -/
-instance toIsStrictOrderedRing [Semiring R] [PartialOrder R] [IsStrictOrderedRing R]
-    (s : Subsemiring R) : IsStrictOrderedRing s :=
+instance toIsStrictOrderedRing
+    [Semiring R] [PartialOrder R] [IsStrictOrderedRing R] (s : Subsemiring R)
+    : IsStrictOrderedRing s :=
   SubsemiringClass.toIsStrictOrderedRing _
 
 section nonneg
@@ -57,7 +61,8 @@ def nonneg : Subsemiring R where
   mul_mem' := mul_nonneg
   one_mem' := zero_le_one
 
-@[simp] lemma mem_nonneg {x : R} : x ∈ nonneg R ↔ 0 ≤ x := .rfl
+@[simp]
+lemma mem_nonneg {x : R} : x ∈ nonneg R ↔ 0 ≤ x := .rfl
 
 variable (R) in
 @[simp]

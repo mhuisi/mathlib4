@@ -29,8 +29,8 @@ example : √1e12 = 1e6 := by dyadic_interval
 
 example : √(√16) = 2 := by dyadic_interval
 
-example {x y : ℝ} (hx : x ∈ Set.Icc (-0.5) 1.5) (hy₀ : -2 ≤ y) (hy₁ : y ≤ -1) :
-    √(x ^ 2 + y ^ 2) + (1 / 2 : ℚ) * x * y ∈ Set.Icc (-0.5) 3 := by
+example {x y : ℝ} (hx : x ∈ Set.Icc (-0.5) 1.5) (hy₀ : -2 ≤ y) (hy₁ : y ≤ -1)
+    : √(x ^ 2 + y ^ 2) + (1 / 2 : ℚ) * x * y ∈ Set.Icc (-0.5) 3 := by
   dyadic_interval [prec := 1]
 
 example : 1.4142 < √2 := by dyadic_interval [prec := 30]
@@ -58,9 +58,8 @@ example {x : ℝ} (hx : x ∈ Set.Icc 1 2) : √(x ^ 2) ∈ Set.Icc 1 2 := by dy
 
 example {x : ℝ} (hx : x ∈ Set.Icc (-2) (-1)) : √(x ^ 2) ∈ Set.Icc 1 2 := by dyadic_interval
 
-example :
-    √2 ∈ Set.Ioo
-      1.4142135623730950488016887242096980785696718753769
+example
+    : √2 ∈ Set.Ioo 1.4142135623730950488016887242096980785696718753769
       1.4142135623730950488016887242096980785696718753770 := by
   dyadic_interval [prec := 165]
 
@@ -73,8 +72,10 @@ example {x : ℝ} (hx : x ∈ Set.Icc 0 1) : √x - x ∈ Set.Icc (-0.05) 0.27 :
 example {x : ℝ} (hx : x ∈ Set.Icc 0 1) : √x * (1 - x) ∈ Set.Icc 0 0.4 := by
   dyadic_interval [binSplit := 6, prec := 10]
 
-/-- error: The inclusion check failed:
-The proposition is provably false -/
+/--
+error: The inclusion check failed:
+The proposition is provably false
+-/
 #guard_msgs in
 set_option linter.unusedTactic false in
 example (h : False) : √2 < 1.414 := by

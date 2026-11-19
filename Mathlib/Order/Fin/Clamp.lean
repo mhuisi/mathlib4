@@ -21,8 +21,7 @@ public lemma clamp_monotone {m : ℕ} : Monotone (fun n ↦ clamp n m) := by
   rw [le_iff_val_le_val]
   exact min_le_min_right m h
 
-public lemma clamp_eq_last (n m : ℕ) (hmn : m ≤ n) :
-    clamp n m = last _ := by
+public lemma clamp_eq_last (n m : ℕ) (hmn : m ≤ n) : clamp n m = last _ := by
   ext
   simpa
 

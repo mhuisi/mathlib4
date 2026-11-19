@@ -41,8 +41,7 @@ open NNReal ENNReal Finset MeasureTheory CompleteLattice
 section Map
 
 /-- The functorial action of a function on a `PMF`. -/
-def map (f : α → β) (p : PMF α) : PMF β :=
-  bind p (pure ∘ f)
+def map (f : α → β) (p : PMF α) : PMF β := bind p (pure ∘ f)
 
 variable (f : α → β) (p : PMF α) (b : β)
 
@@ -60,13 +59,11 @@ theorem mem_support_map_iff : b ∈ (map f p).support ↔ ∃ a ∈ p.support, f
 
 theorem bind_pure_comp : bind p (pure ∘ f) = map f p := rfl
 
-theorem map_id : map id p = p :=
-  bind_pure _
+theorem map_id : map id p = p := bind_pure _
 
 theorem map_comp (g : β → γ) : (p.map f).map g = p.map (g ∘ f) := by simp [map, Function.comp_def]
 
-theorem pure_map (a : α) : (pure a).map f = pure (f a) :=
-  pure_bind _ _
+theorem pure_map (a : α) : (pure a).map f = pure (f a) := pure_bind _ _
 
 theorem map_bind (q : α → PMF β) (f : β → γ) : (p.bind q).map f = p.bind fun a => (q a).map f :=
   bind_bind _ _ _
@@ -91,8 +88,8 @@ theorem toOuterMeasure_map_apply : (p.map f).toOuterMeasure s = p.toOuterMeasure
 variable {mα : MeasurableSpace α} {mβ : MeasurableSpace β}
 
 @[simp]
-theorem toMeasure_map_apply (hf : Measurable f)
-    (hs : MeasurableSet s) : (p.map f).toMeasure s = p.toMeasure (f ⁻¹' s) := by
+theorem toMeasure_map_apply (hf : Measurable f) (hs : MeasurableSet s)
+    : (p.map f).toMeasure s = p.toMeasure (f ⁻¹' s) := by
   rw [toMeasure_apply_eq_toOuterMeasure_apply _ hs,
     toMeasure_apply_eq_toOuterMeasure_apply _ (measurableSet_preimage hf hs)]
   exact toOuterMeasure_map_apply f p s
@@ -108,8 +105,7 @@ end Map
 section Seq
 
 /-- The monadic sequencing operation for `PMF`. -/
-def seq (q : PMF (α → β)) (p : PMF α) : PMF β :=
-  q.bind fun m => p.bind fun a => pure (m a)
+def seq (q : PMF (α → β)) (p : PMF α) : PMF β := q.bind fun m => p.bind fun a => pure (m a)
 
 variable (q : PMF (α → β)) (p : PMF α) (b : β)
 
@@ -135,11 +131,10 @@ instance : LawfulFunctor PMF where
   id_map := bind_pure
   comp_map _ _ _ := (map_comp _ _ _).symm
 
-instance : LawfulMonad PMF := LawfulMonad.mk'
-  (bind_pure_comp := fun _ _ => rfl)
-  (id_map := id_map)
-  (pure_bind := pure_bind)
-  (bind_assoc := bind_bind)
+instance : LawfulMonad PMF :=
+  LawfulMonad.mk'
+    (bind_pure_comp := fun _ _ => rfl)
+    (id_map := id_map) (pure_bind := pure_bind) (bind_assoc := bind_bind)
 
 /--
 This instance allows `do` notation for `PMF` to be used across universes, for instance as
@@ -151,17 +146,21 @@ example {R : Type u} [Ring R] (x : PMF ℕ) : PMF R := do
 where `x` is in universe `0`, but the return value is in universe `u`.
 -/
 instance : ULiftable PMF.{u} PMF.{v} where
-  congr e :=
-    { toFun := map e, invFun := map e.symm
-      left_inv := fun a => by simp [map_comp, map_id]
-      right_inv := fun a => by simp [map_comp, map_id] }
+  congr e := {
+    toFun := map e
+    invFun := map e.symm
+    left_inv := fun a => by simp [map_comp, map_id]
+    right_inv := fun a => by simp [map_comp, map_id]
+  }
 
 section OfFinset
 
-/-- Given a finset `s` and a function `f : α → ℝ≥0∞` with sum `1` on `s`,
-  such that `f a = 0` for `a ∉ s`, we get a `PMF`. -/
-def ofFinset (f : α → ℝ≥0∞) (s : Finset α) (h : ∑ a ∈ s, f a = 1)
-    (h' : ∀ (a) (_ : a ∉ s), f a = 0) : PMF α :=
+/--
+Given a finset `s` and a function `f : α → ℝ≥0∞` with sum `1` on `s`,
+such that `f a = 0` for `a ∉ s`, we get a `PMF`.
+-/
+def ofFinset (f : α → ℝ≥0∞) (s : Finset α) (h : ∑ a ∈ s, f a = 1) (h' : ∀ (a) (_ : a ∉ s), f a = 0)
+    : PMF α :=
   ⟨f, h ▸ hasSum_sum_of_ne_finset_zero h'⟩
 
 variable {f : α → ℝ≥0∞} {s : Finset α} (h : ∑ a ∈ s, f a = 1) (h' : ∀ (a) (_ : a ∉ s), f a = 0)
@@ -176,21 +175,20 @@ theorem support_ofFinset : (ofFinset f s h h').support = ↑s ∩ Function.suppo
 theorem mem_support_ofFinset_iff (a : α) : a ∈ (ofFinset f s h h').support ↔ a ∈ s ∧ f a ≠ 0 := by
   simp
 
-theorem ofFinset_apply_of_notMem {a : α} (ha : a ∉ s) : ofFinset f s h h' a = 0 :=
-  h' a ha
+theorem ofFinset_apply_of_notMem {a : α} (ha : a ∉ s) : ofFinset f s h h' a = 0 := h' a ha
 
 section Measure
 
 variable (t : Set α)
 
 @[simp]
-theorem toOuterMeasure_ofFinset_apply :
-    (ofFinset f s h h').toOuterMeasure t = ∑' x, t.indicator f x :=
+theorem toOuterMeasure_ofFinset_apply
+    : (ofFinset f s h h').toOuterMeasure t = ∑' x, t.indicator f x :=
   toOuterMeasure_apply (ofFinset f s h h') t
 
 @[simp]
-theorem toMeasure_ofFinset_apply [MeasurableSpace α] (ht : MeasurableSet t) :
-    (ofFinset f s h h').toMeasure t = ∑' x, t.indicator f x :=
+theorem toMeasure_ofFinset_apply [MeasurableSpace α] (ht : MeasurableSet t)
+    : (ofFinset f s h h').toMeasure t = ∑' x, t.indicator f x :=
   (toMeasure_apply_eq_toOuterMeasure_apply _ ht).trans (toOuterMeasure_ofFinset_apply h h' t)
 
 end Measure
@@ -215,9 +213,10 @@ theorem mem_support_ofFintype_iff (a : α) : a ∈ (ofFintype f h).support ↔ f
 
 open scoped Classical in
 @[simp]
-lemma map_ofFintype [Fintype β] (f : α → ℝ≥0∞) (h : ∑ a, f a = 1) (g : α → β) :
-    (ofFintype f h).map g = ofFintype (fun b ↦ ∑ a with g a = b, f a)
-      (by simpa [Finset.sum_fiberwise_eq_sum_filter univ univ g f]) := by
+lemma map_ofFintype [Fintype β] (f : α → ℝ≥0∞) (h : ∑ a, f a = 1) (g : α → β)
+    : (ofFintype f h).map g
+      = ofFintype (fun b ↦ ∑ a with g a = b, f a) (by
+        simpa [Finset.sum_fiberwise_eq_sum_filter univ univ g f]) := by
   ext b : 1
   simp only [sum_filter, eq_comm, map_apply, ofFintype_apply]
   exact tsum_eq_sum fun _ h ↦ (h <| mem_univ _).elim
@@ -231,8 +230,8 @@ theorem toOuterMeasure_ofFintype_apply : (ofFintype f h).toOuterMeasure s = ∑'
   toOuterMeasure_apply (ofFintype f h) s
 
 @[simp]
-theorem toMeasure_ofFintype_apply [MeasurableSpace α] (hs : MeasurableSet s) :
-    (ofFintype f h).toMeasure s = ∑' x, s.indicator f x :=
+theorem toMeasure_ofFintype_apply [MeasurableSpace α] (hs : MeasurableSet s)
+    : (ofFintype f h).toMeasure s = ∑' x, s.indicator f x :=
   (toMeasure_apply_eq_toOuterMeasure_apply _ hs).trans (toOuterMeasure_ofFintype_apply h s)
 
 end Measure
@@ -241,11 +240,13 @@ end OfFintype
 
 section normalize
 
-/-- Given an `f` with non-zero and non-infinite sum, get a `PMF` by normalizing `f` by its `tsum`.
+/--
+Given an `f` with non-zero and non-infinite sum, get a `PMF` by normalizing `f` by its `tsum`.
 -/
-def normalize (f : α → ℝ≥0∞) (hf0 : tsum f ≠ 0) (hf : tsum f ≠ ∞) : PMF α :=
-  ⟨fun a => f a * (∑' x, f x)⁻¹,
-    summable.hasSum_iff.2 (ENNReal.tsum_mul_right.trans (ENNReal.mul_inv_cancel hf0 hf))⟩
+def normalize (f : α → ℝ≥0∞) (hf0 : tsum f ≠ 0) (hf : tsum f ≠ ∞) : PMF α := ⟨
+  fun a => f a * (∑' x, f x)⁻¹,
+  summable.hasSum_iff.2 (ENNReal.tsum_mul_right.trans (ENNReal.mul_inv_cancel hf0 hf))
+⟩
 
 variable {f : α → ℝ≥0∞} (hf0 : tsum f ≠ 0) (hf : tsum f ≠ ∞)
 
@@ -269,8 +270,8 @@ def filter (p : PMF α) (s : Set α) (h : ∃ a ∈ s, a ∈ p.support) : PMF α
 variable {p : PMF α} {s : Set α} (h : ∃ a ∈ s, a ∈ p.support)
 
 @[simp]
-theorem filter_apply (a : α) :
-    (p.filter s h) a = s.indicator p a * (∑' a', (s.indicator p) a')⁻¹ := by
+theorem filter_apply (a : α)
+    : (p.filter s h) a = s.indicator p a * (∑' a', (s.indicator p) a')⁻¹ := by
   rw [filter, normalize_apply]
 
 theorem filter_apply_eq_zero_of_notMem {a : α} (ha : a ∉ s) : (p.filter s h) a = 0 := by

@@ -42,7 +42,6 @@ instance {X Y : Ind C} (f : X ⟶ Y) : IsIso (Abelian.coimageImageComparison f) 
     Arrow.isIso_iff_isIso_of_isIso (PreservesCoimageImageComparison.iso (Ind.lim I) ϕ).inv]
   infer_instance
 
-noncomputable instance : Abelian (Ind C) :=
-  .ofCoimageImageComparisonIsIso
+noncomputable instance : Abelian (Ind C) := .ofCoimageImageComparisonIsIso
 
 end CategoryTheory

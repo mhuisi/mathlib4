@@ -19,7 +19,6 @@ Notably, we show that the sum of bounded sets remain bounded.
 
 public section
 
-
 open Metric Set Pointwise Topology
 
 variable {E : Type*}
@@ -61,12 +60,10 @@ open Bornology
 
 variable (E) in
 @[to_additive (attr := simp) bddBelow_range_norm]
-lemma bddBelow_range_norm' : BddBelow (range (‖·‖ : E → ℝ)) :=
-  ⟨0, by rintro - ⟨x, rfl⟩; positivity⟩
+lemma bddBelow_range_norm' : BddBelow (range (‖·‖ : E → ℝ)) := ⟨0, by rintro - ⟨x, rfl⟩; positivity⟩
 
 @[to_additive bddAbove_image_norm_iff]
-lemma bddAbove_image_norm_iff' :
-    BddAbove ((‖·‖) '' s) ↔ IsBounded s := by
+lemma bddAbove_image_norm_iff' : BddAbove ((‖·‖) '' s) ↔ IsBounded s := by
   simp [isBounded_iff_forall_norm_le', bddAbove_def]
 
 alias ⟨BddAbove.isBounded_of_norm', Bornology.IsBounded.bddAbove_norm'⟩ := bddAbove_image_norm_iff'
@@ -109,8 +106,8 @@ theorem infEDist_inv (x : E) (s : Set E) : infEDist x⁻¹ s = infEDist x s⁻¹
 @[to_additive]
 theorem ediam_mul_le (x y : Set E) : ediam (x * y) ≤ ediam x + ediam y :=
   (LipschitzOnWith.ediam_image2_le (· * ·) _ _
-        (fun _ _ => (isometry_mul_right _).lipschitzWith.lipschitzOnWith) fun _ _ =>
-        (isometry_mul_left _).lipschitzWith.lipschitzOnWith).trans_eq <|
+      (fun _ _ => (isometry_mul_right _).lipschitzWith.lipschitzOnWith)
+      fun _ _ => (isometry_mul_left _).lipschitzWith.lipschitzOnWith).trans_eq <|
     by simp only [ENNReal.coe_one, one_mul]
 
 end EMetric
@@ -135,8 +132,7 @@ theorem inv_closedBall : (closedBall x δ)⁻¹ = closedBall x⁻¹ δ :=
   (IsometryEquiv.inv E).preimage_closedBall x δ
 
 @[to_additive (attr := simp)]
-theorem inv_sphere : (sphere x δ)⁻¹ = sphere x⁻¹ δ :=
-  (IsometryEquiv.inv E).preimage_sphere x δ
+theorem inv_sphere : (sphere x δ)⁻¹ = sphere x⁻¹ δ := (IsometryEquiv.inv E).preimage_sphere x δ
 
 @[to_additive]
 theorem singleton_mul_ball : {x} * ball y δ = ball (x * y) δ := by
@@ -158,15 +154,13 @@ theorem ball_div_singleton : ball x δ / {y} = ball (x / y) δ := by
 theorem singleton_mul_ball_one : {x} * ball 1 δ = ball x δ := by simp
 
 @[to_additive]
-theorem singleton_div_ball_one : {x} / ball 1 δ = ball x δ := by
-  rw [singleton_div_ball, div_one]
+theorem singleton_div_ball_one : {x} / ball 1 δ = ball x δ := by rw [singleton_div_ball, div_one]
 
 @[to_additive]
 theorem ball_one_mul_singleton : ball 1 δ * {x} = ball x δ := by simp
 
 @[to_additive]
-theorem ball_one_div_singleton : ball 1 δ / {x} = ball x⁻¹ δ := by
-  rw [ball_div_singleton, one_div]
+theorem ball_one_div_singleton : ball 1 δ / {x} = ball x⁻¹ δ := by rw [ball_div_singleton, one_div]
 
 @[to_additive]
 theorem smul_ball_one : x • ball (1 : E) δ = ball x δ := by
@@ -217,8 +211,7 @@ theorem sphere_mul_singleton : sphere x δ * {y} = sphere (x * y) δ := by
   simp [mul_comm _ {y}, mul_comm y]
 
 @[to_additive (attr := simp 1100)]
-theorem sphere_div_singleton : sphere x δ / {y} = sphere (x / y) δ := by
-  simp [div_eq_mul_inv]
+theorem sphere_div_singleton : sphere x δ / {y} = sphere (x / y) δ := by simp [div_eq_mul_inv]
 
 @[to_additive]
 theorem singleton_mul_sphere_one : {x} * sphere 1 δ = sphere x δ := by simp
@@ -269,43 +262,46 @@ theorem ball_div : ball x δ / s = x • thickening δ s⁻¹ := by simp [div_eq
 variable {δ s x y}
 
 @[to_additive]
-theorem IsCompact.mul_closedBall_one (hs : IsCompact s) (hδ : 0 ≤ δ) :
-    s * closedBall (1 : E) δ = cthickening δ s := by
+theorem IsCompact.mul_closedBall_one (hs : IsCompact s) (hδ : 0 ≤ δ)
+    : s * closedBall (1 : E) δ = cthickening δ s := by
   rw [hs.cthickening_eq_biUnion_closedBall hδ]
   ext x
   simp only [mem_mul, dist_eq_norm_div, exists_prop, mem_iUnion, mem_closedBall,
     ← eq_div_iff_mul_eq'', div_one, exists_eq_right]
 
 @[to_additive]
-theorem IsCompact.div_closedBall_one (hs : IsCompact s) (hδ : 0 ≤ δ) :
-    s / closedBall 1 δ = cthickening δ s := by simp [div_eq_mul_inv, hs.mul_closedBall_one hδ]
+theorem IsCompact.div_closedBall_one (hs : IsCompact s) (hδ : 0 ≤ δ)
+    : s / closedBall 1 δ = cthickening δ s := by
+  simp [div_eq_mul_inv, hs.mul_closedBall_one hδ]
 
 @[to_additive]
-theorem IsCompact.closedBall_one_mul (hs : IsCompact s) (hδ : 0 ≤ δ) :
-    closedBall 1 δ * s = cthickening δ s := by rw [mul_comm, hs.mul_closedBall_one hδ]
+theorem IsCompact.closedBall_one_mul (hs : IsCompact s) (hδ : 0 ≤ δ)
+    : closedBall 1 δ * s = cthickening δ s := by
+  rw [mul_comm, hs.mul_closedBall_one hδ]
 
 @[to_additive]
-theorem IsCompact.closedBall_one_div (hs : IsCompact s) (hδ : 0 ≤ δ) :
-    closedBall 1 δ / s = cthickening δ s⁻¹ := by
+theorem IsCompact.closedBall_one_div (hs : IsCompact s) (hδ : 0 ≤ δ)
+    : closedBall 1 δ / s = cthickening δ s⁻¹ := by
   simp [div_eq_mul_inv, mul_comm, hs.inv.mul_closedBall_one hδ]
 
 @[to_additive]
-theorem IsCompact.mul_closedBall (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E) :
-    s * closedBall x δ = x • cthickening δ s := by
+theorem IsCompact.mul_closedBall (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E)
+    : s * closedBall x δ = x • cthickening δ s := by
   rw [← smul_closedBall_one, mul_smul_comm, hs.mul_closedBall_one hδ]
 
 @[to_additive]
-theorem IsCompact.div_closedBall (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E) :
-    s / closedBall x δ = x⁻¹ • cthickening δ s := by
+theorem IsCompact.div_closedBall (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E)
+    : s / closedBall x δ = x⁻¹ • cthickening δ s := by
   simp [div_eq_mul_inv, hs.mul_closedBall hδ]
 
 @[to_additive]
-theorem IsCompact.closedBall_mul (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E) :
-    closedBall x δ * s = x • cthickening δ s := by rw [mul_comm, hs.mul_closedBall hδ]
+theorem IsCompact.closedBall_mul (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E)
+    : closedBall x δ * s = x • cthickening δ s := by
+  rw [mul_comm, hs.mul_closedBall hδ]
 
 @[to_additive]
-theorem IsCompact.closedBall_div (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E) :
-    closedBall x δ * s = x • cthickening δ s := by
+theorem IsCompact.closedBall_div (hs : IsCompact s) (hδ : 0 ≤ δ) (x : E)
+    : closedBall x δ * s = x • cthickening δ s := by
   simp [hs.closedBall_mul hδ]
 
 end SeminormedCommGroup

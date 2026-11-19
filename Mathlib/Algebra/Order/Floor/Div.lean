@@ -56,11 +56,13 @@ public section
 variable {ι α β : Type*}
 
 section OrderedAddCommMonoid
-variable (α β) [AddCommMonoid α] [PartialOrder α] [AddCommMonoid β] [PartialOrder β]
-  [SMulZeroClass α β]
+variable
+  (α β) [AddCommMonoid α] [PartialOrder α] [AddCommMonoid β] [PartialOrder β] [SMulZeroClass α β]
 
-/-- Typeclass for division rounded down. For each `a > 0`, this asserts the existence of a right
-adjoint to the map `b ↦ a • b : β → β`. -/
+/--
+Typeclass for division rounded down. For each `a > 0`, this asserts the existence of a right
+adjoint to the map `b ↦ a • b : β → β`.
+-/
 class FloorDiv where
   /-- Flooring division. If `a > 0`, then `b ⌊/⌋ a` is the greatest `c` such that `a • c ≤ b`. -/
   floorDiv : β → α → β
@@ -71,8 +73,10 @@ class FloorDiv where
   /-- Do not use this. Use `zero_floorDiv` instead. -/
   protected zero_floorDiv (a) : floorDiv 0 a = 0
 
-/-- Typeclass for division rounded up. For each `a > 0`, this asserts the existence of a left
-adjoint to the map `b ↦ a • b : β → β`. -/
+/--
+Typeclass for division rounded up. For each `a > 0`, this asserts the existence of a left
+adjoint to the map `b ↦ a • b : β → β`.
+-/
 class CeilDiv where
   /-- Ceiling division. If `a > 0`, then `b ⌈/⌉ a` is the least `c` such that `b ≤ a • c`. -/
   ceilDiv : β → α → β
@@ -83,8 +87,10 @@ class CeilDiv where
   /-- Do not use this. Use `zero_ceilDiv` instead. -/
   protected zero_ceilDiv (a) : ceilDiv 0 a = 0
 
-@[inherit_doc] infixl:70 " ⌊/⌋ " => FloorDiv.floorDiv
-@[inherit_doc] infixl:70 " ⌈/⌉ " => CeilDiv.ceilDiv
+@[inherit_doc]
+infixl:70 " ⌊/⌋ " => FloorDiv.floorDiv
+@[inherit_doc]
+infixl:70 " ⌈/⌉ " => CeilDiv.ceilDiv
 
 variable {α β}
 
@@ -94,12 +100,15 @@ variable [FloorDiv α β] {a : α} {b c : β}
 lemma gc_floorDiv_smul (ha : 0 < a) : GaloisConnection (a • · : β → β) (· ⌊/⌋ a) :=
   FloorDiv.floorDiv_gc ha
 
-@[simp] lemma le_floorDiv_iff_smul_le (ha : 0 < a) : c ≤ b ⌊/⌋ a ↔ a • c ≤ b :=
+@[simp]
+lemma le_floorDiv_iff_smul_le (ha : 0 < a) : c ≤ b ⌊/⌋ a ↔ a • c ≤ b :=
   (gc_floorDiv_smul ha _ _).symm
 
-@[simp] lemma floorDiv_of_nonpos (ha : a ≤ 0) (b : β) : b ⌊/⌋ a = 0 := FloorDiv.floorDiv_nonpos ha _
+@[simp]
+lemma floorDiv_of_nonpos (ha : a ≤ 0) (b : β) : b ⌊/⌋ a = 0 := FloorDiv.floorDiv_nonpos ha _
 lemma floorDiv_zero (b : β) : b ⌊/⌋ (0 : α) = 0 := by simp
-@[simp] lemma zero_floorDiv (a : α) : (0 : β) ⌊/⌋ a = 0 := FloorDiv.zero_floorDiv _
+@[simp]
+lemma zero_floorDiv (a : α) : (0 : β) ⌊/⌋ a = 0 := FloorDiv.zero_floorDiv _
 
 lemma smul_floorDiv_le (ha : 0 < a) : a • (b ⌊/⌋ a) ≤ b := (le_floorDiv_iff_smul_le ha).1 le_rfl
 
@@ -114,9 +123,11 @@ lemma gc_smul_ceilDiv (ha : 0 < a) : GaloisConnection (· ⌈/⌉ a) (a • · :
 @[simp]
 lemma ceilDiv_le_iff_le_smul (ha : 0 < a) : b ⌈/⌉ a ≤ c ↔ b ≤ a • c := gc_smul_ceilDiv ha _ _
 
-@[simp] lemma ceilDiv_of_nonpos (ha : a ≤ 0) (b : β) : b ⌈/⌉ a = 0 := CeilDiv.ceilDiv_nonpos ha _
+@[simp]
+lemma ceilDiv_of_nonpos (ha : a ≤ 0) (b : β) : b ⌈/⌉ a = 0 := CeilDiv.ceilDiv_nonpos ha _
 lemma ceilDiv_zero (b : β) : b ⌈/⌉ (0 : α) = 0 := by simp
-@[simp] lemma zero_ceilDiv (a : α) : (0 : β) ⌈/⌉ a = 0 := CeilDiv.zero_ceilDiv _
+@[simp]
+lemma zero_ceilDiv (a : α) : (0 : β) ⌈/⌉ a = 0 := CeilDiv.zero_ceilDiv _
 
 lemma le_smul_ceilDiv (ha : 0 < a) : b ≤ a • (b ⌈/⌉ a) := (ceilDiv_le_iff_le_smul ha).1 le_rfl
 
@@ -124,8 +135,10 @@ end CeilDiv
 end OrderedAddCommMonoid
 
 section LinearOrderedAddCommMonoid
-variable [AddCommMonoid α] [LinearOrder α] [AddCommMonoid β] [PartialOrder β] [SMulZeroClass α β]
-  [PosSMulReflectLE α β] [FloorDiv α β] [CeilDiv α β] {a : α} {b : β}
+variable
+  [AddCommMonoid α] [LinearOrder α] [AddCommMonoid β] [PartialOrder β] [SMulZeroClass α β]
+  [PosSMulReflectLE α β] [FloorDiv α β] [CeilDiv α β]
+  {a : α} {b : β}
 
 lemma floorDiv_le_ceilDiv : b ⌊/⌋ a ≤ b ⌈/⌉ a := by
   obtain ha | ha := le_or_gt a 0
@@ -140,11 +153,13 @@ variable [Semiring α] [PartialOrder α] [AddCommMonoid β] [PartialOrder β] [M
 section FloorDiv
 variable [FloorDiv α β] {a : α}
 
-@[simp] lemma floorDiv_one [IsOrderedRing α] [Nontrivial α] (b : β) : b ⌊/⌋ (1 : α) = b :=
+@[simp]
+lemma floorDiv_one [IsOrderedRing α] [Nontrivial α] (b : β) : b ⌊/⌋ (1 : α) = b :=
   eq_of_forall_le_iff <| fun c ↦ by simp [zero_lt_one' α]
 
-@[simp] lemma smul_floorDiv [PosSMulMono α β] [PosSMulReflectLE α β] (ha : 0 < a) (b : β) :
-    a • b ⌊/⌋ a = b :=
+@[simp]
+lemma smul_floorDiv [PosSMulMono α β] [PosSMulReflectLE α β] (ha : 0 < a) (b : β)
+    : a • b ⌊/⌋ a = b :=
   eq_of_forall_le_iff <| by simp [smul_le_smul_iff_of_pos_left, ha]
 
 end FloorDiv
@@ -152,11 +167,13 @@ end FloorDiv
 section CeilDiv
 variable [CeilDiv α β] {a : α}
 
-@[simp] lemma ceilDiv_one [IsOrderedRing α] [Nontrivial α] (b : β) : b ⌈/⌉ (1 : α) = b :=
+@[simp]
+lemma ceilDiv_one [IsOrderedRing α] [Nontrivial α] (b : β) : b ⌈/⌉ (1 : α) = b :=
   eq_of_forall_ge_iff <| fun c ↦ by simp [zero_lt_one' α]
 
-@[simp] lemma smul_ceilDiv [PosSMulMono α β] [PosSMulReflectLE α β] (ha : 0 < a) (b : β) :
-    a • b ⌈/⌉ a = b :=
+@[simp]
+lemma smul_ceilDiv [PosSMulMono α β] [PosSMulReflectLE α β] (ha : 0 < a) (b : β)
+    : a • b ⌈/⌉ a = b :=
   eq_of_forall_ge_iff <| by simp [smul_le_smul_iff_of_pos_left, ha]
 
 end CeilDiv
@@ -193,15 +210,16 @@ instance instCeilDiv : CeilDiv ℕ ℕ where
   ceilDiv_nonpos a ha b := by simp_rw [ha.antisymm <| zero_le _, Nat.div_zero]
   zero_ceilDiv a := by cases a <;> simp [Nat.div_eq_zero_iff]
 
-@[simp] lemma floorDiv_eq_div (a b : ℕ) : a ⌊/⌋ b = a / b := rfl
+@[simp]
+lemma floorDiv_eq_div (a b : ℕ) : a ⌊/⌋ b = a / b := rfl
 lemma ceilDiv_eq_add_pred_div (a b : ℕ) : a ⌈/⌉ b = (a + b - 1) / b := rfl
 
 end Nat
 
 namespace Pi
-variable {π : ι → Type*} [AddCommMonoid α] [PartialOrder α]
-  [∀ i, AddCommMonoid (π i)] [∀ i, PartialOrder (π i)]
-  [∀ i, SMulZeroClass α (π i)]
+variable
+  {π : ι → Type*} [AddCommMonoid α] [PartialOrder α] [∀ i, AddCommMonoid (π i)]
+  [∀ i, PartialOrder (π i)] [∀ i, SMulZeroClass α (π i)]
 
 section FloorDiv
 variable [∀ i, FloorDiv α (π i)]
@@ -214,7 +232,8 @@ instance instFloorDiv : FloorDiv α (∀ i, π i) where
 
 @[push ←]
 lemma floorDiv_def (f : ∀ i, π i) (a : α) : f ⌊/⌋ a = fun i ↦ f i ⌊/⌋ a := rfl
-@[simp] lemma floorDiv_apply (f : ∀ i, π i) (a : α) (i : ι) : (f ⌊/⌋ a) i = f i ⌊/⌋ a := rfl
+@[simp]
+lemma floorDiv_apply (f : ∀ i, π i) (a : α) (i : ι) : (f ⌊/⌋ a) i = f i ⌊/⌋ a := rfl
 
 end FloorDiv
 
@@ -228,29 +247,32 @@ instance instCeilDiv : CeilDiv α (∀ i, π i) where
   zero_ceilDiv a := by ext; exact zero_ceilDiv _
 
 lemma ceilDiv_def (f : ∀ i, π i) (a : α) : f ⌈/⌉ a = fun i ↦ f i ⌈/⌉ a := rfl
-@[simp] lemma ceilDiv_apply (f : ∀ i, π i) (a : α) (i : ι) : (f ⌈/⌉ a) i = f i ⌈/⌉ a := rfl
+@[simp]
+lemma ceilDiv_apply (f : ∀ i, π i) (a : α) (i : ι) : (f ⌈/⌉ a) i = f i ⌈/⌉ a := rfl
 
 end CeilDiv
 end Pi
 
 namespace Finsupp
-variable [AddCommMonoid α] [PartialOrder α]
-  [AddCommMonoid β] [PartialOrder β] [SMulZeroClass α β]
+variable [AddCommMonoid α] [PartialOrder α] [AddCommMonoid β] [PartialOrder β] [SMulZeroClass α β]
 
 section FloorDiv
 variable [FloorDiv α β] {f : ι →₀ β} {a : α}
 
 noncomputable instance instFloorDiv : FloorDiv α (ι →₀ β) where
   floorDiv f a := f.mapRange (· ⌊/⌋ a) <| zero_floorDiv _
-  floorDiv_gc _a ha f _g := forall_congr' fun i ↦ by
-    simpa only [coe_smul, Pi.smul_apply, mapRange_apply] using gc_floorDiv_smul ha (f i) _
+  floorDiv_gc _a ha f _g :=
+    forall_congr' fun i ↦ by
+      simpa only [coe_smul, Pi.smul_apply, mapRange_apply] using gc_floorDiv_smul ha (f i) _
   floorDiv_nonpos a ha f := by ext i; exact floorDiv_of_nonpos ha _
   zero_floorDiv a := by ext; exact zero_floorDiv _
 
 lemma floorDiv_def (f : ι →₀ β) (a : α) : f ⌊/⌋ a = f.mapRange (· ⌊/⌋ a) (zero_floorDiv _) := rfl
 set_option warning.simp.otherHead false in
-@[norm_cast] lemma coe_floorDiv (f : ι →₀ β) (a : α) : f ⌊/⌋ a = fun i ↦ f i ⌊/⌋ a := rfl
-@[simp] lemma floorDiv_apply (f : ι →₀ β) (a : α) (i : ι) : (f ⌊/⌋ a) i = f i ⌊/⌋ a := rfl
+@[norm_cast]
+lemma coe_floorDiv (f : ι →₀ β) (a : α) : f ⌊/⌋ a = fun i ↦ f i ⌊/⌋ a := rfl
+@[simp]
+lemma floorDiv_apply (f : ι →₀ β) (a : α) (i : ι) : (f ⌊/⌋ a) i = f i ⌊/⌋ a := rfl
 
 lemma support_floorDiv_subset : (f ⌊/⌋ a).support ⊆ f.support := by
   simp +contextual [Finset.subset_iff, not_imp_not]
@@ -262,15 +284,18 @@ variable [CeilDiv α β] {f : ι →₀ β} {a : α}
 
 noncomputable instance instCeilDiv : CeilDiv α (ι →₀ β) where
   ceilDiv f a := f.mapRange (· ⌈/⌉ a) <| zero_ceilDiv _
-  ceilDiv_gc _a ha f _g := forall_congr' fun i ↦ by
-    simpa only [coe_smul, Pi.smul_apply, mapRange_apply] using gc_smul_ceilDiv ha (f i) _
+  ceilDiv_gc _a ha f _g :=
+    forall_congr' fun i ↦ by
+      simpa only [coe_smul, Pi.smul_apply, mapRange_apply] using gc_smul_ceilDiv ha (f i) _
   ceilDiv_nonpos a ha f := by ext i; exact ceilDiv_of_nonpos ha _
   zero_ceilDiv a := by ext; exact zero_ceilDiv _
 
 lemma ceilDiv_def (f : ι →₀ β) (a : α) : f ⌈/⌉ a = f.mapRange (· ⌈/⌉ a) (zero_ceilDiv _) := rfl
 set_option warning.simp.otherHead false in
-@[norm_cast] lemma coe_ceilDiv_def (f : ι →₀ β) (a : α) : f ⌈/⌉ a = fun i ↦ f i ⌈/⌉ a := rfl
-@[simp] lemma ceilDiv_apply (f : ι →₀ β) (a : α) (i : ι) : (f ⌈/⌉ a) i = f i ⌈/⌉ a := rfl
+@[norm_cast]
+lemma coe_ceilDiv_def (f : ι →₀ β) (a : α) : f ⌈/⌉ a = fun i ↦ f i ⌈/⌉ a := rfl
+@[simp]
+lemma ceilDiv_apply (f : ι →₀ β) (a : α) (i : ι) : (f ⌈/⌉ a) i = f i ⌈/⌉ a := rfl
 
 lemma support_ceilDiv_subset : (f ⌈/⌉ a).support ⊆ f.support := by
   simp +contextual [Finset.subset_iff, not_imp_not]

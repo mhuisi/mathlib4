@@ -12,7 +12,8 @@ set_option linter.fmt.missing true
 
 #guard_msgs in
 /-- A lemma with a doc comment, an attribute, a modifier and a universe parameter. -/
-@[simp] protected lemma Nat.id_eq.{u} {α : Sort u} (a : α) : id a = a := rfl
+@[simp]
+protected lemma Nat.id_eq.{u} {α : Sort u} (a : α) : id a = a := rfl
 
 #guard_msgs in
 lemma assignment_with_where (n : Nat) : n = n := helper n

@@ -30,13 +30,17 @@ inductive Witness where
 -- TODO: add a witness searching mode based on factorising `p - 1`.
 /-- The witnesses of a certificate. -/
 inductive CertMode where
-  /-- The certificate with a list of explicit witnesses in `witnesses`. A prime `p` takes the
+  /--
+  The certificate with a list of explicit witnesses in `witnesses`. A prime `p` takes the
   first entry whose factors are the prime factors of `p - 1` and whose root is a primitive root of
-  `p`. -/
+  `p`.
+  -/
   | witnesses (witnesses : List Witness)
 
-/-- Find the root and the factorization of `p - 1` given by the first entry of `witnesses` that is
-a Lucas witness for the prime `p`. -/
+/--
+Find the root and the factorization of `p - 1` given by the first entry of `witnesses` that is
+a Lucas witness for the prime `p`.
+-/
 def witnessFor (witnesses : List Witness) (p : ℕ) : CoreM (ℕ × List (ℕ × ℕ)) := do
   for .lucas w in witnesses do
     if let some factorization := w.factorization? p then
@@ -46,15 +50,19 @@ def witnessFor (witnesses : List Witness) (p : ℕ) : CoreM (ℕ × List (ℕ ×
 /-- Numbers below this bound are proved prime by `norm_num`'s evaluation of `Nat.minFac`. -/
 def normNumBound : ℕ := 2 ^ 10
 
-/-- Builds the certificate of `p` from the first entry of `witnesses` that fits each prime, with
+/--
+Builds the certificate of `p` from the first entry of `witnesses` that fits each prime, with
 `norm_num` below `normNumBound` and the user's proofs for the primes in `known`. Each prime's
-certificate is built once. -/
-partial def Cert.ofWitnesses (witnesses : List Witness) (known : Std.HashSet ℕ) (p : ℕ) :
-    CoreM Cert :=
+certificate is built once.
+-/
+partial def Cert.ofWitnesses (witnesses : List Witness) (known : Std.HashSet ℕ) (p : ℕ)
+    : CoreM Cert :=
   StateT.run' (go p) {}
 where
-  /-- Builds the certificate of `p`. The state caches the certificates constructed for each
-  nontrivial intermediate result. -/
+  /--
+  Builds the certificate of `p`. The state caches the certificates constructed for each
+  nontrivial intermediate result.
+  -/
   go (p : ℕ) : StateT (Std.HashMap ℕ Cert) CoreM Cert := do
     if let some cert := (← get)[p]? then
       return cert

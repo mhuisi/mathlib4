@@ -36,24 +36,25 @@ open scoped LieRinehartAlgebra
 
 variable (A L : Type*) [CommRing A] [LieRing L] [Module A L]
 
-/-- A Lie-Rinehart subalgebra of a Lie-Rinehart algebra `(R A L)` is an `A`-submodule of `L`, which
+/--
+A Lie-Rinehart subalgebra of a Lie-Rinehart algebra `(R A L)` is an `A`-submodule of `L`, which
 is stable under the Lie bracket. (This can be defined independently of `R` and most
-Lie-Rinehart algebra axioms). -/
+Lie-Rinehart algebra axioms).
+-/
 structure LieRinehartSubalgebra extends Submodule A L where
   lie_mem' {a b} : a ∈ carrier → b ∈ carrier → ⁅a, b⁆ ∈ carrier
 
 instance : Zero (LieRinehartSubalgebra A L) :=
   ⟨⟨0, fun {x y hx _hy} ↦ by simp [(Submodule.mem_bot A).mp hx]⟩⟩
 
-instance : Inhabited (LieRinehartSubalgebra A L) :=
-  ⟨0⟩
+instance : Inhabited (LieRinehartSubalgebra A L) := ⟨0⟩
 
 namespace LieRinehartSubalgebra
 
 variable {A L} in
-theorem toSubmodule_injective :
-    (toSubmodule : LieRinehartSubalgebra A L → Submodule A L).Injective :=
-  fun ⟨s, _⟩ t ↦ by congr!
+theorem toSubmodule_injective
+    : (toSubmodule : LieRinehartSubalgebra A L → Submodule A L).Injective := fun ⟨s, _⟩ t ↦ by
+  congr!
 
 instance : SetLike (LieRinehartSubalgebra A L) L where
   coe L' := L'.carrier
@@ -71,7 +72,8 @@ instance : Top (LieRinehartSubalgebra A L) where
 theorem coe_eq_univ (L' : LieRinehartSubalgebra A L) : (L' : Set L) = Set.univ ↔ L' = ⊤ := by
   rw [iff_comm, ← SetLike.coe_set_eq, coe_top]
 
-@[simp] lemma mem_top {x : L} : x ∈ (⊤ : LieRinehartSubalgebra A L) := trivial
+@[simp]
+lemma mem_top {x : L} : x ∈ (⊤ : LieRinehartSubalgebra A L) := trivial
 
 instance : AddSubgroupClass (LieRinehartSubalgebra A L) L where
   add_mem := Submodule.add_mem _
@@ -84,34 +86,29 @@ instance : SMulMemClass (LieRinehartSubalgebra A L) A L where
 variable {A L}
 variable (L' : LieRinehartSubalgebra A L)
 
-protected theorem zero_mem : (0 : L) ∈ L' :=
-  zero_mem L'
+protected theorem zero_mem : (0 : L) ∈ L' := zero_mem L'
 
-protected theorem add_mem {x y : L} : x ∈ L' → y ∈ L' → (x + y : L) ∈ L' :=
-  add_mem
+protected theorem add_mem {x y : L} : x ∈ L' → y ∈ L' → (x + y : L) ∈ L' := add_mem
 
-protected theorem sub_mem {x y : L} : x ∈ L' → y ∈ L' → (x - y : L) ∈ L' :=
-  sub_mem
+protected theorem sub_mem {x y : L} : x ∈ L' → y ∈ L' → (x - y : L) ∈ L' := sub_mem
 
-protected theorem smul_mem (t : A) {x : L} (h : x ∈ L') : t • x ∈ L' :=
-  SMulMemClass.smul_mem _ h
+protected theorem smul_mem (t : A) {x : L} (h : x ∈ L') : t • x ∈ L' := SMulMemClass.smul_mem _ h
 
 @[membership .]
-theorem lie_mem {x y : L} (hx : x ∈ L') (hy : y ∈ L') : (⁅x, y⁆ : L) ∈ L' :=
-  L'.lie_mem' hx hy
+theorem lie_mem {x y : L} (hx : x ∈ L') (hy : y ∈ L') : (⁅x, y⁆ : L) ∈ L' := L'.lie_mem' hx hy
 
-theorem mem_carrier {x : L} : x ∈ L'.carrier ↔ x ∈ (L' : Set L) :=  .rfl
+theorem mem_carrier {x : L} : x ∈ L'.carrier ↔ x ∈ (L' : Set L) := .rfl
 
-theorem mem_mk_iff (S : Set L) (h₁ h₂ h₃ h₄) {x : L} :
-    x ∈ (⟨⟨⟨⟨S, h₁⟩, h₂⟩, h₃⟩, h₄⟩ : LieRinehartSubalgebra A L) ↔ x ∈ S :=
+theorem mem_mk_iff (S : Set L) (h₁ h₂ h₃ h₄) {x : L}
+    : x ∈ (⟨⟨⟨⟨S, h₁⟩, h₂⟩, h₃⟩, h₄⟩ : LieRinehartSubalgebra A L) ↔ x ∈ S :=
   .rfl
 
 @[simp]
 theorem mem_toSubmodule {x : L} : x ∈ L'.toSubmodule ↔ x ∈ L' := .rfl
 
 @[simp]
-theorem mem_mk_iff' (p : Submodule A L) (h) {x : L} :
-    x ∈ (⟨p, h⟩ : LieRinehartSubalgebra A L) ↔ x ∈ p :=
+theorem mem_mk_iff' (p : Submodule A L) (h) {x : L}
+    : x ∈ (⟨p, h⟩ : LieRinehartSubalgebra A L) ↔ x ∈ p :=
   .rfl
 
 theorem mem_coe {x : L} : x ∈ (L' : Set L) ↔ x ∈ L' := .rfl
@@ -136,16 +133,16 @@ instance lieRing (L' : LieRinehartSubalgebra A L) : LieRing L' where
   leibniz_lie _ _ _ := by simp
 
 @[simp, norm_cast]
-theorem coe_bracket (x y : L') : (↑⁅x, y⁆ : L) = ⁅(↑x : L), ↑y⁆ :=
-  rfl
+theorem coe_bracket (x y : L') : (↑ ⁅x, y⁆ : L) = ⁅(↑x : L), ↑y⁆ := rfl
 
 @[simp]
-theorem mk_coe (S : Set L) (h₁ h₂ h₃ h₄) :
-    ((⟨⟨⟨⟨S, h₁⟩, h₂⟩, h₃⟩, h₄⟩ : LieRinehartSubalgebra A L) : Set L) = S :=
+theorem mk_coe (S : Set L) (h₁ h₂ h₃ h₄)
+    : ((⟨⟨⟨⟨S, h₁⟩, h₂⟩, h₃⟩, h₄⟩ : LieRinehartSubalgebra A L) : Set L) = S :=
   rfl
 
-theorem toSubmodule_mk (p : Submodule A L) (h) :
-    ({ p with lie_mem' := h } : LieRinehartSubalgebra A L).toSubmodule = p := rfl
+theorem toSubmodule_mk (p : Submodule A L) (h)
+    : ({ p with lie_mem' := h } : LieRinehartSubalgebra A L).toSubmodule = p :=
+  rfl
 
 theorem coe_injective : Function.Injective ((↑) : LieRinehartSubalgebra A L → Set L) :=
   SetLike.coe_injective
@@ -154,8 +151,7 @@ theorem coe_injective : Function.Injective ((↑) : LieRinehartSubalgebra A L �
 theorem coe_set_eq (L₁' L₂' : LieRinehartSubalgebra A L) : (L₁' : Set L) = L₂' ↔ L₁' = L₂' :=
   SetLike.coe_set_eq
 
-theorem coe_toSubmodule : (L'.toSubmodule : Set L) = L' :=
-  rfl
+theorem coe_toSubmodule : (L'.toSubmodule : Set L) = L' := rfl
 
 section LieModule
 
@@ -165,14 +161,15 @@ instance : Bracket L' M where
   bracket x m := ⁅(x : L), m⁆
 
 @[simp]
-theorem coe_bracket_of_module (x : L') (m : M) : ⁅x, m⁆ = ⁅(x : L), m⁆ :=
-  rfl
+theorem coe_bracket_of_module (x : L') (m : M) : ⁅x, m⁆ = ⁅(x : L), m⁆ := rfl
 
 instance : IsLieTower L' L M where
   leibniz_lie x y m := leibniz_lie x.val y m
 
-/-- Given a Lie-Rinehart algebra `L` containing a LieRinehart subalgebra `L' ⊆ L`, together with a
-Lie ring module `M` of `L`, we may regard `M` as a Lie ring module of `L'` by restriction. -/
+/--
+Given a Lie-Rinehart algebra `L` containing a LieRinehart subalgebra `L' ⊆ L`, together with a
+Lie ring module `M` of `L`, we may regard `M` as a Lie ring module of `L'` by restriction.
+-/
 instance lieRingModule : LieRingModule L' M where
   add_lie x y m := add_lie (x : L) y m
   lie_add x y m := lie_add (x : L) y m
@@ -180,23 +177,29 @@ instance lieRingModule : LieRingModule L' M where
 
 end LieModule
 
-variable {R L₂ : Type*} [CommRing R] [Algebra R A] [LieAlgebra R L] [LieRingModule L A] [LieRing L₂]
-  [Module A L₂] [LieRingModule L₂ A] [LieAlgebra R L₂] {f : L →ₗ⁅.id R A⁆ L₂} {x : L₂}
+variable
+  {R L₂ : Type*} [CommRing R] [Algebra R A] [LieAlgebra R L] [LieRingModule L A] [LieRing L₂]
+  [Module A L₂] [LieRingModule L₂ A] [LieAlgebra R L₂]
+  {f : L →ₗ⁅.id R A⁆ L₂} {x : L₂}
 
 /-- The pushforward of a Lie-Rinehart subalgebra `L' ⊆ L` by `f : L → L₂`. -/
 def map (f : L →ₗ⁅.id R A⁆ L₂) : LieRinehartSubalgebra A L₂ :=
-  letI : RingHomSurjective (AlgHom.id R A).toRingHom := {is_surjective := Function.surjective_id}
-  { L'.toSubmodule.map f.toLinearMap' with
+  letI : RingHomSurjective (AlgHom.id R A).toRingHom := { is_surjective := Function.surjective_id }
+  {
+    L'.toSubmodule.map f.toLinearMap' with
     lie_mem' {_ _} := by
       rintro ⟨x', hx1, hx2⟩ ⟨y', hy1, hy2⟩
       use ⁅x', y'⁆
       constructor
       · exact L'.lie_mem' hx1 hy1
       · rw [LieRinehartAlgebra.Hom.toLinearMap'_apply] at *
-        rw [LieHom.map_lie, hx2, hy2] }
+        rw [LieHom.map_lie, hx2, hy2]
+  }
 
-@[simp] lemma mem_map : x ∈ map L' f ↔ ∃ y ∈ L', f y = x := .rfl
-@[simp] lemma coe_map : (map L' f : Set L₂) = f '' L' := by rfl
+@[simp]
+lemma mem_map : x ∈ map L' f ↔ ∃ y ∈ L', f y = x := .rfl
+@[simp]
+lemma coe_map : (map L' f : Set L₂) = f '' L' := by rfl
 
 variable [LieRinehartRing A L]
 
@@ -217,15 +220,17 @@ def toLieSubalgebra : LieSubalgebra R L where
   toSubmodule := L'.toSubmodule.restrictScalars R
   lie_mem' := L'.lie_mem'
 
-theorem toLieSubalgebra_injective : Function.Injective (fun L' =>
-    L'.toLieSubalgebra R : LieRinehartSubalgebra A L → LieSubalgebra R L) :=  fun L₁' L₂' h ↦ by
+theorem toLieSubalgebra_injective
+    : Function.Injective
+      (fun L' => L'.toLieSubalgebra R
+        : LieRinehartSubalgebra A L → LieSubalgebra R L) := fun L₁' L₂' h ↦ by
   rw [SetLike.ext'_iff] at h
   rw [← coe_set_eq]
   exact h
 
 @[simp]
-theorem toLieSubalgebra_inj (L₁' L₂' : LieRinehartSubalgebra A L) :
-    (L₁'.toLieSubalgebra R) = (L₂'.toLieSubalgebra R) ↔ L₁' = L₂' :=
+theorem toLieSubalgebra_inj (L₁' L₂' : LieRinehartSubalgebra A L)
+    : (L₁'.toLieSubalgebra R) = (L₂'.toLieSubalgebra R) ↔ L₁' = L₂' :=
   (toLieSubalgebra_injective R).eq_iff
 
 theorem coe_toLieSubalgebra : ((L'.toLieSubalgebra R) : Set L) = L' := by rfl
@@ -234,8 +239,10 @@ section LieModule
 
 variable {M : Type*} [AddCommGroup M] [LieRingModule L M] [Module R M]
 
-/-- Given a Lie-Rinehart algebra  `L` containing a LieRinehart subalgebra `L' ⊆ L`, together with a
-Lie module `M` of `L`, we may regard `M` as a Lie module of `L'` by restriction. -/
+/--
+Given a Lie-Rinehart algebra  `L` containing a LieRinehart subalgebra `L' ⊆ L`, together with a
+Lie module `M` of `L`, we may regard `M` as a Lie module of `L'` by restriction.
+-/
 instance lieModule [LieModule R L M] : LieModule R L' M where
   smul_lie t x m := by
     rw [coe_bracket_of_module, Submodule.coe_smul_of_tower, smul_lie, coe_bracket_of_module]
@@ -246,8 +253,10 @@ end LieModule
 /-- A Lie-Rinehart subalgebra forms a new Lie-Rinehart algebra. -/
 instance : LieRinehartAlgebra R A L' where
 
-/-- The embedding of a Lie-Rinehart subalgebra into the ambient space as a morphism of
-Lie-Rinehart algebras. -/
+/--
+The embedding of a Lie-Rinehart subalgebra into the ambient space as a morphism of
+Lie-Rinehart algebras.
+-/
 def incl : L' →ₗ⁅.id R A⁆ L where
   __ := L'.toSubmodule.subtype.restrictScalars R
   map_lie' {x y} := coe_bracket L' x y
@@ -262,16 +271,23 @@ end LieRinehartSubalgebra
 namespace LieRinehartAlgebra
 namespace Hom
 
-variable {R A L₁ L₂ : Type*} [CommRing R] [CommRing A] [Algebra R A] [LieRing L₁] [Module A L₁]
-  [LieRingModule L₁ A] [LieAlgebra R L₁] [LieRing L₂] [Module A L₂] [LieRingModule L₂ A]
-  [LieAlgebra R L₂] (f : L₁ →ₗ⁅.id R A⁆ L₂) {x : L₂}
+variable
+  {R A L₁ L₂ : Type*}
+  [CommRing R] [CommRing A] [Algebra R A] [LieRing L₁] [Module A L₁] [LieRingModule L₁ A]
+  [LieAlgebra R L₁] [LieRing L₂] [Module A L₂] [LieRingModule L₂ A] [LieAlgebra R L₂]
+  (f : L₁ →ₗ⁅.id R A⁆ L₂)
+  {x : L₂}
 
-/-- The range of a morphism of Lie-Rinehart algebras over the identity is a Lie-Rinehart
-subalgebra. -/
+/--
+The range of a morphism of Lie-Rinehart algebras over the identity is a Lie-Rinehart
+subalgebra.
+-/
 def range : LieRinehartSubalgebra A L₂ := .map ⊤ f
 
-@[simp] lemma mem_range : x ∈ range f ↔ ∃ y, f y = x := by simp [range]
-@[simp] lemma coe_range : (range f : Set L₂) = Set.range f := by simp [range]
+@[simp]
+lemma mem_range : x ∈ range f ↔ ∃ y, f y = x := by simp [range]
+@[simp]
+lemma coe_range : (range f : Set L₂) = Set.range f := by simp [range]
 
 end Hom
 end LieRinehartAlgebra

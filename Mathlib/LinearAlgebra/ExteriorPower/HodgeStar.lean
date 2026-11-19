@@ -38,28 +38,25 @@ namespace exteriorPower
 
 open Function Module
 
-variable {R M : Type*}
-  [CommRing R] [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.Free R M]
+variable
+  {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.Free R M]
   (B : LinearMap.BilinForm R M) (hB : Bijective B)
   (vol : ⋀[R]^(finrank R M) M ≃ₗ[R] R)
   {k l : ℕ} (hkl : k + l = finrank R M)
 
 /-- The Hodge star associated to `B` and `vol`. -/
 @[expose, simps!]
-public def hodgeStar :
-    ⋀[R]^k M ≃ₗ[R] ⋀[R]^l M :=
+public def hodgeStar : ⋀[R]^k M ≃ₗ[R] ⋀[R]^l M :=
   letI e : ⋀[R]^l M ≃ₗ[R] Dual R (⋀[R]^l M) := .ofBijective _ (B.bijective_exteriorPower l hB)
   (wedgePairing vol hkl).toPerfPair.trans e.symm
 
-lemma exteriorPower_hodgeStar_eq_wedgePairing (x : ⋀[R]^k M) :
-    B.exteriorPower l (hodgeStar B hB vol hkl x) = wedgePairing vol hkl x := by
+lemma exteriorPower_hodgeStar_eq_wedgePairing (x : ⋀[R]^k M)
+    : B.exteriorPower l (hodgeStar B hB vol hkl x) = wedgePairing vol hkl x := by
   simp
 
 variable [LinearOrder R] [IsStrictOrderedRing R] [Module.Oriented R M (Fin (finrank R M))]
 
 /-- The Hodge star associated to a bijective bilinear form on an oriented module. -/
-abbrev hodgeStarOfOrientation :
-    ⋀[R]^k M ≃ₗ[R] ⋀[R]^l M :=
-  hodgeStar B hB volOfOrientation hkl
+abbrev hodgeStarOfOrientation : ⋀[R]^k M ≃ₗ[R] ⋀[R]^l M := hodgeStar B hB volOfOrientation hkl
 
 end exteriorPower

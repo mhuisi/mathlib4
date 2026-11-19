@@ -39,9 +39,8 @@ protected def op (x : Submonoid M) : Submonoid Mᵐᵒᵖ where
 @[to_additive (attr := simp)]
 theorem mem_op {x : Mᵐᵒᵖ} {S : Submonoid M} : x ∈ S.op ↔ x.unop ∈ S := Iff.rfl
 
-@[to_additive (attr := simp)] lemma op_toSubsemigroup (H : Submonoid M) :
-    H.op.toSubsemigroup = H.toSubsemigroup.op :=
-  rfl
+@[to_additive (attr := simp)]
+lemma op_toSubsemigroup (H : Submonoid M) : H.op.toSubsemigroup = H.toSubsemigroup.op := rfl
 
 /-- Pull an opposite submonoid back to a submonoid along `MulOpposite.op` -/
 @[to_additive (attr := simps) /-- Pull an opposite additive submonoid back to a submonoid along
@@ -54,8 +53,8 @@ protected def unop (x : Submonoid Mᵐᵒᵖ) : Submonoid M where
 @[to_additive (attr := simp)]
 theorem mem_unop {x : M} {S : Submonoid Mᵐᵒᵖ} : x ∈ S.unop ↔ MulOpposite.op x ∈ S := Iff.rfl
 
-@[to_additive (attr := simp)] lemma unop_toSubsemigroup (H : Submonoid Mᵐᵒᵖ) :
-    H.unop.toSubsemigroup = H.toSubsemigroup.unop :=
+@[to_additive (attr := simp)]
+lemma unop_toSubsemigroup (H : Submonoid Mᵐᵒᵖ) : H.unop.toSubsemigroup = H.toSubsemigroup.unop :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -129,8 +128,7 @@ theorem unop_top : (⊤ : Submonoid Mᵐᵒᵖ).unop = ⊤ := rfl
 theorem unop_eq_top {S : Submonoid Mᵐᵒᵖ} : S.unop = ⊤ ↔ S = ⊤ := unop_injective.eq_iff' unop_top
 
 @[to_additive]
-theorem op_sup (S₁ S₂ : Submonoid M) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op :=
-  opEquiv.map_sup _ _
+theorem op_sup (S₁ S₂ : Submonoid M) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.op := opEquiv.map_sup _ _
 
 @[to_additive]
 theorem unop_sup (S₁ S₂ : Submonoid Mᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
@@ -185,8 +183,7 @@ theorem unop_closure (s : Set Mᵐᵒᵖ) : (closure s).unop = closure (MulOppos
 
 /-- Bijection between a submonoid `H` and its opposite. -/
 @[to_additive (attr := simps!) /-- Bijection between an additive submonoid `H` and its opposite. -/]
-def equivOp (H : Submonoid M) : H ≃ H.op :=
-  MulOpposite.opEquiv.subtypeEquiv fun _ => Iff.rfl
+def equivOp (H : Submonoid M) : H ≃ H.op := MulOpposite.opEquiv.subtypeEquiv fun _ => Iff.rfl
 
 /-- Bijection between a submonoid `S` and `MulOpposite` of its opposite. -/
 @[to_additive (attr := simps!) addEquivOpAop

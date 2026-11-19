@@ -25,9 +25,9 @@ variable {R : Type*}
 
 open WithZero
 
-lemma ValueGroupWithZero.nonempty_orderMonoidIso_withZeroMulInt_iff [Semiring R] [ValuativeRel R] :
-    Nonempty (ValueGroupWithZero R ≃*o ℤᵐ⁰) ↔
-      IsDiscrete R ∧ IsNontrivial R ∧ MulArchimedean (ValueGroupWithZero R) := by
+lemma ValueGroupWithZero.nonempty_orderMonoidIso_withZeroMulInt_iff [Semiring R] [ValuativeRel R]
+    : Nonempty (ValueGroupWithZero R ≃*o ℤᵐ⁰)
+      ↔ IsDiscrete R ∧ IsNontrivial R ∧ MulArchimedean (ValueGroupWithZero R) := by
   constructor
   · rintro ⟨e⟩
     let x := e.symm (exp (-1))
@@ -38,8 +38,8 @@ lemma ValueGroupWithZero.nonempty_orderMonoidIso_withZeroMulInt_iff [Semiring R]
     · simp
     · rw [← map_one e.symm, ← map_inv_lt_iff, ← log_lt_log (by simp [hy0]) (by simp)] at hy
       rw [← map_inv_le_iff, ← log_le_log (by simp [hy0]) (by simp)]
-      simp only [OrderMonoidIso.equivLike_inv_eq_symm, OrderMonoidIso.symm_symm, log_one,
-        log_exp] at hy ⊢
+      simp only [OrderMonoidIso.equivLike_inv_eq_symm, OrderMonoidIso.symm_symm, log_one, log_exp]
+        at hy ⊢
       linarith
   · rintro ⟨hD, hN, hM⟩
     rw [isNontrivial_iff_nontrivial_units] at hN
@@ -52,22 +52,24 @@ lemma ValueGroupWithZero.nonempty_orderMonoidIso_withZeroMulInt_iff [Semiring R]
 @[deprecated (since := "2026-09-08")] alias nonempty_orderIso_withZeroMul_int_iff :=
   ValueGroupWithZero.nonempty_orderMonoidIso_withZeroMulInt_iff
 
-lemma IsDiscrete.of_compatible_withZeroMulInt [Ring R] [ValuativeRel R]
-    (v : Valuation R ℤᵐ⁰) [v.Compatible] : IsDiscrete R := by
+lemma IsDiscrete.of_compatible_withZeroMulInt
+    [Ring R] [ValuativeRel R] (v : Valuation R ℤᵐ⁰) [v.Compatible]
+    : IsDiscrete R := by
   have : IsRankLeOne R := .of_compatible_mulArchimedean v
   by_cases h : IsNontrivial R
   · by_cases H : DenselyOrdered (ValueGroupWithZero R)
     · classical
       exfalso
-      refine (MonoidWithZeroHom.range_nontrivial
-        (ValueGroupWithZero.orderMonoidIso v).toMonoidWithZeroHom).not_subsingleton ?_
+      refine (MonoidWithZeroHom.range_nontrivial (ValueGroupWithZero.orderMonoidIso
+        v).toMonoidWithZeroHom).not_subsingleton ?_
       rw [← WithZero.denselyOrdered_set_iff_subsingleton]
       exact (ValueGroupWithZero.embed_strictMono v).denselyOrdered_range
     · rw [isNontrivial_iff_nontrivial_units] at h
       rw [← LinearOrderedCommGroupWithZero.discrete_iff_not_denselyOrdered] at H
       rw [ValueGroupWithZero.nonempty_orderMonoidIso_withZeroMulInt_iff] at H
       exact H.left
-  · rw [isNontrivial_iff_nontrivial_units] at h; push Not at h
+  · rw [isNontrivial_iff_nontrivial_units] at h
+    push Not at h
     refine ⟨⟨0, zero_lt_one, fun y hy ↦ ?_⟩⟩
     contrapose! hy
     have : 1 = Units.mk0 y hy.ne' := Subsingleton.elim _ _

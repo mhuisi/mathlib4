@@ -51,8 +51,10 @@ instance instSemilatticeSup : SemilatticeSup (α ⊕ₗ β) where
     | inrₗ b₁, inlₗ a₂, inrₗ b₃, Lex.inr h₁₃, Lex.sep _ _ => inr_le_inr_iff.2 h₁₃
     | inrₗ b₁, inrₗ b₂, inrₗ b₃, Lex.inr h₁₃, Lex.inr h₂₃ => inr_le_inr_iff.2 <| sup_le h₁₃ h₂₃
 
-@[simp] lemma inl_sup (a₁ a₂ : α) : (inlₗ (a₁ ⊔ a₂) : α ⊕ β) = inlₗ a₁ ⊔ inlₗ a₂ := rfl
-@[simp] lemma inr_sup (b₁ b₂ : β) : (inrₗ (b₁ ⊔ b₂) : α ⊕ β) = inrₗ b₁ ⊔ inrₗ b₂ := rfl
+@[simp]
+lemma inl_sup (a₁ a₂ : α) : (inlₗ (a₁ ⊔ a₂) : α ⊕ β) = inlₗ a₁ ⊔ inlₗ a₂ := rfl
+@[simp]
+lemma inr_sup (b₁ b₂ : β) : (inrₗ (b₁ ⊔ b₂) : α ⊕ β) = inrₗ b₁ ⊔ inrₗ b₂ := rfl
 
 end SemilatticeSup
 
@@ -84,8 +86,10 @@ instance instSemilatticeInf : SemilatticeInf (α ⊕ₗ β) where
     | inlₗ a₁, inrₗ b₂, inrₗ b₃, Lex.sep _ _, Lex.sep _ _ => Lex.sep _ _
     | inrₗ b₁, inrₗ b₂, inrₗ b₃, Lex.inr h₁₃, Lex.inr h₂₃ => inr_le_inr_iff.2 <| le_inf h₁₃ h₂₃
 
-@[simp] lemma inl_inf (a₁ a₂ : α) : (inlₗ (a₁ ⊓ a₂) : α ⊕ β) = inlₗ a₁ ⊓ inlₗ a₂ := rfl
-@[simp] lemma inr_inf (b₁ b₂ : β) : (inrₗ (b₁ ⊓ b₂) : α ⊕ β) = inrₗ b₁ ⊓ inrₗ b₂ := rfl
+@[simp]
+lemma inl_inf (a₁ a₂ : α) : (inlₗ (a₁ ⊓ a₂) : α ⊕ β) = inlₗ a₁ ⊓ inlₗ a₂ := rfl
+@[simp]
+lemma inr_inf (b₁ b₂ : β) : (inrₗ (b₁ ⊓ b₂) : α ⊕ β) = inrₗ b₁ ⊓ inrₗ b₂ := rfl
 
 end SemilatticeInf
 
@@ -110,9 +114,8 @@ end Lattice
 
 instance instDistribLattice [DistribLattice α] [DistribLattice β] : DistribLattice (α ⊕ₗ β) where
   le_sup_inf := by
-    simp only [Lex.forall, Sum.forall, inr_le_inr_iff,
-      le_sup_left, inl_le_inr, sup_of_le_right, and_self,
-      inf_of_le_left, implies_true, inf_of_le_right, sup_of_le_left, ← inl_sup,
-      ← inr_sup, ← inl_inf, ← inr_inf, sup_inf_left, le_rfl]
+    simp only [Lex.forall, Sum.forall, inr_le_inr_iff, le_sup_left, inl_le_inr, sup_of_le_right,
+      and_self, inf_of_le_left, implies_true, inf_of_le_right, sup_of_le_left, ← inl_sup, ← inr_sup,
+      ← inl_inf, ← inr_inf, sup_inf_left, le_rfl]
 
 end Sum.Lex

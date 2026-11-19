@@ -35,13 +35,27 @@ variable {x y z : ℕ∞}
 instance : Pow ℕ∞ ℕ∞ where
   pow
     | x, some y => x ^ y
-    | x, ⊤ => if x = 0 then 0 else if x = 1 then 1 else ⊤
+    | x, ⊤ =>
+      if x = 0 then
+        0
+      else if x = 1 then
+        1
+      else
+        ⊤
 
-lemma epow_def {x y : ℕ∞} :
-    x ^ y = if y < ⊤ then x ^ y.toNat else if x = 0 then 0 else if x = 1 then 1 else ⊤ := by
+lemma epow_def {x y : ℕ∞}
+    : x ^ y
+      = if y < ⊤ then
+          x ^ y.toNat
+        else if x = 0 then
+          0
+        else if x = 1 then
+          1
+        else
+          ⊤ := by
   cases y with
-  | top => simp only [lt_self_iff_false, ↓reduceIte]; rfl
-  | coe n => simp only [natCast_lt_top, ↓reduceIte, toNat_natCast]; rfl
+  | top => simp only [lt_self_iff_false, ↓ reduceIte]; rfl
+  | coe n => simp only [natCast_lt_top, ↓ reduceIte, toNat_natCast]; rfl
 
 @[simp, norm_cast]
 lemma epow_natCast {y : ℕ} : x ^ (y : ℕ∞) = x ^ y := rfl
@@ -69,12 +83,10 @@ lemma top_epow (h : y ≠ 0) : (⊤ : ℕ∞) ^ y = ⊤ := by
   | coe y => rwa [epow_natCast, pow_eq_top_iff, eq_self ⊤, true_and, ← y.cast_ne_zero (R := ℕ∞)]
 
 @[simp]
-lemma epow_zero : x ^ (0 : ℕ∞) = 1 := by
-  rw [← natCast_zero, epow_natCast, pow_zero]
+lemma epow_zero : x ^ (0 : ℕ∞) = 1 := by rw [← natCast_zero, epow_natCast, pow_zero]
 
 @[simp]
-lemma epow_one : x ^ (1 : ℕ∞) = x := by
-  rw [← natCast_one, epow_natCast, pow_one]
+lemma epow_one : x ^ (1 : ℕ∞) = x := by rw [← natCast_one, epow_natCast, pow_one]
 
 lemma epow_top (h : 1 < x) : x ^ (⊤ : ℕ∞) = ⊤ := by
   have : (0 : ℕ∞) ≤ 1 := zero_le_one
@@ -91,11 +103,9 @@ lemma epow_right_mono (h : x ≠ 0) : Monotone (fun y : ℕ∞ ↦ x ^ y) := by
     · simp only [epow_top x_2, le_top]
   · exact pow_right_mono₀ (Order.one_le_iff_ne_zero.2 h) (Nat.cast_le.1 y_z)
 
-lemma one_le_epow (h : x ≠ 0) : 1 ≤ x ^ y := by
-  simpa using epow_right_mono h zero_le
+lemma one_le_epow (h : x ≠ 0) : 1 ≤ x ^ y := by simpa using epow_right_mono h zero_le
 
-lemma epow_pos (h : x ≠ 0) : 0 < x ^ y := by
-  rw [← Order.one_le_iff_pos]; exact one_le_epow h
+lemma epow_pos (h : x ≠ 0) : 0 < x ^ y := by rw [← Order.one_le_iff_pos]; exact one_le_epow h
 
 lemma epow_left_mono : Monotone (fun x : ℕ∞ ↦ x ^ y) := by
   intro x z x_z

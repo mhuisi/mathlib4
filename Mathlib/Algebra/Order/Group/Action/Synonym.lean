@@ -68,27 +68,33 @@ instance instMulAction' [Monoid M] [MulAction M α] : MulAction M (Lex α) :=
   inferInstanceAs <| MulAction M α
 
 @[to_additive]
-instance instSMulCommClass [SMul M α] [SMul N α] [SMulCommClass M N α] :
-    SMulCommClass (Lex M) N α := inferInstanceAs <| SMulCommClass M N α
+instance instSMulCommClass [SMul M α] [SMul N α] [SMulCommClass M N α]
+    : SMulCommClass (Lex M) N α :=
+  inferInstanceAs <| SMulCommClass M N α
 
 @[to_additive]
-instance instSMulCommClass' [SMul M α] [SMul N α] [SMulCommClass M N α] :
-    SMulCommClass M (Lex N) α := inferInstanceAs <| SMulCommClass M N α
+instance instSMulCommClass' [SMul M α] [SMul N α] [SMulCommClass M N α]
+    : SMulCommClass M (Lex N) α :=
+  inferInstanceAs <| SMulCommClass M N α
 
 @[to_additive]
-instance instSMulCommClass'' [SMul M α] [SMul N α] [SMulCommClass M N α] :
-    SMulCommClass M N (Lex α) := inferInstanceAs <| SMulCommClass M N α
+instance instSMulCommClass'' [SMul M α] [SMul N α] [SMulCommClass M N α]
+    : SMulCommClass M N (Lex α) :=
+  inferInstanceAs <| SMulCommClass M N α
 
 @[to_additive]
-instance instIsScalarTower [SMul M N] [SMul M α] [SMul N α] [IsScalarTower M N α] :
-    IsScalarTower (Lex M) N α := inferInstanceAs <| IsScalarTower M N α
+instance instIsScalarTower [SMul M N] [SMul M α] [SMul N α] [IsScalarTower M N α]
+    : IsScalarTower (Lex M) N α :=
+  inferInstanceAs <| IsScalarTower M N α
 
 @[to_additive]
-instance instIsScalarTower' [SMul M N] [SMul M α] [SMul N α] [IsScalarTower M N α] :
-    IsScalarTower M (Lex N) α := inferInstanceAs <| IsScalarTower M N α
+instance instIsScalarTower' [SMul M N] [SMul M α] [SMul N α] [IsScalarTower M N α]
+    : IsScalarTower M (Lex N) α :=
+  inferInstanceAs <| IsScalarTower M N α
 
 @[to_additive]
-instance instIsScalarTower'' [SMul M N] [SMul M α] [SMul N α] [IsScalarTower M N α] :
-    IsScalarTower M N (Lex α) := inferInstanceAs <| IsScalarTower M N α
+instance instIsScalarTower'' [SMul M N] [SMul M α] [SMul N α] [IsScalarTower M N α]
+    : IsScalarTower M N (Lex α) :=
+  inferInstanceAs <| IsScalarTower M N α
 
 end Lex

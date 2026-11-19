@@ -30,11 +30,10 @@ universe u
 
 variable {L : Language} {T : L.Theory} {α : Type*}
 
-public instance : TopologicalSpace (CompleteType T α) :=
-  generateFrom (range (T.typesWith))
+public instance : TopologicalSpace (CompleteType T α) := generateFrom (range (T.typesWith))
 
-public lemma isTopologicalBasis_range_typesWith :
-    IsTopologicalBasis (range (T.typesWith (α := α))) where
+public lemma isTopologicalBasis_range_typesWith
+    : IsTopologicalBasis (range (T.typesWith (α := α))) where
   exists_subset_inter := by
     intro t₁ ⟨φ, ht₁⟩ t₂ ⟨ψ, ht₂⟩ x hx
     refine ⟨T.typesWith (φ ⊓ ψ), ⟨φ ⊓ ψ, rfl⟩, ?_⟩
@@ -77,7 +76,7 @@ instance : CompactSpace (T.CompleteType α) := by
     exact F.mem_of_superset Filter.univ_mem (fun p _ ↦ p.subset x)
   · rw [Theory.IsMaximal, Theory.isSatisfiable_iff_isFinitelySatisfiable]
     refine ⟨?_, ?_⟩
-    · rw[Theory.IsFinitelySatisfiable]
+    · rw [Theory.IsFinitelySatisfiable]
       intro x hx
       have : ∀ φ ∈ x, T.typesWith φ ∈ F.toFilter := by intro φ hφ; exact hx hφ
       rw [← Filter.biInter_finset_mem x] at this

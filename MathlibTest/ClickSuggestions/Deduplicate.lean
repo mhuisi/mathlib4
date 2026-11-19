@@ -9,17 +9,23 @@ and should be deduplicated.
 
 open Lean Meta Elab
 
-elab "check_same" e₁:term ", " e₂:term : command => Command.runTermElabM fun _ ↦ do
-  let e₁ ← Term.elabTerm e₁ none; let e₂ ← Term.elabTerm e₂ none
-  Term.synthesizeSyntheticMVarsNoPostponing
-  let e₁ ← instantiateMVars e₁; let e₂ ← instantiateMVars e₂
-  guard <| ← Mathlib.Tactic.ClickSuggestions.isExplicitEq e₁ e₂
+elab "check_same" e₁:term ", " e₂:term : command =>
+  Command.runTermElabM fun _ ↦ do
+    let e₁ ← Term.elabTerm e₁ none
+    let e₂ ← Term.elabTerm e₂ none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let e₁ ← instantiateMVars e₁
+    let e₂ ← instantiateMVars e₂
+    guard <| ← Mathlib.Tactic.ClickSuggestions.isExplicitEq e₁ e₂
 
-elab "check_not_same" e₁:term ", " e₂:term : command => Command.runTermElabM fun _ ↦ do
-  let e₁ ← Term.elabTerm e₁ none; let e₂ ← Term.elabTerm e₂ none
-  Term.synthesizeSyntheticMVarsNoPostponing
-  let e₁ ← instantiateMVars e₁; let e₂ ← instantiateMVars e₂
-  guard !(← Mathlib.Tactic.ClickSuggestions.isExplicitEq e₁ e₂)
+elab "check_not_same" e₁:term ", " e₂:term : command =>
+  Command.runTermElabM fun _ ↦ do
+    let e₁ ← Term.elabTerm e₁ none
+    let e₂ ← Term.elabTerm e₂ none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let e₁ ← instantiateMVars e₁
+    let e₂ ← instantiateMVars e₂
+    guard !(← Mathlib.Tactic.ClickSuggestions.isExplicitEq e₁ e₂)
 
 variable (a b : Nat)
 

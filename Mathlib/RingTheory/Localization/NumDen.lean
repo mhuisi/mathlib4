@@ -24,7 +24,6 @@ commutative ring, field of fractions
 
 @[expose] public section
 
-
 namespace IsFractionRing
 
 open IsLocalization
@@ -34,8 +33,8 @@ section NumDen
 variable (A : Type*) [CommRing A] [IsDomain A] [UniqueFactorizationMonoid A]
 variable {K : Type*} [Field K] [Algebra A K] [IsFractionRing A K]
 
-theorem exists_reduced_fraction (x : K) :
-    ∃ (a : A) (b : nonZeroDivisors A), IsRelPrime a b ∧ mk' K a b = x := by
+theorem exists_reduced_fraction (x : K)
+    : ∃ (a : A) (b : nonZeroDivisors A), IsRelPrime a b ∧ mk' K a b = x := by
   obtain ⟨⟨b, b_nonzero⟩, a, hab⟩ := exists_integer_multiple (nonZeroDivisors A) x
   obtain ⟨a', b', c', no_factor, rfl, rfl⟩ :=
     UniqueFactorizationMonoid.exists_reduced_factors' a b
@@ -47,8 +46,7 @@ theorem exists_reduced_fraction (x : K) :
   rw [← hab, mul_assoc, mk'_spec' _ a' ⟨b', b'_nonzero⟩]
 
 /-- `f.num x` is the numerator of `x : f.codomain` as a reduced fraction. -/
-noncomputable def num (x : K) : A :=
-  Classical.choose (exists_reduced_fraction A x)
+noncomputable def num (x : K) : A := Classical.choose (exists_reduced_fraction A x)
 
 /-- `f.den x` is the denominator of `x : f.codomain` as a reduced fraction. -/
 noncomputable def den (x : K) : nonZeroDivisors A :=
@@ -68,18 +66,20 @@ theorem mk'_num_den' (x : K) : algebraMap A K (num A x) / algebraMap A K (den A 
 
 variable {A}
 
-theorem num_mul_den_eq_num_iff_eq {x y : K} :
-    x * algebraMap A K (den A y) = algebraMap A K (num A y) ↔ x = y :=
-  ⟨fun h => by simpa only [mk'_num_den] using eq_mk'_iff_mul_eq.mpr h, fun h ↦
-    eq_mk'_iff_mul_eq.mp (by rw [h, mk'_num_den])⟩
+theorem num_mul_den_eq_num_iff_eq {x y : K}
+    : x * algebraMap A K (den A y) = algebraMap A K (num A y) ↔ x = y := ⟨
+  fun h => by simpa only [mk'_num_den] using eq_mk'_iff_mul_eq.mpr h,
+  fun h ↦ eq_mk'_iff_mul_eq.mp (by rw [h, mk'_num_den])
+⟩
 
-theorem num_mul_den_eq_num_iff_eq' {x y : K} :
-    y * algebraMap A K (den A x) = algebraMap A K (num A x) ↔ x = y :=
-  ⟨fun h ↦ by simpa only [eq_comm, mk'_num_den] using eq_mk'_iff_mul_eq.mpr h, fun h ↦
-    eq_mk'_iff_mul_eq.mp (by rw [h, mk'_num_den])⟩
+theorem num_mul_den_eq_num_iff_eq' {x y : K}
+    : y * algebraMap A K (den A x) = algebraMap A K (num A x) ↔ x = y := ⟨
+  fun h ↦ by simpa only [eq_comm, mk'_num_den] using eq_mk'_iff_mul_eq.mpr h,
+  fun h ↦ eq_mk'_iff_mul_eq.mp (by rw [h, mk'_num_den])
+⟩
 
-theorem num_mul_den_eq_num_mul_den_iff_eq {x y : K} :
-    num A y * den A x = num A x * den A y ↔ x = y :=
+theorem num_mul_den_eq_num_mul_den_iff_eq {x y : K}
+    : num A y * den A x = num A x * den A y ↔ x = y :=
   ⟨fun h ↦ by simpa only [mk'_num_den] using mk'_eq_of_eq' (S := K) h, fun h ↦ by rw [h]⟩
 
 theorem eq_zero_of_num_eq_zero {x : K} (h : num A x = 0) : x = 0 :=
@@ -125,12 +125,11 @@ lemma associated_den_num_inv (x : K) (hx : x ≠ 0) : Associated (den A x : A) (
   associated_of_dvd_dvd
     (IsRelPrime.dvd_of_dvd_mul_right (IsFractionRing.num_den_reduced A x).symm <|
       dvd_of_mul_left_dvd (a := (den A x⁻¹ : A)) <| dvd_of_eq <|
-      FaithfulSMul.algebraMap_injective A K <| Eq.symm <| eq_of_div_eq_one
-      (by simp [mul_div_mul_comm, hx]))
+        FaithfulSMul.algebraMap_injective A K <| Eq.symm <|
+          eq_of_div_eq_one (by simp [mul_div_mul_comm, hx]))
     (IsRelPrime.dvd_of_dvd_mul_right (IsFractionRing.num_den_reduced A x⁻¹) <|
       dvd_of_mul_left_dvd (a := (num A x : A)) <| dvd_of_eq <|
-      FaithfulSMul.algebraMap_injective A K <| eq_of_div_eq_one
-      (by simp [mul_div_mul_comm, hx]))
+        FaithfulSMul.algebraMap_injective A K <| eq_of_div_eq_one (by simp [mul_div_mul_comm, hx]))
 
 lemma associated_num_den_inv (x : K) (hx : x ≠ 0) : Associated (num A x : A) (den A x⁻¹) := by
   have : Associated (num A x⁻¹⁻¹ : A) (den A x⁻¹) :=
@@ -139,24 +138,26 @@ lemma associated_num_den_inv (x : K) (hx : x ≠ 0) : Associated (num A x : A) (
   exact this
 
 variable (A) in
-theorem num_den_unique (x : K) (n : A) (d : nonZeroDivisors A) (pr : IsRelPrime n d)
-    (h : IsLocalization.mk' K n d = x) :
-    Associated (num A x) n ∧ Associated (den A x : A) d := by
+theorem num_den_unique
+    (x : K) (n : A) (d : nonZeroDivisors A) (pr : IsRelPrime n d) (h : IsLocalization.mk' K n d = x)
+    : Associated (num A x) n ∧ Associated (den A x : A) d := by
   rw [← IsFractionRing.mk'_num_den A x, IsLocalization.mk'_eq_iff_eq',
-    (FaithfulSMul.algebraMap_injective _ _).eq_iff] at h
-  refine ⟨associated_of_dvd_dvd
-      ((num_den_reduced A x).dvd_of_dvd_mul_right <| h ▸ dvd_mul_right _ _)
+      (FaithfulSMul.algebraMap_injective _ _).eq_iff]
+    at h
+  refine ⟨
+    associated_of_dvd_dvd ((num_den_reduced A x).dvd_of_dvd_mul_right <| h ▸ dvd_mul_right _ _)
       (pr.dvd_of_dvd_mul_right <| h ▸ dvd_mul_right _ _),
-    associated_of_dvd_dvd
-      ((num_den_reduced A x).symm.dvd_of_dvd_mul_left <| h ▸ dvd_mul_left _ _)
-      (pr.symm.dvd_of_dvd_mul_left <| h ▸ dvd_mul_left _ _)⟩
-
+    associated_of_dvd_dvd ((num_den_reduced A x).symm.dvd_of_dvd_mul_left <| h ▸ dvd_mul_left _ _)
+      (pr.symm.dvd_of_dvd_mul_left <| h ▸ dvd_mul_left _ _)
+  ⟩
 
 variable (A) in
-/-- Every element of the fraction field of a unique factorization domain is a square times a
-squarefree element. -/
-theorem exists_sq_mul_squarefree (q : K) :
-    ∃ (r : K) (d : A), r ^ 2 * algebraMap A K d = q ∧ Squarefree d := by
+/--
+Every element of the fraction field of a unique factorization domain is a square times a
+squarefree element.
+-/
+theorem exists_sq_mul_squarefree (q : K)
+    : ∃ (r : K) (d : A), r ^ 2 * algebraMap A K d = q ∧ Squarefree d := by
   obtain ⟨x, y, hy, rfl⟩ := div_surjective A q
   obtain ⟨e, d, hed, hd⟩ := _root_.exists_sq_mul_squarefree (x * y)
   refine ⟨algebraMap A K e / algebraMap A K y, d, ?_, hd⟩

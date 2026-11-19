@@ -48,7 +48,8 @@ section AlgebraicInstances
 
 variable {α β R : Type*} {𝔖 : Set <| Set α} {x : α}
 
-@[to_additive] instance [One β] : One (α →ᵤ β) := inferInstanceAs <| One (α → β)
+@[to_additive]
+instance [One β] : One (α →ᵤ β) := inferInstanceAs <| One (α → β)
 
 @[to_additive (attr := simp)]
 lemma UniformFun.toFun_one [One β] : toFun (1 : α →ᵤ β) = 1 := rfl
@@ -56,7 +57,8 @@ lemma UniformFun.toFun_one [One β] : toFun (1 : α →ᵤ β) = 1 := rfl
 @[to_additive (attr := simp)]
 lemma UniformFun.ofFun_one [One β] : ofFun (1 : α → β) = 1 := rfl
 
-@[to_additive] instance [One β] : One (α →ᵤ[𝔖] β) := inferInstanceAs <| One (α → β)
+@[to_additive]
+instance [One β] : One (α →ᵤ[𝔖] β) := inferInstanceAs <| One (α → β)
 
 @[to_additive (attr := simp)]
 lemma UniformOnFun.toFun_one [One β] : toFun 𝔖 (1 : α →ᵤ[𝔖] β) = 1 := rfl
@@ -64,7 +66,8 @@ lemma UniformOnFun.toFun_one [One β] : toFun 𝔖 (1 : α →ᵤ[𝔖] β) = 1 
 @[to_additive (attr := simp)]
 lemma UniformOnFun.one_apply [One β] : ofFun 𝔖 (1 : α → β) = 1 := rfl
 
-@[to_additive] instance [Mul β] : Mul (α →ᵤ β) := inferInstanceAs <| Mul (α → β)
+@[to_additive]
+instance [Mul β] : Mul (α →ᵤ β) := inferInstanceAs <| Mul (α → β)
 
 @[to_additive (attr := simp)]
 lemma UniformFun.toFun_mul [Mul β] (f g : α →ᵤ β) : toFun (f * g) = toFun f * toFun g := rfl
@@ -72,17 +75,18 @@ lemma UniformFun.toFun_mul [Mul β] (f g : α →ᵤ β) : toFun (f * g) = toFun
 @[to_additive (attr := simp)]
 lemma UniformFun.ofFun_mul [Mul β] (f g : α → β) : ofFun (f * g) = ofFun f * ofFun g := rfl
 
-@[to_additive] instance [Mul β] : Mul (α →ᵤ[𝔖] β) := inferInstanceAs <| Mul (α → β)
+@[to_additive]
+instance [Mul β] : Mul (α →ᵤ[𝔖] β) := inferInstanceAs <| Mul (α → β)
 
 @[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_mul [Mul β] (f g : α →ᵤ[𝔖] β) :
-    toFun 𝔖 (f * g) = toFun 𝔖 f * toFun 𝔖 g :=
+lemma UniformOnFun.toFun_mul [Mul β] (f g : α →ᵤ[𝔖] β) : toFun 𝔖 (f * g) = toFun 𝔖 f * toFun 𝔖 g :=
   rfl
 
 @[to_additive (attr := simp)]
 lemma UniformOnFun.ofFun_mul [Mul β] (f g : α → β) : ofFun 𝔖 (f * g) = ofFun 𝔖 f * ofFun 𝔖 g := rfl
 
-@[to_additive] instance [Inv β] : Inv (α →ᵤ β) := inferInstanceAs <| Inv (α → β)
+@[to_additive]
+instance [Inv β] : Inv (α →ᵤ β) := inferInstanceAs <| Inv (α → β)
 
 @[to_additive (attr := simp)]
 lemma UniformFun.toFun_inv [Inv β] (f : α →ᵤ β) : toFun (f⁻¹) = (toFun f)⁻¹ := rfl
@@ -90,7 +94,8 @@ lemma UniformFun.toFun_inv [Inv β] (f : α →ᵤ β) : toFun (f⁻¹) = (toFun
 @[to_additive (attr := simp)]
 lemma UniformFun.ofFun_inv [Inv β] (f : α → β) : ofFun (f⁻¹) = (ofFun f)⁻¹ := rfl
 
-@[to_additive] instance [Inv β] : Inv (α →ᵤ[𝔖] β) := inferInstanceAs <| Inv (α → β)
+@[to_additive]
+instance [Inv β] : Inv (α →ᵤ[𝔖] β) := inferInstanceAs <| Inv (α → β)
 
 @[to_additive (attr := simp)]
 lemma UniformOnFun.toFun_inv [Inv β] (f : α →ᵤ[𝔖] β) : toFun 𝔖 (f⁻¹) = (toFun 𝔖 f)⁻¹ := rfl
@@ -98,7 +103,8 @@ lemma UniformOnFun.toFun_inv [Inv β] (f : α →ᵤ[𝔖] β) : toFun 𝔖 (f�
 @[to_additive (attr := simp)]
 lemma UniformOnFun.ofFun_inv [Inv β] (f : α → β) : ofFun 𝔖 (f⁻¹) = (ofFun 𝔖 f)⁻¹ := rfl
 
-@[to_additive] instance [Div β] : Div (α →ᵤ β) := inferInstanceAs <| Div (α → β)
+@[to_additive]
+instance [Div β] : Div (α →ᵤ β) := inferInstanceAs <| Div (α → β)
 
 @[to_additive (attr := simp)]
 lemma UniformFun.toFun_div [Div β] (f g : α →ᵤ β) : toFun (f / g) = toFun f / toFun g := rfl
@@ -106,11 +112,11 @@ lemma UniformFun.toFun_div [Div β] (f g : α →ᵤ β) : toFun (f / g) = toFun
 @[to_additive (attr := simp)]
 lemma UniformFun.ofFun_div [Div β] (f g : α → β) : ofFun (f / g) = ofFun f / ofFun g := rfl
 
-@[to_additive] instance [Div β] : Div (α →ᵤ[𝔖] β) := inferInstanceAs <| Div (α → β)
+@[to_additive]
+instance [Div β] : Div (α →ᵤ[𝔖] β) := inferInstanceAs <| Div (α → β)
 
 @[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_div [Div β] (f g : α →ᵤ[𝔖] β) :
-    toFun 𝔖 (f / g) = toFun 𝔖 f / toFun 𝔖 g :=
+lemma UniformOnFun.toFun_div [Div β] (f g : α →ᵤ[𝔖] β) : toFun 𝔖 (f / g) = toFun 𝔖 f / toFun 𝔖 g :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -120,26 +126,26 @@ lemma UniformOnFun.ofFun_div [Div β] (f g : α → β) : ofFun 𝔖 (f / g) = o
 instance {M : Type*} [Pow β M] : Pow (α →ᵤ β) M := inferInstanceAs <| Pow (α → β) M
 
 @[to_additive (attr := simp) toFun_smul]
-lemma UniformFun.toFun_pow {M : Type*} [Pow β M] (c : M) (f : α →ᵤ β) :
-    toFun (f ^ c) = toFun f ^ c :=
+lemma UniformFun.toFun_pow {M : Type*} [Pow β M] (c : M) (f : α →ᵤ β)
+    : toFun (f ^ c) = toFun f ^ c :=
   rfl
 
 @[to_additive (attr := simp) ofFun_smul]
-lemma UniformFun.ofFun_pow {M : Type*} [Pow β M] (c : M) (f : α → β) :
-    ofFun (f ^ c) = ofFun f ^ c :=
+lemma UniformFun.ofFun_pow {M : Type*} [Pow β M] (c : M) (f : α → β)
+    : ofFun (f ^ c) = ofFun f ^ c :=
   rfl
 
 @[to_additive]
 instance {M : Type*} [Pow β M] : Pow (α →ᵤ[𝔖] β) M := inferInstanceAs <| Pow (α → β) M
 
 @[to_additive (attr := simp) toFun_smul]
-lemma UniformOnFun.toFun_pow {M : Type*} [Pow β M] (c : M) (f : α →ᵤ[𝔖] β) :
-    toFun 𝔖 (f ^ c) = toFun 𝔖 f ^ c :=
+lemma UniformOnFun.toFun_pow {M : Type*} [Pow β M] (c : M) (f : α →ᵤ[𝔖] β)
+    : toFun 𝔖 (f ^ c) = toFun 𝔖 f ^ c :=
   rfl
 
 @[to_additive (attr := simp) ofFun_smul]
-lemma UniformOnFun.ofFun_pow {M : Type*} [Pow β M] (c : M) (f : α → β) :
-    ofFun 𝔖 (f ^ c) = ofFun 𝔖 f ^ c :=
+lemma UniformOnFun.ofFun_pow {M : Type*} [Pow β M] (c : M) (f : α → β)
+    : ofFun 𝔖 (f ^ c) = ofFun 𝔖 f ^ c :=
   rfl
 
 @[to_additive]
@@ -166,20 +172,19 @@ instance [CommGroup β] : CommGroup (α →ᵤ β) := inferInstanceAs <| CommGro
 @[to_additive]
 instance [CommGroup β] : CommGroup (α →ᵤ[𝔖] β) := inferInstanceAs <| CommGroup (α → β)
 
-instance {M N : Type*} [SMul M N] [SMul M β] [SMul N β] [IsScalarTower M N β] :
-    IsScalarTower M N (α →ᵤ β) :=
+instance {M N : Type*} [SMul M N] [SMul M β] [SMul N β] [IsScalarTower M N β]
+    : IsScalarTower M N (α →ᵤ β) :=
   inferInstanceAs <| IsScalarTower M N (α → β)
 
-instance {M N : Type*} [SMul M N] [SMul M β] [SMul N β] [IsScalarTower M N β] :
-    IsScalarTower M N (α →ᵤ[𝔖] β) :=
+instance {M N : Type*} [SMul M N] [SMul M β] [SMul N β] [IsScalarTower M N β]
+    : IsScalarTower M N (α →ᵤ[𝔖] β) :=
   inferInstanceAs <| IsScalarTower M N (α → β)
 
-instance {M N : Type*} [SMul M β] [SMul N β] [SMulCommClass M N β] :
-    SMulCommClass M N (α →ᵤ β) :=
+instance {M N : Type*} [SMul M β] [SMul N β] [SMulCommClass M N β] : SMulCommClass M N (α →ᵤ β) :=
   inferInstanceAs <| SMulCommClass M N (α → β)
 
-instance {M N : Type*} [SMul M β] [SMul N β] [SMulCommClass M N β] :
-    SMulCommClass M N (α →ᵤ[𝔖] β) :=
+instance {M N : Type*} [SMul M β] [SMul N β] [SMulCommClass M N β]
+    : SMulCommClass M N (α →ᵤ[𝔖] β) :=
   inferInstanceAs <| SMulCommClass M N (α → β)
 
 instance {M : Type*} [Monoid M] [MulAction M β] : MulAction M (α →ᵤ β) :=
@@ -188,12 +193,12 @@ instance {M : Type*} [Monoid M] [MulAction M β] : MulAction M (α →ᵤ β) :=
 instance {M : Type*} [Monoid M] [MulAction M β] : MulAction M (α →ᵤ[𝔖] β) :=
   inferInstanceAs <| MulAction M (α → β)
 
-instance {M : Type*} [Monoid M] [AddMonoid β] [DistribMulAction M β] :
-    DistribMulAction M (α →ᵤ β) :=
+instance {M : Type*} [Monoid M] [AddMonoid β] [DistribMulAction M β]
+    : DistribMulAction M (α →ᵤ β) :=
   inferInstanceAs <| DistribMulAction M (α → β)
 
-instance {M : Type*} [Monoid M] [AddMonoid β] [DistribMulAction M β] :
-    DistribMulAction M (α →ᵤ[𝔖] β) :=
+instance {M : Type*} [Monoid M] [AddMonoid β] [DistribMulAction M β]
+    : DistribMulAction M (α →ᵤ[𝔖] β) :=
   inferInstanceAs <| DistribMulAction M (α → β)
 
 instance [Semiring R] [AddCommMonoid β] [Module R β] : Module R (α →ᵤ β) :=
@@ -212,77 +217,81 @@ variable {α G ι : Type*} [Group G] {𝔖 : Set <| Set α} [UniformSpace G] [Is
 @[to_additive /-- If `G` is a uniform additive group,
 then `α →ᵤ G` is a uniform additive group as well. -/]
 instance : IsUniformGroup (α →ᵤ G) :=
-  ⟨(-- Since `(/) : G × G → G` is uniformly continuous,
-    -- `UniformFun.postcomp_uniformContinuous` tells us that
-    -- `((/) ∘ —) : (α →ᵤ G × G) → (α →ᵤ G)` is uniformly continuous too. By precomposing with
-    -- `UniformFun.uniformEquivProdArrow`, this gives that
-    -- `(/) : (α →ᵤ G) × (α →ᵤ G) → (α →ᵤ G)` is also uniformly continuous
-    UniformFun.postcomp_uniformContinuous uniformContinuous_div).comp
+  -- Since `(/) : G × G → G` is uniformly continuous,
+  -- `UniformFun.postcomp_uniformContinuous` tells us that
+  -- `((/) ∘ —) : (α →ᵤ G × G) → (α →ᵤ G)` is uniformly continuous too. By precomposing with
+  -- `UniformFun.uniformEquivProdArrow`, this gives that
+  -- `(/) : (α →ᵤ G) × (α →ᵤ G) → (α →ᵤ G)` is also uniformly continuous
+  ⟨(UniformFun.postcomp_uniformContinuous uniformContinuous_div).comp
     UniformFun.uniformEquivProdArrow.symm.uniformContinuous⟩
 
 @[to_additive]
-protected theorem UniformFun.hasBasis_nhds_one_of_basis {p : ι → Prop} {b : ι → Set G}
-    (h : (𝓝 1 : Filter G).HasBasis p b) :
-    (𝓝 1 : Filter (α →ᵤ G)).HasBasis p fun i => { f : α →ᵤ G | ∀ x, toFun f x ∈ b i } := by
+protected theorem UniformFun.hasBasis_nhds_one_of_basis
+    {p : ι → Prop} {b : ι → Set G} (h : (𝓝 1 : Filter G).HasBasis p b)
+    : (𝓝 1 : Filter (α →ᵤ G)).HasBasis p fun i => { f : α →ᵤ G | ∀ x, toFun f x ∈ b i } := by
   convert! UniformFun.hasBasis_nhds_of_basis α _ (1 : α →ᵤ G) h.uniformity_of_nhds_one
   simp
 
 @[to_additive]
-protected theorem UniformFun.hasBasis_nhds_one :
-    (𝓝 1 : Filter (α →ᵤ G)).HasBasis (fun V : Set G => V ∈ (𝓝 1 : Filter G)) fun V =>
-      { f : α → G | ∀ x, f x ∈ V } :=
+protected theorem UniformFun.hasBasis_nhds_one
+    : (𝓝 1 : Filter (α →ᵤ G)).HasBasis
+      (fun V : Set G => V ∈ (𝓝 1 : Filter G))
+      fun V => { f : α → G | ∀ x, f x ∈ V } :=
   UniformFun.hasBasis_nhds_one_of_basis (basis_sets _)
 
-/-- Let `𝔖 : Set (Set α)`. If `G` is a uniform group, then `α →ᵤ[𝔖] G` is a uniform group as
-well. -/
+/--
+Let `𝔖 : Set (Set α)`. If `G` is a uniform group, then `α →ᵤ[𝔖] G` is a uniform group as
+well.
+-/
 @[to_additive /-- Let `𝔖 : Set (Set α)`. If `G` is a uniform additive group,
 then `α →ᵤ[𝔖] G` is a uniform additive group as well. -/]
 instance : IsUniformGroup (α →ᵤ[𝔖] G) :=
-  ⟨(-- Since `(/) : G × G → G` is uniformly continuous,
-    -- `UniformOnFun.postcomp_uniformContinuous` tells us that
-    -- `((/) ∘ —) : (α →ᵤ[𝔖] G × G) → (α →ᵤ[𝔖] G)` is uniformly continuous too. By precomposing with
-    -- `UniformOnFun.uniformEquivProdArrow`, this gives that
-    -- `(/) : (α →ᵤ[𝔖] G) × (α →ᵤ[𝔖] G) → (α →ᵤ[𝔖] G)` is also uniformly continuous
-    UniformOnFun.postcomp_uniformContinuous uniformContinuous_div).comp
+  -- Since `(/) : G × G → G` is uniformly continuous,
+  -- `UniformOnFun.postcomp_uniformContinuous` tells us that
+  -- `((/) ∘ —) : (α →ᵤ[𝔖] G × G) → (α →ᵤ[𝔖] G)` is uniformly continuous too. By precomposing with
+  -- `UniformOnFun.uniformEquivProdArrow`, this gives that
+  -- `(/) : (α →ᵤ[𝔖] G) × (α →ᵤ[𝔖] G) → (α →ᵤ[𝔖] G)` is also uniformly continuous
+  ⟨(UniformOnFun.postcomp_uniformContinuous uniformContinuous_div).comp
     UniformOnFun.uniformEquivProdArrow.symm.uniformContinuous⟩
 
 @[to_additive]
-protected theorem UniformOnFun.hasBasis_nhds_one_of_basis (𝔖 : Set <| Set α) (h𝔖₁ : 𝔖.Nonempty)
-    (h𝔖₂ : DirectedOn (· ⊆ ·) 𝔖) {p : ι → Prop} {b : ι → Set G}
-    (h : (𝓝 1 : Filter G).HasBasis p b) :
-    (𝓝 1 : Filter (α →ᵤ[𝔖] G)).HasBasis (fun Si : Set α × ι => Si.1 ∈ 𝔖 ∧ p Si.2) fun Si =>
-      { f : α →ᵤ[𝔖] G | ∀ x ∈ Si.1, toFun 𝔖 f x ∈ b Si.2 } := by
+protected theorem UniformOnFun.hasBasis_nhds_one_of_basis
+    (𝔖 : Set <| Set α) (h𝔖₁ : 𝔖.Nonempty) (h𝔖₂ : DirectedOn (· ⊆ ·) 𝔖)
+    {p : ι → Prop} {b : ι → Set G} (h : (𝓝 1 : Filter G).HasBasis p b)
+    : (𝓝 1 : Filter (α →ᵤ[𝔖] G)).HasBasis
+      (fun Si : Set α × ι => Si.1 ∈ 𝔖 ∧ p Si.2)
+      fun Si => { f : α →ᵤ[𝔖] G | ∀ x ∈ Si.1, toFun 𝔖 f x ∈ b Si.2 } := by
   convert!
     UniformOnFun.hasBasis_nhds_of_basis α _ 𝔖 (1 : α →ᵤ[𝔖] G) h𝔖₁ h𝔖₂
       h.uniformity_of_nhds_one_swapped
   simp [UniformOnFun.gen]
 
 @[to_additive]
-protected theorem UniformOnFun.hasBasis_nhds_one (𝔖 : Set <| Set α) (h𝔖₁ : 𝔖.Nonempty)
-    (h𝔖₂ : DirectedOn (· ⊆ ·) 𝔖) :
-    (𝓝 1 : Filter (α →ᵤ[𝔖] G)).HasBasis
-      (fun SV : Set α × Set G => SV.1 ∈ 𝔖 ∧ SV.2 ∈ (𝓝 1 : Filter G)) fun SV =>
-      { f : α →ᵤ[𝔖] G | ∀ x ∈ SV.1, f x ∈ SV.2 } :=
+protected theorem UniformOnFun.hasBasis_nhds_one
+    (𝔖 : Set <| Set α) (h𝔖₁ : 𝔖.Nonempty) (h𝔖₂ : DirectedOn (· ⊆ ·) 𝔖)
+    : (𝓝 1 : Filter (α →ᵤ[𝔖] G)).HasBasis
+      (fun SV : Set α × Set G => SV.1 ∈ 𝔖 ∧ SV.2 ∈ (𝓝 1 : Filter G))
+      fun SV => { f : α →ᵤ[𝔖] G | ∀ x ∈ SV.1, f x ∈ SV.2 } :=
   UniformOnFun.hasBasis_nhds_one_of_basis 𝔖 h𝔖₁ h𝔖₂ (basis_sets _)
 
 @[to_additive (attr := simp)]
-lemma UniformOnFun.ofFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι) :
-    ofFun 𝔖 (∏ i ∈ I, f i) = ∏ i ∈ I, ofFun 𝔖 (f i) :=
+lemma UniformOnFun.ofFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι)
+    : ofFun 𝔖 (∏ i ∈ I, f i) = ∏ i ∈ I, ofFun 𝔖 (f i) :=
   rfl
 
 @[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι) :
-    toFun 𝔖 (∏ i ∈ I, f i) = ∏ i ∈ I, toFun 𝔖 (f i) :=
+lemma UniformOnFun.toFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι)
+    : toFun 𝔖 (∏ i ∈ I, f i) = ∏ i ∈ I, toFun 𝔖 (f i) :=
   rfl
 
 @[to_additive (attr := simp)]
-lemma UniformFun.ofFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι) :
-    ofFun (∏ i ∈ I, f i) = ∏ i ∈ I, ofFun (f i) :=
+lemma UniformFun.ofFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι)
+    : ofFun (∏ i ∈ I, f i) = ∏ i ∈ I, ofFun (f i) :=
   rfl
 
 @[to_additive (attr := simp)]
-lemma UniformFun.toFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι) :
-    toFun (∏ i ∈ I, f i) = ∏ i ∈ I, toFun (f i) :=
+lemma UniformFun.toFun_prod {β : Type*} [CommMonoid β] {f : ι → α → β} (I : Finset ι)
+    : toFun (∏ i ∈ I, f i) = ∏ i ∈ I, toFun (f i) :=
   rfl
 
 end Group
@@ -291,14 +300,13 @@ section ConstSMul
 
 variable (M α X : Type*) [SMul M X] [UniformSpace X] [UniformContinuousConstSMul M X]
 
-instance UniformFun.uniformContinuousConstSMul :
-    UniformContinuousConstSMul M (α →ᵤ X) where
-  uniformContinuous_const_smul c := UniformFun.postcomp_uniformContinuous <|
-    uniformContinuous_const_smul c
+instance UniformFun.uniformContinuousConstSMul : UniformContinuousConstSMul M (α →ᵤ X) where
+  uniformContinuous_const_smul c :=
+    UniformFun.postcomp_uniformContinuous <| uniformContinuous_const_smul c
 
-instance UniformFunOn.uniformContinuousConstSMul {𝔖 : Set (Set α)} :
-    UniformContinuousConstSMul M (α →ᵤ[𝔖] X) where
-  uniformContinuous_const_smul c := UniformOnFun.postcomp_uniformContinuous <|
-    uniformContinuous_const_smul c
+instance UniformFunOn.uniformContinuousConstSMul {𝔖 : Set (Set α)}
+    : UniformContinuousConstSMul M (α →ᵤ[𝔖] X) where
+  uniformContinuous_const_smul c :=
+    UniformOnFun.postcomp_uniformContinuous <| uniformContinuous_const_smul c
 
 end ConstSMul

@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Algebra.Category.CommAlgCat.FiniteType
 
-
 /-! # Smallness results on the category of `CommRing` -/
 
 public section
@@ -20,9 +19,10 @@ namespace CommRingCat
 
 variable {P Q : ObjectProperty CommRingCat.{u}}
 
-lemma essentiallySmall_of_finiteType [ObjectProperty.EssentiallySmall.{u} Q]
-    (hPQ : ∀ S, P S → ∃ R, Q R ∧ ∃ (f : R ⟶ S), f.hom.FiniteType) :
-    ObjectProperty.EssentiallySmall.{u} P := by
+lemma essentiallySmall_of_finiteType
+    [ObjectProperty.EssentiallySmall.{u} Q]
+    (hPQ : ∀ S, P S → ∃ R, Q R ∧ ∃ (f : R ⟶ S), f.hom.FiniteType)
+    : ObjectProperty.EssentiallySmall.{u} P := by
   obtain ⟨Q', _, hQ'Q, hQQ'⟩ := ObjectProperty.EssentiallySmall.exists_small_le Q
   let f (S : Σ R : Subtype Q', FGAlgCatSkeleton R) : CommRingCat := ↧S.2.eval.obj
   refine ⟨.ofObj f, inferInstance, fun S hS ↦ ?_⟩
@@ -34,9 +34,10 @@ lemma essentiallySmall_of_finiteType [ObjectProperty.EssentiallySmall.{u} Q]
   obtain ⟨T, e, he⟩ := hφ.exists_smallRepr
   exact ⟨_, ⟨⟨_, hR'⟩, T⟩, ⟨RingEquiv.toCommRingCatIso e.symm⟩⟩
 
-lemma essentiallySmall_of_localizationAway [ObjectProperty.EssentiallySmall.{u} Q]
-    (hPQ : ∀ S, P S → ∃ s : Set S, Ideal.span s = ⊤ ∧ ∀ f ∈ s, Q ↧(Localization.Away f)) :
-    ObjectProperty.EssentiallySmall.{u} P := by
+lemma essentiallySmall_of_localizationAway
+    [ObjectProperty.EssentiallySmall.{u} Q]
+    (hPQ : ∀ S, P S → ∃ s : Set S, Ideal.span s = ⊤ ∧ ∀ f ∈ s, Q ↧(Localization.Away f))
+    : ObjectProperty.EssentiallySmall.{u} P := by
   obtain ⟨Q', _, hQ'Q, hQQ'⟩ := ObjectProperty.EssentiallySmall.exists_small_le Q
   let f (S : Σ (n : ℕ) (R : Fin n → Subtype Q'), Subring (Π i, (R i).val)) : CommRingCat := ↧S.2.2
   refine ⟨.ofObj f, inferInstance, fun S hS ↦ ?_⟩

@@ -19,21 +19,22 @@ public section
 
 open MeasureTheory Measure
 
-variable {α β R : Type*} [MeasurableSpace α] [AddCommMonoid β] {f : α → α} {g : α → β} {n : ℕ}
-  {μ : Measure α} [DivisionSemiring R] [Module R β]
+variable
+  {α β R : Type*} [MeasurableSpace α] [AddCommMonoid β]
+  {f : α → α} {g : α → β} {n : ℕ} {μ : Measure α} [DivisionSemiring R] [Module R β]
 
 section Measurable
 
 variable [MeasurableSpace β] [MeasurableAdd₂ β] [MeasurableConstSMul R β]
 
 @[fun_prop]
-lemma measurable_birkhoffSum (hf : Measurable f) (hg : Measurable g) :
-    Measurable (birkhoffSum f g n) := by
+lemma measurable_birkhoffSum (hf : Measurable f) (hg : Measurable g)
+    : Measurable (birkhoffSum f g n) := by
   fun_prop [birkhoffSum]
 
 @[fun_prop]
-lemma measurable_birkhoffAverage (hf : Measurable f) (hg : Measurable g) :
-    Measurable (birkhoffAverage R f g n) := by
+lemma measurable_birkhoffAverage (hf : Measurable f) (hg : Measurable g)
+    : Measurable (birkhoffAverage R f g n) := by
   fun_prop [birkhoffAverage]
 
 end Measurable
@@ -43,29 +44,30 @@ section AEStronglyMeasurable
 variable [TopologicalSpace β] [ContinuousAdd β] [ContinuousConstSMul R β]
 
 @[fun_prop]
-lemma aestronglyMeasurable_birkhoffSum (hf : QuasiMeasurePreserving f μ μ)
-    (hg : AEStronglyMeasurable g μ) :
-    AEStronglyMeasurable (birkhoffSum f g n) μ := by
+lemma aestronglyMeasurable_birkhoffSum
+    (hf : QuasiMeasurePreserving f μ μ) (hg : AEStronglyMeasurable g μ)
+    : AEStronglyMeasurable (birkhoffSum f g n) μ := by
   apply Finset.aestronglyMeasurable_fun_sum
   exact fun i _ ↦ hg.comp_quasiMeasurePreserving (hf.iterate i)
 
 @[fun_prop]
-lemma aestronglyMeasurable_birkhoffAverage (hf : QuasiMeasurePreserving f μ μ)
-    (hg : AEStronglyMeasurable g μ) :
-    AEStronglyMeasurable (birkhoffAverage R f g n) μ := by
+lemma aestronglyMeasurable_birkhoffAverage
+    (hf : QuasiMeasurePreserving f μ μ) (hg : AEStronglyMeasurable g μ)
+    : AEStronglyMeasurable (birkhoffAverage R f g n) μ := by
   fun_prop [birkhoffAverage]
 
 end AEStronglyMeasurable
 
-variable {β R : Type*} [NormedAddCommGroup β] [NormedDivisionRing R] [Module R β]
-  [IsBoundedSMul R β] {g : α → β}
+variable
+  {β R : Type*} [NormedAddCommGroup β] [NormedDivisionRing R] [Module R β] [IsBoundedSMul R β]
+  {g : α → β}
 
 @[fun_prop]
-lemma integrable_birkhoffSum (hf : MeasurePreserving f μ μ) (hg : Integrable g μ) :
-    Integrable (birkhoffSum f g n) μ :=
+lemma integrable_birkhoffSum (hf : MeasurePreserving f μ μ) (hg : Integrable g μ)
+    : Integrable (birkhoffSum f g n) μ :=
   integrable_finsetSum _ fun _ _ ↦ (hf.iterate _).integrable_comp_of_integrable hg
 
 @[fun_prop]
-lemma integrable_birkhoffAverage (hf : MeasurePreserving f μ μ) (hg : Integrable g μ) :
-    Integrable (birkhoffAverage R f g n) μ := by
+lemma integrable_birkhoffAverage (hf : MeasurePreserving f μ μ) (hg : Integrable g μ)
+    : Integrable (birkhoffAverage R f g n) μ := by
   fun_prop [birkhoffAverage]

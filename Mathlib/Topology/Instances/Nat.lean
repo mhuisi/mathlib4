@@ -24,8 +24,7 @@ open Filter Metric Set Topology
 
 namespace Nat
 
-noncomputable instance : Dist ℕ :=
-  ⟨fun x y => dist (x : ℝ) y⟩
+noncomputable instance : Dist ℕ := ⟨fun x y => dist (x : ℝ) y⟩
 
 theorem dist_eq (x y : ℕ) : dist x y = |(x : ℝ) - y| := rfl
 
@@ -54,10 +53,12 @@ theorem closedBall_eq_Icc (x : ℕ) (r : ℝ) : closedBall x r = Icc ⌈↑x - r
   · rw [← preimage_closedBall, Real.closedBall_eq_Icc, preimage_Icc]
     positivity
   · rw [closedBall_eq_empty.2 hr, Icc_eq_empty_of_lt]
-    calc ⌊(x : ℝ) + r⌋₊ ≤ ⌊(x : ℝ)⌋₊ := floor_mono <| by linarith
-    _ < ⌈↑x - r⌉₊ := by
-      rw [floor_natCast, Nat.lt_ceil]
-      linarith
+    calc
+      ⌊(x : ℝ) + r⌋₊
+        ≤ ⌊(x : ℝ)⌋₊ := floor_mono <| by linarith
+      _ < ⌈↑x - r⌉₊ := by
+        rw [floor_natCast, Nat.lt_ceil]
+        linarith
 
 instance : ProperSpace ℕ :=
   ⟨fun x r => by

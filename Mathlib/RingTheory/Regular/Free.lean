@@ -30,9 +30,9 @@ instance [Module.Free R M] (x : R) : Module.Free (R ⧸ Ideal.span {x}) (QuotSMu
     Ideal.Quotient.mk_surjective).symm
 
 open Pointwise in
-lemma Module.free_quotSMulTop_iff_free [Module.FinitePresentation R M] {x : R}
-    (mem : x ∈ Ring.jacobson R) (reg : IsSMulRegular M x) :
-    Module.Free (R ⧸ Ideal.span {x}) (QuotSMulTop x M) ↔ Module.Free R M := by
+lemma Module.free_quotSMulTop_iff_free
+    [Module.FinitePresentation R M] {x : R} (mem : x ∈ Ring.jacobson R) (reg : IsSMulRegular M x)
+    : Module.Free (R ⧸ Ideal.span {x}) (QuotSMulTop x M) ↔ Module.Free R M := by
   refine ⟨fun free ↦ ?_, fun free ↦ inferInstance⟩
   have := Module.Finite.of_restrictScalars_finite R (R ⧸ Ideal.span {x}) (QuotSMulTop x M)
   let I := Module.Free.ChooseBasisIndex (R ⧸ Ideal.span {x}) (QuotSMulTop x M)
@@ -40,7 +40,8 @@ lemma Module.free_quotSMulTop_iff_free [Module.FinitePresentation R M] {x : R}
   let b' : QuotSMulTop x M ≃ₗ[R] I →₀ R ⧸ Ideal.span {x} := b.repr.restrictScalars R
   let f := b'.symm.toLinearMap.comp (Finsupp.mapRange.linearMap (Submodule.mkQ (Ideal.span {x})))
   rcases Module.projective_lifting_property (Submodule.mkQ (x • (⊤ : Submodule R M))) f
-    (Submodule.mkQ_surjective _) with ⟨g, hg⟩
+      (Submodule.mkQ_surjective _)
+    with ⟨g, hg⟩
   have surjf : Function.Surjective f := by
     simpa [f] using! Finsupp.mapRange_surjective _ rfl (Submodule.mkQ_surjective (Ideal.span {x}))
   have lejac : Ideal.span {x} ≤ Ring.jacobson R := by simpa

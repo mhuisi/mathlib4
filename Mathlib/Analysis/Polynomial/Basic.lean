@@ -29,22 +29,21 @@ open scoped Topology
 
 namespace Polynomial
 
-variable {𝕜 : Type*} [NormedField 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜] (P Q : 𝕜[X])
-  [OrderTopology 𝕜]
+variable
+  {𝕜 : Type*} [NormedField 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜] (P Q : 𝕜[X]) [OrderTopology 𝕜]
 
-theorem isEquivalent_atTop_lead :
-    (fun x => eval x P) ~[atTop] fun x => P.leadingCoeff * x ^ P.natDegree := by
+theorem isEquivalent_atTop_lead
+    : (fun x => eval x P) ~[atTop] fun x => P.leadingCoeff * x ^ P.natDegree := by
   by_cases h : P = 0
   · simp [h, IsEquivalent.refl]
   · simp only [Polynomial.eval_eq_sum_range, sum_range_succ]
-    exact
-      IsLittleO.add_isEquivalent
-        (IsLittleO.fun_sum fun i hi =>
-          IsLittleO.const_mul_left
-            ((IsLittleO.const_mul_right fun hz => h <| leadingCoeff_eq_zero.mp hz) <|
-              isLittleO_pow_pow_atTop_of_lt (mem_range.mp hi))
-            _)
-        IsEquivalent.refl
+    exact IsLittleO.add_isEquivalent
+      (IsLittleO.fun_sum fun i hi =>
+        IsLittleO.const_mul_left
+          ((IsLittleO.const_mul_right fun hz => h <| leadingCoeff_eq_zero.mp hz) <|
+            isLittleO_pow_pow_atTop_of_lt (mem_range.mp hi))
+          _)
+      IsEquivalent.refl
 
 theorem isEquivalent_atBot_lead : P.eval ~[atBot] (P.leadingCoeff * · ^ P.natDegree) := by
   convert! (P.comp (-X)).isEquivalent_atTop_lead.comp_tendsto tendsto_neg_atBot_atTop using 2
@@ -52,28 +51,26 @@ theorem isEquivalent_atBot_lead : P.eval ~[atBot] (P.leadingCoeff * · ^ P.natDe
   · rw [Function.comp_apply, comp_neg_X_leadingCoeff_eq, ← mul_rotate]
     simp [natDegree_comp, ← mul_pow, mul_comm]
 
-theorem isEquivalent_atTop_div :
-    (fun x => eval x P / eval x Q) ~[atTop] fun x =>
-      P.leadingCoeff / Q.leadingCoeff * x ^ (P.natDegree - Q.natDegree : ℤ) := by
+theorem isEquivalent_atTop_div
+    : (fun x => eval x P / eval x Q) ~[atTop] fun x =>
+        P.leadingCoeff / Q.leadingCoeff * x ^ (P.natDegree - Q.natDegree : ℤ) := by
   by_cases hP : P = 0
   · simp [hP, IsEquivalent.refl]
   by_cases hQ : Q = 0
   · simp [hQ, IsEquivalent.refl]
-  refine
-    (P.isEquivalent_atTop_lead.symm.div Q.isEquivalent_atTop_lead.symm).symm.trans
-      (EventuallyEq.isEquivalent ((eventually_gt_atTop 0).mono fun x hx => ?_))
+  refine (P.isEquivalent_atTop_lead.symm.div Q.isEquivalent_atTop_lead.symm).symm.trans
+    (EventuallyEq.isEquivalent ((eventually_gt_atTop 0).mono fun x hx => ?_))
   simp [← div_mul_div_comm, zpow_sub₀ hx.ne.symm]
 
-theorem isEquivalent_atBot_div :
-    (fun x ↦ P.eval x / Q.eval x) ~[atBot] fun x ↦
-      P.leadingCoeff / Q.leadingCoeff * x ^ (P.natDegree - Q.natDegree : ℤ) := by
+theorem isEquivalent_atBot_div
+    : (fun x ↦ P.eval x / Q.eval x) ~[atBot] fun x ↦
+        P.leadingCoeff / Q.leadingCoeff * x ^ (P.natDegree - Q.natDegree : ℤ) := by
   by_cases hP : P = 0
   · simp [hP, IsEquivalent.refl]
   by_cases hQ : Q = 0
   · simp [hQ, IsEquivalent.refl]
-  refine
-    (P.isEquivalent_atBot_lead.symm.div Q.isEquivalent_atBot_lead.symm).symm.trans
-      (EventuallyEq.isEquivalent ((eventually_lt_atBot 0).mono fun x hx => ?_))
+  refine (P.isEquivalent_atBot_lead.symm.div Q.isEquivalent_atBot_lead.symm).symm.trans
+    (EventuallyEq.isEquivalent ((eventually_lt_atBot 0).mono fun x hx => ?_))
   simp [← div_mul_div_comm, zpow_sub₀ hx.ne]
 
 theorem isLittleO_atTop_of_degree_lt (h : P.degree < Q.degree) : P.eval =o[atTop] Q.eval := by
@@ -110,8 +107,8 @@ open Bornology
 
 variable {R : Type*} [NormedRing R] [NormMulClass R] {P Q : R[X]}
 
-lemma isEquivalent_cobounded_leading_monomial :
-    P.eval ~[cobounded R] (P.leadingCoeff * · ^ P.natDegree) := by
+lemma isEquivalent_cobounded_leading_monomial
+    : P.eval ~[cobounded R] (P.leadingCoeff * · ^ P.natDegree) := by
   by_cases h : P = 0
   · simp [h, IsEquivalent.refl]
   · simp only [eval_eq_sum_range, sum_range_succ]
@@ -119,12 +116,12 @@ lemma isEquivalent_cobounded_leading_monomial :
       ((isLittleO_pow_pow_cobounded_of_lt (mem_range.mp hi)).const_mul_right
         (leadingCoeff_ne_zero.mpr h)).const_mul_left _).add_isEquivalent .refl
 
-theorem isBigO_cobounded_pow_natDegree (p : Polynomial R) :
-    p.eval =O[cobounded R] (· ^ p.natDegree) :=
+theorem isBigO_cobounded_pow_natDegree (p : Polynomial R)
+    : p.eval =O[cobounded R] (· ^ p.natDegree) :=
   isEquivalent_cobounded_leading_monomial.isBigO.trans (isBigO_const_mul_self _ _ _)
 
-theorem isLittleO_cobounded_of_degree_lt (h : P.degree < Q.degree) :
-    P.eval =o[cobounded R] Q.eval := by
+theorem isLittleO_cobounded_of_degree_lt (h : P.degree < Q.degree)
+    : P.eval =o[cobounded R] Q.eval := by
   by_cases hP : P = 0
   · simp [hP]
   · refine isEquivalent_cobounded_leading_monomial.trans_isLittleO <|
@@ -133,8 +130,8 @@ theorem isLittleO_cobounded_of_degree_lt (h : P.degree < Q.degree) :
     · exact leadingCoeff_ne_zero.mpr (ne_zero_of_degree_gt h)
     · exact isLittleO_pow_pow_cobounded_of_lt (natDegree_lt_natDegree hP h)
 
-theorem isBigO_cobounded_of_degree_le (h : P.degree ≤ Q.degree) :
-    P.eval =O[cobounded R] Q.eval := by
+theorem isBigO_cobounded_of_degree_le (h : P.degree ≤ Q.degree)
+    : P.eval =O[cobounded R] Q.eval := by
   by_cases hQ : Q.leadingCoeff = 0
   · aesop
   · refine isEquivalent_cobounded_leading_monomial.trans_isBigO <|
@@ -145,8 +142,8 @@ theorem isBigO_cobounded_of_degree_le (h : P.degree ≤ Q.degree) :
 end Cobounded
 
 /-- If `deg Q < deg P`, there are only finitely many integers `x` where `|P(x)| ≤ |Q(x)|`. -/
-lemma finite_abs_eval_le_of_degree_lt {P Q : ℤ[X]} (h : Q.degree < P.degree) :
-    {x | |P.eval x| ≤ |Q.eval x|}.Finite := by
+lemma finite_abs_eval_le_of_degree_lt {P Q : ℤ[X]} (h : Q.degree < P.degree)
+    : {x | |P.eval x| ≤ |Q.eval x|}.Finite := by
   have o := isLittleO_cobounded_of_degree_lt h
   rw [IsOrderBornology.cobounded_eq, ← Int.cofinite_eq] at o
   have nr := eventually_cofinite_not_isRoot (ne_zero_of_degree_gt h)
@@ -156,7 +153,8 @@ lemma finite_abs_eval_le_of_degree_lt {P Q : ℤ[X]} (h : Q.degree < P.degree) :
 
 /-- If `Q(x) ∣ P(x)` at infinitely many integers `x` and `Q` is monic, `Q ∣ P`. -/
 theorem dvd_of_infinite_eval_dvd_eval
-    {P Q : ℤ[X]} (mQ : Q.Monic) (h : {a | Q.eval a ∣ P.eval a}.Infinite) : Q ∣ P := by
+    {P Q : ℤ[X]} (mQ : Q.Monic) (h : {a | Q.eval a ∣ P.eval a}.Infinite)
+    : Q ∣ P := by
   have eqR := modByMonic_add_div P Q
   have degR := degree_modByMonic_lt P mQ
   rw [← modByMonic_eq_zero_iff_dvd mQ]

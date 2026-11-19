@@ -7,7 +7,7 @@ module
 
 -- Import this linter explicitly to ensure that
 -- this file has a valid copyright header and module docstring.
-public import Mathlib.Tactic.Linter.Header  -- shake: keep
+public import Mathlib.Tactic.Linter.Header -- shake: keep
 
 import Batteries.Util.ExtendedBinder
 
@@ -41,8 +41,7 @@ def cdotLinter (stx : Syntax) : CommandElabM Unit := do
   -- Both `cdotTk` and `cdot` have `.atom ..` at `stx[0]`
   if let .atom _ dot := stx[0] then
     if dot != "·" then
-      logLintIf linter.style.cdot stx
-        m!"Please, use `·` (typed as `\\.`) instead of `.` as `cdot`."
+      logLintIf linter.style.cdot stx m!"Please, use `·` (typed as `\\.`) instead of `.` as `cdot`."
   -- We also check for isolated cdot's, i.e. when the cdot is on its own line.
   -- Apply this only to cdot tactics
   if stx.isOfKind ``cdotTk then
@@ -50,7 +49,6 @@ def cdotLinter (stx : Syntax) : CommandElabM Unit := do
       if (trailingWhitespace.takeWhile (·.isWhitespace)).contains '\n' then
         Linter.logLintIf linter.style.cdot stx
           m!"This central dot `·` is isolated; please merge it with the next line."
-
 
 /-! ### The `dollarSyntax` linter -/
 
@@ -68,7 +66,6 @@ def dollarLinter (stx : Syntax) : CommandElabM Unit := do
   Linter.logLintIf linter.style.dollarSyntax stx
     m!"Please use `<|` instead of `$` for the pipe operator."
 
-
 /-! ### The `lambdaSyntax` linter -/
 
 /--
@@ -83,10 +80,10 @@ public register_option linter.style.lambdaSyntax : Bool := {
 /-- Run the lambda syntax linter, given that `stx` has kind `Lean.Parser.Term.fun`. -/
 def lambdaLinter (stx : Syntax) : CommandElabM Unit := do
   if let .atom _ "λ" := stx[0] then
-    Linter.logLintIf linter.style.lambdaSyntax stx[0] m!"\
-      Please use `fun` and not `λ` to define anonymous functions.\n\
-      The `λ` syntax is deprecated in mathlib4."
-
+    Linter.logLintIf linter.style.lambdaSyntax stx[0]
+      m!"\
+        Please use `fun` and not `λ` to define anonymous functions.\n\
+        The `λ` syntax is deprecated in mathlib4."
 
 /-! ### The auxiliary declaration linter -/
 
@@ -104,17 +101,17 @@ public register_option linter.auxLemma : Bool := {
 }
 
 /-- Returns `true` if `s` has the form `pfx ++ digits`, e.g. `"_proof_17"`. -/
-@[inline] def matchesAuxPattern (pfx : String) (s : String) : Bool :=
+@[inline]
+def matchesAuxPattern (pfx : String) (s : String) : Bool :=
   s.startsWith pfx && (s.drop pfx.length).all (·.isDigit) && s.rawEndPos > pfx.rawEndPos
 
-/-- Returns `true` if `s` is an auto-generated auxiliary name component,
-such as `_proof_1`, `match_2`, or `_sizeOf_3`. -/
+/--
+Returns `true` if `s` is an auto-generated auxiliary name component,
+such as `_proof_1`, `match_2`, or `_sizeOf_3`.
+-/
 def isAuxName (s : String) : Bool :=
-  matchesAuxPattern "_proof_" s ||
-  matchesAuxPattern "match_" s ||
-  matchesAuxPattern "_sizeOf_" s ||
-  matchesAuxPattern "_simp_" s ||
-  matchesAuxPattern "_aux_" s
+  matchesAuxPattern "_proof_" s || matchesAuxPattern "match_" s || matchesAuxPattern "_sizeOf_" s
+    || matchesAuxPattern "_simp_" s || matchesAuxPattern "_aux_" s
 
 /-- Returns `true` if any component of the name is an auto-generated auxiliary name. -/
 def nameRefersToAuxLemma : Name → Bool
@@ -128,7 +125,6 @@ def auxLemmaLinter (stx : Syntax) : CommandElabM Unit := do
     logLintIf linter.auxLemma stx
       m!"`{stx.getId}` refers to an auto-generated auxiliary declaration. \
         These are not stable across refactors; consider using a different approach."
-
 
 /-!
 ### The `oldObtain` linter, against stream-of-consciousness `obtain`
@@ -203,21 +199,26 @@ open Batteries.ExtendedBinder in
 /-- Run the `extendedBinder` linter, given that `stx` has kind `«term∃ᵉ_,_»` or `«term∀ᵉ_,_»`. -/
 partial def extendedBinderLinter (stx : Syntax) (symbol : String) : CommandElabM Unit := do
   if stx[1].isAntiquot then return -- `∃ᵉ` can be used to define other notation, like `{_ | _}`.
-  let binders := match stx[1] with
+  let binders :=
+    match stx[1] with
     | `(extBinders| $[($binders)]*) => binders.toList
     | `(extBinder| $b) => [b]
   let source := (← getFileMap).source
-  let suggestion := String.intercalate ", " <| binders.map fun b ↦
-    match b.raw.getRange? with
-    | none => s!"{symbol} {b.raw.reprint}"
-    | some { start, stop } => s!"{symbol} {start.extract source stop}"
+  let suggestion :=
+    String.intercalate ", " <| binders.map fun b ↦
+      match b.raw.getRange? with
+      | none => s!"{symbol} {b.raw.reprint}"
+      | some { start, stop } => s!"{symbol} {start.extract source stop}"
   if let some start := stx[0].getPos? then
     if let some stop := stx[2].getPos? then
       let ref := .ofRange { start, stop }
-      let sugg ← Elab.Command.liftCoreM <| Meta.Hint.mkSuggestionsMessage
-        #[{ toTryThisSuggestion := suggestion, diffGranularity := .char }] ref none false
-      logWarningAt ref m!"Try this:{sugg}\n\n\
-        The basic `{symbol}` syntax is preferred over `{symbol}ᵉ`."
+      let sugg ←
+        Elab.Command.liftCoreM <| Meta.Hint.mkSuggestionsMessage
+          #[{ toTryThisSuggestion := suggestion, diffGranularity := .char }] ref none false
+      logWarningAt ref
+        m!"Try this:{sugg}\
+          \n\n\
+          The basic `{symbol}` syntax is preferred over `{symbol}ᵉ`."
 
 /-! ### The combined syntax linter -/
 
@@ -237,10 +238,11 @@ partial def lintSyntax (stx : Syntax) : CommandElabM Unit := do
   | _ => pure ()
 
 def syntaxBasedLinter : Linter where
-  run := withSetOptionIn fun stx ↦ do
-    if ← MonadLog.hasErrors then
-      return
-    lintSyntax stx
+  run :=
+    withSetOptionIn fun stx ↦ do
+      if ← MonadLog.hasErrors then
+        return
+      lintSyntax stx
 
 initialize addLinter syntaxBasedLinter
 
